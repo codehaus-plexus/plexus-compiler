@@ -31,6 +31,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +58,12 @@ public class JavacCompiler
 
         String[] sources = getSourceFiles( config );
 
-        System.out.println( "Compiling " + sources.length + " source file" + ( sources.length == 1 ? "" : "s" )
+        if ( sources.length == 0 )
+        {
+            return Collections.EMPTY_LIST;
+        }
+
+        getLogger().info( "Compiling " + sources.length + " source file" + ( sources.length == 1 ? "" : "s" )
             + " to " + destinationDir.getAbsolutePath() );
 
         Map compilerOptions = config.getCompilerOptions();
@@ -115,7 +121,7 @@ public class JavacCompiler
         if ( !ok.booleanValue() )
         {
             // TODO: don't throw exception
-            throw new Exception( "Failed to execute javac: \n\n" + err.toString() );
+            throw new Exception( "Failure executing javac: \n\n'javac " + args + "'\n\n" + err.toString() );
         }
 
         List messages = parseModernStream( new BufferedReader( new InputStreamReader( new ByteArrayInputStream( err.toByteArray() ) ) ) );
