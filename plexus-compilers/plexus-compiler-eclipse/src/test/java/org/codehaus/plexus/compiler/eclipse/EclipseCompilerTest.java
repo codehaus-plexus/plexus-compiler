@@ -13,9 +13,9 @@ public class EclipseCompilerTest
     extends AbstractCompilerTest
 {
    
-    public EclipseCompilerTest( String s )
+    public EclipseCompilerTest()
     {
-        super( s );
+        super();
     }
     
 

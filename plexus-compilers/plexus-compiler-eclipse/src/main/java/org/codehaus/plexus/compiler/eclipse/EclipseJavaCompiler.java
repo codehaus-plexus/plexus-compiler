@@ -1,7 +1,9 @@
 package org.codehaus.plexus.compiler.eclipse;
 
 import org.codehaus.plexus.compiler.AbstractCompiler;
+import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerError;
+
 import org.eclipse.jdt.core.compiler.IProblem;
 import org.eclipse.jdt.internal.compiler.ClassFile;
 import org.eclipse.jdt.internal.compiler.CompilationResult;
@@ -68,16 +70,16 @@ public class EclipseJavaCompiler
         source14 = true;
     }
 
-    public List compile( String[] classpathElements, String[] sourceDirectories, String destinationDirectory )
+    public List compile( CompilerConfiguration config )
         throws Exception
     {
-        String[] sourceFiles = getSourceFiles( sourceDirectories );
+        String[] sourceFiles = getSourceFiles( config );
 
         for ( int i = 0; i < sourceFiles.length; i++ )
         {
             String sourceFile = sourceFiles[i];
 
-            compile( sourceFile, sourceDirectories[0], destinationDirectory );
+            compile( sourceFile, (String) config.getSourceLocations().get( 0 ), config.getOutputLocation() );
         }
 
         return errors;
