@@ -1,4 +1,4 @@
-<model>
+<project>
   <parent>
     <artifactId>plexus-compiler</artifactId>
     <groupId>plexus</groupId>
@@ -15,15 +15,19 @@
       <groupId>plexus</groupId>
       <artifactId>plexus-compiler-api</artifactId>
       <version>1.2-SNAPSHOT</version>
-      <type>jar</type>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-compiler-test</artifactId>
       <version>1.2-SNAPSHOT</version>
-      <type>jar</type>
       <scope>compile</scope>
     </dependency>
   </dependencies>
-</model>
+  <modules>
+    <module>plexus-compiler-aspectj</module>
+    <module>plexus-compiler-eclipse</module>
+    <module>plexus-compiler-javac</module>
+    <module>plexus-compiler-jikes</module>
+  </modules>
+</project>

@@ -1,4 +1,4 @@
-<model>
+<project>
   <parent>
     <artifactId>plexus-compilers</artifactId>
     <groupId>plexus</groupId>
@@ -15,15 +15,13 @@
       <groupId>aspectj</groupId>
       <artifactId>aspectjrt</artifactId>
       <version>1.2</version>
-      <type>jar</type>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>aspectj</groupId>
       <artifactId>aspectjtools</artifactId>
       <version>1.2</version>
-      <type>jar</type>
       <scope>compile</scope>
     </dependency>
   </dependencies>
-</model>
+</project>

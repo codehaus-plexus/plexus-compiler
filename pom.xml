@@ -1,4 +1,4 @@
-<model>
+<project>
   <parent>
     <artifactId>plexus-components</artifactId>
     <groupId>plexus</groupId>
@@ -7,16 +7,12 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>plexus</groupId>
   <artifactId>plexus-compiler</artifactId>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
   <name>Plexus Compiler Parent</name>
   <version>1.2</version>
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <type>jar</type>
-      <scope>compile</scope>
-    </dependency>
-  </dependencies>
-</model>
+  <modules>
+    <module>plexus-compiler-api</module>
+    <module>plexus-compiler-test</module>
+    <module>plexus-compilers</module>
+  </modules>
+</project>
