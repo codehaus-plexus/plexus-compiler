@@ -2,7 +2,7 @@
   <parent>
     <artifactId>plexus-compilers</artifactId>
     <groupId>plexus</groupId>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.2</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>plexus</groupId>
@@ -10,6 +10,12 @@
   <packaging>jar</packaging>
   <name>Plexus Eclipse Compiler</name>
   <dependencies>
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+      <version>2.0</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>eclipse</groupId>
       <artifactId>ejc</artifactId>
