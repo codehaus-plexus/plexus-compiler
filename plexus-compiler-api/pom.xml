@@ -1,12 +1,13 @@
-<project>
-  <modelVersion>4.0.0</modelVersion>
+<model>
   <parent>
-    <groupId>plexus</groupId>
     <artifactId>plexus-compiler</artifactId>
+    <groupId>plexus</groupId>
     <version>1.2</version>
   </parent>
+  <modelVersion>4.0.0</modelVersion>
   <groupId>plexus</groupId>
   <artifactId>plexus-compiler-api</artifactId>
-  <version>1.2-SNAPSHOT</version>
+  <packaging>jar</packaging>
   <name>Plexus Compiler Api</name>
-</project>
+  <version>1.2-SNAPSHOT</version>
+</model>

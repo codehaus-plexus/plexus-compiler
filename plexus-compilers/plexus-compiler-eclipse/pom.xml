@@ -1,19 +1,22 @@
-<project>
-  <modelVersion>4.0.0</modelVersion>
+<model>
   <parent>
-    <groupId>plexus</groupId>
     <artifactId>plexus-compilers</artifactId>
+    <groupId>plexus</groupId>
     <version>1.2</version>
   </parent>
+  <modelVersion>4.0.0</modelVersion>
   <groupId>plexus</groupId>
   <artifactId>plexus-compiler-eclipse</artifactId>
-  <version>1.2-SNAPSHOT</version>
+  <packaging>jar</packaging>
   <name>Plexus Eclipse Compiler</name>
+  <version>1.2-SNAPSHOT</version>
   <dependencies>
     <dependency>
       <groupId>eclipse</groupId>
       <artifactId>ejc</artifactId>
       <version>3.0M8</version>
+      <type>jar</type>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
-</project>
+</model>

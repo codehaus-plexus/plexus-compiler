@@ -1,24 +1,29 @@
-<project>
-  <modelVersion>4.0.0</modelVersion>
+<model>
   <parent>
-    <groupId>plexus</groupId>
     <artifactId>plexus-compilers</artifactId>
+    <groupId>plexus</groupId>
     <version>1.2</version>
   </parent>
+  <modelVersion>4.0.0</modelVersion>
   <groupId>plexus</groupId>
   <artifactId>plexus-compiler-aspectj</artifactId>
-  <version>1.2-SNAPSHOT</version>
+  <packaging>jar</packaging>
   <name>Plexus AspectJ Compiler</name>
+  <version>1.2-SNAPSHOT</version>
   <dependencies>
     <dependency>
       <groupId>aspectj</groupId>
       <artifactId>aspectjrt</artifactId>
       <version>1.2</version>
+      <type>jar</type>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>aspectj</groupId>
       <artifactId>aspectjtools</artifactId>
       <version>1.2</version>
-    </dependency>    
+      <type>jar</type>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
-</project>
+</model>

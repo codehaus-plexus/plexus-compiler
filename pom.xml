@@ -1,19 +1,22 @@
-<project>
-  <modelVersion>4.0.0</modelVersion>
+<model>
   <parent>
-    <groupId>plexus</groupId>
     <artifactId>plexus-components</artifactId>
+    <groupId>plexus</groupId>
     <version>1.0</version>
   </parent>
+  <modelVersion>4.0.0</modelVersion>
   <groupId>plexus</groupId>
   <artifactId>plexus-compiler</artifactId>
-  <version>1.2</version>
+  <packaging>jar</packaging>
   <name>Plexus Compiler Parent</name>
-  <dependencies>   
+  <version>1.2</version>
+  <dependencies>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>3.8.1</version>
+      <type>jar</type>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
-</project>
+</model>

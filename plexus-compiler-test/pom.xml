@@ -1,30 +1,36 @@
-<project>
-  <modelVersion>4.0.0</modelVersion>
+<model>
   <parent>
-    <groupId>plexus</groupId>
     <artifactId>plexus-compiler</artifactId>
+    <groupId>plexus</groupId>
     <version>1.2</version>
   </parent>
+  <modelVersion>4.0.0</modelVersion>
   <groupId>plexus</groupId>
   <artifactId>plexus-compiler-test</artifactId>
-  <version>1.2-SNAPSHOT</version>
+  <packaging>jar</packaging>
   <name>Plexus Compiler Test Harness</name>
+  <version>1.2-SNAPSHOT</version>
   <dependencies>
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-container-default</artifactId>
       <version>1.0-alpha-1-SNAPSHOT</version>
+      <type>jar</type>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-compiler-api</artifactId>
       <version>1.2-SNAPSHOT</version>
+      <type>jar</type>
+      <scope>compile</scope>
     </dependency>
-    <!-- for run tests, we must find a solution for don't use it in pom -->
     <dependency>
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
       <version>2.0</version>
+      <type>jar</type>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
-</project>
+</model>
