@@ -87,13 +87,25 @@ public class CompilerError
     }
 
     /**
-     * The error message constructor.
+     * The warning message constructor.
      *
      * @param message The actual error text produced by the language processor
      */
     public CompilerError( String message )
     {
         this.message = message;
+    }
+
+    /**
+     * The error message constructor.
+     *
+     * @param message The actual error text produced by the language processor
+     * @param error whether it was an error or informational
+     */
+    public CompilerError( String message, boolean error )
+    {
+        this.message = message;
+        this.error = error;
     }
 
     /**
@@ -172,6 +184,13 @@ public class CompilerError
 
     public String toString()
     {
-        return file + ":" + "[" + startline + "," + startcolumn + "] " + message;
+        if ( file != null )
+        {
+            return file + ":" + "[" + startline + "," + startcolumn + "] " + message;
+        }
+        else
+        {
+            return message;
+        }
     }
 }

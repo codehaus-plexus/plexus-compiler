@@ -138,8 +138,8 @@ public class JavacCompiler
 
         if ( !ok.booleanValue() && messages.isEmpty() )
         {
-            // TODO: don't throw exception
-            throw new Exception( "Failure executing javac, but could not parse the error:\n\n" + err.toString() );
+            // TODO: exception?
+            messages.add( new CompilerError( "Failure executing javac, but could not parse the error:\n\n" + err.toString(), true ) );
         }
 
         return messages;
@@ -166,9 +166,14 @@ public class JavacCompiler
                     return errors;
                 }
 
+                // TODO: there should be a better way to parse these
                 if ( buffer.length() == 0 && line.startsWith( "error: " ) )
                 {
-                    errors.add( new CompilerError( line ) );
+                    errors.add( new CompilerError( line, true ) );
+                }
+                else if ( buffer.length() == 0 && line.startsWith( "Note: " ) )
+                {
+                    // skip this one - it is JDK 1.5 telling us that the interface is deprecated.
                 }
                 else
                 {
@@ -218,11 +223,13 @@ public class JavacCompiler
         }
         catch ( NoSuchElementException nse )
         {
-            return new CompilerError( "no more tokens - could not parse error message: " + error );
+            // TODO: exception?
+            return new CompilerError( "no more tokens - could not parse error message: " + error, true );
         }
         catch ( Exception nse )
         {
-            return new CompilerError( "could not parse error message: " + error );
+            // TODO: exception?
+            return new CompilerError( "could not parse error message: " + error, true );
         }
     }
 
