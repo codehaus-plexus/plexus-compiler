@@ -2,9 +2,7 @@ package org.codehaus.plexus.compiler.ajc;
 
 import org.aspectj.ajdt.internal.core.builder.AjBuildConfig;
 import org.aspectj.ajdt.internal.core.builder.AjBuildManager;
-import org.aspectj.bridge.CountingMessageHandler;
 import org.aspectj.bridge.IMessage;
-import org.aspectj.bridge.IMessageHolder;
 import org.aspectj.bridge.MessageHandler;
 import org.aspectj.tools.ajc.Main;
 import org.codehaus.plexus.compiler.AbstractCompiler;
@@ -25,198 +23,197 @@ import java.util.Map;
 
 /**
  * Options
- *
+ * <p/>
  * -injars JarList
- *
- *     Accept as source bytecode any .class files inside the specified .jar files. The output will include these
- *     classes, possibly as woven with any applicable aspects. JarList, like classpath, is a single argument
- *     containing a list of paths to jar files, delimited by the platform- specific classpath delimiter.
- *
+ * <p/>
+ * Accept as source bytecode any .class files inside the specified .jar files. The output will include these
+ * classes, possibly as woven with any applicable aspects. JarList, like classpath, is a single argument
+ * containing a list of paths to jar files, delimited by the platform- specific classpath delimiter.
+ * <p/>
  * -aspectpath JarList
- *
- *     Weave binary aspects from JarList zip files into all sources. The aspects should have been output by
- *     the same version of the compiler. To run the output classes requires putting all the aspectpath entries on
- *     the run classpath. JarList, like classpath, is a single argument containing a list of paths to jar files,
- *     delimited by the platform- specific classpath delimiter.
- *
+ * <p/>
+ * Weave binary aspects from JarList zip files into all sources. The aspects should have been output by
+ * the same version of the compiler. To run the output classes requires putting all the aspectpath entries on
+ * the run classpath. JarList, like classpath, is a single argument containing a list of paths to jar files,
+ * delimited by the platform- specific classpath delimiter.
+ * <p/>
  * -argfile File
- *
- *     The file is a line-delimited list of arguments. These arguments are inserted into the argument list.
- *
+ * <p/>
+ * The file is a line-delimited list of arguments. These arguments are inserted into the argument list.
+ * <p/>
  * -outjar output.jar
- *
- *     Put output classes in zip file output.jar.
- *
+ * <p/>
+ * Put output classes in zip file output.jar.
+ * <p/>
  * -incremental
- *
- *     Run the compiler continuously. After the initial compilation, the compiler will wait to recompile until it
- *     reads a newline from the standard input, and will quit when it reads a 'q'. It will only recompile necessary
- *     components, so a recompile should be much faster than doing a second compile. This requires -sourceroots.
- *
+ * <p/>
+ * Run the compiler continuously. After the initial compilation, the compiler will wait to recompile until it
+ * reads a newline from the standard input, and will quit when it reads a 'q'. It will only recompile necessary
+ * components, so a recompile should be much faster than doing a second compile. This requires -sourceroots.
+ * <p/>
  * -sourceroots DirPaths
- *
- *     Find and build all .java or .aj source files under any directory listed in DirPaths. DirPaths, like
- *     classpath, is a single argument containing a list of paths to directories, delimited by the platform-
- *     specific classpath delimiter. Required by -incremental.
- *
+ * <p/>
+ * Find and build all .java or .aj source files under any directory listed in DirPaths. DirPaths, like
+ * classpath, is a single argument containing a list of paths to directories, delimited by the platform-
+ * specific classpath delimiter. Required by -incremental.
+ * <p/>
  * -emacssym
- *
- *     Generate .ajesym symbol files for emacs support
- *
+ * <p/>
+ * Generate .ajesym symbol files for emacs support
+ * <p/>
  * -Xlint
- *
- *     Same as -Xlint:warning (enabled by default)
- *
+ * <p/>
+ * Same as -Xlint:warning (enabled by default)
+ * <p/>
  * -Xlint:{level}
- *
- *     Set default level for messages about potential programming mistakes in crosscutting code. {level} may be
- *     ignore, warning, or error. This overrides entries in org/aspectj/weaver/XlintDefault.properties from
- *     aspectjtools.jar, but does not override levels set using the -Xlintfile option.
- *
+ * <p/>
+ * Set default level for messages about potential programming mistakes in crosscutting code. {level} may be
+ * ignore, warning, or error. This overrides entries in org/aspectj/weaver/XlintDefault.properties from
+ * aspectjtools.jar, but does not override levels set using the -Xlintfile option.
+ * <p/>
  * -Xlintfile PropertyFile
- *
- *     Specify properties file to set levels for specific crosscutting messages. PropertyFile is a path to a
- *     Java .properties file that takes the same property names and values as
- *     org/aspectj/weaver/XlintDefault.properties from aspectjtools.jar, which it also overrides.
+ * <p/>
+ * Specify properties file to set levels for specific crosscutting messages. PropertyFile is a path to a
+ * Java .properties file that takes the same property names and values as
+ * org/aspectj/weaver/XlintDefault.properties from aspectjtools.jar, which it also overrides.
  * -help
- *
- *     Emit information on compiler options and usage
- *
+ * <p/>
+ * Emit information on compiler options and usage
+ * <p/>
  * -version
- *
- *     Emit the version of the AspectJ compiler
- *
+ * <p/>
+ * Emit the version of the AspectJ compiler
+ * <p/>
  * -classpath Path
- *
- *     Specify where to find user class files. Path is a single argument containing a list of paths to zip files
- *     or directories, delimited by the platform-specific path delimiter.
- *
+ * <p/>
+ * Specify where to find user class files. Path is a single argument containing a list of paths to zip files
+ * or directories, delimited by the platform-specific path delimiter.
+ * <p/>
  * -bootclasspath Path
- *
- *     Override location of VM's bootclasspath for purposes of evaluating types when compiling. Path is a single
- *     argument containing a list of paths to zip files or directories, delimited by the platform-specific path
- *     delimiter.
- *
+ * <p/>
+ * Override location of VM's bootclasspath for purposes of evaluating types when compiling. Path is a single
+ * argument containing a list of paths to zip files or directories, delimited by the platform-specific path
+ * delimiter.
+ * <p/>
  * -extdirs Path
- *
- *     Override location of VM's extension directories for purposes of evaluating types when compiling. Path is
- *     a single argument containing a list of paths to directories, delimited by the platform-specific path
- *     delimiter.
- *
+ * <p/>
+ * Override location of VM's extension directories for purposes of evaluating types when compiling. Path is
+ * a single argument containing a list of paths to directories, delimited by the platform-specific path
+ * delimiter.
+ * <p/>
  * -d Directory
- *
- *     Specify where to place generated .class files. If not specified, Directory defaults to the current
- *     working dir.
- *
+ * <p/>
+ * Specify where to place generated .class files. If not specified, Directory defaults to the current
+ * working dir.
+ * <p/>
  * -target [1.1|1.2]
- *
- *     Specify classfile target setting (1.1 or 1.2, default is 1.1)
- *
+ * <p/>
+ * Specify classfile target setting (1.1 or 1.2, default is 1.1)
+ * <p/>
  * -1.3
- *
- *     Set compliance level to 1.3 (default)
+ * <p/>
+ * Set compliance level to 1.3 (default)
  * -1.4
- *
- *     Set compliance level to 1.4
+ * <p/>
+ * Set compliance level to 1.4
  * -source [1.3|1.4]
- *
- *     Toggle assertions (1.3 or 1.4, default is 1.3 in -1.3 mode and 1.4 in -1.4 mode). When using -source 1.3,
- *     an assert() statement valid under Java 1.4 will result in a compiler error. When using -source 1.4, treat
- *     assert as a keyword and implement assertions according to the 1.4 language spec.
- *
+ * <p/>
+ * Toggle assertions (1.3 or 1.4, default is 1.3 in -1.3 mode and 1.4 in -1.4 mode). When using -source 1.3,
+ * an assert() statement valid under Java 1.4 will result in a compiler error. When using -source 1.4, treat
+ * assert as a keyword and implement assertions according to the 1.4 language spec.
+ * <p/>
  * -nowarn
- *
- *     Emit no warnings (equivalent to '-warn:none') This does not suppress messages generated by declare warning
- *     or Xlint.
- *
+ * <p/>
+ * Emit no warnings (equivalent to '-warn:none') This does not suppress messages generated by declare warning
+ * or Xlint.
+ * <p/>
  * -warn: items
- *
- *     Emit warnings for any instances of the comma-delimited list of questionable code
- *     (eg '-warn:unusedLocals,deprecation'):
- *
- *     constructorName        method with constructor name
- *     packageDefaultMethod   attempt to override package-default method
- *     deprecation            usage of deprecated type or member
- *     maskedCatchBlocks      hidden catch block
- *     unusedLocals           local variable never read
- *     unusedArguments        method argument never read
- *     unusedImports          import statement not used by code in file
- *     none                   suppress all compiler warnings
- *
- *
- *     -warn:none does not suppress messages generated by declare warning or Xlint.
- *
+ * <p/>
+ * Emit warnings for any instances of the comma-delimited list of questionable code
+ * (eg '-warn:unusedLocals,deprecation'):
+ * <p/>
+ * constructorName        method with constructor name
+ * packageDefaultMethod   attempt to override package-default method
+ * deprecation            usage of deprecated type or member
+ * maskedCatchBlocks      hidden catch block
+ * unusedLocals           local variable never read
+ * unusedArguments        method argument never read
+ * unusedImports          import statement not used by code in file
+ * none                   suppress all compiler warnings
+ * <p/>
+ * <p/>
+ * -warn:none does not suppress messages generated by declare warning or Xlint.
+ * <p/>
  * -deprecation
- *
- *     Same as -warn:deprecation
- *
+ * <p/>
+ * Same as -warn:deprecation
+ * <p/>
  * -noImportError
- *
- *     Emit no errors for unresolved imports
- *
+ * <p/>
+ * Emit no errors for unresolved imports
+ * <p/>
  * -proceedOnError
- *
- *     Keep compiling after error, dumping class files with problem methods
- *
+ * <p/>
+ * Keep compiling after error, dumping class files with problem methods
+ * <p/>
  * -g:[lines,vars,source]
- *
- *     debug attributes level, that may take three forms:
- *
- *     -g         all debug info ('-g:lines,vars,source')
- *     -g:none    no debug info
- *     -g:{items} debug info for any/all of [lines, vars, source], e.g.,
- *                -g:lines,source
- *
- *
+ * <p/>
+ * debug attributes level, that may take three forms:
+ * <p/>
+ * -g         all debug info ('-g:lines,vars,source')
+ * -g:none    no debug info
+ * -g:{items} debug info for any/all of [lines, vars, source], e.g.,
+ * -g:lines,source
+ * <p/>
+ * <p/>
  * -preserveAllLocals
- *
- *     Preserve all local variables during code generation (to facilitate debugging).
- *
+ * <p/>
+ * Preserve all local variables during code generation (to facilitate debugging).
+ * <p/>
  * -referenceInfo
- *
- *     Compute reference information.
- *
+ * <p/>
+ * Compute reference information.
+ * <p/>
  * -encoding format
- *
- *     Specify default source encoding format. Specify custom encoding on a per file basis by suffixing each
- *     input source file/folder name with '[encoding]'.
- *
+ * <p/>
+ * Specify default source encoding format. Specify custom encoding on a per file basis by suffixing each
+ * input source file/folder name with '[encoding]'.
+ * <p/>
  * -verbose
- *
- *     Emit messages about accessed/processed compilation units
- *
+ * <p/>
+ * Emit messages about accessed/processed compilation units
+ * <p/>
  * -log file
- *
- *     Specify a log file for compiler messages.
+ * <p/>
+ * Specify a log file for compiler messages.
  * -progress
- *
- *     Show progress (requires -log mode).
+ * <p/>
+ * Show progress (requires -log mode).
  * -time
- *
- *     Display speed information.
+ * <p/>
+ * Display speed information.
  * -noExit
- *
- *     Do not call System.exit(n) at end of compilation (n=0 if no error)
+ * <p/>
+ * Do not call System.exit(n) at end of compilation (n=0 if no error)
  * -repeat N
- *
- *     Repeat compilation process N times (typically to do performance analysis).
+ * <p/>
+ * Repeat compilation process N times (typically to do performance analysis).
  * -Xnoweave
- *
- *     (Experimental) produce unwoven class files for input using -injars.
+ * <p/>
+ * (Experimental) produce unwoven class files for input using -injars.
  * -Xnoinline
- *
- *     (Experimental) do not inline around advice
+ * <p/>
+ * (Experimental) do not inline around advice
  * -XincrementalFile file
- *
- *     (Experimental) This works like incremental mode, but using a file rather than standard input to control
- *     the compiler. It will recompile each time file is changed and and halt when file is deleted.
- *
+ * <p/>
+ * (Experimental) This works like incremental mode, but using a file rather than standard input to control
+ * the compiler. It will recompile each time file is changed and and halt when file is deleted.
+ * <p/>
  * -XserializableAspects
- *
- *     (Experimental) Normally it is an error to declare aspects Serializable. This option removes that restriction.
+ * <p/>
+ * (Experimental) Normally it is an error to declare aspects Serializable. This option removes that restriction.
  *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- *
  * @version $Id$
  */
 public class AspectJCompiler
@@ -224,10 +221,14 @@ public class AspectJCompiler
     implements Initializable
 {
 
-    /** Aspjectj compiler */
+    /**
+     * Aspjectj compiler
+     */
     private Main compiler;
 
-    /** @see org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable#initialize */
+    /**
+     * @see org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable#initialize
+     */
     public void initialize() throws Exception
     {
         compiler = new Main();
@@ -240,10 +241,10 @@ public class AspectJCompiler
         AjBuildConfig buildConfig = new AjBuildConfig();
         buildConfig.setIncrementalMode( false );
 
-        String[] files = getSourceFiles(config);
+        String[] files = getSourceFiles( config );
         if ( files != null )
         {
-            buildConfig.setFiles( buildFileList( Arrays.asList(files) ) );
+            buildConfig.setFiles( buildFileList( Arrays.asList( files ) ) );
         }
 
         Map javaOpts = config.getCompilerOptions();
@@ -253,8 +254,8 @@ public class AspectJCompiler
         }
 
         List cp = new LinkedList( config.getClasspathEntries() );
-        cp.add( 0, System.getProperty("java.home") + "/lib/rt.jar" );
-        
+        cp.add( 0, System.getProperty( "java.home" ) + "/lib/rt.jar" );
+
         checkForAspectJRT( cp );
         if ( cp != null && !cp.isEmpty() )
         {
@@ -265,10 +266,11 @@ public class AspectJCompiler
         if ( outputLocation != null )
         {
             File outDir = new File( outputLocation );
-            if( !outDir.exists() ) {
+            if ( !outDir.exists() )
+            {
                 outDir.mkdirs();
             }
-            
+
             buildConfig.setOutputDir( outDir );
         }
 
@@ -362,7 +364,7 @@ public class AspectJCompiler
                 URL[] urls = new URL[cp.size()];
                 for ( int i = 0; i < urls.length; i++ )
                 {
-                    urls[i] = new File((String)cp.get( i )).toURL();
+                    urls[i] = new File( (String) cp.get( i ) ).toURL();
                 }
 
                 URLClassLoader cloader = new URLClassLoader( urls );
@@ -388,8 +390,8 @@ public class AspectJCompiler
             String location = (String) it.next();
             fileList.add( new File( location ) );
         }
-        
+
         return fileList;
     }
-    
+
 }
