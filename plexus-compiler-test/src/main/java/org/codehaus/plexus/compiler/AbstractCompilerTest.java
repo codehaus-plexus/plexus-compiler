@@ -39,23 +39,7 @@ public abstract class AbstractCompilerTest
 
         compiler = (Compiler) lookup( Compiler.ROLE, getRoleHint() );
 
-        Properties buildProperties = new Properties();
-
-        // ----------------------------------------------------------------------
-        // We'll need a default pattern for searching for maven.repo.local but
-        // this will do for now. jvz.
-        // ----------------------------------------------------------------------
-
-        try
-        {
-            buildProperties.load( new FileInputStream( new File( System.getProperty( "user.home" ), "build.properties" ) ) );
-
-            mavenRepoLocal = buildProperties.getProperty( "maven.repo.local" );
-        }
-        catch ( Exception e )
-        {
-            // do nothing
-        }
+        mavenRepoLocal = System.getProperty( "maven.repo.local" );
 
         if ( mavenRepoLocal == null )
         {
