@@ -11,9 +11,9 @@ import org.codehaus.plexus.compiler.AbstractCompilerTest;
  */
 public class JikesCompilerTest extends AbstractCompilerTest
 {
-    public JikesCompilerTest( String s )
+    public JikesCompilerTest()
     {
-        super( s );
+        super();
     }
 
     protected String getRoleHint()

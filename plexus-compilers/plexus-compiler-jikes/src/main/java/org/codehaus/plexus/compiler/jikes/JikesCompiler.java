@@ -51,6 +51,7 @@ package org.codehaus.plexus.compiler.jikes;
 
 
 import org.codehaus.plexus.compiler.AbstractCompiler;
+import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerError;
 import org.codehaus.plexus.compiler.util.StreamPumper;
 import org.codehaus.plexus.util.StringUtils;
@@ -70,10 +71,10 @@ public class JikesCompiler
 {
     static final int OUTPUT_BUFFER_SIZE = 1024;
 
-    public List compile( String[] classpathElements, String[] sourceDirectories, String destinationDirectory )
+    public List compile( CompilerConfiguration config )
         throws Exception
     {
-        File destinationDir = new File( destinationDirectory );
+        File destinationDir = new File( config.getOutputLocation() );
 
         if ( !destinationDir.exists() )
         {
@@ -84,7 +85,7 @@ public class JikesCompiler
 
         List messages = null;
 
-        String[] sources = getSourceFiles( sourceDirectories );
+        String[] sources = getSourceFiles( config );
 
         int j = 9;
 
@@ -98,7 +99,9 @@ public class JikesCompiler
 
         args[3] = "-classpath";
 
-        args[4] = getClasspathString( classpathElements );
+        List classpathEntries = config.getClasspathEntries();
+
+        args[4] = getPathString( classpathEntries );
 
         args[5] = "+E";
 
@@ -106,7 +109,7 @@ public class JikesCompiler
 
         args[7] = "-d";
 
-        args[8] = destinationDirectory;
+        args[8] = destinationDir.getAbsolutePath();
 
         for ( int i = 0; i < sources.length; i++ )
         {
