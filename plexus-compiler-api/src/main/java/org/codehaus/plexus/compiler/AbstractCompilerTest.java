@@ -2,7 +2,11 @@ package org.codehaus.plexus.compiler;
 
 import org.codehaus.plexus.PlexusTestCase;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.io.FileInputStream;
 import java.io.File;
@@ -10,30 +14,28 @@ import java.io.File;
 public abstract class AbstractCompilerTest
     extends PlexusTestCase
 {
+
     private Compiler compiler = null;
-
-    private String[] classpathElements;
-
-    private String[] sourceDirectories;
-
-    private String destinationDirectory;
 
     private String mavenRepoLocal;
 
     protected String roleHint;
 
-    public AbstractCompilerTest( String s )
+    private CompilerConfiguration compilerConfig;
+
+    public AbstractCompilerTest()
     {
-        super( s );
+        super( );
     }
 
     protected abstract String getRoleHint();
 
-    public void setUp()
-        throws Exception
+    public void setUp() throws Exception
     {
         super.setUp();
 
+        String basedir = getBasedir();
+        
         basedir = System.getProperty( "basedir" );
 
         compiler = (Compiler) lookup( Compiler.ROLE, getRoleHint() );
@@ -42,7 +44,8 @@ public abstract class AbstractCompilerTest
 
         try
         {
-            buildProperties.load( new FileInputStream( new File( System.getProperty( "user.home" ), "build.properties" ) ) );
+            buildProperties.load( new FileInputStream( new File( System.getProperty( "user.home" ),
+                                                                 "build.properties" ) ) );
 
             mavenRepoLocal = buildProperties.getProperty( "maven.repo.local" );
         }
@@ -56,21 +59,29 @@ public abstract class AbstractCompilerTest
             mavenRepoLocal = new File( System.getProperty( "user.home" ), ".maven/repository" ).getPath();
         }
 
-        classpathElements = new String[]{mavenRepoLocal + "/commons-lang/jars/commons-lang-2.0.jar"};
-
-        sourceDirectories = new String[]{basedir + "/src/test-input/src/main"};
-
-        destinationDirectory = basedir + "/target/" + getRoleHint() + "/classes";
-    }
-
-    public void testCompilingSources()
-        throws Exception
-    {
-        List messages = compiler.compile( classpathElements, sourceDirectories, destinationDirectory );
-
-        assertEquals( "Expected number of compilation errors is 1", expectedErrors(), messages.size() );
+        compilerConfig = new CompilerConfiguration();
+        compilerConfig.setClasspathEntries(getClasspath());
+        compilerConfig.addSourceLocation(basedir + "/src/test-input/src/main");
+        compilerConfig.setOutputLocation(basedir + "/target/" + getRoleHint() + "/classes");
+        compilerConfig.addInclude("**/*.java");
     }
     
+    protected String getMavenRepoLocal() {
+        return mavenRepoLocal;
+    }
+    
+    protected List getClasspath() {
+        return Collections.singletonList(mavenRepoLocal + "/commons-lang/jars/commons-lang-2.0.jar");        
+    }
+
+    public void testCompilingSources( ) throws Exception
+    {
+        List messages = compiler.compile( compilerConfig );
+
+        assertEquals( "Expected number of compilation errors is 1", expectedErrors(),
+                      messages.size() );
+    }
+
     protected int expectedErrors()
     {
         return 1;
