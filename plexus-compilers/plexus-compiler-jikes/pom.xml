@@ -1,4 +1,5 @@
 <project>
+  <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>plexus</groupId>
     <artifactId>plexus-compiler-parent</artifactId>
@@ -7,5 +8,5 @@
   <groupId>plexus</groupId>
   <artifactId>plexus-compiler-jikes</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <name>Plexus Compiler Component</name>
+  <name>Plexus Jikes Component</name>
 </project>

@@ -1,4 +1,5 @@
 <project>
+  <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>plexus</groupId>
     <artifactId>plexus-components</artifactId>
@@ -7,7 +8,7 @@
   <groupId>plexus</groupId>
   <artifactId>plexus-compiler-api</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <name>Plexus Compiler Component</name>
+  <name>Plexus Compiler Api</name>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
