@@ -1,0 +1,29 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>plexus</groupId>
+    <artifactId>plexus-components</artifactId>
+    <version>1.0</version>
+  </parent>
+  <groupId>plexus</groupId>
+  <artifactId>plexus-compiler-test</artifactId>
+  <version>1.1-SNAPSHOT</version>
+  <name>Plexus Compiler Test Harness</name>
+  <dependencies>
+    <dependency>
+        <groupId>plexus</groupId>
+        <artifactId>plexus-container-default</artifactId>
+        <version>0.18-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+        <groupId>plexus</groupId>
+        <artifactId>plexus-compiler-api</artifactId>
+        <version>1.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+    </dependency>
+  </dependencies>
+</project>
