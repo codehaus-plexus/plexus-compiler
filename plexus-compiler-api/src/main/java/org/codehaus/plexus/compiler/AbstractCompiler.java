@@ -48,7 +48,7 @@ public abstract class AbstractCompiler
     {
         Set sources = new HashSet();
 
-        Set sourceFiles = new HashSet();
+        Set sourceFiles = config.getSourceFiles();
         if ( sourceFiles != null && !sourceFiles.isEmpty() )
         {
             for ( Iterator it = sourceFiles.iterator(); it.hasNext(); )
