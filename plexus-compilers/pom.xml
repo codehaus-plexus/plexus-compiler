@@ -23,6 +23,7 @@
     </dependency>
   </dependencies>
   <modules>
+    <module>plexus-compiler-aspectj</module>
     <module>plexus-compiler-eclipse</module>
     <module>plexus-compiler-javac</module>
     <module>plexus-compiler-jikes</module>
