@@ -16,6 +16,12 @@ public class JavacCompilerTest extends AbstractCompilerTest
         super();
     }
 
+    public void setUp() throws Exception
+    {
+        super.setUp();
+        getCompilerConfiguration().addCompilerOption("-g", null);
+    }
+
     protected String getRoleHint()
     {
         return "javac";
