@@ -8,5 +8,5 @@
   <groupId>plexus</groupId>
   <artifactId>plexus-compiler-jikes</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <name>Plexus Jikes Component</name>
+  <name>Plexus Jikes Compiler</name>
 </project>

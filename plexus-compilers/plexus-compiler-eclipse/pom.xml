@@ -8,7 +8,7 @@
   <groupId>plexus</groupId>
   <artifactId>plexus-compiler-eclipse</artifactId>
   <version>1.2-SNAPSHOT</version>
-  <name>Plexus Eclipse Component</name>
+  <name>Plexus Eclipse Compiler</name>
   <dependencies>
     <dependency>
       <groupId>eclipse</groupId>
