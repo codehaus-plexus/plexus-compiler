@@ -3,27 +3,22 @@
   <parent>
     <groupId>plexus</groupId>
     <artifactId>plexus-compiler</artifactId>
-    <version>1.1</version>
+    <version>1.2</version>
   </parent>
   <groupId>plexus</groupId>
   <artifactId>plexus-compiler-test</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.2-SNAPSHOT</version>
   <name>Plexus Compiler Test Harness</name>
   <dependencies>
     <dependency>
-        <groupId>plexus</groupId>
-        <artifactId>plexus-container-default</artifactId>
-        <version>0.18-SNAPSHOT</version>
+      <groupId>plexus</groupId>
+      <artifactId>plexus-container-default</artifactId>
+      <version>0.18-SNAPSHOT</version>
     </dependency>
     <dependency>
-        <groupId>plexus</groupId>
-        <artifactId>plexus-compiler-api</artifactId>
-        <version>1.1-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
+      <groupId>plexus</groupId>
+      <artifactId>plexus-compiler-api</artifactId>
+      <version>1.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
 </project>

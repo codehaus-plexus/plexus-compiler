@@ -2,8 +2,8 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>plexus</groupId>
-    <artifactId>plexus-compiler</artifactId>
-    <version>1.1</version>
+    <artifactId>plexus-compilers</artifactId>
+    <version>1.2</version>
   </parent>
   <groupId>plexus</groupId>
   <artifactId>plexus-compiler-jikes</artifactId>

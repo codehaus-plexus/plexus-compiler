@@ -2,23 +2,23 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>plexus</groupId>
-    <artifactId>plexus-compilers</artifactId>
-    <version>1.0</version>
+    <artifactId>plexus-compiler</artifactId>
+    <version>1.2</version>
   </parent>
   <groupId>plexus</groupId>
-  <artifactId>plexus-compiler</artifactId>
-  <version>1.1</version>
+  <artifactId>plexus-compilers</artifactId>
+  <version>1.2</version>
   <name>Plexus Compiler Parent</name>
   <dependencies>   
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-compiler-api</artifactId>
-      <version>1.1-SNAPSHOT</version>
+      <version>1.2-SNAPSHOT</version>
     </dependency>    
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-compiler-test</artifactId>
-      <version>1.1-SNAPSHOT</version>
+      <version>1.2-SNAPSHOT</version>
     </dependency>    
   </dependencies>
 </project>

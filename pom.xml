@@ -7,19 +7,9 @@
   </parent>
   <groupId>plexus</groupId>
   <artifactId>plexus-compiler</artifactId>
-  <version>1.1</version>
+  <version>1.2</version>
   <name>Plexus Compiler Parent</name>
   <dependencies>   
-    <dependency>
-      <groupId>plexus</groupId>
-      <artifactId>plexus-compiler-api</artifactId>
-      <version>1.1-SNAPSHOT</version>
-    </dependency>    
-    <dependency>
-      <groupId>plexus</groupId>
-      <artifactId>plexus-compiler-test</artifactId>
-      <version>1.1-SNAPSHOT</version>
-    </dependency>    
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
