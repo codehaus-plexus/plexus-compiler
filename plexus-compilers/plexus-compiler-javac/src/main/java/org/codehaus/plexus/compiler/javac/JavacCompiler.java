@@ -112,6 +112,12 @@ public class JavacCompiler
 
         Boolean ok = (Boolean) compile.invoke( compiler, new Object[] { args.toArray( new String[0] ) } );
 
+        if ( !ok.booleanValue() )
+        {
+            // TODO: don't throw exception
+            throw new Exception( "Failed to execute javac: \n\n" + err.toString() );
+        }
+
         List messages = parseModernStream( new BufferedReader( new InputStreamReader( new ByteArrayInputStream( err.toByteArray() ) ) ) );
 
         return messages;
