@@ -51,6 +51,7 @@
 package org.codehaus.plexus.compiler.javac;
 
 import org.codehaus.plexus.compiler.AbstractCompiler;
+import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerError;
 
 import java.io.BufferedReader;
@@ -76,17 +77,17 @@ public class JavacCompiler
     {
     }
 
-    public List compile( String[] classpathElements, String[] sourceDirectories, String destinationDirectory )
+    public List compile( CompilerConfiguration config )
         throws Exception
     {
-        File destinationDir = new File( destinationDirectory );
+        File destinationDir = new File( config.getOutputLocation() );
 
         if ( !destinationDir.exists() )
         {
             destinationDir.mkdirs();
         }
 
-        String[] sources = getSourceFiles( sourceDirectories );
+        String[] sources = getSourceFiles( config );
 
         int j = 5;
 
@@ -100,7 +101,7 @@ public class JavacCompiler
 
         args[3] = "-classpath";
 
-        args[4] = getClasspathString( classpathElements );
+        args[4] = getClasspathString( config.getClasspathEntries() );
 
         for ( int i = 0; i < sources.length; i++ )
         {
