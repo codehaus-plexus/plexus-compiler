@@ -63,7 +63,8 @@ public class JavacCompiler
             return Collections.EMPTY_LIST;
         }
 
-        getLogger().info( "Compiling " + sources.length + " source file" + ( sources.length == 1 ? "" : "s" )
+        // TODO: use getLogger() - but for some reason it is null when this is used
+        System.out.println( "Compiling " + sources.length + " source file" + ( sources.length == 1 ? "" : "s" )
             + " to " + destinationDir.getAbsolutePath() );
 
         Map compilerOptions = config.getCompilerOptions();
@@ -118,13 +119,13 @@ public class JavacCompiler
 
         Boolean ok = (Boolean) compile.invoke( compiler, new Object[] { args.toArray( new String[0] ) } );
 
-        if ( !ok.booleanValue() )
+        List messages = parseModernStream( new BufferedReader( new InputStreamReader( new ByteArrayInputStream( err.toByteArray() ) ) ) );
+
+        if ( !ok.booleanValue() && messages.isEmpty() )
         {
             // TODO: don't throw exception
-            throw new Exception( "Failure executing javac: \n\n'javac " + args + "'\n\n" + err.toString() );
+            throw new Exception( "Failure executing javac, but could not parse the error:\n\n" + err.toString() );
         }
-
-        List messages = parseModernStream( new BufferedReader( new InputStreamReader( new ByteArrayInputStream( err.toByteArray() ) ) ) );
 
         return messages;
     }
@@ -150,10 +151,18 @@ public class JavacCompiler
                     return errors;
                 }
 
-                buffer.append( line );
+                if ( buffer.length() == 0 && line.startsWith( "error: " ) )
+                {
+                    errors.add( new CompilerError( line ) );
+                }
+                else
+                {
+                    buffer.append( line );
 
-                buffer.append( '\n' );
-            } while ( !line.endsWith( "^" ) );
+                    buffer.append( '\n' );
+                }
+            }
+            while ( !line.endsWith( "^" ) );
 
             // add the error bean
             errors.add( parseModernError( buffer.toString() ) );
