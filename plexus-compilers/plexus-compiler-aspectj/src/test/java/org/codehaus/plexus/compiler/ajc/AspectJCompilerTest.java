@@ -1,5 +1,8 @@
 package org.codehaus.plexus.compiler.ajc;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.codehaus.plexus.compiler.AbstractCompilerTest;
 
 /**
@@ -12,9 +15,9 @@ import org.codehaus.plexus.compiler.AbstractCompilerTest;
 public class AspectJCompilerTest
     extends AbstractCompilerTest
 {
-    public AspectJCompilerTest( String s )
+    public AspectJCompilerTest()
     {
-        super( s );
+        super();
     }
 
     protected String getRoleHint()
@@ -24,6 +27,15 @@ public class AspectJCompilerTest
     
     protected int expectedErrors()
     {
-        return 4;
+        return 2;
     }
+    
+    protected List getClasspath()
+    {
+        List cp = new LinkedList(super.getClasspath());
+        cp.add(getMavenRepoLocal() + "/aspectj/jars/aspectjrt-1.2.jar");
+        
+        return cp;
+    }
+    
 }

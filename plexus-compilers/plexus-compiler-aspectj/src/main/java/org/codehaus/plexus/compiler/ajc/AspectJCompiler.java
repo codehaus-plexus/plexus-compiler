@@ -1,15 +1,27 @@
 package org.codehaus.plexus.compiler.ajc;
 
+import org.aspectj.ajdt.internal.core.builder.AjBuildConfig;
+import org.aspectj.ajdt.internal.core.builder.AjBuildManager;
+import org.aspectj.bridge.CountingMessageHandler;
 import org.aspectj.bridge.IMessage;
 import org.aspectj.bridge.IMessageHolder;
 import org.aspectj.bridge.MessageHandler;
 import org.aspectj.tools.ajc.Main;
 import org.codehaus.plexus.compiler.AbstractCompiler;
+import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerError;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Options
@@ -211,54 +223,173 @@ public class AspectJCompiler
     extends AbstractCompiler
     implements Initializable
 {
+
     /** Aspjectj compiler */
     private Main compiler;
 
     /** @see org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable#initialize */
-    public void initialize()
-        throws Exception
+    public void initialize() throws Exception
     {
         compiler = new Main();
     }
 
-    public List compile( String[] classpathElements, String[] sourceDirectories, String destinationDirectory )
-        throws Exception
+    public List compile( CompilerConfiguration config ) throws Exception
     {
         List messages = new ArrayList();
 
-        // We need the location of the maven so we have a couple of options here.
+        AjBuildConfig buildConfig = new AjBuildConfig();
+        buildConfig.setIncrementalMode( false );
+
+        String[] files = getSourceFiles(config);
+        if ( files != null )
+        {
+            buildConfig.setFiles( buildFileList( Arrays.asList(files) ) );
+        }
+
+        Map javaOpts = config.getCompilerOptions();
+        if ( javaOpts != null && !javaOpts.isEmpty() )
+        {
+            buildConfig.setJavaOptions( javaOpts );
+        }
+
+        List cp = new LinkedList( config.getClasspathEntries() );
+        cp.add( 0, System.getProperty("java.home") + "/lib/rt.jar" );
+        
+        checkForAspectJRT( cp );
+        if ( cp != null && !cp.isEmpty() )
+        {
+            buildConfig.setClasspath( cp );
+        }
+
+        String outputLocation = config.getOutputLocation();
+        if ( outputLocation != null )
+        {
+            File outDir = new File( outputLocation );
+            if( !outDir.exists() ) {
+                outDir.mkdirs();
+            }
+            
+            buildConfig.setOutputDir( outDir );
+        }
+
+        if ( config instanceof AspectJCompilerConfiguration )
+        {
+            AspectJCompilerConfiguration ajCfg = (AspectJCompilerConfiguration) config;
+
+            Map sourcePathResources = ajCfg.getSourcePathResources();
+            if ( sourcePathResources != null && !sourcePathResources.isEmpty() )
+            {
+                buildConfig.setSourcePathResources( sourcePathResources );
+            }
+
+            Map ajOptions = ajCfg.getAJOptions();
+            if ( ajOptions != null && !ajOptions.isEmpty() )
+            {
+                buildConfig.setAjOptions( ajCfg.getAJOptions() );
+            }
+
+            List aspectPath = buildFileList( ajCfg.getAspectPath() );
+            if ( aspectPath != null && !aspectPath.isEmpty() )
+            {
+                buildConfig.setAspectpath( buildFileList( ajCfg.getAspectPath() ) );
+            }
+
+            List inJars = buildFileList( ajCfg.getInJars() );
+            if ( inJars != null && !inJars.isEmpty() )
+            {
+                buildConfig.setInJars( buildFileList( ajCfg.getInJars() ) );
+            }
+
+            List inPaths = buildFileList( ajCfg.getInPath() );
+            if ( inPaths != null && !inPaths.isEmpty() )
+            {
+                buildConfig.setInPath( buildFileList( ajCfg.getInPath() ) );
+            }
+
+            String outJar = ajCfg.getOutputJar();
+            if ( outJar != null )
+            {
+                buildConfig.setOutputJar( new File( ajCfg.getOutputJar() ) );
+            }
+        }
+
+        MessageHandler messageHandler = new MessageHandler();
+
+        AjBuildManager manager = new AjBuildManager( messageHandler );
+
+        boolean success = manager.batchBuild( buildConfig, messageHandler );
+        
+        // We need the location of the maven so we have a couple of options
+        // here.
         //
-        // The aspectjrt jar is something this component needs to function so we can either
-        // bake it into the plugin and retrieve it somehow or use a system property or we
+        // The aspectjrt jar is something this component needs to function so we
+        // can either
+        // bake it into the plugin and retrieve it somehow or use a system
+        // property or we
         // could pass in a set of parameters in a Map.
-
-        String[] args = new String[]{"-classpath", "/home/jvanzyl/maven-repo-local/aspectj/jars/aspectjrt-1.1.0.jar",
-                                     "-sourceroots", sourceDirectories[0]};
-
-        IMessageHolder messageHolder = new MessageHandler();
-
-        compiler.run( args, messageHolder );
-
-        boolean errors = messageHolder.hasAnyMessage( IMessage.ERROR, true );
+        
+        boolean errors = messageHandler.hasAnyMessage( IMessage.ERROR, true );
 
         if ( errors )
         {
-            IMessage[] errorMessages = messageHolder.getMessages( IMessage.ERROR, true );
+            IMessage[] errorMessages = messageHandler.getMessages( IMessage.ERROR, true );
 
             for ( int i = 0; i < errorMessages.length; i++ )
             {
                 IMessage m = errorMessages[i];
 
                 messages.add( new CompilerError( m.getSourceLocation().getSourceFile().getPath(),
-                                                 true,
-                                                 m.getSourceLocation().getLine(),
+                                                 true, m.getSourceLocation().getLine(),
                                                  m.getSourceLocation().getColumn(),
                                                  m.getSourceLocation().getEndLine(),
-                                                 m.getSourceLocation().getColumn(),
-                                                 m.getMessage() ) );
+                                                 m.getSourceLocation().getColumn(), m.getMessage() ) );
             }
         }
 
         return messages;
     }
+
+    private void checkForAspectJRT( List cp )
+    {
+        if ( cp == null || cp.isEmpty() )
+        {
+            throw new IllegalStateException( "AspectJ Runtime not found in supplied classpath" );
+        }
+        else
+        {
+            try
+            {
+                URL[] urls = new URL[cp.size()];
+                for ( int i = 0; i < urls.length; i++ )
+                {
+                    urls[i] = new File((String)cp.get( i )).toURL();
+                }
+
+                URLClassLoader cloader = new URLClassLoader( urls );
+
+                cloader.loadClass( "org.aspectj.lang.JoinPoint" );
+            }
+            catch ( MalformedURLException e )
+            {
+                throw new IllegalArgumentException( "Invalid classpath entry" );
+            }
+            catch ( ClassNotFoundException e )
+            {
+                throw new IllegalStateException( "AspectJ Runtime not found in supplied classpath" );
+            }
+        }
+    }
+
+    private List buildFileList( List locations )
+    {
+        List fileList = new LinkedList();
+        for ( Iterator it = locations.iterator(); it.hasNext(); )
+        {
+            String location = (String) it.next();
+            fileList.add( new File( location ) );
+        }
+        
+        return fileList;
+    }
+    
 }
