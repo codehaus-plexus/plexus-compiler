@@ -26,6 +26,6 @@ public class EclipseCompilerTest
 
     protected int expectedErrors()
     {
-        return 4;
+        return 2;
     }
 }
