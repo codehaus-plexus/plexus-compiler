@@ -22,6 +22,7 @@ public class CompilerConfiguration
     private Set includes = new HashSet();
     private Set excludes = new HashSet();
     private Map compilerOptions = new TreeMap();
+    private boolean debug = false;
 
     public void setOutputLocation(String outputLocation)
     {
@@ -92,6 +93,24 @@ public class CompilerConfiguration
     
     public Map getCompilerOptions() {
         return Collections.unmodifiableMap(compilerOptions);
+    }
+
+    /**
+     * @param debug The debug to set.
+     */
+    public void setDebug( boolean debug )
+    {
+        this.debug = debug;
+    }
+
+    /**
+     * Compile with debug info
+     * 
+     * @return Returns the debug.
+     */
+    public boolean isDebug()
+    {
+        return debug;
     }
     
 }

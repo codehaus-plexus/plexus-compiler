@@ -70,6 +70,11 @@ public class JavacCompiler
         args.add( "-classpath" );
 
         args.add( getClasspathString( config.getClasspathEntries() ) );
+        
+        if ( config.isDebug() )
+        {
+            args.add( "-g" );
+        }
 
         Iterator it = compilerOptions.entrySet().iterator();
 
