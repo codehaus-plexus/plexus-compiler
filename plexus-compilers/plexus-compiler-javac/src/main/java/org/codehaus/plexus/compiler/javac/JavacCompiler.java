@@ -75,15 +75,30 @@ public class JavacCompiler
 
         args.add( destinationDir.getAbsolutePath() );
 
-        args.add( "-nowarn" );
+        if(config.isNoWarn())
+        {
+            args.add( "-nowarn" );
+        }
 
-        args.add( "-classpath" );
+        List classpathEntries = config.getClasspathEntries();
+        if(classpathEntries != null && !classpathEntries.isEmpty())
+        {
+            args.add( "-classpath" );
 
-        args.add( getClasspathString( config.getClasspathEntries() ) );
+            args.add( getPathString( classpathEntries ) );
+        }
         
         if ( config.isDebug() )
         {
             args.add( "-g" );
+        }
+        
+        List sourceLocations = config.getSourceLocations();
+        if(sourceLocations != null && !sourceLocations.isEmpty())
+        {
+            args.add("-sourcepath");
+            
+            args.add( getPathString( sourceLocations ) );
         }
 
         Iterator it = compilerOptions.entrySet().iterator();
