@@ -1,0 +1,9 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.codehaus.plexus.compiler.Compiler</role>
+      <role-hint>eclipse</role-hint>
+      <implementation>org.codehaus.plexus.compiler.eclipse.EclipseJavaCompiler</implementation>
+    </component>
+  </components>
+</component-set>

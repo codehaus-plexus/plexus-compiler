@@ -1,0 +1,9 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.codehaus.plexus.compiler.Compiler</role>
+      <role-hint>jikes</role-hint>
+      <implementation>org.codehaus.plexus.compiler.jikes.JikesCompiler</implementation>
+    </component>
+  </components>
+</component-set>

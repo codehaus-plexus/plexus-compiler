@@ -1,0 +1,11 @@
+<project>
+  <parent>
+    <groupId>plexus</groupId>
+    <artifactId>plexus-compiler-parent</artifactId>
+    <version>1.0</version>
+  </parent>
+  <groupId>plexus</groupId>
+  <artifactId>plexus-compiler-javac</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <name>Plexus Compiler Component</name>
+</project>
