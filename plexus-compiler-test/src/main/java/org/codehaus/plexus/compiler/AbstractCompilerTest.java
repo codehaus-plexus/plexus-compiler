@@ -5,6 +5,7 @@ import org.codehaus.plexus.PlexusTestCase;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -76,6 +77,10 @@ public abstract class AbstractCompilerTest
     {
         List messages = compiler.compile( compilerConfig );
 
+        for ( Iterator iter = messages.iterator(); iter.hasNext(); )
+        {
+            System.out.println( iter.next() );
+        }
         assertEquals( "Expected number of compilation errors is 1", expectedErrors(), messages.size() );
     }
 
