@@ -73,6 +73,11 @@ public abstract class AbstractCompilerTest
         return Collections.singletonList( mavenRepoLocal + "/commons-lang/jars/commons-lang-2.0.jar" );
     }
 
+    protected CompilerConfiguration getCompilerConfiguration()
+    {
+        return compilerConfig;
+    }
+    
     public void testCompilingSources() throws Exception
     {
         List messages = compiler.compile( compilerConfig );
@@ -81,7 +86,7 @@ public abstract class AbstractCompilerTest
         {
             System.out.println( iter.next() );
         }
-        assertEquals( "Expected number of compilation errors is 1", expectedErrors(), messages.size() );
+        assertEquals( "Expected number of compilation errors is" + expectedErrors(), expectedErrors(), messages.size() );
     }
 
     protected int expectedErrors()
