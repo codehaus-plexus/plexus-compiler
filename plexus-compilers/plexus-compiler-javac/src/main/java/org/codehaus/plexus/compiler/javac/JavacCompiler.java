@@ -57,6 +57,9 @@ public class JavacCompiler
 
         String[] sources = getSourceFiles( config );
 
+        System.out.println( "Compiling " + sources.length + " source file" + ( sources.length == 1 ? "" : "s" )
+            + " to " + destinationDir.getAbsolutePath() );
+
         Map compilerOptions = config.getCompilerOptions();
 
         List args = new ArrayList( sources.length + 5 + compilerOptions.size() * 2 );
@@ -175,7 +178,7 @@ public class JavacCompiler
                 endcolumn = context.length();
             }
 
-            return new CompilerError( file, false, line, startcolumn, line, endcolumn, message );
+            return new CompilerError( file, true, line, startcolumn, line, endcolumn, message );
         }
         catch ( NoSuchElementException nse )
         {
