@@ -11,11 +11,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
- *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @author <a href="mailto:michal.maczka@dimatics.com">Michal Maczka</a>
- *
  * @version $Id$
  */
 public abstract class AbstractCompiler
@@ -32,7 +29,7 @@ public abstract class AbstractCompiler
         for ( Iterator it = classpathElements.iterator(); it.hasNext(); )
         {
             String element = (String) it.next();
-            
+
             sb.append( element ).append( PS );
         }
 
@@ -46,7 +43,7 @@ public abstract class AbstractCompiler
         for ( Iterator it = config.getSourceLocations().iterator(); it.hasNext(); )
         {
             String sourceLocation = (String) it.next();
-            
+
             DirectoryScanner scanner = new DirectoryScanner();
 
             scanner.setBasedir( sourceLocation );

@@ -15,17 +15,14 @@
       <groupId>plexus</groupId>
       <artifactId>plexus-compiler-api</artifactId>
       <version>1.2-SNAPSHOT</version>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-compiler-test</artifactId>
       <version>1.2-SNAPSHOT</version>
-      <scope>compile</scope>
     </dependency>
   </dependencies>
   <modules>
-    <module>plexus-compiler-aspectj</module>
     <module>plexus-compiler-eclipse</module>
     <module>plexus-compiler-javac</module>
     <module>plexus-compiler-jikes</module>
