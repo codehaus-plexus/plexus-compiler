@@ -1,23 +1,15 @@
 package org.codehaus.plexus.compiler;
 
-import org.codehaus.plexus.PlexusTestCase;
+import org.apache.maven.artifact.test.ArtifactTestCase;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.io.FileInputStream;
-import java.io.File;
 
 public abstract class AbstractCompilerTest
-    extends PlexusTestCase
+    extends ArtifactTestCase
 {
     private Compiler compiler = null;
-
-    private String mavenRepoLocal;
 
     protected String roleHint;
 
@@ -40,18 +32,6 @@ public abstract class AbstractCompilerTest
 
         compiler = (Compiler) lookup( Compiler.ROLE, getRoleHint() );
 
-        mavenRepoLocal = System.getProperty( "maven.repo.local" );
-
-        if ( mavenRepoLocal == null )
-        {
-            mavenRepoLocal = System.getProperty( "maven.repo.local" );
-        }
-
-        if ( mavenRepoLocal == null )
-        {
-            mavenRepoLocal = new File( System.getProperty( "user.home" ), ".maven/repository" ).getPath();
-        }
-
         compilerConfig = new CompilerConfiguration();
 
         compilerConfig.setClasspathEntries( getClasspath() );
@@ -63,14 +43,10 @@ public abstract class AbstractCompilerTest
         compilerConfig.addInclude( "**/*.java" );
     }
 
-    protected String getMavenRepoLocal()
-    {
-        return mavenRepoLocal;
-    }
-
     protected List getClasspath()
+        throws Exception
     {
-        return Collections.singletonList( mavenRepoLocal + "/commons-lang/jars/commons-lang-2.0.jar" );
+        return Collections.EMPTY_LIST;
     }
 
     protected CompilerConfiguration getCompilerConfiguration()
