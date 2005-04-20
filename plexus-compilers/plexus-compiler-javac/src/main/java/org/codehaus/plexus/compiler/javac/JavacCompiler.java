@@ -148,10 +148,10 @@ public class JavacCompiler
         }
         catch ( ClassNotFoundException e )
         {
-            String message = "Unable to locate the Javac class. Please ensure you are using a JDK " +
-                "that provides the com.sun.tools.javac.Main class (1.4 and above), and " +
-                "not a JRE. In most cases, you can change the location of your java " +
-                "installation by settings the JAVA_HOME environment variable.";
+            String message = "Unable to locate the Javac Compiler. Please ensure you are using JDK 1.4 or above and\n" +
+                "not a JRE (the com.sun.tools.javac.Main class is required).\n" +
+                "In most cases you can change the location of your Java\n" +
+                "installation by setting the JAVA_HOME environment variable.";
             return Collections.singletonList( new CompilerError( message, true ) );
         }
 
