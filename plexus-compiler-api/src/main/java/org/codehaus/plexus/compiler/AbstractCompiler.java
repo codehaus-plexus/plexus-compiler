@@ -30,7 +30,6 @@ public abstract class AbstractCompiler
     }
 
     public String getPathString( List pathElements )
-        throws Exception
     {
         StringBuffer sb = new StringBuffer();
 

@@ -141,7 +141,19 @@ public class JavacCompiler
             cl.addURL( toolsJar.toURL() );
         }
 
-        Class c = cl.loadClass( "com.sun.tools.javac.Main" );
+        Class c;
+        try
+        {
+            c = cl.loadClass( "com.sun.tools.javac.Main" );
+        }
+        catch ( ClassNotFoundException e )
+        {
+            String message = "Unable to locate the Javac class. Please ensure you are using a JDK " +
+                "that provides the com.sun.tools.javac.Main class (1.4 and above), and " +
+                "not a JRE. In most cases, you can change the location of your java " +
+                "installation by settings the JAVA_HOME environment variable.";
+            return Collections.singletonList( new CompilerError( message, true ) );
+        }
 
         ByteArrayOutputStream err = new ByteArrayOutputStream();
 
