@@ -27,6 +27,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -155,20 +156,20 @@ public class JavacCompiler
             return Collections.singletonList( new CompilerError( message, true ) );
         }
 
-        ByteArrayOutputStream err = new ByteArrayOutputStream();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        Method compile = c.getMethod( "compile", new Class[]{String[].class} );
+        Method compile = c.getMethod( "compile", new Class[]{String[].class, PrintWriter.class} );
 
-        Integer ok = (Integer) compile.invoke( null, new Object[]{args.toArray( new String[0] )} );
+        Integer ok = (Integer) compile.invoke( null, new Object[]{args.toArray( new String[0] ), new PrintWriter( out )} );
 
         List messages = parseModernStream(
-            new BufferedReader( new InputStreamReader( new ByteArrayInputStream( err.toByteArray() ) ) ) );
+            new BufferedReader( new InputStreamReader( new ByteArrayInputStream( out.toByteArray() ) ) ) );
 
         if ( ok.intValue() != 0 && messages.isEmpty() )
         {
             // TODO: exception?
             messages.add( new CompilerError(
-                "Failure executing javac, but could not parse the error:\n\n" + err.toString(), true ) );
+                "Failure executing javac, but could not parse the error:\n\n" + out.toString(), true ) );
         }
 
         return messages;
