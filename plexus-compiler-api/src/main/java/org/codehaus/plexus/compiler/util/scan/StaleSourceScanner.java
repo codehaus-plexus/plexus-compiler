@@ -129,6 +129,7 @@ public class StaleSourceScanner
         }
 
         ds.setExcludes( excludes );
+        ds.addDefaultExcludes();
 
         ds.scan();
 
