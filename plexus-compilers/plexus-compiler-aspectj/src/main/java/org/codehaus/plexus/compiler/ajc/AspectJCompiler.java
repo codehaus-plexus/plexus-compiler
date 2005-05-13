@@ -254,12 +254,18 @@ public class AspectJCompiler
         }
 
         List cp = new LinkedList( config.getClasspathEntries() );
-        cp.add( 0, System.getProperty( "java.home" ) + "/lib/rt.jar" );
+        cp.add( 0, new File( System.getProperty( "java.home" ) + "/lib/rt.jar" ) );
 
         checkForAspectJRT( cp );
         if ( cp != null && !cp.isEmpty() )
         {
-            buildConfig.setClasspath( cp );
+            List elements = new ArrayList( cp.size() );
+            for ( Iterator i = cp.iterator(); i.hasNext(); )
+            {
+                elements.add( ( (File) i.next() ).getAbsolutePath() );
+            }
+
+            buildConfig.setClasspath( elements );
         }
 
         String outputLocation = config.getOutputLocation();
@@ -364,7 +370,7 @@ public class AspectJCompiler
                 URL[] urls = new URL[cp.size()];
                 for ( int i = 0; i < urls.length; i++ )
                 {
-                    urls[i] = new File( (String) cp.get( i ) ).toURL();
+                    urls[i] = ( (File) cp.get( i ) ).toURL();
                 }
 
                 URLClassLoader cloader = new URLClassLoader( urls );

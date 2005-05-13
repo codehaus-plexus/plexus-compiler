@@ -1,7 +1,10 @@
 package org.codehaus.plexus.compiler;
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.test.ArtifactTestCase;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -46,7 +49,13 @@ public abstract class AbstractCompilerTest
     protected List getClasspath()
         throws Exception
     {
-        return Collections.EMPTY_LIST;
+        Artifact artifact = new DefaultArtifact( "commons-lang", "commons-lang", "2.0", "jar" );
+
+        List cp = new ArrayList();
+
+        cp.add( getLocalArtifactPath( artifact ) );
+
+        return cp;
     }
 
     protected CompilerConfiguration getCompilerConfiguration()

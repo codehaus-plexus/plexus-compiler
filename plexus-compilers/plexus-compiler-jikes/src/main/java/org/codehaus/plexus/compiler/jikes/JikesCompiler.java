@@ -209,8 +209,11 @@ public class JikesCompiler
                 errors = new ArrayList();
             }
 
-            // add the error bean
-            errors.add( parseError( buffer.toString() ) );
+            if ( buffer.length() > 0 )
+            {
+                // add the error bean
+                errors.add( parseError( buffer.toString() ) );
+            }
         }
     }
 

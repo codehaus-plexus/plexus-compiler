@@ -35,9 +35,7 @@ public abstract class AbstractCompiler
 
         for ( Iterator it = pathElements.iterator(); it.hasNext(); )
         {
-            String element = (String) it.next();
-
-            sb.append( element ).append( PS );
+            sb.append( it.next() ).append( PS );
         }
 
         return sb.toString();
