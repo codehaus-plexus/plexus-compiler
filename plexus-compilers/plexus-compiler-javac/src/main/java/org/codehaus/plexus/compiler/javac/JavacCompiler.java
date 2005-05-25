@@ -235,7 +235,19 @@ public class JavacCompiler
 
             int line = Integer.parseInt( tokens.nextToken() );
 
-            String message = tokens.nextToken( "\n" ).substring( 1 );
+            StringBuffer msgBuffer = new StringBuffer();
+
+            msgBuffer.append( tokens.nextToken( "\n" ).substring( 1 ) );
+
+            msgBuffer.append( "\n" );
+
+            msgBuffer.append( tokens.nextToken( "\n" ) );
+
+            msgBuffer.append( "\n" );
+
+            msgBuffer.append( tokens.nextToken( "\n" ) );
+
+            String message = msgBuffer.toString();
 
             String context = tokens.nextToken( "\n" );
 
