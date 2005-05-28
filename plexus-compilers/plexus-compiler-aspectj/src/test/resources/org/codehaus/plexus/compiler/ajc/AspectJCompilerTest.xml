@@ -1,8 +1,0 @@
-<plexus>
-  <components>
-    <component>
-      <role>org.codehaus.plexus.compiler.Compiler</role>
-      <implementation>org.codehaus.plexus.compiler.ajc.AspectJCompiler</implementation>
-    </component>
-  </components>
-</plexus>

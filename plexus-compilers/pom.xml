@@ -23,9 +23,17 @@
     </dependency>
   </dependencies>
   <modules>
+    <!--
+    
+    TODO:
+    Omitting these two because the aspectj compiler doesn't seem
+    to work in the reactor and people may not have jikes installed.
+    
     <module>plexus-compiler-aspectj</module>
-    <module>plexus-compiler-eclipse</module>
-    <module>plexus-compiler-javac</module>
     <module>plexus-compiler-jikes</module>
+    
+    -->
+    <module>plexus-compiler-eclipse</module>    
+    <module>plexus-compiler-javac</module>    
   </modules>
 </project>

@@ -9,6 +9,7 @@ import org.codehaus.plexus.compiler.AbstractCompiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerError;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -229,7 +230,7 @@ public class AspectJCompiler
     /**
      * @see org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable#initialize
      */
-    public void initialize() throws Exception
+    public void initialize() throws InitializationException
     {
         compiler = new Main();
     }
