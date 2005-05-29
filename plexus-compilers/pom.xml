@@ -5,7 +5,7 @@
   <parent>
     <groupId>plexus</groupId>
     <artifactId>plexus-compiler</artifactId>
-    <version>1.3</version>
+    <version>1.4-SNAPSHOT</version>
   </parent>
   <artifactId>plexus-compilers</artifactId>
   <name>Plexus Compilers Parent</name>
@@ -13,12 +13,12 @@
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-compiler-api</artifactId>
-      <version>1.3</version>
+      <version>1.4-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-compiler-test</artifactId>
-      <version>1.3</version>
+      <version>1.4-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
