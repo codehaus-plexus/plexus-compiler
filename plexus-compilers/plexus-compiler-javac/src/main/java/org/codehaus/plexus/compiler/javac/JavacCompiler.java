@@ -241,17 +241,24 @@ public class JavacCompiler
 
             msgBuffer.append( "\n" );
 
-            msgBuffer.append( tokens.nextToken( "\n" ) );
-
-            msgBuffer.append( "\n" );
-
-            msgBuffer.append( tokens.nextToken( "\n" ) );
-
-            String message = msgBuffer.toString();
-
             String context = tokens.nextToken( "\n" );
 
             String pointer = tokens.nextToken( "\n" );
+
+            if ( tokens.hasMoreTokens() )
+            {
+                msgBuffer.append( context );	// 'symbol' line
+                
+                msgBuffer.append( "\n" );
+
+                msgBuffer.append( pointer );	// 'location' line
+                
+                context = tokens.nextToken( "\n" );
+
+                pointer = tokens.nextToken( "\n" );
+            }
+
+            String message = msgBuffer.toString();
 
             int startcolumn = pointer.indexOf( "^" );
 
