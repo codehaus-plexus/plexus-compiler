@@ -1,0 +1,14 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.codehaus.plexus.compiler.manager.CompilerManager</role>
+      <implementation>org.codehaus.plexus.compiler.manager.DefaultCompilerManager</implementation>
+      <requirements>
+        <requirement>
+          <role>org.codehaus.plexus.compiler.Compiler</role>
+          <field-name>compilers</field-name>
+        </requirement>
+      </requirements>
+    </component>
+  </components>
+</component-set>

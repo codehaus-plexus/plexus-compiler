@@ -1,3 +1,29 @@
+package org.codehaus.plexus.compiler.javac;
+
+/**
+ * The MIT License
+ *
+ * Copyright (c) 2005, The Codehaus
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of
+ * this software and associated documentation files (the "Software"), to deal in
+ * the Software without restriction, including without limitation the rights to
+ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+ * of the Software, and to permit persons to whom the Software is furnished to do
+ * so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 /**
  *
  * Copyright 2004 The Apache Software Foundation
@@ -14,8 +40,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
-package org.codehaus.plexus.compiler.javac;
 
 import org.codehaus.plexus.compiler.AbstractCompiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
@@ -40,11 +64,9 @@ import java.util.StringTokenizer;
 public class JavacCompiler
     extends AbstractCompiler
 {
-    static final int OUTPUT_BUFFER_SIZE = 1024;
+    private static final int OUTPUT_BUFFER_SIZE = 1024;
 
-    public JavacCompiler()
-    {
-    }
+    private static final String EOL = System.getProperty( "line.separator" );
 
     public List compile( CompilerConfiguration config )
         throws Exception
@@ -122,7 +144,7 @@ public class JavacCompiler
         {
             Map.Entry entry = (Map.Entry) it.next();
             args.add( entry.getKey() );
-            if ( ( entry.getValue() != null ) )
+            if ( entry.getValue() != null )
             {
                 args.add( entry.getValue() );
             }
@@ -149,9 +171,9 @@ public class JavacCompiler
         }
         catch ( ClassNotFoundException e )
         {
-            String message = "Unable to locate the Javac Compiler. Please ensure you are using JDK 1.4 or above and\n" +
-                "not a JRE (the com.sun.tools.javac.Main class is required).\n" +
-                "In most cases you can change the location of your Java\n" +
+            String message = "Unable to locate the Javac Compiler. Please ensure you are using JDK 1.4 or above and" + EOL +
+                "not a JRE (the com.sun.tools.javac.Main class is required)." + EOL +
+                "In most cases you can change the location of your Java" + EOL +
                 "installation by setting the JAVA_HOME environment variable.";
             return Collections.singletonList( new CompilerError( message, true ) );
         }
@@ -168,8 +190,8 @@ public class JavacCompiler
         if ( ok.intValue() != 0 && messages.isEmpty() )
         {
             // TODO: exception?
-            messages.add( new CompilerError(
-                "Failure executing javac, but could not parse the error:\n\n" + out.toString(), true ) );
+            messages.add( new CompilerError( "Failure executing javac, " +
+                                             "but could not parse the error:" + EOL + EOL + out.toString(), true ) );
         }
 
         return messages;
@@ -180,9 +202,9 @@ public class JavacCompiler
     {
         List errors = new ArrayList();
 
-        String line = null;
+        String line;
 
-        StringBuffer buffer = null;
+        StringBuffer buffer;
 
         while ( true )
         {
@@ -192,7 +214,9 @@ public class JavacCompiler
             // most errors terminate with the '^' char
             do
             {
-                if ( ( line = input.readLine() ) == null )
+                line = input.readLine();
+
+                if ( line == null )
                 {
                     return errors;
                 }
@@ -210,7 +234,7 @@ public class JavacCompiler
                 {
                     buffer.append( line );
 
-                    buffer.append( '\n' );
+                    buffer.append( EOL );
                 }
             }
             while ( !line.endsWith( "^" ) );
@@ -237,25 +261,25 @@ public class JavacCompiler
 
             StringBuffer msgBuffer = new StringBuffer();
 
-            msgBuffer.append( tokens.nextToken( "\n" ).substring( 1 ) );
+            msgBuffer.append( tokens.nextToken( EOL ).substring( 1 ) );
 
-            msgBuffer.append( "\n" );
+            msgBuffer.append( EOL );
 
-            String context = tokens.nextToken( "\n" );
+            String context = tokens.nextToken( EOL );
 
-            String pointer = tokens.nextToken( "\n" );
+            String pointer = tokens.nextToken( EOL );
 
             if ( tokens.hasMoreTokens() )
             {
                 msgBuffer.append( context );	// 'symbol' line
-                
-                msgBuffer.append( "\n" );
+
+                msgBuffer.append( EOL );
 
                 msgBuffer.append( pointer );	// 'location' line
-                
-                context = tokens.nextToken( "\n" );
 
-                pointer = tokens.nextToken( "\n" );
+                context = tokens.nextToken( EOL );
+
+                pointer = tokens.nextToken( EOL );
             }
 
             String message = msgBuffer.toString();
@@ -275,6 +299,11 @@ public class JavacCompiler
         {
             // TODO: exception?
             return new CompilerError( "no more tokens - could not parse error message: " + error, true );
+        }
+        catch ( NumberFormatException nse )
+        {
+            // TODO: exception?
+            return new CompilerError( "could not parse error message: " + error, true );
         }
         catch ( Exception nse )
         {

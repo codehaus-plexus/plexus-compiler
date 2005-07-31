@@ -7,18 +7,13 @@
     <artifactId>plexus-compiler</artifactId>
     <version>1.5-SNAPSHOT</version>
   </parent>
-  <artifactId>plexus-compiler-test</artifactId>
-  <name>Plexus Compiler Test Harness</name>
+  <artifactId>plexus-compiler-manager</artifactId>
+  <name>Plexus Compiler Manager</name>
   <dependencies>
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-compiler-api</artifactId>
       <version>1.5-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-artifact-test</artifactId>
-      <version>2.0-beta-1-SNAPSHOT</version>
     </dependency>
   </dependencies>
 </project>

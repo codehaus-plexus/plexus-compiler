@@ -1,9 +1,34 @@
 package org.codehaus.plexus.compiler.eclipse;
 
+/**
+ * The MIT License
+ *
+ * Copyright (c) 2005, The Codehaus
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of
+ * this software and associated documentation files (the "Software"), to deal in
+ * the Software without restriction, including without limitation the rights to
+ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+ * of the Software, and to permit persons to whom the Software is furnished to do
+ * so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 import org.codehaus.plexus.compiler.AbstractCompiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerError;
-
+import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.IOUtil;
 import org.eclipse.jdt.core.compiler.IProblem;
 import org.eclipse.jdt.internal.compiler.ClassFile;
 import org.eclipse.jdt.internal.compiler.CompilationResult;
@@ -13,6 +38,7 @@ import org.eclipse.jdt.internal.compiler.ICompilerRequestor;
 import org.eclipse.jdt.internal.compiler.IErrorHandlingPolicy;
 import org.eclipse.jdt.internal.compiler.IProblemFactory;
 import org.eclipse.jdt.internal.compiler.classfmt.ClassFileReader;
+import org.eclipse.jdt.internal.compiler.classfmt.ClassFormatException;
 import org.eclipse.jdt.internal.compiler.env.ICompilationUnit;
 import org.eclipse.jdt.internal.compiler.env.INameEnvironment;
 import org.eclipse.jdt.internal.compiler.env.NameEnvironmentAnswer;
@@ -20,14 +46,11 @@ import org.eclipse.jdt.internal.compiler.impl.CompilerOptions;
 import org.eclipse.jdt.internal.compiler.problem.DefaultProblemFactory;
 
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -46,7 +69,9 @@ public class EclipseJavaCompiler
 
     private String sourceEncoding;
 
-    private List errors = new LinkedList();
+    // ----------------------------------------------------------------------
+    // Static initializer
+    // ----------------------------------------------------------------------
 
     static
     {
@@ -55,195 +80,72 @@ public class EclipseJavaCompiler
 
         try
         {
-            source14 = target14 = Float.parseFloat( version ) >= 1.4;
+            target14 = Float.parseFloat( version ) >= 1.4;
+
+            source14 = target14;
         }
         catch ( NumberFormatException e )
         {
-            source14 = target14 = false;
+            target14 = false;
+
+            source14 = target14;
         }
     }
 
+    // ----------------------------------------------------------------------
+    //
+    // ----------------------------------------------------------------------
+
     public EclipseJavaCompiler()
     {
-        this.debug = false;
+        debug = false;
 
         source14 = true;
     }
+
+    // ----------------------------------------------------------------------
+    //
+    // ----------------------------------------------------------------------
 
     public List compile( CompilerConfiguration config )
         throws Exception
     {
         String[] sourceFiles = getSourceFiles( config );
 
+        List errors = new LinkedList();
+
         for ( int i = 0; i < sourceFiles.length; i++ )
         {
-            String sourceFile = sourceFiles[i];
+            String sourceFile = sourceFiles[ i ];
 
-            compile( sourceFile, (String) config.getSourceLocations().get( 0 ), config.getOutputLocation() );
+            compile( sourceFile,
+                     (String) config.getSourceLocations().get( 0 ),
+                     config.getOutputLocation(),
+                     errors );
         }
 
         return errors;
     }
 
-    public void setEncoding( String encoding )
+    public void compile( String sourceFile,
+                         String sourceDir,
+                         String destinationDirectory,
+                         List errors )
+        throws Exception
     {
-        this.sourceEncoding = encoding;
-    }
+        String targetClassName = makeClassName( sourceFile, sourceDir );
 
-    public boolean compile( final String sourceFile, String sourceDir, final String destinationDirectory )
-        throws IOException
-    {
-        final String targetClassName = makeClassName( sourceFile, sourceDir );
-
-        final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
         String[] fileNames = new String[]{sourceFile};
 
         String[] classNames = new String[]{targetClassName};
 
+        INameEnvironment env = new EclipseCompilerINameEnvironment( targetClassName, sourceFile, classLoader, errors );
 
-        final INameEnvironment env = new INameEnvironment()
-        {
+        IErrorHandlingPolicy policy = DefaultErrorHandlingPolicies.proceedWithAllProblems();
 
-            public NameEnvironmentAnswer findType( char[][] compoundTypeName )
-            {
-                String result = "";
-
-                String sep = "";
-
-                for ( int i = 0; i < compoundTypeName.length; i++ )
-                {
-                    result += sep;
-                    result += new String( compoundTypeName[i] );
-                    sep = ".";
-                }
-
-                return findType( result );
-            }
-
-            public NameEnvironmentAnswer findType( char[] typeName, char[][] packageName )
-            {
-                String result = "";
-
-                String sep = "";
-
-                for ( int i = 0; i < packageName.length; i++ )
-                {
-                    result += sep;
-                    result += new String( packageName[i] );
-                    sep = ".";
-                }
-
-                result += sep;
-                result += new String( typeName );
-                return findType( result );
-            }
-
-            private NameEnvironmentAnswer findType( String className )
-            {
-                try
-                {
-                    if ( className.equals( targetClassName ) )
-                    {
-                        ICompilationUnit compilationUnit = new CompilationUnit( sourceFile, className );
-                        return new NameEnvironmentAnswer( compilationUnit );
-                    }
-
-                    String resourceName = className.replace( '.', '/' ) + ".class";
-
-                    InputStream is = classLoader.getResourceAsStream( resourceName );
-
-                    if ( is != null )
-                    {
-                        byte[] classBytes;
-                        byte[] buf = new byte[8192];
-                        ByteArrayOutputStream baos = new ByteArrayOutputStream( buf.length );
-
-                        int count;
-
-                        while ( ( count = is.read( buf, 0, buf.length ) ) > 0 )
-                        {
-                            baos.write( buf, 0, count );
-                        }
-
-                        baos.flush();
-
-                        classBytes = baos.toByteArray();
-
-                        char[] fileName = className.toCharArray();
-
-                        ClassFileReader classFileReader = new ClassFileReader( classBytes, fileName, true );
-
-                        return new NameEnvironmentAnswer( classFileReader );
-                    }
-                }
-                catch ( IOException exc )
-                {
-                    handleError( className, -1, -1, exc.getMessage() );
-                }
-                catch ( org.eclipse.jdt.internal.compiler.classfmt.ClassFormatException exc )
-                {
-                    handleError( className, -1, -1, exc.getMessage() );
-                }
-
-                return null;
-            }
-
-            private boolean isPackage( String result )
-            {
-                if ( result.equals( targetClassName ) )
-                {
-                    return false;
-                }
-                String resourceName = result.replace( '.', '/' ) + ".class";
-                InputStream is =
-                    classLoader.getResourceAsStream( resourceName );
-                return is == null;
-            }
-
-            public boolean isPackage( char[][] parentPackageName,
-                                      char[] packageName )
-            {
-                String result = "";
-
-                String sep = "";
-
-                if ( parentPackageName != null )
-                {
-                    for ( int i = 0; i < parentPackageName.length; i++ )
-                    {
-                        result += sep;
-                        String str = new String( parentPackageName[i] );
-                        result += str;
-                        sep = ".";
-                    }
-                }
-                String str = new String( packageName );
-
-                if ( Character.isUpperCase( str.charAt( 0 ) ) )
-                {
-                    if ( !isPackage( result ) )
-                    {
-                        return false;
-                    }
-                }
-
-                result += sep;
-
-                result += str;
-
-                return isPackage( result );
-            }
-
-            public void cleanup()
-            {
-            }
-
-        };
-
-        final IErrorHandlingPolicy policy = DefaultErrorHandlingPolicies.proceedWithAllProblems();
-
-        final Map settings = new HashMap();
+        Map settings = new HashMap();
 
         settings.put( CompilerOptions.OPTION_LineNumberAttribute, CompilerOptions.GENERATE );
 
@@ -271,86 +173,25 @@ public class EclipseJavaCompiler
             settings.put( CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_1_4 );
         }
 
-        final IProblemFactory problemFactory = new DefaultProblemFactory( Locale.getDefault() );
+        IProblemFactory problemFactory = new DefaultProblemFactory( Locale.getDefault() );
 
-        final ICompilerRequestor requestor = new ICompilerRequestor()
-        {
-            public void acceptResult( CompilationResult result )
-            {
-                try
-                {
-                    if ( result.hasProblems() )
-                    {
-                        IProblem[] problems = result.getProblems();
-
-                        for ( int i = 0; i < problems.length; i++ )
-                        {
-                            IProblem problem = problems[i];
-                            String name = new String( problems[i].getOriginatingFileName() );
-                            handleError( name, problem.getSourceLineNumber(), -1, problem.getMessage() );
-                        }
-                    }
-                    else
-                    {
-                        ClassFile[] classFiles = result.getClassFiles();
-
-                        for ( int i = 0; i < classFiles.length; i++ )
-                        {
-                            ClassFile classFile = classFiles[i];
-                            char[][] compoundName = classFile.getCompoundName();
-                            String className = "";
-                            String sep = "";
-
-                            for ( int j = 0; j < compoundName.length; j++ )
-                            {
-                                className += sep;
-                                className += new String( compoundName[j] );
-                                sep = ".";
-                            }
-
-                            byte[] bytes = classFile.getBytes();
-
-                            File outFile = new File( destinationDirectory, className.replace( '.', '/' ) + ".class" );
-
-                            if ( !outFile.getParentFile().exists() )
-                            {
-                                outFile.getParentFile().mkdirs();
-                            }
-
-                            FileOutputStream fout = new FileOutputStream( outFile );
-
-                            BufferedOutputStream bos = new BufferedOutputStream( fout );
-
-                            bos.write( bytes );
-
-                            bos.close();
-                        }
-                    }
-                }
-                catch ( IOException exc )
-                {
-                    exc.printStackTrace();
-                }
-            }
-        };
+        ICompilerRequestor requestor = new EclipseCompilerICompilerRequestor( destinationDirectory, errors );
 
         ICompilationUnit[] compilationUnits = new ICompilationUnit[classNames.length];
 
         for ( int i = 0; i < compilationUnits.length; i++ )
         {
-            String className = classNames[i];
+            String className = classNames[ i ];
 
-            compilationUnits[i] = new CompilationUnit( fileNames[i], className );
+            compilationUnits[ i ] = new CompilationUnit( fileNames[ i ], className, errors );
         }
 
         Compiler compiler = new Compiler( env, policy, settings, requestor, problemFactory );
 
         compiler.compile( compilationUnits );
-
-        return errors.size() == 0;
     }
 
-    void handleError( String className, int line, int column, Object errorMessage )
+    private CompilerError handleError( String className, int line, int column, Object errorMessage )
     {
         String fileName = className.replace( '.', File.separatorChar ) + ".java";
 
@@ -359,34 +200,31 @@ public class EclipseJavaCompiler
             column = 0;
         }
 
-        CompilerError err = new CompilerError( fileName,
-                                               true,
-                                               line,
-                                               column,
-                                               line,
-                                               column,
-                                               errorMessage.toString() );
-
-        System.out.println( "err = " + err );
-
-        errors.add( err );
+        return new CompilerError( fileName,
+                                  true,
+                                  line,
+                                  column,
+                                  line,
+                                  column,
+                                  errorMessage.toString() );
     }
 
-    public List getErrors()
-        throws IOException
+    private class CompilationUnit
+        implements ICompilationUnit
     {
-        return errors;
-    }
+        private String className;
 
-    class CompilationUnit implements ICompilationUnit
-    {
-        String className;
-        String sourceFile;
+        private String sourceFile;
 
-        CompilationUnit( String sourceFile, String className )
+        private List errors;
+
+        CompilationUnit( String sourceFile,
+                         String className,
+                         List errors )
         {
             this.className = className;
             this.sourceFile = sourceFile;
+            this.errors = errors;
         }
 
         public char[] getFileName()
@@ -396,35 +234,22 @@ public class EclipseJavaCompiler
 
         public char[] getContents()
         {
-            char[] result = null;
             try
             {
-                Reader reader = new BufferedReader( new FileReader( sourceFile ) );
+                return FileUtils.fileRead( sourceFile ).toCharArray();
+            }
+            catch ( FileNotFoundException e )
+            {
+                errors.add( handleError( className, -1, -1, e.getMessage() ) );
 
-                if ( reader != null )
-                {
-                    char[] chars = new char[8192];
-
-                    StringBuffer buf = new StringBuffer();
-
-                    int count;
-
-                    while ( ( count = reader.read( chars, 0, chars.length ) ) > 0 )
-                    {
-                        buf.append( chars, 0, count );
-                    }
-
-                    result = new char[buf.length()];
-
-                    buf.getChars( 0, result.length, result, 0 );
-                }
+                return null;
             }
             catch ( IOException e )
             {
-                handleError( className, -1, -1, e.getMessage() );
-            }
+                errors.add( handleError( className, -1, -1, e.getMessage() ) );
 
-            return result;
+                return null;
+            }
         }
 
         public char[] getMainTypeName()
@@ -449,10 +274,241 @@ public class EclipseJavaCompiler
             {
                 String tok = izer.nextToken();
 
-                result[i] = tok.toCharArray();
+                result[ i ] = tok.toCharArray();
             }
 
             return result;
+        }
+    }
+
+    private class EclipseCompilerINameEnvironment
+        implements INameEnvironment
+    {
+        private String targetClassName;
+
+        private String sourceFile;
+
+        private ClassLoader classLoader;
+
+        private List errors;
+
+        public EclipseCompilerINameEnvironment( String targetClassName,
+                                                String sourceFile,
+                                                ClassLoader classLoader,
+                                                List errors )
+        {
+            this.targetClassName = targetClassName;
+            this.sourceFile = sourceFile;
+            this.classLoader = classLoader;
+            this.errors = errors;
+        }
+
+        public NameEnvironmentAnswer findType( char[][] compoundTypeName )
+        {
+            String result = "";
+
+            String sep = "";
+
+            for ( int i = 0; i < compoundTypeName.length; i++ )
+            {
+                result += sep;
+                result += new String( compoundTypeName[ i ] );
+                sep = ".";
+            }
+
+            return findType( result );
+        }
+
+        public NameEnvironmentAnswer findType( char[] typeName, char[][] packageName )
+        {
+            String result = "";
+
+            String sep = "";
+
+            for ( int i = 0; i < packageName.length; i++ )
+            {
+                result += sep;
+                result += new String( packageName[ i ] );
+                sep = ".";
+            }
+
+            result += sep;
+            result += new String( typeName );
+            return findType( result );
+        }
+
+        private NameEnvironmentAnswer findType( String className )
+        {
+            try
+            {
+                if ( className.equals( targetClassName ) )
+                {
+                    ICompilationUnit compilationUnit = new CompilationUnit( sourceFile,
+                                                                            className,
+                                                                            errors );
+
+                    return new NameEnvironmentAnswer( compilationUnit );
+                }
+
+                String resourceName = className.replace( '.', '/' ) + ".class";
+
+                InputStream is = classLoader.getResourceAsStream( resourceName );
+
+                if ( is == null )
+                {
+                    return null;
+                }
+
+                byte[] classBytes = IOUtil.toByteArray( is );
+
+                char[] fileName = className.toCharArray();
+
+                ClassFileReader classFileReader = new ClassFileReader( classBytes, fileName, true );
+
+                return new NameEnvironmentAnswer( classFileReader );
+            }
+            catch ( IOException e )
+            {
+                errors.add( handleError( className, -1, -1, e.getMessage() ) );
+
+                return null;
+            }
+            catch ( ClassFormatException e )
+            {
+                errors.add( handleError( className, -1, -1, e.getMessage() ) );
+
+                return null;
+            }
+        }
+
+        private boolean isPackage( String result )
+        {
+            if ( result.equals( targetClassName ) )
+            {
+                return false;
+            }
+            String resourceName = result.replace( '.', '/' ) + ".class";
+            InputStream is =
+                classLoader.getResourceAsStream( resourceName );
+            return is == null;
+        }
+
+        public boolean isPackage( char[][] parentPackageName,
+                                  char[] packageName )
+        {
+            String result = "";
+
+            String sep = "";
+
+            if ( parentPackageName != null )
+            {
+                for ( int i = 0; i < parentPackageName.length; i++ )
+                {
+                    result += sep;
+                    result += new String( parentPackageName[ i ] );
+                    sep = ".";
+                }
+            }
+            String str = new String( packageName );
+
+            if ( Character.isUpperCase( str.charAt( 0 ) ) )
+            {
+                if ( !isPackage( result ) )
+                {
+                    return false;
+                }
+            }
+
+            result += sep;
+
+            result += str;
+
+            return isPackage( result );
+        }
+
+        public void cleanup()
+        {
+        }
+
+    }
+
+    private class EclipseCompilerICompilerRequestor
+        implements ICompilerRequestor
+    {
+        private final String destinationDirectory;
+
+        private final List errors;
+
+        public EclipseCompilerICompilerRequestor( String destinationDirectory, List errors )
+        {
+            this.destinationDirectory = destinationDirectory;
+            this.errors = errors;
+        }
+
+        public void acceptResult( CompilationResult result )
+        {
+            if ( result.hasProblems() )
+            {
+                IProblem[] problems = result.getProblems();
+
+                for ( int i = 0; i < problems.length; i++ )
+                {
+                    IProblem problem = problems[ i ];
+                    String name = new String( problems[ i ].getOriginatingFileName() );
+                    errors.add( handleError( name, problem.getSourceLineNumber(), -1, problem.getMessage() ) );
+                }
+            }
+            else
+            {
+                ClassFile[] classFiles = result.getClassFiles();
+
+                for ( int i = 0; i < classFiles.length; i++ )
+                {
+                    ClassFile classFile = classFiles[ i ];
+                    char[][] compoundName = classFile.getCompoundName();
+                    String className = "";
+                    String sep = "";
+
+                    for ( int j = 0; j < compoundName.length; j++ )
+                    {
+                        className += sep;
+                        className += new String( compoundName[ j ] );
+                        sep = ".";
+                    }
+
+                    byte[] bytes = classFile.getBytes();
+
+                    File outFile = new File( destinationDirectory, className.replace( '.', '/' ) + ".class" );
+
+                    if ( !outFile.getParentFile().exists() )
+                    {
+                        outFile.getParentFile().mkdirs();
+                    }
+
+                    FileOutputStream fout = null;
+
+                    try
+                    {
+                        fout = new FileOutputStream( outFile );
+
+                        BufferedOutputStream bos = new BufferedOutputStream( fout );
+
+                        bos.write( bytes );
+                    }
+                    catch ( FileNotFoundException e )
+                    {
+                        errors.add( handleError( className, -1, -1, e.getMessage() ) );
+                    }
+                    catch ( IOException e )
+                    {
+                        errors.add( handleError( className, -1, -1, e.getMessage() ) );
+                    }
+                    finally
+                    {
+                        IOUtil.close( fout );
+                    }
+                }
+            }
         }
     }
 }

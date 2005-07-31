@@ -1,4 +1,4 @@
-package org.codehaus.plexus.compiler.eclipse;
+package org.codehaus.plexus.compiler.manager;
 
 /**
  * The MIT License
@@ -24,22 +24,38 @@ package org.codehaus.plexus.compiler.eclipse;
  * SOFTWARE.
  */
 
-import org.codehaus.plexus.compiler.AbstractCompilerTest;
+import org.codehaus.plexus.compiler.Compiler;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
+
+import java.util.Map;
 
 /**
- * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>
+ * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  * @version $Id$
  */
-public class EclipseCompilerTest
-    extends AbstractCompilerTest
+public class DefaultCompilerManager
+    extends AbstractLogEnabled
+    implements CompilerManager
 {
-    protected String getRoleHint()
-    {
-        return "eclipse";
-    }
+    /**
+     * @plexus.requirement
+     */
+    private Map compilers;
 
-    protected int expectedErrors()
+    // ----------------------------------------------------------------------
+    // CompilerManager Implementation
+    // ----------------------------------------------------------------------
+
+    public Compiler getCompiler( String compilerId )
+        throws NoSuchCompilerException
     {
-        return 2;
+        Compiler compiler = (Compiler) compilers.get( compilerId );
+
+        if ( compiler == null )
+        {
+            throw new NoSuchCompilerException( compilerId );
+        }
+
+        return compiler;
     }
 }

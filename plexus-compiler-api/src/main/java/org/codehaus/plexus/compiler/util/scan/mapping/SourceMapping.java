@@ -23,11 +23,10 @@ import java.util.Set;
 
 /**
  * @author jdcasey
+ * @version $Id$
  */
 public interface SourceMapping
 {
-
     Set getTargetFiles( File targetDir, String source )
         throws InclusionScanException;
-
 }

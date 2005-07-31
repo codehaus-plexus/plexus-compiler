@@ -29,7 +29,6 @@ import java.util.Set;
 public class SuffixMappingTest
     extends TestCase
 {
-
     public void testShouldReturnSingleClassFileForSingleJavaFile()
         throws InclusionScanException
     {

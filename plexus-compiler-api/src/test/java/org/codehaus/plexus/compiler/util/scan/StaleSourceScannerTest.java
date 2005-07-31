@@ -29,6 +29,7 @@ import java.util.Set;
 
 /**
  * @author jdcasey
+ * @version $Id$
  */
 public class StaleSourceScannerTest
     extends TestCase
@@ -173,26 +174,26 @@ public class StaleSourceScannerTest
         File base = new File( getTestBaseDir(), "test5" );
 
         long now = System.currentTimeMillis();
-        
+
         // target/source (1) should result in source being included.
-        
-        // write the target file first, and set the lastmod to some time in the 
+
+        // write the target file first, and set the lastmod to some time in the
         // past to ensure this.
         File targetFile = new File( base, "file.xml" );
 
         writeFile( targetFile );
 
         targetFile.setLastModified( now - 60000 );
-        
+
         // now write the source file, and set the lastmod to now.
         File sourceFile = new File( base, "file.java" );
 
         writeFile( sourceFile );
 
         sourceFile.setLastModified( now );
-        
+
         // target/source (2) should result in source being omitted.
-        
+
         // write the source file first, and set the lastmod to some time in the
         // past to ensure this.
         File sourceFile2 = new File( base, "file2.java" );
@@ -200,7 +201,7 @@ public class StaleSourceScannerTest
         writeFile( sourceFile2 );
 
         sourceFile2.setLastModified( now - 60000 );
-        
+
         // now write the target file, with lastmod of now.
         File targetFile2 = new File( base, "file2.xml" );
 
@@ -232,15 +233,15 @@ public class StaleSourceScannerTest
         File targetFile = new File( base, "file.xml" );
 
         writeFile( targetFile );
-        
-        // should be within the threshold of lastMod for stale sources. 
+
+        // should be within the threshold of lastMod for stale sources.
         targetFile.setLastModified( now - 8000 );
 
         File sourceFile = new File( base, "file.java" );
 
         writeFile( sourceFile );
-        
-        // modified 'now' for comparison with the above target file. 
+
+        // modified 'now' for comparison with the above target file.
         sourceFile.setLastModified( now );
 
         File targetFile2 = new File( base, "file2.xml" );
@@ -252,7 +253,7 @@ public class StaleSourceScannerTest
         File sourceFile2 = new File( base, "file2.java" );
 
         writeFile( sourceFile2 );
-        
+
         // modified 'now' for comparison to above target file.
         sourceFile2.setLastModified( now );
 
@@ -282,15 +283,15 @@ public class StaleSourceScannerTest
         File targetFile = new File( base, "file.xml" );
 
         writeFile( targetFile );
-        
-        // should be within the threshold of lastMod for stale sources. 
+
+        // should be within the threshold of lastMod for stale sources.
         targetFile.setLastModified( now - 12000 );
 
         File sourceFile = new File( base, "file.java" );
 
         writeFile( sourceFile );
-        
-        // modified 'now' for comparison with the above target file. 
+
+        // modified 'now' for comparison with the above target file.
         sourceFile.setLastModified( now );
 
         File targetFile2 = new File( base, "file2.xml" );
@@ -302,7 +303,7 @@ public class StaleSourceScannerTest
         File sourceFile2 = new File( base, "file2.java" );
 
         writeFile( sourceFile2 );
-        
+
         // modified 'now' for comparison to above target file.
         sourceFile2.setLastModified( now );
 
@@ -315,7 +316,7 @@ public class StaleSourceScannerTest
         File sourceFile3 = new File( base, "file3.java" );
 
         writeFile( sourceFile3 );
-        
+
         // modified 'now' for comparison to above target file.
         sourceFile3.setLastModified( now );
 
@@ -348,15 +349,15 @@ public class StaleSourceScannerTest
         File targetFile = new File( base, "fileX.xml" );
 
         writeFile( targetFile );
-        
-        // should be within the threshold of lastMod for stale sources. 
+
+        // should be within the threshold of lastMod for stale sources.
         targetFile.setLastModified( now - 12000 );
 
         File sourceFile = new File( base, "fileX.java" );
 
         writeFile( sourceFile );
-        
-        // modified 'now' for comparison with the above target file. 
+
+        // modified 'now' for comparison with the above target file.
         sourceFile.setLastModified( now );
 
         File targetFile2 = new File( base, "file2.xml" );
@@ -368,7 +369,7 @@ public class StaleSourceScannerTest
         File sourceFile2 = new File( base, "file2.java" );
 
         writeFile( sourceFile2 );
-        
+
         // modified 'now' for comparison to above target file.
         sourceFile2.setLastModified( now );
 
@@ -381,7 +382,7 @@ public class StaleSourceScannerTest
         File sourceFile3 = new File( base, "file3.java" );
 
         writeFile( sourceFile3 );
-        
+
         // modified 'now' for comparison to above target file.
         sourceFile3.setLastModified( now );
 
