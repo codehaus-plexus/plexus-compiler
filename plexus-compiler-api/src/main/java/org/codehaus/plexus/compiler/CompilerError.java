@@ -54,26 +54,32 @@ public class CompilerError
      * Is this a severe error or a warning?
      */
     private boolean error;
+
     /**
      * The start line number of the offending program text
      */
     private int startline;
+
     /**
      * The start column number of the offending program text
      */
     private int startcolumn;
+
     /**
      * The end line number of the offending program text
      */
     private int endline;
+
     /**
      * The end column number of the offending program text
      */
     private int endcolumn;
+
     /**
      * The name of the file containing the offending program text
      */
     private String file;
+
     /**
      * The actual error text produced by the language processor
      */
@@ -90,15 +96,13 @@ public class CompilerError
      * @param endcolumn The end column number of the offending program text
      * @param message The actual error text produced by the language processor
      */
-    public CompilerError(
-        String file,
-        boolean error,
-        int startline,
-        int startcolumn,
-        int endline,
-        int endcolumn,
-        String message
-        )
+    public CompilerError( String file,
+                          boolean error,
+                          int startline,
+                          int startcolumn,
+                          int endline,
+                          int endcolumn,
+                          String message )
     {
         this.file = file;
         this.error = error;

@@ -223,8 +223,6 @@ public class EclipseJavaCompiler
         }
         else
         {
-            new Exception().printStackTrace();
-
             message = "No message";
         }
 
@@ -281,15 +279,11 @@ public class EclipseJavaCompiler
             {
                 errors.add( handleError( className, -1, -1, e.getMessage() ) );
 
-                e.printStackTrace();
-
                 return null;
             }
             catch ( IOException e )
             {
                 errors.add( handleError( className, -1, -1, e.getMessage() ) );
-
-                e.printStackTrace();
 
                 return null;
             }
@@ -412,15 +406,11 @@ public class EclipseJavaCompiler
             {
                 errors.add( handleError( className, -1, -1, e.getMessage() ) );
 
-                e.printStackTrace();
-
                 return null;
             }
             catch ( ClassFormatException e )
             {
                 errors.add( handleError( className, -1, -1, e.getMessage() ) );
-
-                e.printStackTrace();
 
                 return null;
             }
@@ -559,14 +549,10 @@ public class EclipseJavaCompiler
                     catch ( FileNotFoundException e )
                     {
                         errors.add( handleError( className, -1, -1, e.getMessage() ) );
-
-                        e.printStackTrace();
                     }
                     catch ( IOException e )
                     {
                         errors.add( handleError( className, -1, -1, e.getMessage() ) );
-
-                        e.printStackTrace();
                     }
                     finally
                     {

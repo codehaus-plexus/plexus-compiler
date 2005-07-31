@@ -81,7 +81,7 @@ public abstract class AbstractCompilerTest
 
         List cp = new ArrayList();
 
-        cp.add( getLocalArtifactPath( artifact ) );
+        cp.add( getLocalArtifactPath( artifact ).getAbsolutePath() );
 
         return cp;
     }
