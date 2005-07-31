@@ -45,17 +45,21 @@ import org.eclipse.jdt.internal.compiler.env.NameEnvironmentAnswer;
 import org.eclipse.jdt.internal.compiler.impl.CompilerOptions;
 import org.eclipse.jdt.internal.compiler.problem.DefaultProblemFactory;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 public class EclipseJavaCompiler
@@ -110,38 +114,31 @@ public class EclipseJavaCompiler
     public List compile( CompilerConfiguration config )
         throws Exception
     {
-        String[] sourceFiles = getSourceFiles( config );
-
         List errors = new LinkedList();
 
-        for ( int i = 0; i < sourceFiles.length; i++ )
-        {
-            String sourceFile = sourceFiles[ i ];
+        List warnings = new LinkedList();
 
-            compile( sourceFile,
-                     (String) config.getSourceLocations().get( 0 ),
-                     config.getOutputLocation(),
-                     errors );
+        List classpathEntries = config.getClasspathEntries();
+
+        URL[] urls = new URL[ 1 + classpathEntries.size() ];
+
+        int i = 0;
+
+        urls[ i++ ] = new File( config.getOutputLocation() ).toURL();
+
+        for ( Iterator it = classpathEntries.iterator(); it.hasNext(); )
+        {
+            urls[ i++ ] = new File( (String) it.next() ).toURL();
         }
 
-        return errors;
-    }
+//        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        ClassLoader classLoader = new URLClassLoader( urls );
 
-    public void compile( String sourceFile,
-                         String sourceDir,
-                         String destinationDirectory,
-                         List errors )
-        throws Exception
-    {
-        String targetClassName = makeClassName( sourceFile, sourceDir );
+        SourceCodeLocator sourceCodeLocator = new SourceCodeLocator( config.getSourceLocations() );
 
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-
-        String[] fileNames = new String[]{sourceFile};
-
-        String[] classNames = new String[]{targetClassName};
-
-        INameEnvironment env = new EclipseCompilerINameEnvironment( targetClassName, sourceFile, classLoader, errors );
+        INameEnvironment env = new EclipseCompilerINameEnvironment( sourceCodeLocator,
+                                                                    classLoader,
+                                                                    errors );
 
         IErrorHandlingPolicy policy = DefaultErrorHandlingPolicies.proceedWithAllProblems();
 
@@ -175,20 +172,38 @@ public class EclipseJavaCompiler
 
         IProblemFactory problemFactory = new DefaultProblemFactory( Locale.getDefault() );
 
-        ICompilerRequestor requestor = new EclipseCompilerICompilerRequestor( destinationDirectory, errors );
+        ICompilerRequestor requestor = new EclipseCompilerICompilerRequestor( config.getOutputLocation(),
+                                                                              errors,
+                                                                              warnings );
 
-        ICompilationUnit[] compilationUnits = new ICompilationUnit[classNames.length];
+        List compilationUnits = new ArrayList();
 
-        for ( int i = 0; i < compilationUnits.length; i++ )
+        for ( Iterator it = config.getSourceLocations().iterator(); it.hasNext(); )
         {
-            String className = classNames[ i ];
+            String sourceRoot = (String) it.next();
 
-            compilationUnits[ i ] = new CompilationUnit( fileNames[ i ], className, errors );
+            Set sources = getSourceFilesForSourceRoot( config, sourceRoot );
+
+            for ( Iterator it2 = sources.iterator(); it2.hasNext(); )
+            {
+                String source = (String) it2.next();
+
+                CompilationUnit unit = new CompilationUnit( source,
+                                                            makeClassName( source, sourceRoot ),
+                                                            errors );
+
+                compilationUnits.add( unit );
+            }
         }
 
         Compiler compiler = new Compiler( env, policy, settings, requestor, problemFactory );
 
-        compiler.compile( compilationUnits );
+        ICompilationUnit[] units = (ICompilationUnit[])
+            compilationUnits.toArray( new ICompilationUnit[ compilationUnits.size() ] );
+
+        compiler.compile( units );
+
+        return errors;
     }
 
     private CompilerError handleError( String className, int line, int column, Object errorMessage )
@@ -200,13 +215,37 @@ public class EclipseJavaCompiler
             column = 0;
         }
 
+        String message;
+
+        if ( errorMessage != null )
+        {
+            message = errorMessage.toString();
+        }
+        else
+        {
+            new Exception().printStackTrace();
+
+            message = "No message";
+        }
+
         return new CompilerError( fileName,
                                   true,
                                   line,
                                   column,
                                   line,
                                   column,
-                                  errorMessage.toString() );
+                                  message );
+    }
+
+    private CompilerError handleWarning( IProblem warning )
+    {
+        return new CompilerError( new String( warning.getOriginatingFileName() ),
+                                  false,
+                                  warning.getSourceLineNumber(),
+                                  warning.getSourceStart(),
+                                  warning.getSourceLineNumber(),
+                                  warning.getSourceEnd(),
+                                  warning.getMessage() );
     }
 
     private class CompilationUnit
@@ -242,11 +281,15 @@ public class EclipseJavaCompiler
             {
                 errors.add( handleError( className, -1, -1, e.getMessage() ) );
 
+                e.printStackTrace();
+
                 return null;
             }
             catch ( IOException e )
             {
                 errors.add( handleError( className, -1, -1, e.getMessage() ) );
+
+                e.printStackTrace();
 
                 return null;
             }
@@ -284,21 +327,17 @@ public class EclipseJavaCompiler
     private class EclipseCompilerINameEnvironment
         implements INameEnvironment
     {
-        private String targetClassName;
-
-        private String sourceFile;
+        private SourceCodeLocator sourceCodeLocator;
 
         private ClassLoader classLoader;
 
         private List errors;
 
-        public EclipseCompilerINameEnvironment( String targetClassName,
-                                                String sourceFile,
+        public EclipseCompilerINameEnvironment( SourceCodeLocator sourceCodeLocator,
                                                 ClassLoader classLoader,
                                                 List errors )
         {
-            this.targetClassName = targetClassName;
-            this.sourceFile = sourceFile;
+            this.sourceCodeLocator = sourceCodeLocator;
             this.classLoader = classLoader;
             this.errors = errors;
         }
@@ -341,13 +380,15 @@ public class EclipseJavaCompiler
         {
             try
             {
-                if ( className.equals( targetClassName ) )
+                File f = sourceCodeLocator.findSourceCodeForClass( className );
+
+                if ( f != null )
                 {
-                    ICompilationUnit compilationUnit = new CompilationUnit( sourceFile,
+                    ICompilationUnit compilationUnit = new CompilationUnit( f.getAbsolutePath(),
                                                                             className,
                                                                             errors );
 
-                    return new NameEnvironmentAnswer( compilationUnit );
+                    return new NameEnvironmentAnswer( compilationUnit, null );
                 }
 
                 String resourceName = className.replace( '.', '/' ) + ".class";
@@ -365,11 +406,13 @@ public class EclipseJavaCompiler
 
                 ClassFileReader classFileReader = new ClassFileReader( classBytes, fileName, true );
 
-                return new NameEnvironmentAnswer( classFileReader );
+                return new NameEnvironmentAnswer( classFileReader, null );
             }
             catch ( IOException e )
             {
                 errors.add( handleError( className, -1, -1, e.getMessage() ) );
+
+                e.printStackTrace();
 
                 return null;
             }
@@ -377,19 +420,23 @@ public class EclipseJavaCompiler
             {
                 errors.add( handleError( className, -1, -1, e.getMessage() ) );
 
+                e.printStackTrace();
+
                 return null;
             }
         }
 
         private boolean isPackage( String result )
         {
-            if ( result.equals( targetClassName ) )
+            if ( sourceCodeLocator.findSourceCodeForClass( result ) != null )
             {
                 return false;
             }
-            String resourceName = result.replace( '.', '/' ) + ".class";
-            InputStream is =
-                classLoader.getResourceAsStream( resourceName );
+
+            String resourceName = "/" + result.replace( '.', '/' ) + ".class";
+
+            InputStream is = classLoader.getResourceAsStream( resourceName );
+
             return is == null;
         }
 
@@ -409,15 +456,13 @@ public class EclipseJavaCompiler
                     sep = ".";
                 }
             }
-            String str = new String( packageName );
 
-            if ( Character.isUpperCase( str.charAt( 0 ) ) )
+            if ( Character.isUpperCase( packageName[ 0 ] ) )
             {
-                if ( !isPackage( result ) )
-                {
-                    return false;
-                }
+                return false;
             }
+
+            String str = new String( packageName );
 
             result += sep;
 
@@ -429,33 +474,49 @@ public class EclipseJavaCompiler
         public void cleanup()
         {
         }
-
     }
 
     private class EclipseCompilerICompilerRequestor
         implements ICompilerRequestor
     {
-        private final String destinationDirectory;
+        private String destinationDirectory;
 
-        private final List errors;
+        private List errors;
 
-        public EclipseCompilerICompilerRequestor( String destinationDirectory, List errors )
+        private List warnings;
+
+        public EclipseCompilerICompilerRequestor( String destinationDirectory,
+                                                  List errors,
+                                                  List warnings )
         {
             this.destinationDirectory = destinationDirectory;
             this.errors = errors;
+            this.warnings = warnings;
         }
 
         public void acceptResult( CompilationResult result )
         {
-            if ( result.hasProblems() )
+            if ( result.hasErrors() )
             {
                 IProblem[] problems = result.getProblems();
 
                 for ( int i = 0; i < problems.length; i++ )
                 {
                     IProblem problem = problems[ i ];
+
                     String name = new String( problems[ i ].getOriginatingFileName() );
-                    errors.add( handleError( name, problem.getSourceLineNumber(), -1, problem.getMessage() ) );
+
+                    if ( problem.isWarning() )
+                    {
+                        warnings.add( handleWarning( problem ) );
+                    }
+                    else
+                    {
+                        errors.add( handleError( name,
+                                                 problem.getSourceLineNumber(),
+                                                 -1,
+                                                 problem.getMessage() ) );
+                    }
                 }
             }
             else
@@ -491,17 +552,21 @@ public class EclipseJavaCompiler
                     {
                         fout = new FileOutputStream( outFile );
 
-                        BufferedOutputStream bos = new BufferedOutputStream( fout );
+//                        BufferedOutputStream bos = new BufferedOutputStream( fout );
 
-                        bos.write( bytes );
+                        fout.write( bytes );
                     }
                     catch ( FileNotFoundException e )
                     {
                         errors.add( handleError( className, -1, -1, e.getMessage() ) );
+
+                        e.printStackTrace();
                     }
                     catch ( IOException e )
                     {
                         errors.add( handleError( className, -1, -1, e.getMessage() ) );
+
+                        e.printStackTrace();
                     }
                     finally
                     {
