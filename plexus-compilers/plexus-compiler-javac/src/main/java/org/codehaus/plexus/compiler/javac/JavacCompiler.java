@@ -171,7 +171,8 @@ public class JavacCompiler
         }
         catch ( ClassNotFoundException e )
         {
-            String message = "Unable to locate the Javac Compiler. Please ensure you are using JDK 1.4 or above and" + EOL +
+            String message = "Unable to locate the Javac Compiler in:" + EOL + "  " + toolsJar + EOL +
+                "Please ensure you are using JDK 1.4 or above and" + EOL +
                 "not a JRE (the com.sun.tools.javac.Main class is required)." + EOL +
                 "In most cases you can change the location of your Java" + EOL +
                 "installation by setting the JAVA_HOME environment variable.";
