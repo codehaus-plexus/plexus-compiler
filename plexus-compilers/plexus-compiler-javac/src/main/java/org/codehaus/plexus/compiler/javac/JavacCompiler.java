@@ -249,6 +249,8 @@ public class JavacCompiler
     {
         StringTokenizer tokens = new StringTokenizer( error, ":" );
 
+        boolean isError = true;
+
         try
         {
             String file = tokens.nextToken();
@@ -262,9 +264,20 @@ public class JavacCompiler
 
             StringBuffer msgBuffer = new StringBuffer();
 
-            msgBuffer.append( tokens.nextToken( EOL ).substring( 1 ) );
+            String msg = tokens.nextToken( EOL ).substring( 2 );
+
+            msgBuffer.append( msg );
 
             msgBuffer.append( EOL );
+
+            if ( msg.startsWith( "warning: " ) )
+            {
+                isError = false;
+
+                msgBuffer.append( tokens.nextToken( EOL ) ); // '(try -source'
+
+                msgBuffer.append( EOL );
+            }
 
             String context = tokens.nextToken( EOL );
 
@@ -277,6 +290,8 @@ public class JavacCompiler
                 msgBuffer.append( EOL );
 
                 msgBuffer.append( pointer );	// 'location' line
+
+                msgBuffer.append( EOL );
 
                 context = tokens.nextToken( EOL );
 
@@ -294,7 +309,7 @@ public class JavacCompiler
                 endcolumn = context.length();
             }
 
-            return new CompilerError( file, true, line, startcolumn, line, endcolumn, message );
+            return new CompilerError( file, isError, line, startcolumn, line, endcolumn, message );
         }
         catch ( NoSuchElementException nse )
         {

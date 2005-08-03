@@ -105,7 +105,19 @@ public abstract class AbstractCompilerTest
 
         assertEquals( "Wrong number of compilation errors.",
                       expectedErrors(),
-                      messages.size() );
+                      compilerErrorCount( messages ) );
+    }
+
+    protected int compilerErrorCount( List messages )
+    {
+        int count = 0;
+
+        for ( int i = 0; i < messages.size(); i++ )
+        {
+            count += ( (CompilerError) messages.get( i ) ).isError() ? 1 : 0;
+        }
+
+        return count;
     }
 
     protected int expectedErrors()
