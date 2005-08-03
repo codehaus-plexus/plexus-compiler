@@ -7,6 +7,7 @@
     <artifactId>plexus-compiler</artifactId>
     <version>1.5-SNAPSHOT</version>
   </parent>
+  <packaging>pom</packaging>
   <artifactId>plexus-compilers</artifactId>
   <name>Plexus Compilers Parent</name>
   <dependencies>
