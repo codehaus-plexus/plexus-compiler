@@ -29,6 +29,7 @@ import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerError;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.jdt.core.compiler.IProblem;
 import org.eclipse.jdt.internal.compiler.ClassFile;
 import org.eclipse.jdt.internal.compiler.CompilationResult;
@@ -65,58 +66,14 @@ import java.util.StringTokenizer;
 public class EclipseJavaCompiler
     extends AbstractCompiler
 {
-    private static boolean target14;
-
-    private static boolean source14;
-
-    private boolean debug;
-
-    private String sourceEncoding;
-
     // ----------------------------------------------------------------------
-    // Static initializer
-    // ----------------------------------------------------------------------
-
-    static
-    {
-        // Detect JDK version we are running under
-        String version = System.getProperty( "java.specification.version" );
-
-        try
-        {
-            target14 = Float.parseFloat( version ) >= 1.4;
-
-            source14 = target14;
-        }
-        catch ( NumberFormatException e )
-        {
-            target14 = false;
-
-            source14 = target14;
-        }
-    }
-
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
-
-    public EclipseJavaCompiler()
-    {
-        debug = false;
-
-        source14 = true;
-    }
-
-    // ----------------------------------------------------------------------
-    //
+    // Compiler Implementation
     // ----------------------------------------------------------------------
 
     public List compile( CompilerConfiguration config )
         throws Exception
     {
         List errors = new LinkedList();
-
-        List warnings = new LinkedList();
 
         List classpathEntries = config.getClasspathEntries();
 
@@ -131,7 +88,6 @@ public class EclipseJavaCompiler
             urls[ i++ ] = new File( (String) it.next() ).toURL();
         }
 
-//        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         ClassLoader classLoader = new URLClassLoader( urls );
 
         SourceCodeLocator sourceCodeLocator = new SourceCodeLocator( config.getSourceLocations() );
@@ -142,39 +98,63 @@ public class EclipseJavaCompiler
 
         IErrorHandlingPolicy policy = DefaultErrorHandlingPolicies.proceedWithAllProblems();
 
+        // ----------------------------------------------------------------------
+        // Build settings from configuration
+        // ----------------------------------------------------------------------
+
         Map settings = new HashMap();
+
+        if ( config.isDebug() )
+        {
+            settings.put( CompilerOptions.OPTION_LocalVariableAttribute, CompilerOptions.GENERATE );
+        }
+
+        if ( config.isShowWarnings() )
+        {
+            // TODO: Implement. I'm not sure what value to pass - trygve
+//            settings.put( CompilerOptions.OPTION_SuppressWarnings,  );
+        }
+
+        String sourceVersion = decodeVersion( config.getSourceVersion() );
+
+        if ( sourceVersion != null )
+        {
+            settings.put( CompilerOptions.OPTION_Source, sourceVersion );
+        }
+
+        String targetVersion = decodeVersion( config.getTargetVersion() );
+
+        if ( targetVersion != null )
+        {
+            settings.put( CompilerOptions.OPTION_TargetPlatform, targetVersion );
+        }
+
+        if ( !StringUtils.isEmpty( config.getSourceEncoding() ) )
+        {
+            settings.put( CompilerOptions.OPTION_Encoding, config.getSourceEncoding() );
+        }
+
+        if ( config.isShowDeprecation() )
+        {
+            settings.put( CompilerOptions.OPTION_ReportDeprecation, CompilerOptions.WARNING );
+        }
+        else
+        {
+            settings.put( CompilerOptions.OPTION_ReportDeprecation, CompilerOptions.IGNORE );
+        }
+
+        // ----------------------------------------------------------------------
+        // Set Eclipse-specific options
+        // ----------------------------------------------------------------------
 
         settings.put( CompilerOptions.OPTION_LineNumberAttribute, CompilerOptions.GENERATE );
 
         settings.put( CompilerOptions.OPTION_SourceFileAttribute, CompilerOptions.GENERATE );
 
-        settings.put( CompilerOptions.OPTION_ReportDeprecation, CompilerOptions.IGNORE );
-
-        if ( sourceEncoding != null )
-        {
-            settings.put( CompilerOptions.OPTION_Encoding, sourceEncoding );
-        }
-
-        if ( debug )
-        {
-            settings.put( CompilerOptions.OPTION_LocalVariableAttribute, CompilerOptions.GENERATE );
-        }
-
-        if ( source14 )
-        {
-            settings.put( CompilerOptions.OPTION_Source, CompilerOptions.VERSION_1_4 );
-        }
-
-        if ( target14 )
-        {
-            settings.put( CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_1_4 );
-        }
-
         IProblemFactory problemFactory = new DefaultProblemFactory( Locale.getDefault() );
 
         ICompilerRequestor requestor = new EclipseCompilerICompilerRequestor( config.getOutputLocation(),
-                                                                              errors,
-                                                                              warnings );
+                                                                              errors );
 
         List compilationUnits = new ArrayList();
 
@@ -195,6 +175,10 @@ public class EclipseJavaCompiler
                 compilationUnits.add( unit );
             }
         }
+
+        // ----------------------------------------------------------------------
+        // Compile!
+        // ----------------------------------------------------------------------
 
         Compiler compiler = new Compiler( env, policy, settings, requestor, problemFactory );
 
@@ -245,6 +229,44 @@ public class EclipseJavaCompiler
                                   warning.getSourceEnd(),
                                   warning.getMessage() );
     }
+
+    private String decodeVersion( String versionSpec )
+    {
+        if ( StringUtils.isEmpty( versionSpec ) )
+        {
+            return null;
+        }
+        else if ( versionSpec.equals( "1.1" ) )
+        {
+            return CompilerOptions.VERSION_1_1;
+        }
+        else if ( versionSpec.equals( "1.2" ) )
+        {
+            return CompilerOptions.VERSION_1_2;
+        }
+        else if ( versionSpec.equals( "1.3" ) )
+        {
+            return CompilerOptions.VERSION_1_3;
+        }
+        else if ( versionSpec.equals( "1.4" ) )
+        {
+            return CompilerOptions.VERSION_1_4;
+        }
+        else if ( versionSpec.equals( "1.5" ) )
+        {
+            return CompilerOptions.VERSION_1_5;
+        }
+        else
+        {
+            getLogger().warn( "Unknown version '" + versionSpec + "', no version setting will be given to the compiler." );
+
+            return null;
+        }
+    }
+
+    // ----------------------------------------------------------------------
+    // Classes
+    // ----------------------------------------------------------------------
 
     private class CompilationUnit
         implements ICompilationUnit
@@ -473,20 +495,16 @@ public class EclipseJavaCompiler
 
         private List errors;
 
-        private List warnings;
-
         public EclipseCompilerICompilerRequestor( String destinationDirectory,
-                                                  List errors,
-                                                  List warnings )
+                                                  List errors )
         {
             this.destinationDirectory = destinationDirectory;
             this.errors = errors;
-            this.warnings = warnings;
         }
 
         public void acceptResult( CompilationResult result )
         {
-            if ( result.hasErrors() )
+            if ( result.hasProblems() )
             {
                 IProblem[] problems = result.getProblems();
 
@@ -498,7 +516,7 @@ public class EclipseJavaCompiler
 
                     if ( problem.isWarning() )
                     {
-                        warnings.add( handleWarning( problem ) );
+                        errors.add( handleWarning( problem ) );
                     }
                     else
                     {
@@ -541,8 +559,6 @@ public class EclipseJavaCompiler
                     try
                     {
                         fout = new FileOutputStream( outFile );
-
-//                        BufferedOutputStream bos = new BufferedOutputStream( fout );
 
                         fout.write( bytes );
                     }

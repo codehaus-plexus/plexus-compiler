@@ -44,14 +44,14 @@ package org.codehaus.plexus.compiler.javac;
 import org.codehaus.plexus.compiler.AbstractCompiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerError;
+import org.codehaus.plexus.util.StringUtils;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -85,22 +85,18 @@ public class JavacCompiler
             return Collections.EMPTY_LIST;
         }
 
-        // TODO: use getLogger() - but for some reason it is null when this is used
-        System.out.println( "Compiling " + sources.length + " source file" + ( sources.length == 1 ? "" : "s" ) +
-                            " to " + destinationDir.getAbsolutePath() );
+        getLogger().info( "Compiling " + sources.length + " source file" + ( sources.length == 1 ? "" : "s" ) + " " +
+                          "to " + destinationDir.getAbsolutePath() );
 
-        Map compilerOptions = config.getCompilerOptions();
+        List args = new ArrayList( 100 );
 
-        List args = new ArrayList( sources.length + 5 + compilerOptions.size() * 2 );
+        // ----------------------------------------------------------------------
+        // Build command line arguments list
+        // ----------------------------------------------------------------------
 
         args.add( "-d" );
 
         args.add( destinationDir.getAbsolutePath() );
-
-        if ( config.isNoWarn() )
-        {
-            args.add( "-nowarn" );
-        }
 
         List classpathEntries = config.getClasspathEntries();
         if ( classpathEntries != null && !classpathEntries.isEmpty() )
@@ -108,11 +104,6 @@ public class JavacCompiler
             args.add( "-classpath" );
 
             args.add( getPathString( classpathEntries ) );
-        }
-
-        if ( config.isDebug() )
-        {
-            args.add( "-g" );
         }
 
         List sourceLocations = config.getSourceLocations();
@@ -123,10 +114,32 @@ public class JavacCompiler
             args.add( getPathString( sourceLocations ) );
         }
 
-        // TODO: this could be much improved
-        if ( !compilerOptions.containsKey( "-target" ) )
+        // ----------------------------------------------------------------------
+        // Build settings from configuration
+        // ----------------------------------------------------------------------
+
+        if ( config.isDebug() )
         {
-            if ( !compilerOptions.containsKey( "-source" ) )
+            args.add( "-g" );
+        }
+
+        if ( config.isShowDeprecation() )
+        {
+            args.add( "-deprecation" );
+
+            // This is required to actually display the deprecation messages
+            config.setShowWarnings( true );
+        }
+
+        if ( !config.isShowWarnings() )
+        {
+            args.add( "-nowarn" );
+        }
+
+        // TODO: this could be much improved
+        if ( StringUtils.isEmpty( config.getTargetVersion() ) )
+        {
+            if ( StringUtils.isEmpty( config.getSourceVersion() ) )
             {
                 // If omitted, later JDKs complain about a 1.1 target
                 args.add( "-source" );
@@ -137,6 +150,18 @@ public class JavacCompiler
             args.add( "-target" );
             args.add( "1.1" );
         }
+
+        if ( !StringUtils.isEmpty( config.getSourceEncoding() ) )
+        {
+            args.add( "-encoding" );
+            args.add( config.getSourceEncoding() );
+        }
+
+        // ----------------------------------------------------------------------
+        // Add all other compiler options verbatim
+        // ----------------------------------------------------------------------
+
+        Map compilerOptions = config.getCompilerOptions();
 
         Iterator it = compilerOptions.entrySet().iterator();
 
@@ -165,6 +190,7 @@ public class JavacCompiler
         }
 
         Class c;
+
         try
         {
             c = cl.loadClass( "com.sun.tools.javac.Main" );
@@ -179,14 +205,13 @@ public class JavacCompiler
             return Collections.singletonList( new CompilerError( message, true ) );
         }
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        StringWriter out = new StringWriter();
 
         Method compile = c.getMethod( "compile", new Class[]{String[].class, PrintWriter.class} );
 
         Integer ok = (Integer) compile.invoke( null, new Object[]{args.toArray( new String[0] ), new PrintWriter( out )} );
 
-        List messages = parseModernStream(
-            new BufferedReader( new InputStreamReader( new ByteArrayInputStream( out.toByteArray() ) ) ) );
+        List messages = parseModernStream(  new BufferedReader( new StringReader( out.toString() ) ) );
 
         if ( ok.intValue() != 0 && messages.isEmpty() )
         {
@@ -245,16 +270,19 @@ public class JavacCompiler
         }
     }
 
-    private CompilerError parseModernError( String error )
+    public static CompilerError parseModernError( String error )
     {
         StringTokenizer tokens = new StringTokenizer( error, ":" );
 
-        boolean isError = true;
+        boolean isError;
+
+        StringBuffer msgBuffer;
 
         try
         {
             String file = tokens.nextToken();
 
+            // When will this happen?
             if ( file.length() == 1 )
             {
                 file = new StringBuffer( file ).append( ":" ).append( tokens.nextToken() ).toString();
@@ -262,27 +290,28 @@ public class JavacCompiler
 
             int line = Integer.parseInt( tokens.nextToken() );
 
-            StringBuffer msgBuffer = new StringBuffer();
+            msgBuffer = new StringBuffer();
 
             String msg = tokens.nextToken( EOL ).substring( 2 );
+
+            String WARNING_PREFIX = "warning: ";
+
+            isError = !msg.startsWith( WARNING_PREFIX );
+
+            // Remove the 'warning: ' prefix
+            if ( !isError )
+            {
+                msg = msg.substring( WARNING_PREFIX.length() );
+            }
 
             msgBuffer.append( msg );
 
             msgBuffer.append( EOL );
 
-            if ( msg.startsWith( "warning: " ) )
-            {
-                isError = false;
-
-                msgBuffer.append( tokens.nextToken( EOL ) ); // '(try -source'
-
-                msgBuffer.append( EOL );
-            }
-
             String context = tokens.nextToken( EOL );
 
             String pointer = tokens.nextToken( EOL );
-
+/*
             if ( tokens.hasMoreTokens() )
             {
                 msgBuffer.append( context );	// 'symbol' line
@@ -297,7 +326,7 @@ public class JavacCompiler
 
                 pointer = tokens.nextToken( EOL );
             }
-
+*/
             String message = msgBuffer.toString();
 
             int startcolumn = pointer.indexOf( "^" );
@@ -311,25 +340,18 @@ public class JavacCompiler
 
             return new CompilerError( file, isError, line, startcolumn, line, endcolumn, message );
         }
-        catch ( NoSuchElementException nse )
+        catch ( NoSuchElementException e )
         {
-            // TODO: exception?
+            e.printStackTrace();
             return new CompilerError( "no more tokens - could not parse error message: " + error, true );
         }
-        catch ( NumberFormatException nse )
+        catch ( NumberFormatException e )
         {
-            // TODO: exception?
             return new CompilerError( "could not parse error message: " + error, true );
         }
-        catch ( Exception nse )
+        catch ( Exception e )
         {
-            // TODO: exception?
             return new CompilerError( "could not parse error message: " + error, true );
         }
-    }
-
-    public String toString()
-    {
-        return "Sun Javac Compiler";
     }
 }

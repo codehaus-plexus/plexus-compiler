@@ -96,13 +96,6 @@ public abstract class AbstractCompilerTest
     {
         List messages = compiler.compile( compilerConfig );
 
-        System.err.println( "Compiler messages: " );
-
-        for ( Iterator iter = messages.iterator(); iter.hasNext(); )
-        {
-            System.out.println( iter.next() );
-        }
-
         assertEquals( "Wrong number of compilation errors.",
                       expectedErrors(),
                       compilerErrorCount( messages ) );

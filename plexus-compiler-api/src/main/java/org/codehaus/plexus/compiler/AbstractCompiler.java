@@ -45,14 +45,6 @@ public abstract class AbstractCompiler
 {
     private static String PS = System.getProperty( "path.separator" );
 
-    /**
-     * @deprecated Use getPathString(..) instead.
-     */
-    public String getClasspathString( List pathElements ) throws Exception
-    {
-        return getPathString( pathElements );
-    }
-
     public String getPathString( List pathElements )
     {
         StringBuffer sb = new StringBuffer();

@@ -42,29 +42,43 @@ public class CompilerConfiguration
 
     private List classpathEntries = new LinkedList();
 
+    // ----------------------------------------------------------------------
+    // Sources
+    // ----------------------------------------------------------------------
+
+    private Set sourceFiles = new HashSet();
+
     private List sourceLocations = new LinkedList();
 
     private Set includes = new HashSet();
 
     private Set excludes = new HashSet();
 
-    private Map compilerOptions = new TreeMap();
+    // ----------------------------------------------------------------------
+    // Compiler Settings
+    // ----------------------------------------------------------------------
 
     private boolean debug;
 
-    private Set sourceFiles = new HashSet();
+    private boolean showWarnings;
 
-    private boolean noWarn;
+    private boolean showDeprecation;
 
-    public void setSourceFiles( Set sourceFiles )
-    {
-        this.sourceFiles = sourceFiles;
-    }
+    private String sourceVersion;
 
-    public Set getSourceFiles()
-    {
-        return sourceFiles;
-    }
+    private String targetVersion;
+
+    private String sourceEncoding;
+
+    // ----------------------------------------------------------------------
+    //
+    // ----------------------------------------------------------------------
+
+    private Map compilerOptions = new TreeMap();
+
+    // ----------------------------------------------------------------------
+    //
+    // ----------------------------------------------------------------------
 
     public void setOutputLocation( String outputLocation )
     {
@@ -75,6 +89,10 @@ public class CompilerConfiguration
     {
         return outputLocation;
     }
+
+    // ----------------------------------------------------------------------
+    // Class path
+    // ----------------------------------------------------------------------
 
     public void addClasspathEntry( String classpathEntry )
     {
@@ -91,6 +109,10 @@ public class CompilerConfiguration
         return Collections.unmodifiableList( classpathEntries );
     }
 
+    // ----------------------------------------------------------------------
+    // Source files
+    // ----------------------------------------------------------------------
+
     public void addSourceLocation( String sourceLocation )
     {
         sourceLocations.add( sourceLocation );
@@ -104,6 +126,16 @@ public class CompilerConfiguration
     public List getSourceLocations()
     {
         return Collections.unmodifiableList( sourceLocations );
+    }
+
+    public void setSourceFiles( Set sourceFiles )
+    {
+        this.sourceFiles = sourceFiles;
+    }
+
+    public Set getSourceFiles()
+    {
+        return sourceFiles;
     }
 
     public void addInclude( String include )
@@ -136,6 +168,60 @@ public class CompilerConfiguration
         return Collections.unmodifiableSet( excludes );
     }
 
+    public void setDebug( boolean debug )
+    {
+        this.debug = debug;
+    }
+
+    public boolean isDebug()
+    {
+        return debug;
+    }
+
+    public void setShowWarnings( boolean showWarnings )
+    {
+        this.showWarnings = showWarnings;
+    }
+
+    public boolean isShowWarnings()
+    {
+        return showWarnings;
+    }
+
+    public String getSourceVersion()
+    {
+        return sourceVersion;
+    }
+
+    public void setSourceVersion( String sourceVersion )
+    {
+        this.sourceVersion = sourceVersion;
+    }
+
+    public String getTargetVersion()
+    {
+        return targetVersion;
+    }
+
+    public void setTargetVersion( String targetVersion )
+    {
+        this.targetVersion = targetVersion;
+    }
+
+    public String getSourceEncoding()
+    {
+        return sourceEncoding;
+    }
+
+    public void setSourceEncoding( String sourceEncoding )
+    {
+        this.sourceEncoding = sourceEncoding;
+    }
+
+    // ----------------------------------------------------------------------
+    // Generic options
+    // ----------------------------------------------------------------------
+
     public void addCompilerOption( String optionName, String optionValue )
     {
         compilerOptions.put( optionName, optionValue );
@@ -151,31 +237,13 @@ public class CompilerConfiguration
         return Collections.unmodifiableMap( compilerOptions );
     }
 
-    /**
-     * @param debug The debug to set.
-     */
-    public void setDebug( boolean debug )
+    public boolean isShowDeprecation()
     {
-        this.debug = debug;
+        return showDeprecation;
     }
 
-    /**
-     * Compile with debug info
-     *
-     * @return Returns the debug.
-     */
-    public boolean isDebug()
+    public void setShowDeprecation( boolean showDeprecation )
     {
-        return debug;
-    }
-
-    public void setNoWarn( boolean noWarn )
-    {
-        this.noWarn = noWarn;
-    }
-
-    public boolean isNoWarn()
-    {
-        return noWarn;
+        this.showDeprecation = showDeprecation;
     }
 }
