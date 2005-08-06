@@ -139,16 +139,26 @@ public class JavacCompiler
         // TODO: this could be much improved
         if ( StringUtils.isEmpty( config.getTargetVersion() ) )
         {
-            if ( StringUtils.isEmpty( config.getSourceVersion() ) )
-            {
-                // If omitted, later JDKs complain about a 1.1 target
-                args.add( "-source" );
-                args.add( "1.3" );
-            }
-
             // Required, or it defaults to the target of your JDK (eg 1.5)
             args.add( "-target" );
             args.add( "1.1" );
+        }
+        else
+        {
+            args.add( "-target" );
+            args.add( config.getTargetVersion() );
+        }
+
+        if ( StringUtils.isEmpty( config.getSourceVersion() ) )
+        {
+            // If omitted, later JDKs complain about a 1.1 target
+            args.add( "-source" );
+            args.add( "1.3" );
+        }
+        else
+        {
+            args.add( "-source" );
+            args.add( config.getSourceVersion() );
         }
 
         if ( !StringUtils.isEmpty( config.getSourceEncoding() ) )
