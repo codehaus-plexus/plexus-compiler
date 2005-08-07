@@ -85,8 +85,9 @@ public class JavacCompiler
             return Collections.EMPTY_LIST;
         }
 
-        getLogger().info( "Compiling " + sources.length + " source file" + ( sources.length == 1 ? "" : "s" ) + " " +
-                          "to " + destinationDir.getAbsolutePath() );
+        // TODO: use getLogger() - but for some reason it is null when this is used
+        System.out.println( "Compiling " + sources.length + " source file" + ( sources.length == 1 ? "" : "s" ) + " " +
+                            "to " + destinationDir.getAbsolutePath() );
 
         List args = new ArrayList( 100 );
 
