@@ -1,5 +1,29 @@
 package org.codehaus.plexus.compiler.jikes;
 
+/**
+ * The MIT License
+ *
+ * Copyright (c) 2005, The Codehaus
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of
+ * this software and associated documentation files (the "Software"), to deal in
+ * the Software without restriction, including without limitation the rights to
+ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+ * of the Software, and to permit persons to whom the Software is furnished to do
+ * so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 /*============================================================================
                    The Apache Software License, Version 1.1
  ============================================================================
@@ -49,7 +73,6 @@ package org.codehaus.plexus.compiler.jikes;
 
 */
 
-
 import org.codehaus.plexus.compiler.AbstractCompiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerError;
@@ -63,13 +86,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
 
 public class JikesCompiler
     extends AbstractCompiler
 {
-    static final int OUTPUT_BUFFER_SIZE = 1024;
+    private static final int OUTPUT_BUFFER_SIZE = 1024;
 
     public List compile( CompilerConfiguration config )
         throws Exception
@@ -83,37 +106,35 @@ public class JikesCompiler
 
         String javaHome = System.getProperty( "java.home" );
 
-        List messages = null;
+        List messages = new ArrayList();
 
-        String[] sources = getSourceFiles( config );
+        List args = new ArrayList();
 
-        int j = 9;
+        args.add( "jikes" );
 
-        String[] args = new String[sources.length + j];
+        args.add( "-bootclasspath" );
 
-        args[0] = "jikes";
+        args.add( new File( javaHome, "lib/rt.jar" ).getPath() );
 
-        args[1] = "-bootclasspath";
-
-        args[2] = new File( javaHome, "lib/rt.jar" ).getPath();
-
-        args[3] = "-classpath";
+        args.add( "-classpath" );
 
         List classpathEntries = config.getClasspathEntries();
 
-        args[4] = getPathString( classpathEntries );
+        args.add( getPathString( classpathEntries ) );
 
-        args[5] = "+E";
+        args.add( "+E" );
 
-        args[6] = "-nowarn";
+        args.add( "-nowarn" );
 
-        args[7] = "-d";
+        args.add( "-d" );
 
-        args[8] = destinationDir.getAbsolutePath();
+        args.add( destinationDir.getAbsolutePath() );
+
+        String[] sources = getSourceFiles( config );
 
         for ( int i = 0; i < sources.length; i++ )
         {
-            args[i + j] = sources[i];
+            args.add( sources[i] );
         }
 
         int exitValue;
@@ -122,7 +143,7 @@ public class JikesCompiler
 
         try
         {
-            Process p = Runtime.getRuntime().exec( args );
+            Process p = Runtime.getRuntime().exec( (String[]) args.toArray( new String[ args.size() ] ) );
 
             BufferedInputStream compilerErr = new BufferedInputStream( p.getErrorStream() );
 
@@ -143,11 +164,16 @@ public class JikesCompiler
 
             tmpErr.close();
 
-            messages = parseStream( new BufferedReader( new InputStreamReader( new ByteArrayInputStream( tmpErr.toByteArray() ) ) ) );
+            parseStream( new BufferedReader( new InputStreamReader( new ByteArrayInputStream( tmpErr.toByteArray() ) ) ), messages );
+
+            if ( exitValue != 0 )
+            {
+                messages.add( new CompilerError( "Exit code from jikes was not 0.", true ) );
+            }
         }
         catch ( InterruptedException e )
         {
-            getLogger().debug( "Jikes.compile():SomethingHappened", e );
+            messages.add( new CompilerError( "Got an Exception while compiling.", true ) );
         }
 
         return messages;
@@ -161,11 +187,11 @@ public class JikesCompiler
      * @return The list of compiler error messages
      * @exception IOException If an error occurs during message collection
      */
-    protected List parseStream( BufferedReader input ) throws IOException
+    protected List parseStream( BufferedReader input, List messages )
+        throws IOException
     {
-        List errors = null;
         String line = null;
-        StringBuffer buffer = null;
+        StringBuffer buffer;
 
         while ( true )
         {
@@ -180,7 +206,7 @@ public class JikesCompiler
 
             if ( line == null )
             {
-                return errors;
+                return messages;
             }
 
             buffer.append( line );
@@ -199,20 +225,14 @@ public class JikesCompiler
                 {
                     break;
                 }
-                buffer.append( '\n' );
+                buffer.append( EOL );
                 buffer.append( line );
-            }
-
-            // if error is found create the vector
-            if ( errors == null )
-            {
-                errors = new ArrayList();
             }
 
             if ( buffer.length() > 0 )
             {
                 // add the error bean
-                errors.add( parseError( buffer.toString() ) );
+                messages.add( parseError( buffer.toString() ) );
             }
         }
     }
@@ -227,7 +247,7 @@ public class JikesCompiler
     {
         String[] errorBits = StringUtils.split( error, ":" );
 
-        int i = 0;
+        int i;
         String file;
 
         if (System.getProperty("os.name").startsWith("Windows"))
@@ -240,7 +260,7 @@ public class JikesCompiler
             file = errorBits[0];
             i = 1;
         }
-        
+
         int startline = Integer.parseInt( errorBits[i++] );
 
         int startcolumn = Integer.parseInt( errorBits[i++] );
@@ -251,13 +271,8 @@ public class JikesCompiler
 
         String type = errorBits[i++];
 
-        String message = errorBits[i++];
+        String message = errorBits[i];
 
-        return new CompilerError( file, type.equals( "error" ), startline, startcolumn, endline, endcolumn, message.toString() );
-    }
-
-    public String toString()
-    {
-        return "IBM Jikes Compiler";
+        return new CompilerError( file, type.equals( "error" ), startline, startcolumn, endline, endcolumn, message );
     }
 }

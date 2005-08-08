@@ -43,9 +43,11 @@ public abstract class AbstractCompiler
     extends AbstractLogEnabled
     implements Compiler
 {
-    private static String PS = System.getProperty( "path.separator" );
+    protected static final String EOL = System.getProperty( "line.separator" );
 
-    public String getPathString( List pathElements )
+    protected static final String PS = System.getProperty( "path.separator" );
+
+    public static String getPathString( List pathElements )
     {
         StringBuffer sb = new StringBuffer();
 
@@ -57,8 +59,8 @@ public abstract class AbstractCompiler
         return sb.toString();
     }
 
-    protected Set getSourceFilesForSourceRoot( CompilerConfiguration config,
-                                               String sourceLocation )
+    protected static Set getSourceFilesForSourceRoot( CompilerConfiguration config,
+                                                      String sourceLocation )
     {
         DirectoryScanner scanner = new DirectoryScanner();
 
@@ -100,7 +102,7 @@ public abstract class AbstractCompiler
         return sources;
     }
 
-    protected String[] getSourceFiles( CompilerConfiguration config )
+    protected static String[] getSourceFiles( CompilerConfiguration config )
     {
         Set sources = new HashSet();
 
@@ -139,7 +141,7 @@ public abstract class AbstractCompiler
         return result;
     }
 
-    protected String makeClassName( String fileName, String sourceDir )
+    protected static String makeClassName( String fileName, String sourceDir )
         throws IOException
     {
         File origFile = new File( fileName );
@@ -178,9 +180,7 @@ public abstract class AbstractCompiler
                 {
                     str = t.getCanonicalPath().replace( '\\', '/' );
 
-                    String result = str.substring( prefix.length() + 1, str.length() - 5 ).replace( '/', '.' );
-
-                    return result;
+                    return str.substring( prefix.length() + 1, str.length() - 5 ).replace( '/', '.' );
                 }
             }
         }
@@ -195,7 +195,10 @@ public abstract class AbstractCompiler
         return fileName.replace( '/', '.' );
     }
 
-    protected String[] toStringArray( List arguments )
+    /**
+     * @deprecated use (String[]) arguments.toArray( new String[ arguments.size() ] ); instead
+     */
+    protected static String[] toStringArray( List arguments )
     {
         String[] args = new String[arguments.size()];
 

@@ -24,6 +24,7 @@ package org.codehaus.plexus.compiler;
  * SOFTWARE.
  */
 
+import java.io.File;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -69,6 +70,18 @@ public class CompilerConfiguration
     private String targetVersion;
 
     private String sourceEncoding;
+
+    // ----------------------------------------------------------------------
+    // Process Settings
+    // ----------------------------------------------------------------------
+
+    private boolean fork;
+
+    private String executable;
+
+    private List compilerArguements;
+
+    private File workingDirectory;
 
     // ----------------------------------------------------------------------
     //
@@ -245,5 +258,45 @@ public class CompilerConfiguration
     public void setShowDeprecation( boolean showDeprecation )
     {
         this.showDeprecation = showDeprecation;
+    }
+
+    public String getExecutable()
+    {
+        return executable;
+    }
+
+    public void setExecutable( String executable )
+    {
+        this.executable = executable;
+    }
+
+    public boolean isFork()
+    {
+        return fork;
+    }
+
+    public void setFork( boolean fork )
+    {
+        this.fork = fork;
+    }
+
+    public List getCompilerArguements()
+    {
+        return compilerArguements;
+    }
+
+    public void setCompilerArguements( List compilerArguements )
+    {
+        this.compilerArguements = compilerArguements;
+    }
+
+    public File getWorkingDirectory()
+    {
+        return workingDirectory;
+    }
+
+    public void setWorkingDirectory( File workingDirectory )
+    {
+        this.workingDirectory = workingDirectory;
     }
 }
