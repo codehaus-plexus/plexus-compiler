@@ -47,6 +47,8 @@ public abstract class AbstractCompilerTest
 
     private boolean compilerDebug = false;
 
+    private boolean compilerDeprecationWarnings = false;
+
     protected abstract String getRoleHint();
 
     public void setUp()
@@ -59,6 +61,12 @@ public abstract class AbstractCompilerTest
     {
         compilerDebug = flag;
     }
+
+    protected void setCompilerDeprecationWarnings( boolean flag )
+    {
+        compilerDeprecationWarnings = flag;
+    }
+
 
     protected List getClasspath()
         throws Exception
@@ -124,6 +132,8 @@ public abstract class AbstractCompilerTest
             CompilerConfiguration compilerConfig = new CompilerConfiguration();
 
             compilerConfig.setDebug( compilerDebug );
+
+            compilerConfig.setShowDeprecation( compilerDeprecationWarnings );
 
             compilerConfig.setClasspathEntries( getClasspath() );
 

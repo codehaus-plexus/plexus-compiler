@@ -38,6 +38,7 @@ public class JavacCompilerTest
     {
         super.setUp();
         setCompilerDebug( true );
+        setCompilerDeprecationWarnings( true );
     }
 
     protected String getRoleHint()
@@ -52,7 +53,7 @@ public class JavacCompilerTest
 
     protected int expectedWarnings()
     {
-        return 1;
+        return 2;
     }
     
 }
