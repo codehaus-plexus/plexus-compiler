@@ -37,11 +37,22 @@ public class JavacCompilerTest
         throws Exception
     {
         super.setUp();
-        getCompilerConfiguration().setDebug( true );
+        setCompilerDebug( true );
     }
 
     protected String getRoleHint()
     {
         return "javac";
     }
+
+    protected int expectedErrors()
+    {
+        return 3;
+    }
+
+    protected int expectedWarnings()
+    {
+        return 1;
+    }
+    
 }

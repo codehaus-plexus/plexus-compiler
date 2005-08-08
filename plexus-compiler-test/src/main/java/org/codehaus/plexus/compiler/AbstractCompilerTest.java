@@ -30,6 +30,9 @@ import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.artifact.test.ArtifactTestCase;
 
+import org.codehaus.plexus.util.FileUtils;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -42,7 +45,7 @@ public abstract class AbstractCompilerTest
 {
     private Compiler compiler;
 
-    private CompilerConfiguration compilerConfig;
+    private boolean compilerDebug = false;
 
     protected abstract String getRoleHint();
 
@@ -50,20 +53,11 @@ public abstract class AbstractCompilerTest
         throws Exception
     {
         super.setUp();
+    }
 
-        String basedir = getBasedir();
-
-        compiler = (Compiler) lookup( Compiler.ROLE, getRoleHint() );
-
-        compilerConfig = new CompilerConfiguration();
-
-        compilerConfig.setClasspathEntries( getClasspath() );
-
-        compilerConfig.addSourceLocation( basedir + "/src/test-input/src/main" );
-
-        compilerConfig.setOutputLocation( basedir + "/target/" + getRoleHint() + "/classes" );
-
-        compilerConfig.addInclude( "**/*.java" );
+    protected void setCompilerDebug( boolean flag )
+    {
+        compilerDebug = flag;
     }
 
     protected List getClasspath()
@@ -86,20 +80,65 @@ public abstract class AbstractCompilerTest
         return cp;
     }
 
-    protected CompilerConfiguration getCompilerConfiguration()
-    {
-        return compilerConfig;
-    }
-
     public void testCompilingSources()
         throws Exception
     {
-        List messages = compiler.compile( compilerConfig );
+        List messages = new ArrayList();
+
+        for ( Iterator it = getCompilerConfigurations().iterator(); it.hasNext(); )
+        {
+            CompilerConfiguration compilerConfig = (CompilerConfiguration) it.next();
+
+            compiler = (Compiler) lookup( Compiler.ROLE, getRoleHint() );
+
+            messages.addAll( compiler.compile( compilerConfig ) );
+        }
+
+        int numCompilerErrors = compilerErrorCount( messages );
+
+        int numCompilerWarnings = messages.size() - numCompilerErrors;
 
         assertEquals( "Wrong number of compilation errors.",
                       expectedErrors(),
-                      compilerErrorCount( messages ) );
+                      numCompilerErrors );
+
+        assertEquals( "Wrong number of compilation warnings.",
+                      expectedWarnings(),
+                      numCompilerWarnings );
     }
+
+
+    private List getCompilerConfigurations()
+        throws Exception
+    {
+        String sourceDir = getBasedir() + "/src/test-input/src/main";
+
+        List filenames = FileUtils.getFileNames( new File( sourceDir ), "**/*.java", null, false, true );
+
+        List compilerConfigurations = new ArrayList();
+
+        for ( Iterator it = filenames.iterator(); it.hasNext(); )
+        {
+            String filename = (String) it.next();
+
+            CompilerConfiguration compilerConfig = new CompilerConfiguration();
+
+            compilerConfig.setDebug( compilerDebug );
+
+            compilerConfig.setClasspathEntries( getClasspath() );
+
+            compilerConfig.addSourceLocation( sourceDir );
+
+            compilerConfig.setOutputLocation( getBasedir() + "/target/" + getRoleHint() + "/classes" );
+
+            compilerConfig.addInclude( filename );
+
+            compilerConfigurations.add( compilerConfig );
+        }
+
+        return compilerConfigurations;
+    }
+
 
     protected int compilerErrorCount( List messages )
     {
@@ -116,5 +155,10 @@ public abstract class AbstractCompilerTest
     protected int expectedErrors()
     {
         return 1;
+    }
+
+    protected int expectedWarnings()
+    {
+        return 0;
     }
 }

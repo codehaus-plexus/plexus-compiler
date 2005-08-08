@@ -109,8 +109,6 @@ public class StaleSourceScannerTest
     {
         File base = new File( getTestBaseDir(), "test3" );
 
-        long now = System.currentTimeMillis();
-
         File sourceFile = new File( base, "file.java" );
 
         writeFile( sourceFile );

@@ -25,7 +25,6 @@ package org.codehaus.plexus.compiler;
  */
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>

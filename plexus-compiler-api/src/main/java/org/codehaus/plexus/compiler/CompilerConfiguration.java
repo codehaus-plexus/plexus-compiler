@@ -61,7 +61,7 @@ public class CompilerConfiguration
 
     private boolean debug;
 
-    private boolean showWarnings;
+    private boolean showWarnings = true;
 
     private boolean showDeprecation;
 

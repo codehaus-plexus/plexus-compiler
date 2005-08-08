@@ -159,17 +159,17 @@ public class JavacCompiler
             args.add( "-g" );
         }
 
+        if ( !config.isShowWarnings() )
+        {
+            args.add( "-nowarn" );
+        }
+
         if ( config.isShowDeprecation() )
         {
             args.add( "-deprecation" );
 
             // This is required to actually display the deprecation messages
             config.setShowWarnings( true );
-        }
-
-        if ( !config.isShowWarnings() )
-        {
-            args.add( "-nowarn" );
         }
 
         // TODO: this could be much improved
@@ -297,7 +297,7 @@ public class JavacCompiler
         return messages;
     }
 
-    protected List parseModernStream( BufferedReader input )
+    protected static List parseModernStream( BufferedReader input )
         throws IOException
     {
         List errors = new ArrayList();
@@ -348,7 +348,7 @@ public class JavacCompiler
     {
         StringTokenizer tokens = new StringTokenizer( error, ":" );
 
-        boolean isError;
+        boolean isError = true;
 
         StringBuffer msgBuffer;
 
@@ -385,7 +385,7 @@ public class JavacCompiler
             String context = tokens.nextToken( EOL );
 
             String pointer = tokens.nextToken( EOL );
-/*
+
             if ( tokens.hasMoreTokens() )
             {
                 msgBuffer.append( context );    // 'symbol' line
@@ -398,14 +398,24 @@ public class JavacCompiler
 
                 context = tokens.nextToken( EOL );
 
-                pointer = tokens.nextToken( EOL );
+                try
+                {
+                    pointer = tokens.nextToken( EOL );
+                }
+                catch ( NoSuchElementException e )
+                {
+                    pointer = context;
+
+                    context = null;
+                }
+
             }
-*/
+
             String message = msgBuffer.toString();
 
             int startcolumn = pointer.indexOf( "^" );
 
-            int endcolumn = context.indexOf( " ", startcolumn );
+            int endcolumn = context == null ? startcolumn : context.indexOf( " ", startcolumn );
 
             if ( endcolumn == -1 )
             {
@@ -416,15 +426,15 @@ public class JavacCompiler
         }
         catch ( NoSuchElementException e )
         {
-            return new CompilerError( "no more tokens - could not parse error message: " + error, true );
+            return new CompilerError( "no more tokens - could not parse error message: " + error, isError );
         }
         catch ( NumberFormatException e )
         {
-            return new CompilerError( "could not parse error message: " + error, true );
+            return new CompilerError( "could not parse error message: " + error, isError );
         }
         catch ( Exception e )
         {
-            return new CompilerError( "could not parse error message: " + error, true );
+            return new CompilerError( "could not parse error message: " + error, isError );
         }
     }
 }
