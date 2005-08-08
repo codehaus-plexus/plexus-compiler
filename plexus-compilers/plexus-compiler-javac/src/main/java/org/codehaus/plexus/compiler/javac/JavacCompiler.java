@@ -45,6 +45,10 @@ import org.codehaus.plexus.compiler.AbstractCompiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerError;
 import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.cli.CommandLineUtils;
+import org.codehaus.plexus.util.cli.Commandline;
+import org.codehaus.plexus.util.cli.StreamConsumer;
+import org.codehaus.plexus.util.cli.WriterStreamConsumer;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -52,6 +56,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -64,10 +69,6 @@ import java.util.StringTokenizer;
 public class JavacCompiler
     extends AbstractCompiler
 {
-    private static final int OUTPUT_BUFFER_SIZE = 1024;
-
-    private static final String EOL = System.getProperty( "line.separator" );
-
     public List compile( CompilerConfiguration config )
         throws Exception
     {
@@ -78,26 +79,59 @@ public class JavacCompiler
             destinationDir.mkdirs();
         }
 
-        String[] sources = getSourceFiles( config );
+        String[] sourceFiles = getSourceFiles( config );
 
-        if ( sources.length == 0 )
+        if ( sourceFiles.length == 0 )
         {
             return Collections.EMPTY_LIST;
         }
 
-        // TODO: use getLogger() - but for some reason it is null when this is used
-        System.out.println( "Compiling " + sources.length + " source file" + ( sources.length == 1 ? "" : "s" ) + " " +
-                            "to " + destinationDir.getAbsolutePath() );
+        System.out.println( "Compiling " + sourceFiles.length + " " +
+                            "source file" + ( sourceFiles.length == 1 ? "" : "s" ) +
+                            " to " + destinationDir.getAbsolutePath() );
 
-        List args = new ArrayList( 100 );
+
+        String[] args = buildCompilerArguments( config, sourceFiles );
+
+        List messages;
+
+        if ( config.isFork() )
+        {
+            String executable = config.getExecutable();
+
+            if ( StringUtils.isEmpty( executable ) )
+            {
+                executable = "javac";
+            }
+
+            messages = compileOutOfProcess( config.getWorkingDirectory(), executable, args );
+        }
+        else
+        {
+            messages = compileInProcess( args );
+        }
+
+        return messages;
+    }
+
+    public static String[] buildCompilerArguments( CompilerConfiguration config,
+                                                   String[] sourceFiles )
+    {
+        List args = new ArrayList();
 
         // ----------------------------------------------------------------------
-        // Build command line arguments list
+        // Set output
         // ----------------------------------------------------------------------
+
+        File destinationDir = new File( config.getOutputLocation() );
 
         args.add( "-d" );
 
         args.add( destinationDir.getAbsolutePath() );
+
+        // ----------------------------------------------------------------------
+        // Set the class and source paths
+        // ----------------------------------------------------------------------
 
         List classpathEntries = config.getClasspathEntries();
         if ( classpathEntries != null && !classpathEntries.isEmpty() )
@@ -115,9 +149,10 @@ public class JavacCompiler
             args.add( getPathString( sourceLocations ) );
         }
 
-        // ----------------------------------------------------------------------
-        // Build settings from configuration
-        // ----------------------------------------------------------------------
+        for ( int i = 0; i < sourceFiles.length; i++ )
+        {
+            args.add( sourceFiles[i] );
+        }
 
         if ( config.isDebug() )
         {
@@ -168,10 +203,6 @@ public class JavacCompiler
             args.add( config.getSourceEncoding() );
         }
 
-        // ----------------------------------------------------------------------
-        // Add all other compiler options verbatim
-        // ----------------------------------------------------------------------
-
         Map compilerOptions = config.getCompilerOptions();
 
         Iterator it = compilerOptions.entrySet().iterator();
@@ -186,11 +217,43 @@ public class JavacCompiler
             }
         }
 
-        for ( int i = 0; i < sources.length; i++ )
+        return (String[]) args.toArray( new String[ args.size() ] );
+    }
+
+    private List compileOutOfProcess( File workingDirectory, String executable, String[] args )
+        throws Exception
+    {
+        Commandline cli = new Commandline();
+
+        cli.setWorkingDirectory( workingDirectory.getAbsolutePath() );
+
+        cli.setExecutable( executable );
+
+        cli.addArguments( args );
+
+        Writer stringWriter = new StringWriter();
+
+        StreamConsumer out = new WriterStreamConsumer( stringWriter );
+
+        StreamConsumer err = new WriterStreamConsumer( stringWriter );
+
+        int returnCode = CommandLineUtils.executeCommandLine( cli, out, err );
+
+        List messages = parseModernStream( new BufferedReader( new StringReader( stringWriter.toString() ) ) );
+
+        if ( returnCode != 0 && messages.isEmpty() )
         {
-            args.add( sources[i] );
+            // TODO: exception?
+            messages.add( new CompilerError( "Failure executing javac,  but could not parse the error:" +  EOL +
+                                             stringWriter.toString(), true ) );
         }
 
+        return messages;
+    }
+
+    private List compileInProcess( String[] args )
+        throws Exception
+    {
         IsolatedClassLoader cl = new IsolatedClassLoader();
 
         File toolsJar = new File( System.getProperty( "java.home" ), "../lib/tools.jar" );
@@ -208,27 +271,27 @@ public class JavacCompiler
         }
         catch ( ClassNotFoundException e )
         {
-            String message = "Unable to locate the Javac Compiler in:" + EOL + "  " + toolsJar + EOL +
-                "Please ensure you are using JDK 1.4 or above and" + EOL +
-                "not a JRE (the com.sun.tools.javac.Main class is required)." + EOL +
-                "In most cases you can change the location of your Java" + EOL +
-                "installation by setting the JAVA_HOME environment variable.";
+            String message = "Unable to locate the Javac Compiler in:" + EOL + "  " + toolsJar + EOL
+                + "Please ensure you are using JDK 1.4 or above and" + EOL
+                + "not a JRE (the com.sun.tools.javac.Main class is required)." + EOL
+                + "In most cases you can change the location of your Java" + EOL
+                + "installation by setting the JAVA_HOME environment variable.";
             return Collections.singletonList( new CompilerError( message, true ) );
         }
 
         StringWriter out = new StringWriter();
 
-        Method compile = c.getMethod( "compile", new Class[]{String[].class, PrintWriter.class} );
+        Method compile = c.getMethod( "compile", new Class[] { String[].class, PrintWriter.class } );
 
-        Integer ok = (Integer) compile.invoke( null, new Object[]{args.toArray( new String[0] ), new PrintWriter( out )} );
+        Integer ok = (Integer) compile.invoke( null, new Object[] { args, new PrintWriter( out ) } );
 
-        List messages = parseModernStream(  new BufferedReader( new StringReader( out.toString() ) ) );
+        List messages = parseModernStream( new BufferedReader( new StringReader( out.toString() ) ) );
 
         if ( ok.intValue() != 0 && messages.isEmpty() )
         {
             // TODO: exception?
-            messages.add( new CompilerError( "Failure executing javac, " +
-                                             "but could not parse the error:" + EOL + EOL + out.toString(), true ) );
+            messages.add( new CompilerError( "Failure executing javac, but could not parse the error:" + EOL +
+                                             out.toString(), true ) );
         }
 
         return messages;
@@ -325,11 +388,11 @@ public class JavacCompiler
 /*
             if ( tokens.hasMoreTokens() )
             {
-                msgBuffer.append( context );	// 'symbol' line
+                msgBuffer.append( context );    // 'symbol' line
 
                 msgBuffer.append( EOL );
 
-                msgBuffer.append( pointer );	// 'location' line
+                msgBuffer.append( pointer );    // 'location' line
 
                 msgBuffer.append( EOL );
 
@@ -353,7 +416,6 @@ public class JavacCompiler
         }
         catch ( NoSuchElementException e )
         {
-            e.printStackTrace();
             return new CompilerError( "no more tokens - could not parse error message: " + error, true );
         }
         catch ( NumberFormatException e )

@@ -9,4 +9,11 @@
   </parent>
   <artifactId>plexus-compiler-javac</artifactId>
   <name>Plexus Javac Component</name>
+  <dependencies>
+    <dependency>
+      <groupId>plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+      <version>1.0.2-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
 </project>
