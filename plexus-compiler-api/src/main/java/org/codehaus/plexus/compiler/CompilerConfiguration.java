@@ -102,7 +102,14 @@ public class CompilerConfiguration
 
     public void setClasspathEntries( List classpathEntries )
     {
-        this.classpathEntries = new LinkedList( classpathEntries );
+        if ( classpathEntries == null )
+        {
+            this.classpathEntries = Collections.EMPTY_LIST;
+        }
+        else
+        {
+            this.classpathEntries = new LinkedList( classpathEntries );
+        }
     }
 
     public List getClasspathEntries()
@@ -116,7 +123,14 @@ public class CompilerConfiguration
 
     public void setSourceFiles( Set sourceFiles )
     {
-        this.sourceFiles = sourceFiles;
+        if ( sourceFiles == null )
+        {
+            this.sourceFiles = Collections.EMPTY_SET;
+        }
+        else
+        {
+            this.sourceFiles = new HashSet( sourceFiles );
+        }
     }
 
     public Set getSourceFiles()
@@ -131,7 +145,14 @@ public class CompilerConfiguration
 
     public void setSourceLocations( List sourceLocations )
     {
-        this.sourceLocations = new LinkedList( sourceLocations );
+        if ( sourceLocations == null )
+        {
+            this.sourceLocations = Collections.EMPTY_LIST;
+        }
+        else
+        {
+            this.sourceLocations = new LinkedList( sourceLocations );
+        }
     }
 
     public List getSourceLocations()
@@ -146,7 +167,14 @@ public class CompilerConfiguration
 
     public void setIncludes( Set includes )
     {
-        this.includes = new HashSet( includes );
+        if ( includes == null )
+        {
+            this.includes = Collections.EMPTY_SET;
+        }
+        else
+        {
+            this.includes = new HashSet( includes );
+        }
     }
 
     public Set getIncludes()
@@ -161,7 +189,14 @@ public class CompilerConfiguration
 
     public void setExcludes( Set excludes )
     {
-        this.excludes = new HashSet( excludes );
+        if ( excludes == null )
+        {
+            this.excludes = Collections.EMPTY_SET;
+        }
+        else
+        {
+            this.excludes = new HashSet( excludes );
+        }
     }
 
     public Set getExcludes()
@@ -245,7 +280,14 @@ public class CompilerConfiguration
 
     public void setCustomCompilerArguments( List customCompilerArguments )
     {
-        this.customCompilerArguments = customCompilerArguments;
+        if ( customCompilerArguments == null )
+        {
+            this.customCompilerArguments = Collections.EMPTY_LIST;
+        }
+        else
+        {
+            this.customCompilerArguments = customCompilerArguments;
+        }
     }
 
     public boolean isFork()
