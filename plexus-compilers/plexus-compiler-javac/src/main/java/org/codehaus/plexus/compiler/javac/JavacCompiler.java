@@ -62,13 +62,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
 public class JavacCompiler
     extends AbstractCompiler
 {
+    private static final String WARNING_PREFIX = "warning: ";
+
     public List compile( CompilerConfiguration config )
         throws Exception
     {
@@ -89,7 +90,6 @@ public class JavacCompiler
         System.out.println( "Compiling " + sourceFiles.length + " " +
                             "source file" + ( sourceFiles.length == 1 ? "" : "s" ) +
                             " to " + destinationDir.getAbsolutePath() );
-
 
         String[] args = buildCompilerArguments( config, sourceFiles );
 
@@ -203,18 +203,16 @@ public class JavacCompiler
             args.add( config.getSourceEncoding() );
         }
 
-        Map compilerOptions = config.getCompilerOptions();
-
-        Iterator it = compilerOptions.entrySet().iterator();
-
-        while ( it.hasNext() )
+        for ( Iterator it = config.getCustomCompilerArguments().iterator(); it.hasNext(); )
         {
-            Map.Entry entry = (Map.Entry) it.next();
-            args.add( entry.getKey() );
-            if ( entry.getValue() != null )
+            String argument = (String) it.next();
+
+            if ( StringUtils.isEmpty( argument ) )
             {
-                args.add( entry.getValue() );
+                continue;
             }
+
+            args.add( argument );
         }
 
         return (String[]) args.toArray( new String[ args.size() ] );
@@ -367,8 +365,6 @@ public class JavacCompiler
             msgBuffer = new StringBuffer();
 
             String msg = tokens.nextToken( EOL ).substring( 2 );
-
-            String WARNING_PREFIX = "warning: ";
 
             isError = !msg.startsWith( WARNING_PREFIX );
 

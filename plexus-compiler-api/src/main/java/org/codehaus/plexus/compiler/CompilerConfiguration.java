@@ -29,9 +29,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 /**
  * @author jdcasey
@@ -44,7 +42,7 @@ public class CompilerConfiguration
     private List classpathEntries = new LinkedList();
 
     // ----------------------------------------------------------------------
-    // Sources
+    // Source Files
     // ----------------------------------------------------------------------
 
     private Set sourceFiles = new HashSet();
@@ -71,23 +69,13 @@ public class CompilerConfiguration
 
     private String sourceEncoding;
 
-    // ----------------------------------------------------------------------
-    // Process Settings
-    // ----------------------------------------------------------------------
+    private List customCompilerArguments = new LinkedList();
 
     private boolean fork;
 
     private String executable;
 
-    private List compilerArguements;
-
     private File workingDirectory;
-
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
-
-    private Map compilerOptions = new TreeMap();
 
     // ----------------------------------------------------------------------
     //
@@ -126,6 +114,16 @@ public class CompilerConfiguration
     // Source files
     // ----------------------------------------------------------------------
 
+    public void setSourceFiles( Set sourceFiles )
+    {
+        this.sourceFiles = sourceFiles;
+    }
+
+    public Set getSourceFiles()
+    {
+        return sourceFiles;
+    }
+
     public void addSourceLocation( String sourceLocation )
     {
         sourceLocations.add( sourceLocation );
@@ -139,16 +137,6 @@ public class CompilerConfiguration
     public List getSourceLocations()
     {
         return Collections.unmodifiableList( sourceLocations );
-    }
-
-    public void setSourceFiles( Set sourceFiles )
-    {
-        this.sourceFiles = sourceFiles;
-    }
-
-    public Set getSourceFiles()
-    {
-        return sourceFiles;
     }
 
     public void addInclude( String include )
@@ -181,6 +169,10 @@ public class CompilerConfiguration
         return Collections.unmodifiableSet( excludes );
     }
 
+    // ----------------------------------------------------------------------
+    // Compiler Settings
+    // ----------------------------------------------------------------------
+
     public void setDebug( boolean debug )
     {
         this.debug = debug;
@@ -199,6 +191,16 @@ public class CompilerConfiguration
     public boolean isShowWarnings()
     {
         return showWarnings;
+    }
+
+    public boolean isShowDeprecation()
+    {
+        return showDeprecation;
+    }
+
+    public void setShowDeprecation( boolean showDeprecation )
+    {
+        this.showDeprecation = showDeprecation;
     }
 
     public String getSourceVersion()
@@ -231,43 +233,19 @@ public class CompilerConfiguration
         this.sourceEncoding = sourceEncoding;
     }
 
-    // ----------------------------------------------------------------------
-    // Generic options
-    // ----------------------------------------------------------------------
-
-    public void addCompilerOption( String optionName, String optionValue )
+    public void addCompilerCustomArgument( String customArgument )
     {
-        compilerOptions.put( optionName, optionValue );
+        customCompilerArguments.add( customArgument );
     }
 
-    public void setCompilerOptions( Map compilerOptions )
+    public List getCustomCompilerArguments()
     {
-        this.compilerOptions = new TreeMap( compilerOptions );
+        return Collections.unmodifiableList( customCompilerArguments );
     }
 
-    public Map getCompilerOptions()
+    public void setCustomCompilerArguments( List customCompilerArguments )
     {
-        return Collections.unmodifiableMap( compilerOptions );
-    }
-
-    public boolean isShowDeprecation()
-    {
-        return showDeprecation;
-    }
-
-    public void setShowDeprecation( boolean showDeprecation )
-    {
-        this.showDeprecation = showDeprecation;
-    }
-
-    public String getExecutable()
-    {
-        return executable;
-    }
-
-    public void setExecutable( String executable )
-    {
-        this.executable = executable;
+        this.customCompilerArguments = customCompilerArguments;
     }
 
     public boolean isFork()
@@ -280,14 +258,14 @@ public class CompilerConfiguration
         this.fork = fork;
     }
 
-    public List getCompilerArguements()
+    public String getExecutable()
     {
-        return compilerArguements;
+        return executable;
     }
 
-    public void setCompilerArguements( List compilerArguements )
+    public void setExecutable( String executable )
     {
-        this.compilerArguements = compilerArguements;
+        this.executable = executable;
     }
 
     public File getWorkingDirectory()
