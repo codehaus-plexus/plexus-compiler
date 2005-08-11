@@ -243,7 +243,7 @@ public class JavacCompiler
 
             args.add( key );
 
-            String value = (String) it.next();
+            String value = (String) entry.getValue();
 
             if ( StringUtils.isEmpty( value ) )
             {
