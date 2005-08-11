@@ -30,6 +30,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.Map;
+import java.util.LinkedHashMap;
 
 /**
  * @author jdcasey
@@ -69,7 +71,7 @@ public class CompilerConfiguration
 
     private String sourceEncoding;
 
-    private List customCompilerArguments = new LinkedList();
+    private Map customCompilerArguments = new LinkedHashMap();
 
     private boolean fork;
 
@@ -268,21 +270,21 @@ public class CompilerConfiguration
         this.sourceEncoding = sourceEncoding;
     }
 
-    public void addCompilerCustomArgument( String customArgument )
+    public void addCompilerCustomArgument( String customArgument, String value )
     {
-        customCompilerArguments.add( customArgument );
+        customCompilerArguments.put( customArgument, value );
     }
 
-    public List getCustomCompilerArguments()
+    public Map getCustomCompilerArguments()
     {
-        return Collections.unmodifiableList( customCompilerArguments );
+        return Collections.unmodifiableMap( customCompilerArguments );
     }
 
-    public void setCustomCompilerArguments( List customCompilerArguments )
+    public void setCustomCompilerArguments( Map customCompilerArguments )
     {
         if ( customCompilerArguments == null )
         {
-            this.customCompilerArguments = Collections.EMPTY_LIST;
+            this.customCompilerArguments = Collections.EMPTY_MAP;
         }
         else
         {

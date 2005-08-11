@@ -24,28 +24,20 @@ package org.codehaus.plexus.compiler;
  * SOFTWARE.
  */
 
-import java.util.List;
-
 /**
- * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  * @version $Id$
  */
-public interface Compiler
+public class CompilerException
+    extends Exception
 {
-    String ROLE = Compiler.class.getName();
+    public CompilerException( String message )
+    {
+        super( message );
+    }
 
-    CompilerOutputStyle getCompilerOutputStyle();
-
-    String getInputFileEnding( CompilerConfiguration configuration )
-        throws CompilerException;
-
-    String getOutputFileEnding( CompilerConfiguration configuration )
-        throws CompilerException;
-
-    String getOutputFile( CompilerConfiguration configuration )
-        throws CompilerException;
-
-    List compile( CompilerConfiguration configuration )
-        throws CompilerException;
+    public CompilerException( String message, Throwable cause )
+    {
+        super( message, cause );
+    }
 }

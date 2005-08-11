@@ -44,11 +44,14 @@ package org.codehaus.plexus.compiler.javac;
 import org.codehaus.plexus.compiler.AbstractCompiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerError;
+import org.codehaus.plexus.compiler.CompilerOutputStyle;
+import org.codehaus.plexus.compiler.CompilerException;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
 import org.codehaus.plexus.util.cli.StreamConsumer;
 import org.codehaus.plexus.util.cli.WriterStreamConsumer;
+import org.codehaus.plexus.util.cli.CommandLineException;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -58,20 +61,44 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
+import java.util.Map;
+import java.net.MalformedURLException;
 
+/**
+ * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
+ * @author Others
+ * @version $Id$
+ */
 public class JavacCompiler
     extends AbstractCompiler
 {
     private static final String WARNING_PREFIX = "warning: ";
 
+    // ----------------------------------------------------------------------
+    //
+    // ----------------------------------------------------------------------
+
+    public JavacCompiler()
+    {
+        super( CompilerOutputStyle.ONE_OUTPUT_FILE_PER_INPUT_FILE,
+               ".java",
+               ".class",
+               null );
+    }
+
+    // ----------------------------------------------------------------------
+    // Compiler Implementation
+    // ----------------------------------------------------------------------
+
     public List compile( CompilerConfiguration config )
-        throws Exception
+        throws CompilerException
     {
         File destinationDir = new File( config.getOutputLocation() );
 
@@ -203,23 +230,34 @@ public class JavacCompiler
             args.add( config.getSourceEncoding() );
         }
 
-        for ( Iterator it = config.getCustomCompilerArguments().iterator(); it.hasNext(); )
+        for ( Iterator it = config.getCustomCompilerArguments().entrySet().iterator(); it.hasNext(); )
         {
-            String argument = (String) it.next();
+            Map.Entry entry = (Map.Entry) it.next();
 
-            if ( StringUtils.isEmpty( argument ) )
+            String key = (String) entry.getKey();
+
+            if ( StringUtils.isEmpty( key ) )
             {
                 continue;
             }
 
-            args.add( argument );
+            args.add( key );
+
+            String value = (String) it.next();
+
+            if ( StringUtils.isEmpty( value ) )
+            {
+                continue;
+            }
+
+            args.add( value );
         }
 
         return (String[]) args.toArray( new String[ args.size() ] );
     }
 
     private List compileOutOfProcess( File workingDirectory, String executable, String[] args )
-        throws Exception
+        throws CompilerException
     {
         Commandline cli = new Commandline();
 
@@ -235,9 +273,24 @@ public class JavacCompiler
 
         StreamConsumer err = new WriterStreamConsumer( stringWriter );
 
-        int returnCode = CommandLineUtils.executeCommandLine( cli, out, err );
+        int returnCode;
 
-        List messages = parseModernStream( new BufferedReader( new StringReader( stringWriter.toString() ) ) );
+        List messages;
+
+        try
+        {
+            returnCode = CommandLineUtils.executeCommandLine( cli, out, err );
+
+            messages = parseModernStream( new BufferedReader( new StringReader( stringWriter.toString() ) ) );
+        }
+        catch ( CommandLineException e )
+        {
+            throw new CompilerException( "Error while executing the external compiler.", e );
+        }
+        catch ( IOException e )
+        {
+            throw new CompilerException( "Error while executing the external compiler.", e );
+        }
 
         if ( returnCode != 0 && messages.isEmpty() )
         {
@@ -250,7 +303,7 @@ public class JavacCompiler
     }
 
     private List compileInProcess( String[] args )
-        throws Exception
+        throws CompilerException
     {
         IsolatedClassLoader cl = new IsolatedClassLoader();
 
@@ -258,7 +311,14 @@ public class JavacCompiler
 
         if ( toolsJar.exists() )
         {
-            cl.addURL( toolsJar.toURL() );
+            try
+            {
+                cl.addURL( toolsJar.toURL() );
+            }
+            catch ( MalformedURLException e )
+            {
+                throw new CompilerException( "Could not convert the file reference to tools.jar to a URL, path to tools.jar: '" + toolsJar.getAbsolutePath() + "'." );
+            }
         }
 
         Class c;
@@ -270,20 +330,43 @@ public class JavacCompiler
         catch ( ClassNotFoundException e )
         {
             String message = "Unable to locate the Javac Compiler in:" + EOL + "  " + toolsJar + EOL
-                + "Please ensure you are using JDK 1.4 or above and" + EOL
-                + "not a JRE (the com.sun.tools.javac.Main class is required)." + EOL
-                + "In most cases you can change the location of your Java" + EOL
-                + "installation by setting the JAVA_HOME environment variable.";
+                             + "Please ensure you are using JDK 1.4 or above and" + EOL
+                             + "not a JRE (the com.sun.tools.javac.Main class is required)." + EOL
+                             + "In most cases you can change the location of your Java" + EOL
+                             + "installation by setting the JAVA_HOME environment variable.";
             return Collections.singletonList( new CompilerError( message, true ) );
         }
 
         StringWriter out = new StringWriter();
 
-        Method compile = c.getMethod( "compile", new Class[] { String[].class, PrintWriter.class } );
+        Integer ok;
 
-        Integer ok = (Integer) compile.invoke( null, new Object[] { args, new PrintWriter( out ) } );
+        List messages;
 
-        List messages = parseModernStream( new BufferedReader( new StringReader( out.toString() ) ) );
+        try
+        {
+            Method compile = c.getMethod( "compile", new Class[] { String[].class, PrintWriter.class } );
+
+            ok = (Integer) compile.invoke( null, new Object[] { args, new PrintWriter( out ) } );
+
+            messages = parseModernStream( new BufferedReader( new StringReader( out.toString() ) ) );
+        }
+        catch ( NoSuchMethodException e )
+        {
+            throw new CompilerException( "Error while executing the compiler.", e );
+        }
+        catch ( IllegalAccessException e )
+        {
+            throw new CompilerException( "Error while executing the compiler.", e );
+        }
+        catch ( InvocationTargetException e )
+        {
+            throw new CompilerException( "Error while executing the compiler.", e );
+        }
+        catch ( IOException e )
+        {
+            throw new CompilerException( "Error while executing the compiler.", e );
+        }
 
         if ( ok.intValue() != 0 && messages.isEmpty() )
         {

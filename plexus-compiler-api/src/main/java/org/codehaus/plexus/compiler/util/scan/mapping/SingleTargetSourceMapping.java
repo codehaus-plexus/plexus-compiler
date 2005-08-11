@@ -1,9 +1,9 @@
-package org.codehaus.plexus.compiler;
+package org.codehaus.plexus.compiler.util.scan.mapping;
 
 /**
  * The MIT License
  *
- * Copyright (c) 2004, The Codehaus
+ * Copyright (c) 2005, The Codehaus
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -24,28 +24,35 @@ package org.codehaus.plexus.compiler;
  * SOFTWARE.
  */
 
-import java.util.List;
+import org.codehaus.plexus.compiler.util.scan.InclusionScanException;
+
+import java.util.Set;
+import java.util.HashSet;
+import java.io.File;
 
 /**
- * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>
+ * Maps a set of input files to a single output file.
+ *
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  * @version $Id$
  */
-public interface Compiler
+public class SingleTargetSourceMapping
+    implements SourceMapping
 {
-    String ROLE = Compiler.class.getName();
+    private String outputFile;
 
-    CompilerOutputStyle getCompilerOutputStyle();
+    public SingleTargetSourceMapping( String outputFile )
+    {
+        this.outputFile = outputFile;
+    }
 
-    String getInputFileEnding( CompilerConfiguration configuration )
-        throws CompilerException;
+    public Set getTargetFiles( File targetDir, String source )
+        throws InclusionScanException
+    {
+        Set targetFiles = new HashSet();
 
-    String getOutputFileEnding( CompilerConfiguration configuration )
-        throws CompilerException;
+        targetFiles.add( new File( targetDir, outputFile ) );
 
-    String getOutputFile( CompilerConfiguration configuration )
-        throws CompilerException;
-
-    List compile( CompilerConfiguration configuration )
-        throws CompilerException;
+        return targetFiles;
+    }
 }

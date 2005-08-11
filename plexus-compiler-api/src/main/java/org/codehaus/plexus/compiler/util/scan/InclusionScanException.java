@@ -23,7 +23,6 @@ package org.codehaus.plexus.compiler.util.scan;
 public class InclusionScanException
     extends Exception
 {
-
     public InclusionScanException( String message )
     {
         super( message );
@@ -33,5 +32,4 @@ public class InclusionScanException
     {
         super( message, cause );
     }
-
 }

@@ -25,10 +25,8 @@ import java.util.Set;
  */
 public interface SourceInclusionScanner
 {
-
     void addSourceMapping( SourceMapping sourceMapping );
 
     Set getIncludedSources( File sourceDir, File targetDir )
         throws InclusionScanException;
-
 }

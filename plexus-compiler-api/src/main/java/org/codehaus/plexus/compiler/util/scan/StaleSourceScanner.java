@@ -3,15 +3,17 @@ package org.codehaus.plexus.compiler.util.scan;
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 import org.codehaus.plexus.compiler.util.scan.mapping.SourceMapping;
@@ -31,30 +33,44 @@ import java.util.Set;
 public class StaleSourceScanner
     extends AbstractSourceInclusionScanner
 {
-
     private final long lastUpdatedWithinMsecs;
 
     private final Set sourceIncludes;
 
     private final Set sourceExcludes;
 
-    public StaleSourceScanner( long lastUpdatedWithinMsecs )
-    {
-        this( lastUpdatedWithinMsecs, Collections.singleton( "**/*" ), Collections.EMPTY_SET );
-    }
+    // ----------------------------------------------------------------------
+    //
+    // ----------------------------------------------------------------------
 
     public StaleSourceScanner()
     {
-        this( 0, Collections.singleton( "**/*" ), Collections.EMPTY_SET );
+        this( 0,
+              Collections.singleton( "**/*" ),
+              Collections.EMPTY_SET );
     }
 
-    public StaleSourceScanner( long lastUpdatedWithinMsecs, Set sourceIncludes, Set sourceExcludes )
+    public StaleSourceScanner( long lastUpdatedWithinMsecs )
+    {
+        this( lastUpdatedWithinMsecs,
+              Collections.singleton( "**/*" ),
+              Collections.EMPTY_SET );
+    }
+
+    public StaleSourceScanner( long lastUpdatedWithinMsecs,
+                               Set sourceIncludes,
+                               Set sourceExcludes )
     {
         this.lastUpdatedWithinMsecs = lastUpdatedWithinMsecs;
 
         this.sourceIncludes = sourceIncludes;
+
         this.sourceExcludes = sourceExcludes;
     }
+
+    // ----------------------------------------------------------------------
+    // SourceInclusionScanner Implementation
+    // ----------------------------------------------------------------------
 
     public Set getIncludedSources( File sourceDir, File targetDir )
         throws InclusionScanException
@@ -101,13 +117,17 @@ public class StaleSourceScanner
         return matchingSources;
     }
 
+    // ----------------------------------------------------------------------
+    //
+    // ----------------------------------------------------------------------
+
     private String[] scanForSources( File sourceDir )
     {
         DirectoryScanner ds = new DirectoryScanner();
         ds.setFollowSymlinks( true );
         ds.setBasedir( sourceDir );
 
-        String[] includes = null;
+        String[] includes;
         if ( sourceIncludes.isEmpty() )
         {
             includes = new String[0];
@@ -119,7 +139,7 @@ public class StaleSourceScanner
 
         ds.setIncludes( includes );
 
-        String[] excludes = null;
+        String[] excludes;
         if ( sourceExcludes.isEmpty() )
         {
             excludes = new String[0];
@@ -136,5 +156,4 @@ public class StaleSourceScanner
 
         return ds.getIncludedFiles();
     }
-
 }

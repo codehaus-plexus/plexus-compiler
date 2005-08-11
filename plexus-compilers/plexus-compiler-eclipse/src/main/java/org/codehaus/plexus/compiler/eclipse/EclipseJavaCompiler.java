@@ -27,6 +27,7 @@ package org.codehaus.plexus.compiler.eclipse;
 import org.codehaus.plexus.compiler.AbstractCompiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerError;
+import org.codehaus.plexus.compiler.CompilerException;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
@@ -53,6 +54,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -71,7 +73,7 @@ public class EclipseJavaCompiler
     // ----------------------------------------------------------------------
 
     public List compile( CompilerConfiguration config )
-        throws Exception
+        throws CompilerException
     {
         List errors = new LinkedList();
 
@@ -81,11 +83,18 @@ public class EclipseJavaCompiler
 
         int i = 0;
 
-        urls[ i++ ] = new File( config.getOutputLocation() ).toURL();
-
-        for ( Iterator it = classpathEntries.iterator(); it.hasNext(); )
+        try
         {
-            urls[ i++ ] = new File( (String) it.next() ).toURL();
+            urls[ i++ ] = new File( config.getOutputLocation() ).toURL();
+
+            for ( Iterator it = classpathEntries.iterator(); it.hasNext(); )
+            {
+                urls[ i++ ] = new File( (String) it.next() ).toURL();
+            }
+        }
+        catch ( MalformedURLException e )
+        {
+            throw new CompilerException( "Error while converting the classpath entries to URLs.", e );
         }
 
         ClassLoader classLoader = new URLClassLoader( urls );

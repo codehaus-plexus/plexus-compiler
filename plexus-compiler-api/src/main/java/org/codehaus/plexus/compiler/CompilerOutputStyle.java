@@ -24,28 +24,39 @@ package org.codehaus.plexus.compiler;
  * SOFTWARE.
  */
 
-import java.util.List;
-
 /**
- * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  * @version $Id$
  */
-public interface Compiler
+public final class CompilerOutputStyle
 {
-    String ROLE = Compiler.class.getName();
+    public final static CompilerOutputStyle ONE_OUTPUT_FILE_PER_INPUT_FILE = new CompilerOutputStyle( "one-output-file-per-input-file" );
 
-    CompilerOutputStyle getCompilerOutputStyle();
+    public final static CompilerOutputStyle ONE_OUTPUT_FILE_FOR_ALL_INPUT_FILES = new CompilerOutputStyle( "one-output-file" );
 
-    String getInputFileEnding( CompilerConfiguration configuration )
-        throws CompilerException;
+    // ----------------------------------------------------------------------
+    //
+    // ----------------------------------------------------------------------
 
-    String getOutputFileEnding( CompilerConfiguration configuration )
-        throws CompilerException;
+    private String id;
 
-    String getOutputFile( CompilerConfiguration configuration )
-        throws CompilerException;
+    private CompilerOutputStyle( String id )
+    {
+        this.id = id;
+    }
 
-    List compile( CompilerConfiguration configuration )
-        throws CompilerException;
+    public String toString()
+    {
+        return id;
+    }
+
+    public boolean equals( Object obj )
+    {
+        return id.equals( obj );
+    }
+
+    public int hashCode()
+    {
+        return id.hashCode();
+    }
 }

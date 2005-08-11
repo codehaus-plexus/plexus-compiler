@@ -76,6 +76,7 @@ package org.codehaus.plexus.compiler.jikes;
 import org.codehaus.plexus.compiler.AbstractCompiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerError;
+import org.codehaus.plexus.compiler.CompilerException;
 import org.codehaus.plexus.compiler.util.StreamPumper;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -95,7 +96,7 @@ public class JikesCompiler
     private static final int OUTPUT_BUFFER_SIZE = 1024;
 
     public List compile( CompilerConfiguration config )
-        throws Exception
+        throws CompilerException
     {
         File destinationDir = new File( config.getOutputLocation() );
 
@@ -171,9 +172,13 @@ public class JikesCompiler
                 messages.add( new CompilerError( "Exit code from jikes was not 0.", true ) );
             }
         }
+        catch ( IOException e )
+        {
+            throw new CompilerException( "Error while compiling.", e );
+        }
         catch ( InterruptedException e )
         {
-            messages.add( new CompilerError( "Got an Exception while compiling.", true ) );
+            throw new CompilerException( "Error while compiling.", e );
         }
 
         return messages;

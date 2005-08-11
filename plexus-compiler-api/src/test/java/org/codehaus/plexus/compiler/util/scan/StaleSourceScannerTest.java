@@ -1,16 +1,5 @@
 package org.codehaus.plexus.compiler.util.scan;
 
-import junit.framework.TestCase;
-import org.codehaus.plexus.compiler.util.scan.mapping.SuffixMapping;
-import org.codehaus.plexus.util.IOUtil;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.net.URL;
-import java.util.Collections;
-import java.util.Set;
-
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -27,15 +16,30 @@ import java.util.Set;
  * limitations under the License.
  */
 
+import org.codehaus.plexus.compiler.util.scan.mapping.SuffixMapping;
+import org.codehaus.plexus.compiler.util.scan.mapping.SourceMapping;
+import org.codehaus.plexus.compiler.util.scan.mapping.SingleTargetSourceMapping;
+import org.codehaus.plexus.util.IOUtil;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Collections;
+import java.util.Set;
+
+import junit.framework.TestCase;
+
 /**
  * @author jdcasey
+ * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  * @version $Id$
  */
 public class StaleSourceScannerTest
     extends TestCase
 {
-    private static final String TESTFILE_DEST_MARKER_FILE = StaleSourceScanner.class.getName().replace( '.', '/' ) +
-        "-testMarker.txt";
+    private static final String TESTFILE_DEST_MARKER_FILE =
+        StaleSourceScanner.class.getName().replace( '.', '/' ) + "-testMarker.txt";
 
     // test 1.
     public void testWithDefaultConstructorShouldFindOneStaleSource()
@@ -402,22 +406,106 @@ public class StaleSourceScannerTest
         assertTrue( "expected stale source not file found in result", result.contains( sourceFile3 ) );
     }
 
+    // test 9.
+    public void testSingleFileSourceMapping()
+        throws Exception
+    {
+        File src = new File( getTestBaseDir(), "test9-src" );
+
+        File target = new File( getTestBaseDir(), "test9-target" );
+
+        long now = System.currentTimeMillis();
+
+        // ----------------------------------------------------------------------
+        // The output file is missing
+        // ----------------------------------------------------------------------
+
+        File fooCs = new File( src, "Foo.cs" );
+
+        writeFile( fooCs );
+
+        fooCs.setLastModified( now - 10000 );
+
+        SourceMapping mapping = new SingleTargetSourceMapping( "Application.exe" );
+
+        StaleSourceScanner scanner = new StaleSourceScanner( 0 );
+
+        scanner.addSourceMapping( mapping );
+
+        Set result = scanner.getIncludedSources( src, target );
+
+        assertEquals( 1, result.size() );
+
+        assertTrue( result.contains( fooCs ) );
+
+        // ----------------------------------------------------------------------
+        // Add another source file
+        // ----------------------------------------------------------------------
+
+        File barCs = new File( src, "Bar.cs" );
+
+        writeFile( barCs );
+
+        barCs.setLastModified( now - 20000 );
+
+        result = scanner.getIncludedSources( src, target );
+
+        assertEquals( 2, result.size() );
+
+        assertTrue( result.contains( fooCs ) );
+
+        assertTrue( result.contains( barCs ) );
+
+        // ----------------------------------------------------------------------
+        // Now add the result file
+        // ----------------------------------------------------------------------
+
+        File applicationExe = new File( target, "Application.exe" );
+
+        writeFile( applicationExe );
+
+        applicationExe.setLastModified( now );
+
+        result = scanner.getIncludedSources( src, target );
+
+        assertEquals( 0, result.size() );
+
+        // ----------------------------------------------------------------------
+        // Make Application.exe older than the Foo.cs
+        // ----------------------------------------------------------------------
+
+        applicationExe.setLastModified( now - 15000 );
+
+        result = scanner.getIncludedSources( src, target );
+
+        assertEquals( 1, result.size() );
+
+        assertTrue( result.contains( fooCs ) );
+    }
+
+    // ----------------------------------------------------------------------
+    // Utilities
+    // ----------------------------------------------------------------------
+
     private File getTestBaseDir()
     {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         URL markerResource = cl.getResource( TESTFILE_DEST_MARKER_FILE );
 
-        File basedir = null;
+        File basedir;
+
         if ( markerResource != null )
         {
             File marker = new File( markerResource.getPath() );
+
             basedir = marker.getParentFile().getAbsoluteFile();
         }
         else
         {
             // punt.
-            System.out.println(
-                "Cannot find marker file: \'" + TESTFILE_DEST_MARKER_FILE + "\' in classpath. Using '.' for basedir." );
+            System.out.println( "Cannot find marker file: \'" + TESTFILE_DEST_MARKER_FILE + "\' in classpath. " +
+                                "Using '.' for basedir." );
+
             basedir = new File( "." ).getAbsoluteFile();
         }
 
@@ -439,6 +527,7 @@ public class StaleSourceScannerTest
             file.deleteOnExit();
 
             fWriter = new FileWriter( file );
+
             fWriter.write( "This is just a test file." );
         }
         finally
@@ -446,5 +535,4 @@ public class StaleSourceScannerTest
             IOUtil.close( fWriter );
         }
     }
-
 }

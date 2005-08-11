@@ -26,9 +26,9 @@ package org.codehaus.plexus.compiler;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
-import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.artifact.test.ArtifactTestCase;
+import org.apache.maven.artifact.versioning.VersionRange;
 
 import org.codehaus.plexus.util.FileUtils;
 
@@ -43,8 +43,6 @@ import java.util.List;
 public abstract class AbstractCompilerTest
     extends ArtifactTestCase
 {
-    private Compiler compiler;
-
     private boolean compilerDebug = false;
 
     private boolean compilerDeprecationWarnings = false;
@@ -97,7 +95,7 @@ public abstract class AbstractCompilerTest
         {
             CompilerConfiguration compilerConfig = (CompilerConfiguration) it.next();
 
-            compiler = (Compiler) lookup( Compiler.ROLE, getRoleHint() );
+            Compiler compiler = (Compiler) lookup( Compiler.ROLE, getRoleHint() );
 
             messages.addAll( compiler.compile( compilerConfig ) );
         }

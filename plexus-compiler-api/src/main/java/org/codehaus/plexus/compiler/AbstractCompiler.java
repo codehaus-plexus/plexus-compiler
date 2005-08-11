@@ -37,6 +37,7 @@ import java.util.Set;
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  * @author <a href="mailto:michal.maczka@dimatics.com">Michal Maczka </a>
+ * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  * @version $Id$
  */
 public abstract class AbstractCompiler
@@ -46,6 +47,77 @@ public abstract class AbstractCompiler
     protected static final String EOL = System.getProperty( "line.separator" );
 
     protected static final String PS = System.getProperty( "path.separator" );
+
+    private CompilerOutputStyle compilerOutputStyle;
+
+    private String inputFileEnding;
+
+    private String outputFileEnding;
+
+    private String outputFile;
+
+    // ----------------------------------------------------------------------
+    //
+    // ----------------------------------------------------------------------
+
+    protected AbstractCompiler()
+    {
+    }
+
+    protected AbstractCompiler( CompilerOutputStyle compilerOutputStyle,
+                                String inputFileEnding,
+                                String outputFileEnding,
+                                String outputFile )
+    {
+        this.compilerOutputStyle = compilerOutputStyle;
+
+        this.inputFileEnding = inputFileEnding;
+
+        this.outputFileEnding = outputFileEnding;
+
+        this.outputFile = outputFile;
+    }
+
+    // ----------------------------------------------------------------------
+    //
+    // ----------------------------------------------------------------------
+
+    public CompilerOutputStyle getCompilerOutputStyle()
+    {
+        return compilerOutputStyle;
+    }
+
+    public String getInputFileEnding( CompilerConfiguration configuration )
+        throws CompilerException
+    {
+        return inputFileEnding;
+    }
+
+    public String getOutputFileEnding( CompilerConfiguration configuration )
+        throws CompilerException
+    {
+        if ( compilerOutputStyle != CompilerOutputStyle.ONE_OUTPUT_FILE_PER_INPUT_FILE )
+        {
+            throw new RuntimeException( "This compiler implementation doesn't have one output file per input file." );
+        }
+
+        return outputFileEnding;
+    }
+
+    public String getOutputFile( CompilerConfiguration configuration )
+        throws CompilerException
+    {
+        if ( compilerOutputStyle != CompilerOutputStyle.ONE_OUTPUT_FILE_FOR_ALL_INPUT_FILES )
+        {
+            throw new RuntimeException( "This compiler implementation doesn't have one output file for all files." );
+        }
+
+        return outputFile;
+    }
+
+    // ----------------------------------------------------------------------
+    // Utility Methods
+    // ----------------------------------------------------------------------
 
     public static String getPathString( List pathElements )
     {
@@ -142,7 +214,7 @@ public abstract class AbstractCompiler
     }
 
     protected static String makeClassName( String fileName, String sourceDir )
-        throws IOException
+        throws CompilerException
     {
         File origFile = new File( fileName );
 
@@ -150,16 +222,12 @@ public abstract class AbstractCompiler
 
         if ( origFile.exists() )
         {
-            canonical = origFile.getCanonicalPath().replace( '\\', '/' );
+            canonical = getCanonicalPath( origFile ).replace( '\\', '/' );
         }
-
-        String str = fileName;
-
-        str = str.replace( '\\', '/' );
 
         if ( sourceDir != null )
         {
-            String prefix = new File( sourceDir ).getCanonicalPath().replace( '\\', '/' );
+            String prefix = getCanonicalPath( new File( sourceDir ) ).replace( '\\', '/' );
 
             if ( canonical != null )
             {
@@ -178,7 +246,7 @@ public abstract class AbstractCompiler
 
                 if ( t.exists() )
                 {
-                    str = t.getCanonicalPath().replace( '\\', '/' );
+                    String str = getCanonicalPath( t ).replace( '\\', '/' );
 
                     return str.substring( prefix.length() + 1, str.length() - 5 ).replace( '/', '.' );
                 }
@@ -193,6 +261,19 @@ public abstract class AbstractCompiler
         fileName = fileName.replace( '\\', '.' );
 
         return fileName.replace( '/', '.' );
+    }
+
+    private static String getCanonicalPath( File origFile )
+        throws CompilerException
+    {
+        try
+        {
+            return origFile.getCanonicalPath();
+        }
+        catch ( IOException e )
+        {
+            throw new CompilerException( "Error while getting the canonical path of '" + origFile.getAbsolutePath() + "'.", e );
+        }
     }
 
     /**

@@ -41,6 +41,7 @@ public class SuffixMappingTest
         Set results = mapping.getTargetFiles( basedir, base + ".java" );
 
         assertEquals( "Returned wrong number of target files.", 1, results.size() );
+
         assertEquals( "Target file is wrong.", new File( basedir, base + ".class" ), results.iterator().next() );
     }
 
@@ -78,7 +79,6 @@ public class SuffixMappingTest
         assertTrue( "Targets do not contain class target.", results.contains( new File( basedir, base + ".class" ) ) );
 
         assertTrue( "Targets do not contain class target.", results.contains( new File( basedir, base + ".xml" ) ) );
-
     }
 
     public void testShouldReturnNoTargetFilesWhenSourceFileHasWrongSuffix()
@@ -97,7 +97,5 @@ public class SuffixMappingTest
         Set results = mapping.getTargetFiles( basedir, base + ".apt" );
 
         assertTrue( "Returned wrong number of target files.", results.isEmpty() );
-
     }
-
 }
