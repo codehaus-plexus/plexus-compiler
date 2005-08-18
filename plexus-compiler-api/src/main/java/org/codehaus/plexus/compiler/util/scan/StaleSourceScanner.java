@@ -17,7 +17,6 @@ package org.codehaus.plexus.compiler.util.scan;
  */
 
 import org.codehaus.plexus.compiler.util.scan.mapping.SourceMapping;
-import org.codehaus.plexus.util.DirectoryScanner;
 
 import java.io.File;
 import java.util.Collections;
@@ -82,9 +81,10 @@ public class StaleSourceScanner
             return Collections.EMPTY_SET;
         }
 
+        String[] potentialIncludes = scanForSources( sourceDir, sourceIncludes, sourceExcludes );
+
         Set matchingSources = new HashSet();
 
-        String[] potentialIncludes = scanForSources( sourceDir );
         for ( int i = 0; i < potentialIncludes.length; i++ )
         {
             String path = potentialIncludes[i];
@@ -115,45 +115,5 @@ public class StaleSourceScanner
         }
 
         return matchingSources;
-    }
-
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
-
-    private String[] scanForSources( File sourceDir )
-    {
-        DirectoryScanner ds = new DirectoryScanner();
-        ds.setFollowSymlinks( true );
-        ds.setBasedir( sourceDir );
-
-        String[] includes;
-        if ( sourceIncludes.isEmpty() )
-        {
-            includes = new String[0];
-        }
-        else
-        {
-            includes = (String[]) sourceIncludes.toArray( new String[sourceIncludes.size()] );
-        }
-
-        ds.setIncludes( includes );
-
-        String[] excludes;
-        if ( sourceExcludes.isEmpty() )
-        {
-            excludes = new String[0];
-        }
-        else
-        {
-            excludes = (String[]) sourceExcludes.toArray( new String[sourceExcludes.size()] );
-        }
-
-        ds.setExcludes( excludes );
-        ds.addDefaultExcludes();
-
-        ds.scan();
-
-        return ds.getIncludedFiles();
     }
 }

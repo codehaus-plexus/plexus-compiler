@@ -98,4 +98,22 @@ public class SuffixMappingTest
 
         assertTrue( "Returned wrong number of target files.", results.isEmpty() );
     }
+
+    public void testSingleTargetMapper()
+        throws InclusionScanException
+    {
+        String base = "path/to/file";
+
+        File basedir = new File( "target/" );
+
+        SingleTargetSourceMapping mapping = new SingleTargetSourceMapping( ".cs", "/foo" );
+
+        Set results = mapping.getTargetFiles( basedir, base + ".apt" );
+
+        assertTrue( results.isEmpty() );
+
+        results = mapping.getTargetFiles( basedir, base + ".cs" );
+
+        assertEquals( 1, results.size() );
+    }
 }

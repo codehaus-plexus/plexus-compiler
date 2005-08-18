@@ -115,6 +115,12 @@ public abstract class AbstractCompiler
         return outputFile;
     }
 
+    public boolean canUpdateTarget( CompilerConfiguration configuration )
+        throws CompilerException
+    {
+        return true;
+    }
+
     // ----------------------------------------------------------------------
     // Utility Methods
     // ----------------------------------------------------------------------

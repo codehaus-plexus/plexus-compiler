@@ -426,7 +426,7 @@ public class StaleSourceScannerTest
 
         fooCs.setLastModified( now - 10000 );
 
-        SourceMapping mapping = new SingleTargetSourceMapping( "Application.exe" );
+        SourceMapping mapping = new SingleTargetSourceMapping( ".cs", "Application.exe" );
 
         StaleSourceScanner scanner = new StaleSourceScanner( 0 );
 

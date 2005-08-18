@@ -1,9 +1,7 @@
-package org.codehaus.plexus.compiler;
-
-/**
+package org.codehaus.plexus.compiler.util.scan;/**
  * The MIT License
  *
- * Copyright (c) 2004, The Codehaus
+ * Copyright (c) 2005, The Codehaus
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -24,31 +22,41 @@ package org.codehaus.plexus.compiler;
  * SOFTWARE.
  */
 
+import java.util.Set;
 import java.util.List;
+import java.util.Collections;
+import java.util.Collection;
+import java.io.File;
 
 /**
- * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  * @version $Id$
  */
-public interface Compiler
+public class SimpleSourceInclusionScanner
+    extends AbstractSourceInclusionScanner
 {
-    String ROLE = Compiler.class.getName();
+    private Set sourceIncludes;
 
-    CompilerOutputStyle getCompilerOutputStyle();
+    private Set sourceExcludes;
 
-    String getInputFileEnding( CompilerConfiguration configuration )
-        throws CompilerException;
+    public SimpleSourceInclusionScanner( Set sourceIncludes,
+                                         Set sourceExcludes )
+    {
+        this.sourceIncludes = sourceIncludes;
 
-    String getOutputFileEnding( CompilerConfiguration configuration )
-        throws CompilerException;
+        this.sourceExcludes = sourceExcludes;
+    }
 
-    String getOutputFile( CompilerConfiguration configuration )
-        throws CompilerException;
+    public Set getIncludedSources( File sourceDir, File targetDir )
+        throws InclusionScanException
+    {
+        List srcMappings = getSourceMappings();
 
-    boolean canUpdateTarget( CompilerConfiguration configuration )
-        throws CompilerException;
+        if ( srcMappings.isEmpty() )
+        {
+            return Collections.EMPTY_SET;
+        }
 
-    List compile( CompilerConfiguration configuration )
-        throws CompilerException;
+        return Collections.singleton( scanForSources( sourceDir, sourceIncludes, sourceExcludes ) );
+    }
 }

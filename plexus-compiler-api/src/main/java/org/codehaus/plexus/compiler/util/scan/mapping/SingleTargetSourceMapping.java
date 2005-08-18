@@ -27,7 +27,7 @@ package org.codehaus.plexus.compiler.util.scan.mapping;
 import org.codehaus.plexus.compiler.util.scan.InclusionScanException;
 
 import java.util.Set;
-import java.util.HashSet;
+import java.util.Collections;
 import java.io.File;
 
 /**
@@ -39,20 +39,25 @@ import java.io.File;
 public class SingleTargetSourceMapping
     implements SourceMapping
 {
+    private String sourceSuffix;
+
     private String outputFile;
 
-    public SingleTargetSourceMapping( String outputFile )
+    public SingleTargetSourceMapping( String sourceSuffix, String outputFile )
     {
+        this.sourceSuffix = sourceSuffix;
+
         this.outputFile = outputFile;
     }
 
     public Set getTargetFiles( File targetDir, String source )
         throws InclusionScanException
     {
-        Set targetFiles = new HashSet();
+        if ( !source.endsWith( sourceSuffix ) )
+        {
+            return Collections.EMPTY_SET;
+        }
 
-        targetFiles.add( new File( targetDir, outputFile ) );
-
-        return targetFiles;
+        return Collections.singleton( new File( targetDir, outputFile ) );
     }
 }

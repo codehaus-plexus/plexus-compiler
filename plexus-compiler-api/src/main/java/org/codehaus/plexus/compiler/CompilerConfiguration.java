@@ -79,6 +79,19 @@ public class CompilerConfiguration
 
     private File workingDirectory;
 
+    /**
+     * A build temporary directory, eg target/.
+     *
+     * Used by the compiler implementation to put temporary files.
+     */
+    private File buildDirectory;
+
+    /**
+     * Used to control the name of the output file when compiling a set of
+     * sources to a single file.
+     */
+    private String outputFileName;
+
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
@@ -320,5 +333,25 @@ public class CompilerConfiguration
     public void setWorkingDirectory( File workingDirectory )
     {
         this.workingDirectory = workingDirectory;
+    }
+
+    public File getBuildDirectory()
+    {
+        return buildDirectory;
+    }
+
+    public void setBuildDirectory( File buildDirectory )
+    {
+        this.buildDirectory = buildDirectory;
+    }
+
+    public String getOutputFileName()
+    {
+        return outputFileName;
+    }
+
+    public void setOutputFileName( String outputFileName )
+    {
+        this.outputFileName = outputFileName;
     }
 }
