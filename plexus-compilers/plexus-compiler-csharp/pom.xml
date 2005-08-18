@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>plexus</groupId>
+    <artifactId>plexus-compilers</artifactId>
+    <version>1.5-SNAPSHOT</version>
+  </parent>
+  <artifactId>plexus-compiler-csharp</artifactId>
+  <name>Plexus C# Compiler</name>
+  <dependencies>
+    <dependency>
+      <groupId>plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+      <version>1.0.2-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>ant</groupId>
+      <artifactId>ant</artifactId>
+      <version>1.6.5</version>
+    </dependency>
+    <dependency>
+      <groupId>ant</groupId>
+      <artifactId>ant-nodeps</artifactId>
+      <version>1.6.5</version>
+    </dependency>
+  </dependencies>
+</project>
