@@ -36,5 +36,6 @@
 
     <module>plexus-compiler-eclipse</module>        
     <module>plexus-compiler-javac</module>    
+    <module>plexus-compiler-csharp</module>    
   </modules>
 </project>
