@@ -30,7 +30,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.Map;
 import java.util.LinkedHashMap;
 
 /**
@@ -71,13 +70,15 @@ public class CompilerConfiguration
 
     private String sourceEncoding;
 
-    private Map customCompilerArguments = new LinkedHashMap();
+    private LinkedHashMap customCompilerArguments = new LinkedHashMap();
 
     private boolean fork;
 
     private String executable;
 
     private File workingDirectory;
+    
+    private String compilerVersion;
 
     /**
      * A build temporary directory, eg target/.
@@ -288,16 +289,16 @@ public class CompilerConfiguration
         customCompilerArguments.put( customArgument, value );
     }
 
-    public Map getCustomCompilerArguments()
+    public LinkedHashMap getCustomCompilerArguments()
     {
-        return Collections.unmodifiableMap( customCompilerArguments );
+        return new LinkedHashMap( customCompilerArguments );
     }
 
-    public void setCustomCompilerArguments( Map customCompilerArguments )
+    public void setCustomCompilerArguments( LinkedHashMap customCompilerArguments )
     {
         if ( customCompilerArguments == null )
         {
-            this.customCompilerArguments = Collections.EMPTY_MAP;
+            this.customCompilerArguments = new LinkedHashMap();
         }
         else
         {
@@ -353,5 +354,15 @@ public class CompilerConfiguration
     public void setOutputFileName( String outputFileName )
     {
         this.outputFileName = outputFileName;
+    }
+    
+    public String getCompilerVersion()
+    {
+        return compilerVersion;
+    }
+
+    public void setCompilerVersion( String compilerVersion )
+    {
+        this.compilerVersion = compilerVersion;
     }
 }
