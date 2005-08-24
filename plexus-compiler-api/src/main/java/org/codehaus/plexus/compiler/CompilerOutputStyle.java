@@ -45,14 +45,23 @@ public final class CompilerOutputStyle
         this.id = id;
     }
 
+    // ----------------------------------------------------------------------
+    //
+    // ----------------------------------------------------------------------
+
     public String toString()
     {
         return id;
     }
 
-    public boolean equals( Object obj )
+    public boolean equals( Object other )
     {
-        return id.equals( obj );
+        if ( other == null || !(other instanceof CompilerOutputStyle) )
+        {
+            return false;
+        }
+
+        return id.equals( ((CompilerOutputStyle)other ).id );
     }
 
     public int hashCode()
