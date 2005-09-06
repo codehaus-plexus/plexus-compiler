@@ -77,6 +77,7 @@ import org.codehaus.plexus.compiler.AbstractCompiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerError;
 import org.codehaus.plexus.compiler.CompilerException;
+import org.codehaus.plexus.compiler.CompilerOutputStyle;
 import org.codehaus.plexus.compiler.util.StreamPumper;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -94,6 +95,14 @@ public class JikesCompiler
     extends AbstractCompiler
 {
     private static final int OUTPUT_BUFFER_SIZE = 1024;
+
+    public JikesCompiler()
+    {
+        super( CompilerOutputStyle.ONE_OUTPUT_FILE_PER_INPUT_FILE,
+               ".java",
+               ".class",
+               null );
+    }
 
     public List compile( CompilerConfiguration config )
         throws CompilerException

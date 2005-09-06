@@ -60,10 +60,6 @@ public abstract class AbstractCompiler
     //
     // ----------------------------------------------------------------------
 
-    protected AbstractCompiler()
-    {
-    }
-
     protected AbstractCompiler( CompilerOutputStyle compilerOutputStyle,
                                 String inputFileEnding,
                                 String outputFileEnding,

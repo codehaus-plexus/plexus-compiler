@@ -49,12 +49,6 @@ public abstract class AbstractCompilerTest
 
     protected abstract String getRoleHint();
 
-    public void setUp()
-        throws Exception
-    {
-        super.setUp();
-    }
-
     protected void setCompilerDebug( boolean flag )
     {
         compilerDebug = flag;
@@ -104,15 +98,48 @@ public abstract class AbstractCompilerTest
 
         int numCompilerWarnings = messages.size() - numCompilerErrors;
 
-        assertEquals( "Wrong number of compilation errors.",
-                      expectedErrors(),
-                      numCompilerErrors );
+        if ( expectedErrors() != numCompilerErrors )
+        {
+            for ( Iterator it = messages.iterator(); it.hasNext(); )
+            {
+                CompilerError error = (CompilerError) it.next();
 
-        assertEquals( "Wrong number of compilation warnings.",
-                      expectedWarnings(),
-                      numCompilerWarnings );
+                if ( !error.isError() )
+                {
+                    continue;
+                }
+
+                System.err.println( "----" );
+                System.err.println( error.getFile() + ":" + error.getMessage() );
+                System.err.println( "----" );
+            }
+
+            assertEquals( "Wrong number of compilation errors.",
+                          expectedErrors(),
+                          numCompilerErrors );
+        }
+
+        if ( expectedWarnings() != numCompilerWarnings )
+        {
+            for ( Iterator it = messages.iterator(); it.hasNext(); )
+            {
+                CompilerError error = (CompilerError) it.next();
+
+                if ( error.isError() )
+                {
+                    continue;
+                }
+
+                System.err.println( "----" );
+                System.err.println( error.getFile() + ":" + error.getMessage() );
+                System.err.println( "----" );
+            }
+
+            assertEquals( "Wrong number of compilation warnings.",
+                          expectedWarnings(),
+                          numCompilerWarnings );
+        }
     }
-
 
     private List getCompilerConfigurations()
         throws Exception
@@ -146,7 +173,6 @@ public abstract class AbstractCompilerTest
 
         return compilerConfigurations;
     }
-
 
     protected int compilerErrorCount( List messages )
     {

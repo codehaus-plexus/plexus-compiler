@@ -28,6 +28,7 @@ import org.codehaus.plexus.compiler.AbstractCompiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerError;
 import org.codehaus.plexus.compiler.CompilerException;
+import org.codehaus.plexus.compiler.CompilerOutputStyle;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
@@ -68,6 +69,14 @@ import java.util.StringTokenizer;
 public class EclipseJavaCompiler
     extends AbstractCompiler
 {
+    public EclipseJavaCompiler()
+    {
+        super( CompilerOutputStyle.ONE_OUTPUT_FILE_PER_INPUT_FILE,
+               ".java",
+               ".class",
+               null );
+    }
+
     // ----------------------------------------------------------------------
     // Compiler Implementation
     // ----------------------------------------------------------------------
