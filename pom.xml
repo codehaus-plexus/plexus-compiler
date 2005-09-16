@@ -12,6 +12,7 @@
   <modules>
     <module>plexus-compiler-api</module>
     <module>plexus-compiler-test</module>
+    <module>plexus-compiler-manager</module>
     <module>plexus-compilers</module>
   </modules>
 </project>
