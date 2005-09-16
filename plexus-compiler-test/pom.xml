@@ -1,19 +1,18 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
 <project>
-  <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>plexus</groupId>
     <artifactId>plexus-compiler</artifactId>
-    <version>1.5-SNAPSHOT</version>
+    <groupId>plexus</groupId>
+    <version>1.5</version>
   </parent>
+  <modelVersion>4.0.0</modelVersion>
   <artifactId>plexus-compiler-test</artifactId>
   <name>Plexus Compiler Test Harness</name>
+  <version>1.5</version>
   <dependencies>
     <dependency>
-      <groupId>plexus</groupId>
-      <artifactId>plexus-compiler-api</artifactId>
-      <version>1.5-SNAPSHOT</version>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-artifact-test</artifactId>
+      <version>2.0-beta-1</version>
     </dependency>
     <dependency>
       <groupId>plexus</groupId>
@@ -21,9 +20,9 @@
       <version>1.0.3</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-artifact-test</artifactId>
-      <version>2.0-beta-1</version>
+      <groupId>plexus</groupId>
+      <artifactId>plexus-compiler-api</artifactId>
+      <version>1.5</version>
     </dependency>
   </dependencies>
 </project>

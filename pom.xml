@@ -1,16 +1,14 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
 <project>
-  <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>plexus</groupId>
     <artifactId>plexus-components</artifactId>
+    <groupId>plexus</groupId>
     <version>1.1.2</version>
   </parent>
-  <packaging>pom</packaging>
+  <modelVersion>4.0.0</modelVersion>
   <artifactId>plexus-compiler</artifactId>
-  <version>1.5-SNAPSHOT</version>
+  <packaging>pom</packaging>
   <name>Plexus Compiler Parent</name>
+  <version>1.5</version>
   <modules>
     <module>plexus-compiler-api</module>
     <module>plexus-compiler-test</module>
