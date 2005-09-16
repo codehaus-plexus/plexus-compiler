@@ -2,13 +2,13 @@
   <parent>
     <artifactId>plexus-compiler</artifactId>
     <groupId>plexus</groupId>
-    <version>1.5</version>
+    <version>1.6-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>plexus-compilers</artifactId>
   <packaging>pom</packaging>
   <name>Plexus Compilers Parent</name>
-  <version>1.5</version>
+  <version>1.6-SNAPSHOT</version>
   <modules>
     <module>plexus-compiler-eclipse</module>
     <module>plexus-compiler-javac</module>
@@ -18,13 +18,13 @@
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-compiler-test</artifactId>
-      <version>1.5</version>
+      <version>1.6-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-compiler-api</artifactId>
-      <version>1.5</version>
+      <version>1.6-SNAPSHOT</version>
     </dependency>
   </dependencies>
 </project>
