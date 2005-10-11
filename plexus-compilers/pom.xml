@@ -1,7 +1,7 @@
 <project>
   <parent>
     <artifactId>plexus-compiler</artifactId>
-    <groupId>plexus</groupId>
+    <groupId>org.codehaus.plexus</groupId>
     <version>1.6-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
@@ -16,13 +16,13 @@
   </modules>
   <dependencies>
     <dependency>
-      <groupId>plexus</groupId>
+      <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-compiler-test</artifactId>
       <version>1.6-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>plexus</groupId>
+      <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-compiler-api</artifactId>
       <version>1.6-SNAPSHOT</version>
     </dependency>
