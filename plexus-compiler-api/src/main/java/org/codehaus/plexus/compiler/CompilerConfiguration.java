@@ -41,7 +41,7 @@ public class CompilerConfiguration
     private String outputLocation;
 
     private List classpathEntries = new LinkedList();
-
+    
     // ----------------------------------------------------------------------
     // Source Files
     // ----------------------------------------------------------------------
@@ -79,7 +79,9 @@ public class CompilerConfiguration
     private File workingDirectory;
     
     private String compilerVersion;
-
+    
+    private boolean verbose = false;
+    
     /**
      * A build temporary directory, eg target/.
      *
@@ -364,5 +366,15 @@ public class CompilerConfiguration
     public void setCompilerVersion( String compilerVersion )
     {
         this.compilerVersion = compilerVersion;
+    }
+
+    public boolean isVerbose()
+    {
+        return verbose;
+    }
+
+    public void setVerbose(boolean verbose)
+    {
+        this.verbose = verbose;
     }
 }

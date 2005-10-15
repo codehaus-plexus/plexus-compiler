@@ -186,6 +186,11 @@ public class JavacCompiler
             args.add( "-g" );
         }
 
+        if ( config.isVerbose() )
+        {
+            args.add( "-verbose" );
+        }
+
         if ( !config.isShowWarnings() )
         {
             args.add( "-nowarn" );
