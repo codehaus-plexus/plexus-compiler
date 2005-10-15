@@ -173,12 +173,6 @@ public class JavacCompilerTest
 
         expectedArguments.add( "-g" );
 
-        // showWarning
-
-        compilerConfiguration.setShowWarnings( false );
-
-        expectedArguments.add( "-nowarn" );
-
         // showDeprecation
 
         compilerConfiguration.setShowDeprecation( true );

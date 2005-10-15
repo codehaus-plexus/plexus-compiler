@@ -196,17 +196,17 @@ public class JavacCompiler
             args.add( "-verbose" );
         }
 
-        if ( !config.isShowWarnings() )
-        {
-            args.add( "-nowarn" );
-        }
-
         if ( config.isShowDeprecation() )
         {
             args.add( "-deprecation" );
 
             // This is required to actually display the deprecation messages
             config.setShowWarnings( true );
+        }
+
+        if ( !config.isShowWarnings() )
+        {
+            args.add( "-nowarn" );
         }
 
         // TODO: this could be much improved
