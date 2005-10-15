@@ -181,6 +181,11 @@ public class JavacCompiler
             args.add( sourceFiles[i] );
         }
 
+        if ( config.isOptimize() )
+        {
+            args.add( "-O" );
+        }
+
         if ( config.isDebug() )
         {
             args.add( "-g" );
