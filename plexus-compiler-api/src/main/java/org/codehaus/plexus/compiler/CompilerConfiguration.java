@@ -73,6 +73,8 @@ public class CompilerConfiguration
     private LinkedHashMap customCompilerArguments = new LinkedHashMap();
 
     private boolean fork;
+    
+    private boolean optimize;
 
     private String executable;
 
@@ -358,6 +360,16 @@ public class CompilerConfiguration
         this.outputFileName = outputFileName;
     }
     
+    public boolean isOptimize()
+    {
+        return optimize;
+    }
+
+    public void setOptimize( boolean optimize )
+    {
+        this.optimize = optimize;
+    }
+
     public String getCompilerVersion()
     {
         return compilerVersion;
