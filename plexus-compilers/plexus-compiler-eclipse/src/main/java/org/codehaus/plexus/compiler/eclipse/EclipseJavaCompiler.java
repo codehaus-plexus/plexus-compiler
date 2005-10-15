@@ -208,6 +208,12 @@ public class EclipseJavaCompiler
         return errors;
     }
 
+    public String[] createCommandLine( CompilerConfiguration config )
+            throws CompilerException
+    {
+        return null;
+    }
+
     private CompilerError handleError( String className, int line, int column, Object errorMessage )
     {
         String fileName = className.replace( '.', File.separatorChar ) + ".java";

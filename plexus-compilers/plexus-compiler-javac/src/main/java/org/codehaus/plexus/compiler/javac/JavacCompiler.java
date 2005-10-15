@@ -44,14 +44,12 @@ package org.codehaus.plexus.compiler.javac;
 import org.codehaus.plexus.compiler.AbstractCompiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerError;
-import org.codehaus.plexus.compiler.CompilerOutputStyle;
 import org.codehaus.plexus.compiler.CompilerException;
+import org.codehaus.plexus.compiler.CompilerOutputStyle;
 import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
-import org.codehaus.plexus.util.cli.StreamConsumer;
-import org.codehaus.plexus.util.cli.WriterStreamConsumer;
-import org.codehaus.plexus.util.cli.CommandLineException;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -59,20 +57,20 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.io.Writer;
-import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
-import java.util.Map;
-import java.net.MalformedURLException;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
+ * @author <a href="mailto:matthew.pocock@ncl.ac.uk">Matthew Pocock</a>
  * @author Others
  * @version $Id$
  */
@@ -139,6 +137,12 @@ public class JavacCompiler
         }
 
         return messages;
+    }
+
+    public String[] createCommandLine( CompilerConfiguration config )
+            throws CompilerException
+    {
+        return buildCompilerArguments( config, getSourceFiles( config ) );
     }
 
     public static String[] buildCompilerArguments( CompilerConfiguration config,
@@ -265,12 +269,12 @@ public class JavacCompiler
 
         return (String[]) args.toArray( new String[ args.size() ] );
     }
-    
+
     private static boolean suppressSource( CompilerConfiguration config )
     {
         return "1.3".equals( config.getCompilerVersion() );
     }
-    
+
     private static boolean suppressEncoding( CompilerConfiguration config )
     {
         return "1.3".equals( config.getCompilerVersion() );
@@ -314,7 +318,7 @@ public class JavacCompiler
         {
             // TODO: exception?
             messages.add( new CompilerError( "Failure executing javac,  but could not parse the error:" +  EOL +
-                                             err.getOutput(), true ) );
+                                                                          err.getOutput(), true ) );
         }
 
         return messages;

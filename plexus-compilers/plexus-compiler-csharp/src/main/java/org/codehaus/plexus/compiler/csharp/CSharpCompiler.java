@@ -47,6 +47,7 @@ import java.util.Iterator;
 /**
  * @author <a href="mailto:gdodinet@karmicsoft.com">Gilles Dodinet</a>
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
+ * @author <a href="mailto:matthew.pocock@ncl.ac.uk">Matthew Pocock</a>
  * @version $Id$
  */
 public class CSharpCompiler
@@ -119,6 +120,12 @@ public class CSharpCompiler
         }
 
         return messages;
+    }
+
+    public String[] createCommandLine( CompilerConfiguration config )
+            throws CompilerException
+    {
+        return buildCompilerArguments( config, getSourceFiles( config ) );
     }
 
     // ----------------------------------------------------------------------

@@ -29,6 +29,7 @@ import java.util.List;
 /**
  * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
+ * @author <a href="mailto:matthew.pocock@ncl.ac.uk">Matthew Pocock</a>
  * @version $Id$
  */
 public interface Compiler
@@ -50,5 +51,20 @@ public interface Compiler
         throws CompilerException;
 
     List compile( CompilerConfiguration configuration )
+        throws CompilerException;
+
+    /**
+     * Create the command line that would be executed using this configuration.
+     * If this particular compiler has no concept of a command line then returns
+     * null.
+     *
+     * @param config     the CompilerConfiguration describing the
+     *   compilation
+     * @return an array of Strings that make up the command line, or null if
+     *   this compiler has no concept of command line
+     * @throws CompilerException  if there was an error generating the command
+     *   line
+     */
+    String[] createCommandLine(CompilerConfiguration config )
         throws CompilerException;
 }
