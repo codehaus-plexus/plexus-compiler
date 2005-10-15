@@ -287,11 +287,9 @@ public class JavacCompiler
 
         cli.addArguments( args );
 
-        Writer stringWriter = new StringWriter();
+        CommandLineUtils.StringStreamConsumer out = new CommandLineUtils.StringStreamConsumer();
 
-        StreamConsumer out = new WriterStreamConsumer( stringWriter );
-
-        StreamConsumer err = new WriterStreamConsumer( stringWriter );
+        CommandLineUtils.StringStreamConsumer err = new CommandLineUtils.StringStreamConsumer();
 
         int returnCode;
 
@@ -301,7 +299,7 @@ public class JavacCompiler
         {
             returnCode = CommandLineUtils.executeCommandLine( cli, out, err );
 
-            messages = parseModernStream( new BufferedReader( new StringReader( stringWriter.toString() ) ) );
+            messages = parseModernStream( new BufferedReader( new StringReader( err.getOutput() ) ) );
         }
         catch ( CommandLineException e )
         {
@@ -316,7 +314,7 @@ public class JavacCompiler
         {
             // TODO: exception?
             messages.add( new CompilerError( "Failure executing javac,  but could not parse the error:" +  EOL +
-                                             stringWriter.toString(), true ) );
+                                             err.getOutput(), true ) );
         }
 
         return messages;

@@ -56,7 +56,7 @@ public class JavacCompilerTest
 
     protected int expectedErrors()
     {
-        return 5;
+        return 3;
     }
 
     protected int expectedWarnings()
