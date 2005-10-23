@@ -76,6 +76,10 @@ public class CompilerConfiguration
     
     private boolean optimize;
 
+    private String meminitial;
+
+    private String maxmem;
+
     private String executable;
 
     private File workingDirectory;
@@ -318,6 +322,26 @@ public class CompilerConfiguration
     public void setFork( boolean fork )
     {
         this.fork = fork;
+    }
+
+    public String getMeminitial()
+    {
+        return meminitial;
+    }
+
+    public void setMeminitial( String meminitial )
+    {
+        this.meminitial = meminitial;
+    }
+
+    public String getMaxmem()
+    {
+        return maxmem;
+    }
+
+    public void setMaxmem( String maxmem )
+    {
+        this.maxmem = maxmem;
     }
 
     public String getExecutable()
