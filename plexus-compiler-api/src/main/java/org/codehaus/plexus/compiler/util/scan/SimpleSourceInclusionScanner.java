@@ -1,4 +1,6 @@
-package org.codehaus.plexus.compiler.util.scan;/**
+package org.codehaus.plexus.compiler.util.scan;
+
+/**
  * The MIT License
  *
  * Copyright (c) 2005, The Codehaus
@@ -22,11 +24,10 @@ package org.codehaus.plexus.compiler.util.scan;/**
  * SOFTWARE.
  */
 
-import java.util.Set;
-import java.util.List;
-import java.util.Collections;
-import java.util.Collection;
 import java.io.File;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
