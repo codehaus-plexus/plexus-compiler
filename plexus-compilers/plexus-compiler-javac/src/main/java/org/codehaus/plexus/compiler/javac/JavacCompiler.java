@@ -173,7 +173,7 @@ public class JavacCompiler
         }
 
         List sourceLocations = config.getSourceLocations();
-        if ( sourceLocations != null && !sourceLocations.isEmpty() )
+        if ( sourceLocations != null && !sourceLocations.isEmpty() && ( sourceFiles.length == 0 ) )
         {
             args.add( "-sourcepath" );
 
