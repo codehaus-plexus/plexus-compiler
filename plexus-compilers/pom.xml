@@ -10,9 +10,11 @@
   <name>Plexus Compilers Parent</name>
   <version>1.6-SNAPSHOT</version>
   <modules>
-    <module>plexus-compiler-eclipse</module>
     <module>plexus-compiler-javac</module>
+<!-- Currently broken
+    <module>plexus-compiler-eclipse</module>
     <module>plexus-compiler-csharp</module>
+-->
   </modules>
   <dependencies>
     <dependency>
