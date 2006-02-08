@@ -13,8 +13,8 @@
     <module>plexus-compiler-javac</module>
 <!-- Currently broken
     <module>plexus-compiler-eclipse</module>
-    <module>plexus-compiler-csharp</module>
 -->
+    <module>plexus-compiler-csharp</module>
   </modules>
   <dependencies>
     <dependency>
