@@ -19,13 +19,11 @@ import org.aspectj.bridge.AbortException;
 import org.aspectj.bridge.IMessage;
 import org.aspectj.bridge.ISourceLocation;
 import org.aspectj.bridge.MessageHandler;
-import org.aspectj.tools.ajc.Main;
 import org.codehaus.plexus.compiler.AbstractCompiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerError;
 import org.codehaus.plexus.compiler.CompilerException;
 import org.codehaus.plexus.compiler.CompilerOutputStyle;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Options
@@ -383,6 +381,7 @@ public class AspectJCompiler
 
         boolean errors = messageHandler.hasAnyMessage( IMessage.ERROR, true );
 
+        List messages = new ArrayList();
         if ( errors )
         {
             IMessage[] errorMessages = messageHandler.getMessages( IMessage.ERROR, true );
