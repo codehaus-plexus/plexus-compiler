@@ -1,7 +1,6 @@
 /* Created on Oct 4, 2004 */
 package org.codehaus.plexus.compiler.ajc;
 
-import java.io.File;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -84,9 +83,14 @@ public class AspectJCompilerConfiguration
         return outputJar;
     }
 
+    /**
+     * Ignored, not supported yet
+     * @param ajOptions
+     */
     public void setAJOptions( Map ajOptions )
     {
-        this.ajOptions = new TreeMap( ajOptions );
+        //TODO
+        //this.ajOptions = new TreeMap( ajOptions );
     }
 
     public void setAJOption( String optionName, String optionValue )
@@ -94,6 +98,10 @@ public class AspectJCompilerConfiguration
         this.ajOptions.put( optionName, optionValue );
     }
 
+    /**
+     * Ignored, not supported yet
+     * @return empty Map
+     */
     public Map getAJOptions()
     {
         return Collections.unmodifiableMap( ajOptions );

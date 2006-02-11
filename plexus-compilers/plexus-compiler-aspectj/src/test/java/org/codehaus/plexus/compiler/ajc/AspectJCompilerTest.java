@@ -1,12 +1,13 @@
 package org.codehaus.plexus.compiler.ajc;
 
-import org.codehaus.plexus.compiler.AbstractCompilerTest;
-import org.apache.maven.artifact.DefaultArtifact;
-import org.apache.maven.artifact.Artifact;
-
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
-import java.io.File;
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.handler.DefaultArtifactHandler;
+import org.apache.maven.artifact.versioning.VersionRange;
+import org.codehaus.plexus.compiler.AbstractCompilerTest;
 
 /**
  * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>
@@ -27,17 +28,20 @@ public class AspectJCompilerTest
 
     protected int expectedErrors()
     {
-        return 2;
+        return 1;
     }
 
     protected List getClasspath()
         throws Exception
     {
-        List cp = new LinkedList( super.getClasspath() );
+        List cp = super.getClasspath();
 
-        Artifact artifact = new DefaultArtifact( "aspectj", "aspectjrt", "1.2", "jar" );
+        VersionRange versionRange = VersionRange.createFromVersion( "1.5.0" );
 
-        cp.add( getLocalArtifactPath( artifact ) );
+        Artifact artifact = new DefaultArtifact( "aspectj", "aspectjrt", versionRange, Artifact.SCOPE_RUNTIME,
+                                                 "jar", null, new DefaultArtifactHandler( "jar" ) );
+
+        cp.add( getLocalArtifactPath( artifact ).getAbsolutePath() );
 
         return cp;
     }

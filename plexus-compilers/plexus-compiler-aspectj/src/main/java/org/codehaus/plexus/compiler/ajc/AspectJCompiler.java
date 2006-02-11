@@ -1,26 +1,31 @@
 package org.codehaus.plexus.compiler.ajc;
 
-import org.aspectj.ajdt.internal.core.builder.AjBuildConfig;
-import org.aspectj.ajdt.internal.core.builder.AjBuildManager;
-import org.aspectj.bridge.IMessage;
-import org.aspectj.bridge.MessageHandler;
-import org.aspectj.tools.ajc.Main;
-import org.codehaus.plexus.compiler.AbstractCompiler;
-import org.codehaus.plexus.compiler.CompilerConfiguration;
-import org.codehaus.plexus.compiler.CompilerError;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
-
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import org.aspectj.ajdt.internal.core.builder.AjBuildConfig;
+import org.aspectj.ajdt.internal.core.builder.AjBuildManager;
+import org.aspectj.bridge.AbortException;
+import org.aspectj.bridge.IMessage;
+import org.aspectj.bridge.ISourceLocation;
+import org.aspectj.bridge.MessageHandler;
+import org.aspectj.tools.ajc.Main;
+import org.codehaus.plexus.compiler.AbstractCompiler;
+import org.codehaus.plexus.compiler.CompilerConfiguration;
+import org.codehaus.plexus.compiler.CompilerError;
+import org.codehaus.plexus.compiler.CompilerException;
+import org.codehaus.plexus.compiler.CompilerOutputStyle;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Options
@@ -219,26 +224,45 @@ import java.util.Map;
  */
 public class AspectJCompiler
     extends AbstractCompiler
-    implements Initializable
 {
 
-    /**
-     * Aspjectj compiler
-     */
-    private Main compiler;
+    // ----------------------------------------------------------------------
+    //
+    // ----------------------------------------------------------------------
 
-    /**
-     * @see org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable#initialize
-     */
-    public void initialize() throws InitializationException
+    public AspectJCompiler()
     {
-        compiler = new Main();
+        super( CompilerOutputStyle.ONE_OUTPUT_FILE_PER_INPUT_FILE, ".java", ".class", null );
     }
 
-    public List compile( CompilerConfiguration config ) throws Exception
+    public List compile( CompilerConfiguration config )
+        throws CompilerException
     {
-        List messages = new ArrayList();
+        File destinationDir = new File( config.getOutputLocation() );
 
+        if ( !destinationDir.exists() )
+        {
+            destinationDir.mkdirs();
+        }
+
+        String[] sourceFiles = getSourceFiles( config );
+
+        if ( sourceFiles.length == 0 )
+        {
+            return Collections.EMPTY_LIST;
+        }
+
+        System.out.println( "Compiling " + sourceFiles.length + " " + "source file"
+            + ( sourceFiles.length == 1 ? "" : "s" ) + " to " + destinationDir.getAbsolutePath() );
+
+        //        String[] args = buildCompilerArguments( config, sourceFiles );
+        AjBuildConfig buildConfig = buildCompilerConfig( config );
+        return compileInProcess( buildConfig );
+    }
+
+    private AjBuildConfig buildCompilerConfig( CompilerConfiguration config )
+        throws CompilerException
+    {
         AjBuildConfig buildConfig = new AjBuildConfig();
         buildConfig.setIncrementalMode( false );
 
@@ -248,14 +272,15 @@ public class AspectJCompiler
             buildConfig.setFiles( buildFileList( Arrays.asList( files ) ) );
         }
 
-        Map javaOpts = config.getCompilerOptions();
+        Map javaOpts = config.getCustomCompilerArguments();
         if ( javaOpts != null && !javaOpts.isEmpty() )
         {
-            buildConfig.setJavaOptions( javaOpts );
+            // TODO support customCompilerArguments
+            // buildConfig.setJavaOptions( javaOpts );
         }
 
         List cp = new LinkedList( config.getClasspathEntries() );
-        cp.add( 0, new File( System.getProperty( "java.home" ) + "/lib/rt.jar" ) );
+        cp.add( 0, System.getProperty( "java.home" ) + "/lib/rt.jar" );
 
         checkForAspectJRT( cp );
         if ( cp != null && !cp.isEmpty() )
@@ -263,7 +288,7 @@ public class AspectJCompiler
             List elements = new ArrayList( cp.size() );
             for ( Iterator i = cp.iterator(); i.hasNext(); )
             {
-                elements.add( ( (File) i.next() ).getAbsolutePath() );
+                elements.add( ( new File( (String) i.next() ) ).getAbsolutePath() );
             }
 
             buildConfig.setClasspath( elements );
@@ -294,7 +319,8 @@ public class AspectJCompiler
             Map ajOptions = ajCfg.getAJOptions();
             if ( ajOptions != null && !ajOptions.isEmpty() )
             {
-                buildConfig.setAjOptions( ajCfg.getAJOptions() );
+                // TODO not supported
+                //buildConfig.setAjOptions( ajCfg.getAJOptions() );
             }
 
             List aspectPath = buildFileList( ajCfg.getAspectPath() );
@@ -322,12 +348,30 @@ public class AspectJCompiler
             }
         }
 
+        return buildConfig;
+    }
+
+    private List compileInProcess( AjBuildConfig buildConfig )
+        throws CompilerException
+    {
+
         MessageHandler messageHandler = new MessageHandler();
 
         AjBuildManager manager = new AjBuildManager( messageHandler );
 
-        boolean success = manager.batchBuild( buildConfig, messageHandler );
-        
+        try
+        {
+            manager.batchBuild( buildConfig, messageHandler );
+        }
+        catch ( AbortException e )
+        {
+            throw new CompilerException( "Unknown error while compiling", e );
+        }
+        catch ( IOException e )
+        {
+            throw new CompilerException( "Unknown error while compiling", e );
+        }
+
         // We need the location of the maven so we have a couple of options
         // here.
         //
@@ -336,7 +380,7 @@ public class AspectJCompiler
         // bake it into the plugin and retrieve it somehow or use a system
         // property or we
         // could pass in a set of parameters in a Map.
-        
+
         boolean errors = messageHandler.hasAnyMessage( IMessage.ERROR, true );
 
         if ( errors )
@@ -347,11 +391,20 @@ public class AspectJCompiler
             {
                 IMessage m = errorMessages[i];
 
-                messages.add( new CompilerError( m.getSourceLocation().getSourceFile().getPath(),
-                                                 true, m.getSourceLocation().getLine(),
-                                                 m.getSourceLocation().getColumn(),
-                                                 m.getSourceLocation().getEndLine(),
-                                                 m.getSourceLocation().getColumn(), m.getMessage() ) );
+                ISourceLocation sourceLocation = m.getSourceLocation();
+                CompilerError error;
+
+                if ( sourceLocation == null )
+                {
+                    error = new CompilerError( m.getMessage(), true );
+                }
+                else
+                {
+                    error = new CompilerError( sourceLocation.getSourceFile().getPath(), true,
+                                               sourceLocation.getLine(), sourceLocation.getColumn(), sourceLocation
+                                                   .getEndLine(), sourceLocation.getColumn(), m.getMessage() );
+                }
+                messages.add( error ); 
             }
         }
 
@@ -371,7 +424,7 @@ public class AspectJCompiler
                 URL[] urls = new URL[cp.size()];
                 for ( int i = 0; i < urls.length; i++ )
                 {
-                    urls[i] = ( (File) cp.get( i ) ).toURL();
+                    urls[i] = ( new File( (String) cp.get( i ) ) ).toURL();
                 }
 
                 URLClassLoader cloader = new URLClassLoader( urls );
@@ -399,6 +452,15 @@ public class AspectJCompiler
         }
 
         return fileList;
+    }
+
+    /**
+     * @return null
+     */
+    public String[] createCommandLine( CompilerConfiguration config )
+        throws CompilerException
+    {
+        return null;
     }
 
 }
