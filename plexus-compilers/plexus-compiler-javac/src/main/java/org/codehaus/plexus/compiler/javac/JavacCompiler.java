@@ -290,7 +290,17 @@ public class JavacCompiler
         return "1.3".equals( config.getCompilerVersion() );
     }
 
-    private List compileOutOfProcess( File workingDirectory, String executable, String[] args )
+    /**
+     * Compile the java sources in a external process, calling an external executable,
+     * like javac.
+     * 
+     * @param workingDirectory base directory where the process will be launched
+     * @param executable name of the executable to launch
+     * @param args arguments for the executable launched
+     * @return List of CompilerError objects with the errors encountered.
+     * @throws CompilerException
+     */
+    List compileOutOfProcess( File workingDirectory, String executable, String[] args )
         throws CompilerException
     {
         Commandline cli = new Commandline();
@@ -334,7 +344,15 @@ public class JavacCompiler
         return messages;
     }
 
-    private List compileInProcess( String[] args )
+    /**
+     * Compile the java sources in the current JVM, without calling an external executable,
+     * using <code>com.sun.tools.javac.Main</code> class
+     * 
+     * @param args arguments for the compiler as they would be used in the command line javac
+     * @return List of CompilerError objects with the errors encountered.
+     * @throws CompilerException
+     */
+    List compileInProcess( String[] args )
         throws CompilerException
     {
         IsolatedClassLoader cl = new IsolatedClassLoader();
@@ -410,6 +428,13 @@ public class JavacCompiler
         return messages;
     }
 
+    /**
+     * Parse the output from the compiler into a list of CompilerError objects
+     * 
+     * @param input The output of the compiler
+     * @return List of CompilerError objects
+     * @throws IOException
+     */
     protected static List parseModernStream( BufferedReader input )
         throws IOException
     {
@@ -457,6 +482,12 @@ public class JavacCompiler
         }
     }
 
+    /**
+     * Construct a CompilerError object from a line of the compiler output
+     *  
+     * @param error output line from the compiler 
+     * @return the CompilerError object
+     */
     public static CompilerError parseModernError( String error )
     {
         StringTokenizer tokens = new StringTokenizer( error, ":" );
