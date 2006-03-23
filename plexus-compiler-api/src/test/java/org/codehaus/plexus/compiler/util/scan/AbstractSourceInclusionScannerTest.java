@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Iterator;
 import java.util.Set;
 
 import junit.framework.TestCase;
@@ -59,6 +60,14 @@ public class AbstractSourceInclusionScannerTest
         Set includedSources = scanner.getIncludedSources( base, base );
 
         assertTrue( "no sources were included", includedSources.size() > 0 );
+
+        Iterator it = includedSources.iterator();
+
+        while ( it.hasNext() )
+        {
+            File file = (File) it.next();
+            assertTrue( "file included does not exist", file.exists() );
+        }
     }
 
     // ----------------------------------------------------------------------

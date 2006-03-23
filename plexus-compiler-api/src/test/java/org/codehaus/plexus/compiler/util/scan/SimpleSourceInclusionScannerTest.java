@@ -1,5 +1,6 @@
 package org.codehaus.plexus.compiler.util.scan;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -36,7 +37,7 @@ public class SimpleSourceInclusionScannerTest
     {
         super.setUp();
         
-        includes = new HashSet();
+        includes = Collections.singleton( "*.java" );
         excludes = new HashSet();
         scanner = new SimpleSourceInclusionScanner( includes, excludes );
     }

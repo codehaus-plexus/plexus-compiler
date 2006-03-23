@@ -26,6 +26,7 @@ package org.codehaus.plexus.compiler.util.scan;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -58,6 +59,18 @@ public class SimpleSourceInclusionScanner
             return Collections.EMPTY_SET;
         }
 
-        return Collections.singleton( scanForSources( sourceDir, sourceIncludes, sourceExcludes ) );
+        String[] potentialSources = scanForSources( sourceDir, sourceIncludes, sourceExcludes );
+
+        Set matchingSources = new HashSet();
+
+        if ( potentialSources != null )
+        {
+            for ( int i = 0; i < potentialSources.length; ++i )
+            {
+                matchingSources.add( new File( sourceDir, potentialSources[i] ) );
+            }
+        }
+        
+        return matchingSources;
     }
 }
