@@ -16,19 +16,13 @@ package org.codehaus.plexus.compiler.util.scan;
  * limitations under the License.
  */
 
-import org.codehaus.plexus.compiler.util.scan.mapping.SuffixMapping;
-import org.codehaus.plexus.compiler.util.scan.mapping.SourceMapping;
-import org.codehaus.plexus.compiler.util.scan.mapping.SingleTargetSourceMapping;
-import org.codehaus.plexus.util.IOUtil;
-
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.net.URL;
 import java.util.Collections;
 import java.util.Set;
 
-import junit.framework.TestCase;
+import org.codehaus.plexus.compiler.util.scan.mapping.SingleTargetSourceMapping;
+import org.codehaus.plexus.compiler.util.scan.mapping.SourceMapping;
+import org.codehaus.plexus.compiler.util.scan.mapping.SuffixMapping;
 
 /**
  * @author jdcasey
@@ -36,10 +30,15 @@ import junit.framework.TestCase;
  * @version $Id$
  */
 public class StaleSourceScannerTest
-    extends TestCase
+    extends AbstractSourceInclusionScannerTest
 {
-    private static final String TESTFILE_DEST_MARKER_FILE =
-        StaleSourceScanner.class.getName().replace( '.', '/' ) + "-testMarker.txt";
+    
+    protected void setUp()
+        throws Exception
+    {
+        super.setUp();
+        scanner = new StaleSourceScanner();
+    }
 
     // test 1.
     public void testWithDefaultConstructorShouldFindOneStaleSource()
@@ -62,8 +61,6 @@ public class StaleSourceScannerTest
         sourceFile.setLastModified( now );
 
         SuffixMapping mapping = new SuffixMapping( ".java", ".xml" );
-
-        StaleSourceScanner scanner = new StaleSourceScanner();
 
         scanner.addSourceMapping( mapping );
 
@@ -96,8 +93,6 @@ public class StaleSourceScannerTest
 
         SuffixMapping mapping = new SuffixMapping( ".java", ".xml" );
 
-        StaleSourceScanner scanner = new StaleSourceScanner();
-
         scanner.addSourceMapping( mapping );
 
         Set result = scanner.getIncludedSources( base, base );
@@ -118,8 +113,6 @@ public class StaleSourceScannerTest
         writeFile( sourceFile );
 
         SuffixMapping mapping = new SuffixMapping( ".java", ".xml" );
-
-        StaleSourceScanner scanner = new StaleSourceScanner();
 
         scanner.addSourceMapping( mapping );
 
@@ -155,8 +148,6 @@ public class StaleSourceScannerTest
         sourceFile2.setLastModified( now );
 
         SuffixMapping mapping = new SuffixMapping( ".java", ".xml" );
-
-        StaleSourceScanner scanner = new StaleSourceScanner();
 
         scanner.addSourceMapping( mapping );
 
@@ -213,8 +204,6 @@ public class StaleSourceScannerTest
 
         SuffixMapping mapping = new SuffixMapping( ".java", ".xml" );
 
-        StaleSourceScanner scanner = new StaleSourceScanner();
-
         scanner.addSourceMapping( mapping );
 
         Set result = scanner.getIncludedSources( base, base );
@@ -261,7 +250,7 @@ public class StaleSourceScannerTest
 
         SuffixMapping mapping = new SuffixMapping( ".java", ".xml" );
 
-        StaleSourceScanner scanner = new StaleSourceScanner( 10000 );
+        scanner = new StaleSourceScanner( 10000 );
 
         scanner.addSourceMapping( mapping );
 
@@ -324,8 +313,7 @@ public class StaleSourceScannerTest
 
         SuffixMapping mapping = new SuffixMapping( ".java", ".xml" );
 
-        StaleSourceScanner scanner = new StaleSourceScanner( 0, Collections.singleton( "*3.java" ),
-                                                             Collections.EMPTY_SET );
+        scanner = new StaleSourceScanner( 0, Collections.singleton( "*3.java" ), Collections.EMPTY_SET );
 
         scanner.addSourceMapping( mapping );
 
@@ -390,8 +378,7 @@ public class StaleSourceScannerTest
 
         SuffixMapping mapping = new SuffixMapping( ".java", ".xml" );
 
-        StaleSourceScanner scanner = new StaleSourceScanner( 0, Collections.singleton( "**/*" ),
-                                                             Collections.singleton( "*X.*" ) );
+        scanner = new StaleSourceScanner( 0, Collections.singleton( "**/*" ), Collections.singleton( "*X.*" ) );
 
         scanner.addSourceMapping( mapping );
 
@@ -428,7 +415,7 @@ public class StaleSourceScannerTest
 
         SourceMapping mapping = new SingleTargetSourceMapping( ".cs", "Application.exe" );
 
-        StaleSourceScanner scanner = new StaleSourceScanner( 0 );
+        scanner = new StaleSourceScanner( 0 );
 
         scanner.addSourceMapping( mapping );
 
@@ -483,56 +470,4 @@ public class StaleSourceScannerTest
         assertTrue( result.contains( fooCs ) );
     }
 
-    // ----------------------------------------------------------------------
-    // Utilities
-    // ----------------------------------------------------------------------
-
-    private File getTestBaseDir()
-    {
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        URL markerResource = cl.getResource( TESTFILE_DEST_MARKER_FILE );
-
-        File basedir;
-
-        if ( markerResource != null )
-        {
-            File marker = new File( markerResource.getPath() );
-
-            basedir = marker.getParentFile().getAbsoluteFile();
-        }
-        else
-        {
-            // punt.
-            System.out.println( "Cannot find marker file: \'" + TESTFILE_DEST_MARKER_FILE + "\' in classpath. " +
-                                "Using '.' for basedir." );
-
-            basedir = new File( "." ).getAbsoluteFile();
-        }
-
-        return basedir;
-    }
-
-    private void writeFile( File file )
-        throws IOException
-    {
-        FileWriter fWriter = null;
-        try
-        {
-            File parent = file.getParentFile();
-            if ( !parent.exists() )
-            {
-                parent.mkdirs();
-            }
-
-            file.deleteOnExit();
-
-            fWriter = new FileWriter( file );
-
-            fWriter.write( "This is just a test file." );
-        }
-        finally
-        {
-            IOUtil.close( fWriter );
-        }
-    }
 }
