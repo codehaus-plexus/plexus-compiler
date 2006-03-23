@@ -279,9 +279,9 @@ Options can be of the form -option or /option
         String out = (String) compilerArguments.get( "-out" );
         
         if ( ! StringUtils.isEmpty( out ) ) {
-        	args.add( "/out:" + new File( config.getOutputLocation(), out ).getAbsolutePath() ); 
+            args.add( "/out:" + new File( config.getOutputLocation(), out ).getAbsolutePath() ); 
         }else {
-        	args.add( "/out:" + new File( config.getOutputLocation(), getOutputFile( config ) ).getAbsolutePath() );
+            args.add( "/out:" + new File( config.getOutputLocation(), getOutputFile( config ) ).getAbsolutePath() );
         }
 
         // ----------------------------------------------------------------------
@@ -290,8 +290,8 @@ Options can be of the form -option or /option
         String resourcefile = (String) compilerArguments.get( "-resourcefile" );
         
         if ( ! StringUtils.isEmpty( resourcefile ) ) {
-        	String resourceTarget = (String) compilerArguments.get( "-resourcetarget" );
-        	args.add( "/res:" + new File( resourcefile ).getAbsolutePath() + "," + resourceTarget );
+            String resourceTarget = (String) compilerArguments.get( "-resourcetarget" );
+            args.add( "/res:" + new File( resourcefile ).getAbsolutePath() + "," + resourceTarget );
         }
         
         // ----------------------------------------------------------------------
@@ -420,7 +420,7 @@ Options can be of the form -option or /option
         String line = bufferedReader.readLine();
 
         while( line != null )
-        {        	
+        {            
             CompilerError compilerError = DefaultCSharpCompilerParser.parseLine( line ); 
 
             if ( compilerError != null )
@@ -467,9 +467,9 @@ Options can be of the form -option or /option
     // added for debug purposes.... 
     protected static String[] getSourceFiles( CompilerConfiguration config )
     {
-    	Set sources = new HashSet();
+        Set sources = new HashSet();
         
-    	//Set sourceFiles = null;
+        //Set sourceFiles = null;
         //was:
         Set sourceFiles = config.getSourceFiles();
 
@@ -477,18 +477,18 @@ Options can be of the form -option or /option
         {
             for ( Iterator it = sourceFiles.iterator(); it.hasNext(); )
             {
-            	Object o= it.next();
-            	
-            	File sourceFile = null;
-            	
-            	if(o instanceof String ){
-            		sourceFile = new File((String) o);
-            		System.out.println((String) o);
-            	}
-            	else if( o instanceof File){
-            		sourceFile = (File)o;
-            	}
-            	else break; //ignore it
+                Object o= it.next();
+                
+                File sourceFile = null;
+                
+                if(o instanceof String ){
+                    sourceFile = new File((String) o);
+                    System.out.println((String) o);
+                }
+                else if( o instanceof File){
+                    sourceFile = (File)o;
+                }
+                else break; //ignore it
 
                 sources.add( sourceFile.getAbsolutePath() );
             }
@@ -526,50 +526,50 @@ Options can be of the form -option or /option
      */
     public static CompilerError parseLine( String line )
     {
-    	return DefaultCSharpCompilerParser.parseLine( line );
+        return DefaultCSharpCompilerParser.parseLine( line );
     }
     
     protected static Set getSourceFilesForSourceRoot( CompilerConfiguration config,
-    		String sourceLocation )
+            String sourceLocation )
     {
-    	DirectoryScanner scanner = new DirectoryScanner();
-    	
-    	scanner.setBasedir( sourceLocation );
-    	
-    	Set includes = config.getIncludes();
-    	
-    	if ( includes != null && !includes.isEmpty() )
-    	{
-    		String[] inclStrs = (String[]) includes.toArray( new String[includes.size()] );
-    		scanner.setIncludes( inclStrs );
-    	}
-    	else
-    	{
-    		scanner.setIncludes( new String[]{"**/*.cs"} );
-    	}
-    	
-    	Set excludes = config.getExcludes();
-    	
-    	if ( excludes != null && !excludes.isEmpty() )
-    	{
-    		String[] exclStrs = (String[]) excludes.toArray( new String[excludes.size()] );
-    		scanner.setIncludes( exclStrs );
-    	}
-    	
-    	scanner.scan();
-    	
-    	String[] sourceDirectorySources = scanner.getIncludedFiles();
-    	
-    	Set sources = new HashSet();
-    	
-    	for ( int j = 0; j < sourceDirectorySources.length; j++ )
-    	{
-    		File f = new File( sourceLocation, sourceDirectorySources[ j ] );
-    		
-    		sources.add( f.getPath() );
-    	}
-    	
-    	return sources;
+        DirectoryScanner scanner = new DirectoryScanner();
+        
+        scanner.setBasedir( sourceLocation );
+        
+        Set includes = config.getIncludes();
+        
+        if ( includes != null && !includes.isEmpty() )
+        {
+            String[] inclStrs = (String[]) includes.toArray( new String[includes.size()] );
+            scanner.setIncludes( inclStrs );
+        }
+        else
+        {
+            scanner.setIncludes( new String[]{"**/*.cs"} );
+        }
+        
+        Set excludes = config.getExcludes();
+        
+        if ( excludes != null && !excludes.isEmpty() )
+        {
+            String[] exclStrs = (String[]) excludes.toArray( new String[excludes.size()] );
+            scanner.setIncludes( exclStrs );
+        }
+        
+        scanner.scan();
+        
+        String[] sourceDirectorySources = scanner.getIncludedFiles();
+        
+        Set sources = new HashSet();
+        
+        for ( int j = 0; j < sourceDirectorySources.length; j++ )
+        {
+            File f = new File( sourceLocation, sourceDirectorySources[ j ] );
+            
+            sources.add( f.getPath() );
+        }
+        
+        return sources;
     }
     
 }

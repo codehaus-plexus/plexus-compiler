@@ -20,45 +20,45 @@ import org.codehaus.plexus.util.StringUtils;
  */
 public class DefaultCSharpCompilerParser {
 
-	private static String ERROR_PREFIX = "error ";
+    private static String ERROR_PREFIX = "error ";
 
-	private static String COMPILATION_PREFIX = "Compilation ";
+    private static String COMPILATION_PREFIX = "Compilation ";
 
-	private static String MAGIC_LINE_MARKER = ".cs(";
+    private static String MAGIC_LINE_MARKER = ".cs(";
 
-	private static String MAGIC_LINE_MARKER_2 = ")";
+    private static String MAGIC_LINE_MARKER_2 = ")";
 
 
     public static CompilerError parseLine( String line )
     {
-    	CompilerError ce = null;
+        CompilerError ce = null;
 
-    	if( isOutputWithNoColumnNumber( line ) )
-    		ce = parseLineWithNoColumnNumber( line );
-    	else
-    		ce = parseLineWithColumnNumberAndLineNumber( line );
+        if( isOutputWithNoColumnNumber( line ) )
+            ce = parseLineWithNoColumnNumber( line );
+        else
+            ce = parseLineWithColumnNumberAndLineNumber( line );
 
-    	return ce;
+        return ce;
     }
 
     private static boolean isOutputWithNoColumnNumber(String line){
 
-    	int i = line.indexOf( MAGIC_LINE_MARKER );
+        int i = line.indexOf( MAGIC_LINE_MARKER );
 
-    	if( i == -1 ) return true;
+        if( i == -1 ) return true;
 
-    	String chunk1 = line.substring( i +  MAGIC_LINE_MARKER.length() );
+        String chunk1 = line.substring( i +  MAGIC_LINE_MARKER.length() );
 
-    	int j =  chunk1.indexOf( MAGIC_LINE_MARKER_2 );
+        int j =  chunk1.indexOf( MAGIC_LINE_MARKER_2 );
 
-    	String chunk2 = chunk1.substring(0, j);
+        String chunk2 = chunk1.substring(0, j);
 
-    	return (chunk2.indexOf( "," ) == -1 );
+        return (chunk2.indexOf( "," ) == -1 );
     }
 
     private static CompilerError  parseLineWithNoColumnNumber( String line ) {
 
-    	 String file = null;
+         String file = null;
          boolean error = true;
          int startline = -1;
          int startcolumn = -1;
@@ -144,14 +144,14 @@ public class DefaultCSharpCompilerParser {
             String colnum = null;
 
             if(linecol.indexOf(",") > -1 && linecol.split(",").length == 2 ){
-            	linenum = linecol.split(",")[0];
+                linenum = linecol.split(",")[0];
                 colnum = linecol.split(",")[1];
             }else if ( linecol.split(",").length == 1 ) {
-            	linenum = linecol.split(",")[0];
-            	colnum = "-1";
+                linenum = linecol.split(",")[0];
+                colnum = "-1";
             }else {
-            	linenum = linecol.trim();
-            	colnum = "-1";
+                linenum = linecol.trim();
+                colnum = "-1";
             }
 
             startline = StringUtils.isEmpty(linenum) ? -1 : Integer.parseInt( linenum );

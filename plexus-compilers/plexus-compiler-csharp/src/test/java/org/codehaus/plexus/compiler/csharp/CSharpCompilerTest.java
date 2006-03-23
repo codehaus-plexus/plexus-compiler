@@ -107,29 +107,29 @@ public class CSharpCompilerTest
     public void testParserCscWin() throws Exception {
         
         String cscWin = "src\\test\\csharp\\Hierarchy\\Logger.cs(77,4): warning CS0618: 'NUnit.Framework.Assertion' is obsolete: 'Use Assert class instead'\n" + 
-		  "src\\test\\csharp\\Hierarchy\\Logger.cs(98,4): warning CS0618: 'NUnit.Framework.Assertion' is obsolete: 'Use Assert class instead'\n" +
-		  "src\\test\\csharp\\Hierarchy\\Logger.cs(126,4): warning CS0618: 'NUnit.Framework.Assertion' is obsolete: 'Use Assert class instead'\n" + 
-		  "src\\test\\csharp\\Hierarchy\\Logger.cs(151,4): warning CS0618: 'NUnit.Framework.Assertion' is obsolete: 'Use Assert class instead'\n" + 
-		  "src\\test\\csharp\\Hierarchy\\Logger.cs(187,4): warning CS0618: 'NUnit.Framework.Assertion' is obsolete: 'Use Assert class instead'\n" + 
-		  "src\\test\\csharp\\Hierarchy\\Logger.cs(222,4): warning CS0618: 'NUnit.Framework.Assertion' is obsolete: 'Use Assert class instead'\n" +
-		  "src\\test\\csharp\\Hierarchy\\Logger.cs(255,33): warning CS0618: 'NUnit.Framework.Assertion' is obsolete: 'Use Assert class instead'\n" +
-		  "src\\test\\csharp\\Hierarchy\\Logger.cs(270,4): warning CS0618: 'NUnit.Framework.Assertion' is obsolete: 'Use Assert class instead'\n" +
-		  "src\\test\\csharp\\Util\\PropertiesDictionaryTest.cs(56,4): warning CS0618: 'NUnit.Framework.Assertion' is obsolete: 'Use Assert class instead'\n" +
-		  "src\\main\\csharp\\Flow\\Loader.cs(62,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly reference?)\n" + 
-		  "src\\main\\csharp\\Ctl\\Aspx\\AspxController.cs(18,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly\n" +
-		  "src\\main\\csharp\\Transform\\XsltTransform.cs(78,11): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly\n" +
-		  "src\\main\\csharp\\View\\DispatchedViewFactory.cs(20,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assemb\n" +
-		  "src\\main\\csharp\\Flow\\ViewRegistry.cs(31,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly refere\n" +
-		  "src\\main\\csharp\\Flow\\MasterFactory.cs(50,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly refer\n" +
-		  "src\\main\\csharp\\Dispatcher.cs(152,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly reference?)\n" +
-		  "src\\main\\csharp\\Flow\\MaverickContext.cs(43,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly ref\n" +
-		  "src\\main\\csharp\\Transform\\DocumentTransform.cs(38,12): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assem\n"+
-		  "src\\main\\csharp\\Flow\\CommandBase.cs(11,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly referen\n" +
-		  "src\\main\\csharp\\Shunt\\LanguageShuntFactory.cs(47,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assemb\n" +
-		  "src\\main\\csharp\\Shunt\\LanguageShuntFactory.cs(67,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assemb\n" +
-		  "src\\main\\csharp\\Util\\PropertyPopulator.cs(19,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly r\n" +
-		  "src\\main\\csharp\\Ctl\\ThrowawayForm.cs(30,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly refere\n" +
-		  "src\\main\\csharp\\AssemblyInfo.cs(68,12): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly reference?)\n";
+          "src\\test\\csharp\\Hierarchy\\Logger.cs(98,4): warning CS0618: 'NUnit.Framework.Assertion' is obsolete: 'Use Assert class instead'\n" +
+          "src\\test\\csharp\\Hierarchy\\Logger.cs(126,4): warning CS0618: 'NUnit.Framework.Assertion' is obsolete: 'Use Assert class instead'\n" + 
+          "src\\test\\csharp\\Hierarchy\\Logger.cs(151,4): warning CS0618: 'NUnit.Framework.Assertion' is obsolete: 'Use Assert class instead'\n" + 
+          "src\\test\\csharp\\Hierarchy\\Logger.cs(187,4): warning CS0618: 'NUnit.Framework.Assertion' is obsolete: 'Use Assert class instead'\n" + 
+          "src\\test\\csharp\\Hierarchy\\Logger.cs(222,4): warning CS0618: 'NUnit.Framework.Assertion' is obsolete: 'Use Assert class instead'\n" +
+          "src\\test\\csharp\\Hierarchy\\Logger.cs(255,33): warning CS0618: 'NUnit.Framework.Assertion' is obsolete: 'Use Assert class instead'\n" +
+          "src\\test\\csharp\\Hierarchy\\Logger.cs(270,4): warning CS0618: 'NUnit.Framework.Assertion' is obsolete: 'Use Assert class instead'\n" +
+          "src\\test\\csharp\\Util\\PropertiesDictionaryTest.cs(56,4): warning CS0618: 'NUnit.Framework.Assertion' is obsolete: 'Use Assert class instead'\n" +
+          "src\\main\\csharp\\Flow\\Loader.cs(62,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly reference?)\n" + 
+          "src\\main\\csharp\\Ctl\\Aspx\\AspxController.cs(18,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly\n" +
+          "src\\main\\csharp\\Transform\\XsltTransform.cs(78,11): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly\n" +
+          "src\\main\\csharp\\View\\DispatchedViewFactory.cs(20,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assemb\n" +
+          "src\\main\\csharp\\Flow\\ViewRegistry.cs(31,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly refere\n" +
+          "src\\main\\csharp\\Flow\\MasterFactory.cs(50,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly refer\n" +
+          "src\\main\\csharp\\Dispatcher.cs(152,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly reference?)\n" +
+          "src\\main\\csharp\\Flow\\MaverickContext.cs(43,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly ref\n" +
+          "src\\main\\csharp\\Transform\\DocumentTransform.cs(38,12): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assem\n"+
+          "src\\main\\csharp\\Flow\\CommandBase.cs(11,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly referen\n" +
+          "src\\main\\csharp\\Shunt\\LanguageShuntFactory.cs(47,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assemb\n" +
+          "src\\main\\csharp\\Shunt\\LanguageShuntFactory.cs(67,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assemb\n" +
+          "src\\main\\csharp\\Util\\PropertyPopulator.cs(19,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly r\n" +
+          "src\\main\\csharp\\Ctl\\ThrowawayForm.cs(30,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly refere\n" +
+          "src\\main\\csharp\\AssemblyInfo.cs(68,12): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly reference?)\n";
 
         List messagesWinCsc = CSharpCompiler.parseCompilerOutput( new BufferedReader( new StringReader( cscWin ) ) );
         
@@ -140,19 +140,17 @@ public class CSharpCompilerTest
         assertTrue("Check that the line number is not -1", ( (CompilerError) messagesWinCsc.get(0)).getStartLine() != -1 );
         assertTrue("Check that the column number is not -1", ( (CompilerError) messagesWinCsc.get(0)).getStartColumn() != -1 );
 
-        
-    	
     }
     
     public void testParserMonoWin() throws Exception {
 
-    	String monoWin = "C:\\Work\\SCM\\SVN\\javaforge\\maven-csharp\\trunk\\maverick-net\\src\\main\\csharp\\Ctl\\ThrowawayForm.cs(30,27): error CS0246: The type or namespace name `log4net' could not be found. Are you missing a using directive or an assembly reference? error CS0234: No such name or typespace log4net\n" +
-		 "C:\\Work\\SCM\\SVN\\javaforge\\maven-csharp\\trunk\\maverick-net\\src\\main\\csharp\\Util\\PropertyPopulator.cs(19,27): error CS0246: The type or namespace name `log4net' could not be found. Are you missing a using directive or an assembly reference? error CS0234: No such name or typespace log4net\n" +
-		 "C:\\Work\\SCM\\SVN\\javaforge\\maven-csharp\\trunk\\maverick-net\\src\\main\\csharp\\Flow\\ViewRegistry.cs(31,27): error CS0246: The type or namespace name `log4net' could not be found. Are you missing a using directive or an assembly reference? error CS0234: No such name or typespace log4net\n" +
-		 "C:\\Work\\SCM\\SVN\\javaforge\\maven-csharp\\trunk\\maverick-net\\src\\main\\csharp\\Shunt\\LanguageShuntFactory.cs(47,27): error CS0246: The type or namespace name `log4net' could not be found. Are you missing a using directive or an assembly reference? error CS0234: No such name or typespace log4net\n" +
-		 "C:\\Work\\SCM\\SVN\\javaforge\\maven-csharp\\trunk\\maverick-net\\src\\main\\csharp\\Shunt\\LanguageShuntFactory.cs(67,27): error CS0246: The type or namespace name `log4net' could not be found. Are you missing a using directive or an assembly reference? error CS0234: No such name or typespace log4net\n" +
-		 "Compilation failed: 28 error(s), 0 warnings";
-    	
+        String monoWin = "C:\\Work\\SCM\\SVN\\javaforge\\maven-csharp\\trunk\\maverick-net\\src\\main\\csharp\\Ctl\\ThrowawayForm.cs(30,27): error CS0246: The type or namespace name `log4net' could not be found. Are you missing a using directive or an assembly reference? error CS0234: No such name or typespace log4net\n" +
+         "C:\\Work\\SCM\\SVN\\javaforge\\maven-csharp\\trunk\\maverick-net\\src\\main\\csharp\\Util\\PropertyPopulator.cs(19,27): error CS0246: The type or namespace name `log4net' could not be found. Are you missing a using directive or an assembly reference? error CS0234: No such name or typespace log4net\n" +
+         "C:\\Work\\SCM\\SVN\\javaforge\\maven-csharp\\trunk\\maverick-net\\src\\main\\csharp\\Flow\\ViewRegistry.cs(31,27): error CS0246: The type or namespace name `log4net' could not be found. Are you missing a using directive or an assembly reference? error CS0234: No such name or typespace log4net\n" +
+         "C:\\Work\\SCM\\SVN\\javaforge\\maven-csharp\\trunk\\maverick-net\\src\\main\\csharp\\Shunt\\LanguageShuntFactory.cs(47,27): error CS0246: The type or namespace name `log4net' could not be found. Are you missing a using directive or an assembly reference? error CS0234: No such name or typespace log4net\n" +
+         "C:\\Work\\SCM\\SVN\\javaforge\\maven-csharp\\trunk\\maverick-net\\src\\main\\csharp\\Shunt\\LanguageShuntFactory.cs(67,27): error CS0246: The type or namespace name `log4net' could not be found. Are you missing a using directive or an assembly reference? error CS0234: No such name or typespace log4net\n" +
+         "Compilation failed: 28 error(s), 0 warnings";
+
         List messagesMonoWin = CSharpCompiler.parseCompilerOutput( new BufferedReader( new StringReader( monoWin ) ) );
         
         assertNotNull( messagesMonoWin );
@@ -161,7 +159,7 @@ public class CSharpCompilerTest
         
         assertTrue("Check that the line number is not -1", ( (CompilerError) messagesMonoWin.get(0)).getStartLine() != -1 );
         assertTrue("Check that the column number is not -1", ( (CompilerError) messagesMonoWin.get(0)).getStartColumn() != -1 );
-    	
+
     }
     
 }
