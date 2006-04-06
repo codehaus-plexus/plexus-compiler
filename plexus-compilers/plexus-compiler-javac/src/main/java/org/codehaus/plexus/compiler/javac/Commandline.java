@@ -1,9 +1,5 @@
 package org.codehaus.plexus.compiler.javac;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 /*
  * Copyright 2001-2006 The Apache Software Foundation.
  *
@@ -20,8 +16,12 @@ import java.util.List;
  * limitations under the License.
  */
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
- * Commandline class with fix for PLX-161, as we can not upgrade plexus-utils until it's upgraded in core Maven
+ * Commandline class copied from plexus-utils with fix for PLX-161, as we can not upgrade plexus-utils until it's upgraded in core Maven
  * 
  * TODO deprecate when plexus-utils 1.2 can be used
  * 
