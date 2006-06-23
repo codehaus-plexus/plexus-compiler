@@ -26,6 +26,10 @@ import org.codehaus.plexus.compiler.CompilerException;
 import org.codehaus.plexus.compiler.CompilerOutputStyle;
 
 /**
+ * @plexus.component
+ *   role="org.codehaus.plexus.compiler.Compiler"
+ *   role-hint="aspectj"
+ *
  * Options
  * <p/>
  * -injars JarList

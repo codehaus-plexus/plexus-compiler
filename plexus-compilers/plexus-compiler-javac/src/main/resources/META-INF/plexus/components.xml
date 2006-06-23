@@ -1,9 +1,0 @@
-<component-set>
-  <components>
-    <component>
-      <role>org.codehaus.plexus.compiler.Compiler</role>
-      <role-hint>javac</role-hint>
-      <implementation>org.codehaus.plexus.compiler.javac.JavacCompiler</implementation>
-    </component>
-  </components>
-</component-set>

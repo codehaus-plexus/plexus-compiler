@@ -30,6 +30,8 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import java.util.Map;
 
 /**
+ * @plexus.component
+ *
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  * @version $Id$
  */
@@ -38,7 +40,7 @@ public class DefaultCompilerManager
     implements CompilerManager
 {
     /**
-     * @plexus.requirement
+     * @plexus.requirement role="org.codehaus.plexus.compiler.Compiler"
      */
     private Map compilers;
 

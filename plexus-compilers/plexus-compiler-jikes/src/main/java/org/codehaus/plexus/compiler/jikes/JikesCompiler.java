@@ -91,6 +91,11 @@ import java.io.File;
 import java.util.List;
 import java.util.ArrayList;
 
+/**
+ * @plexus.component
+ *   role="org.codehaus.plexus.compiler.Compiler"
+ *   role-hint="jikes"
+ */
 public class JikesCompiler
     extends AbstractCompiler
 {

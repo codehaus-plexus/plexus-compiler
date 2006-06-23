@@ -48,6 +48,10 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
+ * @plexus.component
+ *   role="org.codehaus.plexus.compiler.Compiler"
+ *   role-hint="csharp"
+ *
  * @author <a href="mailto:gdodinet@karmicsoft.com">Gilles Dodinet</a>
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  * @author <a href="mailto:matthew.pocock@ncl.ac.uk">Matthew Pocock</a>
@@ -58,6 +62,7 @@ public class CSharpCompiler
     extends AbstractCompiler
 {
     private final String ARGUMENTS_FILE_NAME = "csharp-arguments";
+
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
@@ -571,5 +576,4 @@ Options can be of the form -option or /option
         
         return sources;
     }
-    
 }

@@ -68,6 +68,10 @@ import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
 /**
+ * @plexus.component
+ *   role="org.codehaus.plexus.compiler.Compiler"
+ *   role-hint="javac"
+ *
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  * @author <a href="mailto:matthew.pocock@ncl.ac.uk">Matthew Pocock</a>
  * @author Others

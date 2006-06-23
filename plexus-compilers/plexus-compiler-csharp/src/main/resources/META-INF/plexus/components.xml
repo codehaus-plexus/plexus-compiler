@@ -1,9 +1,0 @@
-<component-set>
-  <components>
-    <component>
-      <role>org.codehaus.plexus.compiler.Compiler</role>
-      <role-hint>csharp</role-hint>
-      <implementation>org.codehaus.plexus.compiler.csharp.CSharpCompiler</implementation>
-    </component>
-  </components>
-</component-set>

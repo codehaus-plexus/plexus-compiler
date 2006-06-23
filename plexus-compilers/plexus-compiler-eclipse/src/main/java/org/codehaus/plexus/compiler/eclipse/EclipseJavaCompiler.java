@@ -66,6 +66,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+/**
+ * @plexus.component
+ *   role="org.codehaus.plexus.compiler.Compiler"
+ *   role-hint="eclipse"
+ */
 public class EclipseJavaCompiler
     extends AbstractCompiler
 {
