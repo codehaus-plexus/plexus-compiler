@@ -79,27 +79,34 @@ import org.codehaus.plexus.compiler.CompilerError;
 import org.codehaus.plexus.compiler.CompilerException;
 import org.codehaus.plexus.compiler.CompilerOutputStyle;
 import org.codehaus.plexus.compiler.util.StreamPumper;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.File;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
- * @plexus.component
- *   role="org.codehaus.plexus.compiler.Compiler"
- *   role-hint="jikes"
+ * @plexus.component role="org.codehaus.plexus.compiler.Compiler" role-hint="jikes"
  */
 public class JikesCompiler
     extends AbstractCompiler
 {
     private static final int OUTPUT_BUFFER_SIZE = 1024;
+
+    private static final String pathSeperator = System.getProperty( "path.separator" );
+
+    private static final String lineSeperator = System.getProperty( "line.separator" );
+
+    private static final String fileSeperator = System.getProperty( "file.separator" );
 
     public JikesCompiler()
     {
@@ -109,66 +116,36 @@ public class JikesCompiler
                null );
     }
 
+    // -----------------------------------------------------------------------
+    // Compiler Implementation
+    // -----------------------------------------------------------------------
+
     public List compile( CompilerConfiguration config )
         throws CompilerException
     {
-        File destinationDir = new File( config.getOutputLocation() );
-
-        if ( !destinationDir.exists() )
-        {
-            destinationDir.mkdirs();
-        }
-
-        String javaHome = System.getProperty( "java.home" );
-
-        List messages = new ArrayList();
-
-        List args = new ArrayList();
-
-        args.add( "jikes" );
-
-        args.add( "-bootclasspath" );
-
-        args.add( new File( javaHome, "lib/rt.jar" ).getPath() );
-
-        args.add( "-classpath" );
-
-        List classpathEntries = config.getClasspathEntries();
-
-        args.add( getPathString( classpathEntries ) );
-
-        args.add( "+E" );
-
-        args.add( "-nowarn" );
-
-        args.add( "-d" );
-
-        args.add( destinationDir.getAbsolutePath() );
-
-        String[] sources = getSourceFiles( config );
-
-        for ( int i = 0; i < sources.length; i++ )
-        {
-            args.add( sources[i] );
-        }
-
-        int exitValue;
-
-        ByteArrayOutputStream tmpErr = new ByteArrayOutputStream( OUTPUT_BUFFER_SIZE );
+        // Ensures that the directory exist.
+        getDestinationDir( config );
 
         try
         {
-            Process p = Runtime.getRuntime().exec( (String[]) args.toArray( new String[ args.size() ] ) );
+            // TODO: This should use the CommandLine stuff from plexus-utils.
+
+            // -----------------------------------------------------------------------
+            // Execute the compiler
+            // -----------------------------------------------------------------------
+
+            Process p = Runtime.getRuntime().exec( createCommandLine( config ) );
 
             BufferedInputStream compilerErr = new BufferedInputStream( p.getErrorStream() );
 
+            ByteArrayOutputStream tmpErr = new ByteArrayOutputStream( OUTPUT_BUFFER_SIZE );
             StreamPumper errPumper = new StreamPumper( compilerErr, tmpErr );
 
             errPumper.start();
 
             p.waitFor();
 
-            exitValue = p.exitValue();
+            int exitValue = p.exitValue();
 
             // Wait until the complete error stream has been read
             errPumper.join();
@@ -179,12 +156,22 @@ public class JikesCompiler
 
             tmpErr.close();
 
-            parseStream( new BufferedReader( new InputStreamReader( new ByteArrayInputStream( tmpErr.toByteArray() ) ) ), messages );
+            // -----------------------------------------------------------------------
+            // Parse the output
+            // -----------------------------------------------------------------------
 
-            if ( exitValue != 0 )
+            BufferedReader input = new BufferedReader( new InputStreamReader( new ByteArrayInputStream( tmpErr.toByteArray() ) ) );
+
+            List messages = new ArrayList();
+
+            parseStream( input, messages );
+
+            if ( exitValue != 0 && exitValue != 1 )
             {
-                messages.add( new CompilerError( "Exit code from jikes was not 0.", true ) );
+                messages.add( new CompilerError( "Exit code from jikes was not 0 or 1 ->" + exitValue, true ) );
             }
+
+            return messages;
         }
         catch ( IOException e )
         {
@@ -194,8 +181,161 @@ public class JikesCompiler
         {
             throw new CompilerException( "Error while compiling.", e );
         }
+    }
 
-        return messages;
+    public String[] createCommandLine( CompilerConfiguration config )
+        throws CompilerException
+    {
+        String javaHome = System.getProperty( "java.home" );
+
+        List args = new ArrayList();
+
+        args.add( "jikes" );
+
+        args.add( "-bootclasspath" );
+
+        String bootclasspath = convertListToPath( new File( javaHome + "/lib" ).listFiles() );
+        bootclasspath = bootclasspath + convertListToPath( new File( javaHome + "/lib/ext" ).listFiles() );
+
+        args.add( bootclasspath );
+        getLogger().debug( "Bootclasspath: " + bootclasspath );
+
+        args.add( "-classpath" );
+
+        String classpathEntries = getPathString( config.getClasspathEntries() );
+
+        args.add( classpathEntries );
+        getLogger().debug( "Classpath: " + classpathEntries );
+
+        args.add( "+E" );
+
+        if ( config.getCustomCompilerArguments().size() > 0 )
+        {
+            LinkedHashMap customArgs = config.getCustomCompilerArguments();
+            Object[] entries = customArgs.entrySet().toArray();
+            for ( int i = 0; i < customArgs.size(); i++ )
+            {
+                args.add( entries[i] );
+            }
+        }
+        if ( !config.isShowWarnings() )
+        {
+            args.add( "-nowarn" );
+        }
+
+        if ( config.isShowDeprecation() )
+        {
+            args.add( "-deprecation" );
+        }
+
+        if ( config.isOptimize() )
+        {
+            args.add( "-O" );
+        }
+
+        if ( config.isVerbose() )
+        {
+            args.add( "-verbose" );
+        }
+
+        if ( config.isDebug() )
+        {
+            args.add( "-g:lines" );
+        }
+
+        args.add( "-d" );
+
+        args.add( getDestinationDir( config ).getAbsolutePath() );
+
+        Object[] sources = config.getSourceLocations().toArray();
+
+        String sourceDir = "";
+        for ( int i = 0; i < sources.length; i++ )
+        {
+            sourceDir = sourceDir + sources[i] + pathSeperator;
+        }
+        if ( sources.length > 0 )
+        {
+            args.add( "-sourcepath" );
+            args.add( sourceDir.substring( 0, sourceDir.length() - 1 ) + fileSeperator );
+            getLogger().debug( "Source path:" + sourceDir );
+        }
+
+        String[] _sources = getSourceFiles( config );
+
+        if ( System.getProperty( "os.name" ).indexOf( "Windows" ) > -1 )
+        {
+            String filelist = "";
+            for ( int i = 0; i < _sources.length; i++ )
+            {
+                filelist = filelist + _sources[i] + lineSeperator;
+            }
+
+            String tempFileName = null;
+            FileWriter fw = null;
+
+            try
+            {
+                File tempFile = File.createTempFile( "compList", ".cmp" );
+                tempFileName = tempFile.getPath();
+                getLogger().debug( "create TempFile" + tempFileName );
+
+                new File( tempFile.getParent() ).mkdirs();
+                fw = new FileWriter( tempFile );
+                fw.write( filelist );
+                fw.flush();
+                tempFile.deleteOnExit();
+            }
+            catch ( IOException e )
+            {
+                throw new CompilerException( "Could not create temporary file " + tempFileName );
+            }
+            finally
+            {
+                IOUtil.close( fw );
+            }
+
+            args.add( "@" + tempFileName );
+        }
+        else
+        {
+            for ( int i = 0; i < _sources.length; i++ )
+            {
+                args.add( _sources[i] );
+            }
+
+        }
+
+        return (String[]) args.toArray( new String[ args.size() ] );
+    }
+
+    // -----------------------------------------------------------------------
+    // Private
+    // -----------------------------------------------------------------------
+
+    private File getDestinationDir( CompilerConfiguration config )
+    {
+        File destinationDir = new File( config.getOutputLocation() );
+
+        if ( !destinationDir.exists() )
+        {
+            destinationDir.mkdirs();
+        }
+
+        return destinationDir;
+    }
+
+    private String convertListToPath( File[] files )
+    {
+        String filePath = "";
+        for ( int i = 0; i < files.length; i++ )
+        {
+            if ( files[i].getPath().endsWith( ".jar" ) )
+            {
+                filePath = filePath + files[i].getPath() + pathSeperator;
+            }
+        }
+        return filePath;
     }
 
     /**
@@ -204,7 +344,7 @@ public class JikesCompiler
      *
      * @param input The error stream
      * @return The list of compiler error messages
-     * @exception IOException If an error occurs during message collection
+     * @throws IOException If an error occurs during message collection
      */
     protected List parseStream( BufferedReader input, List messages )
         throws IOException
@@ -269,7 +409,7 @@ public class JikesCompiler
         int i;
         String file;
 
-        if (System.getProperty("os.name").startsWith("Windows"))
+        if ( System.getProperty( "os.name" ).startsWith( "Windows" ) )
         {
             file = errorBits[0] + ":" + errorBits[1];
             i = 2;
@@ -292,6 +432,7 @@ public class JikesCompiler
 
         String message = errorBits[i];
 
-        return new CompilerError( file, type.equals( "error" ), startline, startcolumn, endline, endcolumn, message );
+        return new CompilerError( file, type.indexOf( "Error" ) > -1, startline, startcolumn, endline, endcolumn,
+                                  message );
     }
 }

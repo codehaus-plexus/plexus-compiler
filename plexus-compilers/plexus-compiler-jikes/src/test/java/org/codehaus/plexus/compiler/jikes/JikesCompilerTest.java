@@ -26,11 +26,11 @@ package org.codehaus.plexus.compiler.jikes;
 
 import org.codehaus.plexus.compiler.AbstractCompilerTest;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- *
- *
  * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>
- *
  * @version $Id$
  */
 public class JikesCompilerTest
@@ -39,5 +39,40 @@ public class JikesCompilerTest
     protected String getRoleHint()
     {
         return "jikes";
+    }
+
+    public void setUp()
+        throws Exception
+    {
+        super.setUp();
+
+        setCompilerDebug( true );
+        setCompilerDeprecationWarnings( true );
+    }
+
+    protected int expectedErrors()
+    {
+        return 4;
+    }
+
+    protected int expectedWarnings()
+    {
+        return 2;
+    }
+
+    protected List getClasspath()
+        throws Exception
+    {
+        // VersionRange versionRange = VersionRange.createFromVersion("2.0");
+
+        // Artifact artifact = new DefaultArtifact("commons-lang",
+        // "commons-lang", versionRange, Artifact.SCOPE_RUNTIME, "jar", null,
+        // new DefaultArtifactHandler("jar"));
+
+        List cp = new ArrayList();
+
+        // cp.add(getLocalArtifactPath(artifact).getAbsolutePath());
+
+        return cp;
     }
 }
