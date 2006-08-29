@@ -29,5 +29,11 @@
       <artifactId>plexus-utils</artifactId>
       <version>1.0.4</version>
     </dependency>
+    <!-- This just needs to be present in the local repository for tests to pass. It would be preferable for the tests to resolve it directly -->
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+      <version>2.0</version>
+    </dependency>
   </dependencies>
 </project>
