@@ -399,7 +399,7 @@ Options can be of the form -option or /option
 
     private String convertNameToAssemblyResourceName( String name )
     {
-        return name;
+        return name.replace( File.separatorChar, '.' );
     }
 
     private List compileOutOfProcess( File workingDirectory, File target, String executable, String[] args )
