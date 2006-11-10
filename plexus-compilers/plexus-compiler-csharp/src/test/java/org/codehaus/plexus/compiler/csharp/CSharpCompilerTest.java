@@ -24,14 +24,13 @@ package org.codehaus.plexus.compiler.csharp;
  * SOFTWARE.
  */
 
+import junit.framework.TestCase;
 import org.codehaus.plexus.compiler.CompilerError;
 
-import java.util.List;
-import java.io.StringReader;
 import java.io.BufferedReader;
 import java.io.IOException;
-
-import junit.framework.TestCase;
+import java.io.StringReader;
+import java.util.List;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
@@ -63,7 +62,8 @@ public class CSharpCompilerTest
 
         assertNull( error );
 
-        error = DefaultCSharpCompilerParser.parseLine( "/home/trygvis/dev/com.myrealbox/trunk/mcs/nunit20/core/./TestRunnerThread.cs(29) error CS0246: Cannot find type 'NameValueCollection'" );
+        error = DefaultCSharpCompilerParser.parseLine(
+            "/home/trygvis/dev/com.myrealbox/trunk/mcs/nunit20/core/./TestRunnerThread.cs(29) error CS0246: Cannot find type 'NameValueCollection'" );
 
         assertNotNull( error );
 
@@ -81,21 +81,22 @@ public class CSharpCompilerTest
         //
         // ----------------------------------------------------------------------
 
-        String input = "/home/trygvis/dev/com.myrealbox/trunk/mcs/nunit20/core/./TestRunnerThread.cs(5) error CS0234: The type or namespace name `Specialized' could not be found in namespace `System.Collections'\n" +
-                       "/home/trygvis/dev/com.myrealbox/trunk/mcs/nunit20/core/./TestRunnerThread.cs(29) error CS0246: Cannot find type 'NameValueCollection'\n" +
-                       "/home/trygvis/dev/com.myrealbox/trunk/mcs/nunit20/core/./Reflect.cs(4) error CS0234: The type or namespace name `Framework' could not be found in namespace `NUnit'\n" +
-                       "/home/trygvis/dev/com.myrealbox/trunk/mcs/nunit20/core/./Reflect.cs(123) error CS0246: Cannot find type 'TestFixtureAttribute'\n" +
-                       "/home/trygvis/dev/com.myrealbox/trunk/mcs/nunit20/core/./Reflect.cs(129) error CS0246: Cannot find type 'TestAttribute'\n" +
-                       "/home/trygvis/dev/com.myrealbox/trunk/mcs/nunit20/core/./Reflect.cs(135) error CS0246: Cannot find type 'IgnoreAttribute'\n" +
-                       "/home/trygvis/dev/com.myrealbox/trunk/mcs/nunit20/core/./Reflect.cs(141) error CS0246: Cannot find type 'ExpectedExceptionAttribute'\n" +
-                       "/home/trygvis/dev/com.myrealbox/trunk/mcs/nunit20/core/./WarningSuite.cs(49) error CS0506: `NUnit.Core.WarningSuite.Add': cannot override inherited member `TestSuite.Add' because it is not virtual, abstract or override\n" +
-                       "/home/trygvis/dev/com.myrealbox/trunk/mcs/nunit20/core/./WarningSuite.cs(49) error CS0507: `NUnit.Core.WarningSuite.Add': can't change the access modifiers when overriding inherited member `TestSuite.Add'\n" +
-                       "/home/trygvis/dev/com.myrealbox/trunk/mcs/nunit20/core/./WarningSuite.cs(56) error CS0115: 'NUnit.Core.WarningSuite.CreateNewSuite(System.Type)': no suitable methods found to override\n" +
-                       "/home/trygvis/dev/com.myrealbox/trunk/mcs/nunit20/core/./TestRunnerThread.cs(5) error CS0234: The type or namespace name `Specialized' could not be found in namespace `System.Collections'\n" +
-                       "/home/trygvis/dev/com.myrealbox/trunk/mcs/nunit20/core/./TestRunnerThread.cs(5) error CS0246: The namespace `System.Collections.Specialized' can not be found (missing assembly reference?)\n" +
-                       "/home/trygvis/dev/com.myrealbox/trunk/mcs/nunit20/core/./Reflect.cs(4) error CS0234: The type or namespace name `Framework' could not be found in namespace `NUnit'\n" +
-                       "/home/trygvis/dev/com.myrealbox/trunk/mcs/nunit20/core/./Reflect.cs(4) error CS0246: The namespace `NUnit.Framework' can not be found (missing assembly reference?)\n" +
-                       "Compilation failed: 14 error(s), 0 warnings";
+        String input =
+            "/home/trygvis/dev/com.myrealbox/trunk/mcs/nunit20/core/./TestRunnerThread.cs(5) error CS0234: The type or namespace name `Specialized' could not be found in namespace `System.Collections'\n" +
+                "/home/trygvis/dev/com.myrealbox/trunk/mcs/nunit20/core/./TestRunnerThread.cs(29) error CS0246: Cannot find type 'NameValueCollection'\n" +
+                "/home/trygvis/dev/com.myrealbox/trunk/mcs/nunit20/core/./Reflect.cs(4) error CS0234: The type or namespace name `Framework' could not be found in namespace `NUnit'\n" +
+                "/home/trygvis/dev/com.myrealbox/trunk/mcs/nunit20/core/./Reflect.cs(123) error CS0246: Cannot find type 'TestFixtureAttribute'\n" +
+                "/home/trygvis/dev/com.myrealbox/trunk/mcs/nunit20/core/./Reflect.cs(129) error CS0246: Cannot find type 'TestAttribute'\n" +
+                "/home/trygvis/dev/com.myrealbox/trunk/mcs/nunit20/core/./Reflect.cs(135) error CS0246: Cannot find type 'IgnoreAttribute'\n" +
+                "/home/trygvis/dev/com.myrealbox/trunk/mcs/nunit20/core/./Reflect.cs(141) error CS0246: Cannot find type 'ExpectedExceptionAttribute'\n" +
+                "/home/trygvis/dev/com.myrealbox/trunk/mcs/nunit20/core/./WarningSuite.cs(49) error CS0506: `NUnit.Core.WarningSuite.Add': cannot override inherited member `TestSuite.Add' because it is not virtual, abstract or override\n" +
+                "/home/trygvis/dev/com.myrealbox/trunk/mcs/nunit20/core/./WarningSuite.cs(49) error CS0507: `NUnit.Core.WarningSuite.Add': can't change the access modifiers when overriding inherited member `TestSuite.Add'\n" +
+                "/home/trygvis/dev/com.myrealbox/trunk/mcs/nunit20/core/./WarningSuite.cs(56) error CS0115: 'NUnit.Core.WarningSuite.CreateNewSuite(System.Type)': no suitable methods found to override\n" +
+                "/home/trygvis/dev/com.myrealbox/trunk/mcs/nunit20/core/./TestRunnerThread.cs(5) error CS0234: The type or namespace name `Specialized' could not be found in namespace `System.Collections'\n" +
+                "/home/trygvis/dev/com.myrealbox/trunk/mcs/nunit20/core/./TestRunnerThread.cs(5) error CS0246: The namespace `System.Collections.Specialized' can not be found (missing assembly reference?)\n" +
+                "/home/trygvis/dev/com.myrealbox/trunk/mcs/nunit20/core/./Reflect.cs(4) error CS0234: The type or namespace name `Framework' could not be found in namespace `NUnit'\n" +
+                "/home/trygvis/dev/com.myrealbox/trunk/mcs/nunit20/core/./Reflect.cs(4) error CS0246: The namespace `NUnit.Framework' can not be found (missing assembly reference?)\n" +
+                "Compilation failed: 14 error(s), 0 warnings";
 
         List messages = CSharpCompiler.parseCompilerOutput( new BufferedReader( new StringReader( input ) ) );
 
@@ -103,63 +104,73 @@ public class CSharpCompilerTest
 
         assertEquals( 14, messages.size() );
     }
-    
-    public void testParserCscWin() throws Exception {
-        
-        String cscWin = "src\\test\\csharp\\Hierarchy\\Logger.cs(77,4): warning CS0618: 'NUnit.Framework.Assertion' is obsolete: 'Use Assert class instead'\n" + 
-          "src\\test\\csharp\\Hierarchy\\Logger.cs(98,4): warning CS0618: 'NUnit.Framework.Assertion' is obsolete: 'Use Assert class instead'\n" +
-          "src\\test\\csharp\\Hierarchy\\Logger.cs(126,4): warning CS0618: 'NUnit.Framework.Assertion' is obsolete: 'Use Assert class instead'\n" + 
-          "src\\test\\csharp\\Hierarchy\\Logger.cs(151,4): warning CS0618: 'NUnit.Framework.Assertion' is obsolete: 'Use Assert class instead'\n" + 
-          "src\\test\\csharp\\Hierarchy\\Logger.cs(187,4): warning CS0618: 'NUnit.Framework.Assertion' is obsolete: 'Use Assert class instead'\n" + 
-          "src\\test\\csharp\\Hierarchy\\Logger.cs(222,4): warning CS0618: 'NUnit.Framework.Assertion' is obsolete: 'Use Assert class instead'\n" +
-          "src\\test\\csharp\\Hierarchy\\Logger.cs(255,33): warning CS0618: 'NUnit.Framework.Assertion' is obsolete: 'Use Assert class instead'\n" +
-          "src\\test\\csharp\\Hierarchy\\Logger.cs(270,4): warning CS0618: 'NUnit.Framework.Assertion' is obsolete: 'Use Assert class instead'\n" +
-          "src\\test\\csharp\\Util\\PropertiesDictionaryTest.cs(56,4): warning CS0618: 'NUnit.Framework.Assertion' is obsolete: 'Use Assert class instead'\n" +
-          "src\\main\\csharp\\Flow\\Loader.cs(62,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly reference?)\n" + 
-          "src\\main\\csharp\\Ctl\\Aspx\\AspxController.cs(18,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly\n" +
-          "src\\main\\csharp\\Transform\\XsltTransform.cs(78,11): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly\n" +
-          "src\\main\\csharp\\View\\DispatchedViewFactory.cs(20,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assemb\n" +
-          "src\\main\\csharp\\Flow\\ViewRegistry.cs(31,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly refere\n" +
-          "src\\main\\csharp\\Flow\\MasterFactory.cs(50,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly refer\n" +
-          "src\\main\\csharp\\Dispatcher.cs(152,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly reference?)\n" +
-          "src\\main\\csharp\\Flow\\MaverickContext.cs(43,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly ref\n" +
-          "src\\main\\csharp\\Transform\\DocumentTransform.cs(38,12): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assem\n"+
-          "src\\main\\csharp\\Flow\\CommandBase.cs(11,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly referen\n" +
-          "src\\main\\csharp\\Shunt\\LanguageShuntFactory.cs(47,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assemb\n" +
-          "src\\main\\csharp\\Shunt\\LanguageShuntFactory.cs(67,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assemb\n" +
-          "src\\main\\csharp\\Util\\PropertyPopulator.cs(19,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly r\n" +
-          "src\\main\\csharp\\Ctl\\ThrowawayForm.cs(30,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly refere\n" +
-          "src\\main\\csharp\\AssemblyInfo.cs(68,12): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly reference?)\n";
+
+    public void testParserCscWin()
+        throws Exception
+    {
+
+        String cscWin =
+            "src\\test\\csharp\\Hierarchy\\Logger.cs(77,4): warning CS0618: 'NUnit.Framework.Assertion' is obsolete: 'Use Assert class instead'\n" +
+                "src\\test\\csharp\\Hierarchy\\Logger.cs(98,4): warning CS0618: 'NUnit.Framework.Assertion' is obsolete: 'Use Assert class instead'\n" +
+                "src\\test\\csharp\\Hierarchy\\Logger.cs(126,4): warning CS0618: 'NUnit.Framework.Assertion' is obsolete: 'Use Assert class instead'\n" +
+                "src\\test\\csharp\\Hierarchy\\Logger.cs(151,4): warning CS0618: 'NUnit.Framework.Assertion' is obsolete: 'Use Assert class instead'\n" +
+                "src\\test\\csharp\\Hierarchy\\Logger.cs(187,4): warning CS0618: 'NUnit.Framework.Assertion' is obsolete: 'Use Assert class instead'\n" +
+                "src\\test\\csharp\\Hierarchy\\Logger.cs(222,4): warning CS0618: 'NUnit.Framework.Assertion' is obsolete: 'Use Assert class instead'\n" +
+                "src\\test\\csharp\\Hierarchy\\Logger.cs(255,33): warning CS0618: 'NUnit.Framework.Assertion' is obsolete: 'Use Assert class instead'\n" +
+                "src\\test\\csharp\\Hierarchy\\Logger.cs(270,4): warning CS0618: 'NUnit.Framework.Assertion' is obsolete: 'Use Assert class instead'\n" +
+                "src\\test\\csharp\\Util\\PropertiesDictionaryTest.cs(56,4): warning CS0618: 'NUnit.Framework.Assertion' is obsolete: 'Use Assert class instead'\n" +
+                "src\\main\\csharp\\Flow\\Loader.cs(62,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly reference?)\n" +
+                "src\\main\\csharp\\Ctl\\Aspx\\AspxController.cs(18,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly\n" +
+                "src\\main\\csharp\\Transform\\XsltTransform.cs(78,11): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly\n" +
+                "src\\main\\csharp\\View\\DispatchedViewFactory.cs(20,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assemb\n" +
+                "src\\main\\csharp\\Flow\\ViewRegistry.cs(31,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly refere\n" +
+                "src\\main\\csharp\\Flow\\MasterFactory.cs(50,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly refer\n" +
+                "src\\main\\csharp\\Dispatcher.cs(152,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly reference?)\n" +
+                "src\\main\\csharp\\Flow\\MaverickContext.cs(43,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly ref\n" +
+                "src\\main\\csharp\\Transform\\DocumentTransform.cs(38,12): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assem\n" +
+                "src\\main\\csharp\\Flow\\CommandBase.cs(11,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly referen\n" +
+                "src\\main\\csharp\\Shunt\\LanguageShuntFactory.cs(47,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assemb\n" +
+                "src\\main\\csharp\\Shunt\\LanguageShuntFactory.cs(67,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assemb\n" +
+                "src\\main\\csharp\\Util\\PropertyPopulator.cs(19,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly r\n" +
+                "src\\main\\csharp\\Ctl\\ThrowawayForm.cs(30,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly refere\n" +
+                "src\\main\\csharp\\AssemblyInfo.cs(68,12): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly reference?)\n";
 
         List messagesWinCsc = CSharpCompiler.parseCompilerOutput( new BufferedReader( new StringReader( cscWin ) ) );
-        
+
         assertNotNull( messagesWinCsc );
 
         assertEquals( 24, messagesWinCsc.size() );
-        
-        assertTrue("Check that the line number is not -1", ( (CompilerError) messagesWinCsc.get(0)).getStartLine() != -1 );
-        assertTrue("Check that the column number is not -1", ( (CompilerError) messagesWinCsc.get(0)).getStartColumn() != -1 );
+
+        assertTrue( "Check that the line number is not -1",
+                    ( (CompilerError) messagesWinCsc.get( 0 ) ).getStartLine() != -1 );
+        assertTrue( "Check that the column number is not -1",
+                    ( (CompilerError) messagesWinCsc.get( 0 ) ).getStartColumn() != -1 );
 
     }
-    
-    public void testParserMonoWin() throws Exception {
 
-        String monoWin = "C:\\Work\\SCM\\SVN\\javaforge\\maven-csharp\\trunk\\maverick-net\\src\\main\\csharp\\Ctl\\ThrowawayForm.cs(30,27): error CS0246: The type or namespace name `log4net' could not be found. Are you missing a using directive or an assembly reference? error CS0234: No such name or typespace log4net\n" +
-         "C:\\Work\\SCM\\SVN\\javaforge\\maven-csharp\\trunk\\maverick-net\\src\\main\\csharp\\Util\\PropertyPopulator.cs(19,27): error CS0246: The type or namespace name `log4net' could not be found. Are you missing a using directive or an assembly reference? error CS0234: No such name or typespace log4net\n" +
-         "C:\\Work\\SCM\\SVN\\javaforge\\maven-csharp\\trunk\\maverick-net\\src\\main\\csharp\\Flow\\ViewRegistry.cs(31,27): error CS0246: The type or namespace name `log4net' could not be found. Are you missing a using directive or an assembly reference? error CS0234: No such name or typespace log4net\n" +
-         "C:\\Work\\SCM\\SVN\\javaforge\\maven-csharp\\trunk\\maverick-net\\src\\main\\csharp\\Shunt\\LanguageShuntFactory.cs(47,27): error CS0246: The type or namespace name `log4net' could not be found. Are you missing a using directive or an assembly reference? error CS0234: No such name or typespace log4net\n" +
-         "C:\\Work\\SCM\\SVN\\javaforge\\maven-csharp\\trunk\\maverick-net\\src\\main\\csharp\\Shunt\\LanguageShuntFactory.cs(67,27): error CS0246: The type or namespace name `log4net' could not be found. Are you missing a using directive or an assembly reference? error CS0234: No such name or typespace log4net\n" +
-         "Compilation failed: 28 error(s), 0 warnings";
+    public void testParserMonoWin()
+        throws Exception
+    {
+
+        String monoWin =
+            "C:\\Work\\SCM\\SVN\\javaforge\\maven-csharp\\trunk\\maverick-net\\src\\main\\csharp\\Ctl\\ThrowawayForm.cs(30,27): error CS0246: The type or namespace name `log4net' could not be found. Are you missing a using directive or an assembly reference? error CS0234: No such name or typespace log4net\n" +
+                "C:\\Work\\SCM\\SVN\\javaforge\\maven-csharp\\trunk\\maverick-net\\src\\main\\csharp\\Util\\PropertyPopulator.cs(19,27): error CS0246: The type or namespace name `log4net' could not be found. Are you missing a using directive or an assembly reference? error CS0234: No such name or typespace log4net\n" +
+                "C:\\Work\\SCM\\SVN\\javaforge\\maven-csharp\\trunk\\maverick-net\\src\\main\\csharp\\Flow\\ViewRegistry.cs(31,27): error CS0246: The type or namespace name `log4net' could not be found. Are you missing a using directive or an assembly reference? error CS0234: No such name or typespace log4net\n" +
+                "C:\\Work\\SCM\\SVN\\javaforge\\maven-csharp\\trunk\\maverick-net\\src\\main\\csharp\\Shunt\\LanguageShuntFactory.cs(47,27): error CS0246: The type or namespace name `log4net' could not be found. Are you missing a using directive or an assembly reference? error CS0234: No such name or typespace log4net\n" +
+                "C:\\Work\\SCM\\SVN\\javaforge\\maven-csharp\\trunk\\maverick-net\\src\\main\\csharp\\Shunt\\LanguageShuntFactory.cs(67,27): error CS0246: The type or namespace name `log4net' could not be found. Are you missing a using directive or an assembly reference? error CS0234: No such name or typespace log4net\n" +
+                "Compilation failed: 28 error(s), 0 warnings";
 
         List messagesMonoWin = CSharpCompiler.parseCompilerOutput( new BufferedReader( new StringReader( monoWin ) ) );
-        
+
         assertNotNull( messagesMonoWin );
 
         assertEquals( 5, messagesMonoWin.size() );
-        
-        assertTrue("Check that the line number is not -1", ( (CompilerError) messagesMonoWin.get(0)).getStartLine() != -1 );
-        assertTrue("Check that the column number is not -1", ( (CompilerError) messagesMonoWin.get(0)).getStartColumn() != -1 );
+
+        assertTrue( "Check that the line number is not -1",
+                    ( (CompilerError) messagesMonoWin.get( 0 ) ).getStartLine() != -1 );
+        assertTrue( "Check that the column number is not -1",
+                    ( (CompilerError) messagesMonoWin.get( 0 ) ).getStartColumn() != -1 );
 
     }
-    
+
 }

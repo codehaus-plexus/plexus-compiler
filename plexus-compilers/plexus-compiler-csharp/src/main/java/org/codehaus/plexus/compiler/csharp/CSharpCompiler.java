@@ -18,45 +18,43 @@ package org.codehaus.plexus.compiler.csharp;
 
 import org.codehaus.plexus.compiler.AbstractCompiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
+import org.codehaus.plexus.compiler.CompilerError;
 import org.codehaus.plexus.compiler.CompilerException;
 import org.codehaus.plexus.compiler.CompilerOutputStyle;
-import org.codehaus.plexus.compiler.CompilerError;
 import org.codehaus.plexus.util.DirectoryScanner;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.cli.CommandLineException;
+import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
 import org.codehaus.plexus.util.cli.StreamConsumer;
 import org.codehaus.plexus.util.cli.WriterStreamConsumer;
-import org.codehaus.plexus.util.cli.CommandLineUtils;
-import org.codehaus.plexus.util.cli.CommandLineException;
 
-import java.io.File;
-import java.io.Writer;
-import java.io.StringWriter;
 import java.io.BufferedReader;
-import java.io.StringReader;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.FileWriter;
-import java.util.HashSet;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Set;
 
 /**
- * @plexus.component
- *   role="org.codehaus.plexus.compiler.Compiler"
- *   role-hint="csharp"
- *
  * @author <a href="mailto:gdodinet@karmicsoft.com">Gilles Dodinet</a>
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  * @author <a href="mailto:matthew.pocock@ncl.ac.uk">Matthew Pocock</a>
  * @author <a href="mailto:chris.stevenson@gmail.com">Chris Stevenson</a>
  * @version $Id$
+ * @plexus.component role="org.codehaus.plexus.compiler.Compiler"
+ * role-hint="csharp"
  */
 public class CSharpCompiler
     extends AbstractCompiler
@@ -69,10 +67,7 @@ public class CSharpCompiler
 
     public CSharpCompiler()
     {
-        super( CompilerOutputStyle.ONE_OUTPUT_FILE_FOR_ALL_INPUT_FILES,
-               ".cs",
-               null,
-               null );
+        super( CompilerOutputStyle.ONE_OUTPUT_FILE_FOR_ALL_INPUT_FILES, ".cs", null, null );
     }
 
     // ----------------------------------------------------------------------
@@ -90,7 +85,7 @@ public class CSharpCompiler
     {
         return configuration.getOutputFileName() + "." + getTypeExtension( configuration );
     }
-    
+
     public List compile( CompilerConfiguration config )
         throws CompilerException
     {
@@ -101,8 +96,8 @@ public class CSharpCompiler
             destinationDir.mkdirs();
         }
 
-        config.setSourceFiles(null);
-        
+        config.setSourceFiles( null );
+
         String[] sourceFiles = CSharpCompiler.getSourceFiles( config );
 
         if ( sourceFiles.length == 0 )
@@ -110,9 +105,8 @@ public class CSharpCompiler
             return Collections.EMPTY_LIST;
         }
 
-        System.out.println( "Compiling " + sourceFiles.length + " " +
-                            "source file" + ( sourceFiles.length == 1 ? "" : "s" ) +
-                            " to " + destinationDir.getAbsolutePath() );
+        System.out.println( "Compiling " + sourceFiles.length + " " + "source file" +
+            ( sourceFiles.length == 1 ? "" : "s" ) + " to " + destinationDir.getAbsolutePath() );
 
         String[] args = buildCompilerArguments( config, sourceFiles );
 
@@ -120,10 +114,8 @@ public class CSharpCompiler
 
         if ( config.isFork() )
         {
-            messages = compileOutOfProcess( config.getWorkingDirectory(),
-                                            config.getBuildDirectory(),
-                                            findExecutable( config ),
-                                            args );
+            messages = compileOutOfProcess( config.getWorkingDirectory(), config.getBuildDirectory(),
+                                            findExecutable( config ), args );
         }
         else
         {
@@ -134,7 +126,7 @@ public class CSharpCompiler
     }
 
     public String[] createCommandLine( CompilerConfiguration config )
-            throws CompilerException
+        throws CompilerException
     {
         return buildCompilerArguments( config, CSharpCompiler.getSourceFiles( config ) );
     }
@@ -142,7 +134,7 @@ public class CSharpCompiler
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
-    
+
     private String findExecutable( CompilerConfiguration config )
     {
         String executable = config.getExecutable();
@@ -152,7 +144,7 @@ public class CSharpCompiler
             return executable;
         }
 
-        if ( Os.isFamily("windows") )
+        if ( Os.isFamily( "windows" ) )
         {
             return "csc";
         }
@@ -203,8 +195,7 @@ Resources:
 Options can be of the form -option or /option
     */
 
-    private String[] buildCompilerArguments( CompilerConfiguration config,
-                                             String[] sourceFiles )
+    private String[] buildCompilerArguments( CompilerConfiguration config, String[] sourceFiles )
         throws CompilerException
     {
         List args = new ArrayList();
@@ -226,7 +217,7 @@ Options can be of the form -option or /option
         // ----------------------------------------------------------------------
         //
         // ----------------------------------------------------------------------
-        
+
         for ( Iterator it = config.getClasspathEntries().iterator(); it.hasNext(); )
         {
             String element = (String) it.next();
@@ -238,10 +229,9 @@ Options can be of the form -option or /option
                 continue;
             }
 
-            args.add( "/reference:\"" + element + "\"");
+            args.add( "/reference:\"" + element + "\"" );
         }
 
-        
         // ----------------------------------------------------------------------
         // Main class
         // ----------------------------------------------------------------------
@@ -254,16 +244,17 @@ Options can be of the form -option or /option
         {
             args.add( "/main:" + mainClass );
         }
-        
+
         // ----------------------------------------------------------------------
         // Xml Doc output
         // ----------------------------------------------------------------------
 
         String doc = (String) compilerArguments.get( "-doc" );
 
-        if ( ! StringUtils.isEmpty( doc ) )
+        if ( !StringUtils.isEmpty( doc ) )
         {
-            args.add( "/doc:" + new File( config.getOutputLocation(), config.getOutputFileName() + ".xml" ).getAbsolutePath() );
+            args.add( "/doc:" +
+                new File( config.getOutputLocation(), config.getOutputFileName() + ".xml" ).getAbsolutePath() );
         }
 
         // ----------------------------------------------------------------------
@@ -272,20 +263,23 @@ Options can be of the form -option or /option
 
         String nowarn = (String) compilerArguments.get( "-nowarn" );
 
-        if ( ! StringUtils.isEmpty( nowarn ) )
+        if ( !StringUtils.isEmpty( nowarn ) )
         {
             args.add( "/nowarn:" + nowarn );
         }
-        
+
         // ----------------------------------------------------------------------
         // Out - Override output name, this is required for generating the unit test dll
         // ----------------------------------------------------------------------
-      
+
         String out = (String) compilerArguments.get( "-out" );
-        
-        if ( ! StringUtils.isEmpty( out ) ) {
-            args.add( "/out:" + new File( config.getOutputLocation(), out ).getAbsolutePath() ); 
-        }else {
+
+        if ( !StringUtils.isEmpty( out ) )
+        {
+            args.add( "/out:" + new File( config.getOutputLocation(), out ).getAbsolutePath() );
+        }
+        else
+        {
             args.add( "/out:" + new File( config.getOutputLocation(), getOutputFile( config ) ).getAbsolutePath() );
         }
 
@@ -293,12 +287,13 @@ Options can be of the form -option or /option
         // Resource File - compile in a resource file into the assembly being created
         // ----------------------------------------------------------------------
         String resourcefile = (String) compilerArguments.get( "-resourcefile" );
-        
-        if ( ! StringUtils.isEmpty( resourcefile ) ) {
+
+        if ( !StringUtils.isEmpty( resourcefile ) )
+        {
             String resourceTarget = (String) compilerArguments.get( "-resourcetarget" );
             args.add( "/res:" + new File( resourcefile ).getAbsolutePath() + "," + resourceTarget );
         }
-        
+
         // ----------------------------------------------------------------------
         // Target - type of assembly to produce, lib,exe,winexe etc... 
         // ----------------------------------------------------------------------
@@ -319,25 +314,22 @@ Options can be of the form -option or /option
         // ----------------------------------------------------------------------
         String nologo = (String) compilerArguments.get( "-nologo" );
 
-        if ( ! StringUtils.isEmpty( nologo ) )
+        if ( !StringUtils.isEmpty( nologo ) )
         {
             args.add( "/nologo" );
         }
-        
+
         for ( int i = 0; i < sourceFiles.length; i++ )
         {
-            String sourceFile = sourceFiles[ i ];
+            String sourceFile = sourceFiles[i];
 
             args.add( sourceFile );
         }
 
-        return (String[]) args.toArray( new String[ args.size() ] );
+        return (String[]) args.toArray( new String[args.size()] );
     }
 
-    private List compileOutOfProcess( File workingDirectory,
-                                      File target,
-                                      String executable,
-                                      String[] args )
+    private List compileOutOfProcess( File workingDirectory, File target, String executable, String[] args )
         throws CompilerException
     {
         // ----------------------------------------------------------------------
@@ -356,7 +348,7 @@ Options can be of the form -option or /option
 
             for ( int i = 0; i < args.length; i++ )
             {
-                String arg = args[ i ];
+                String arg = args[i];
 
                 output.println( arg );
             }
@@ -410,8 +402,9 @@ Options can be of the form -option or /option
         if ( returnCode != 0 && messages.isEmpty() )
         {
             // TODO: exception?
-            messages.add( new CompilerError( "Failure executing the compiler, but could not parse the error:" +  EOL +
-                                             stringWriter.toString(), true ) );
+            messages.add( new CompilerError(
+                "Failure executing the compiler, but could not parse the error:" + EOL + stringWriter.toString(),
+                true ) );
         }
 
         return messages;
@@ -424,9 +417,9 @@ Options can be of the form -option or /option
 
         String line = bufferedReader.readLine();
 
-        while( line != null )
-        {            
-            CompilerError compilerError = DefaultCSharpCompilerParser.parseLine( line ); 
+        while ( line != null )
+        {
+            CompilerError compilerError = DefaultCSharpCompilerParser.parseLine( line );
 
             if ( compilerError != null )
             {
@@ -473,7 +466,7 @@ Options can be of the form -option or /option
     protected static String[] getSourceFiles( CompilerConfiguration config )
     {
         Set sources = new HashSet();
-        
+
         //Set sourceFiles = null;
         //was:
         Set sourceFiles = config.getSourceFiles();
@@ -482,18 +475,23 @@ Options can be of the form -option or /option
         {
             for ( Iterator it = sourceFiles.iterator(); it.hasNext(); )
             {
-                Object o= it.next();
-                
+                Object o = it.next();
+
                 File sourceFile = null;
-                
-                if(o instanceof String ){
-                    sourceFile = new File((String) o);
-                    System.out.println((String) o);
+
+                if ( o instanceof String )
+                {
+                    sourceFile = new File( (String) o );
+                    System.out.println( (String) o );
                 }
-                else if( o instanceof File){
-                    sourceFile = (File)o;
+                else if ( o instanceof File )
+                {
+                    sourceFile = (File) o;
                 }
-                else break; //ignore it
+                else
+                {
+                    break; //ignore it
+                }
 
                 sources.add( sourceFile.getAbsolutePath() );
             }
@@ -521,11 +519,11 @@ Options can be of the form -option or /option
 
         return result;
     }
-    
+
     /**
      * This method is just here to maintain the public api. This is now handled in the parse
      * compiler output function.
-     * 
+     *
      * @author Chris Stevenson
      * @deprecated
      */
@@ -533,16 +531,15 @@ Options can be of the form -option or /option
     {
         return DefaultCSharpCompilerParser.parseLine( line );
     }
-    
-    protected static Set getSourceFilesForSourceRoot( CompilerConfiguration config,
-            String sourceLocation )
+
+    protected static Set getSourceFilesForSourceRoot( CompilerConfiguration config, String sourceLocation )
     {
         DirectoryScanner scanner = new DirectoryScanner();
-        
+
         scanner.setBasedir( sourceLocation );
-        
+
         Set includes = config.getIncludes();
-        
+
         if ( includes != null && !includes.isEmpty() )
         {
             String[] inclStrs = (String[]) includes.toArray( new String[includes.size()] );
@@ -552,28 +549,28 @@ Options can be of the form -option or /option
         {
             scanner.setIncludes( new String[]{"**/*.cs"} );
         }
-        
+
         Set excludes = config.getExcludes();
-        
+
         if ( excludes != null && !excludes.isEmpty() )
         {
             String[] exclStrs = (String[]) excludes.toArray( new String[excludes.size()] );
             scanner.setIncludes( exclStrs );
         }
-        
+
         scanner.scan();
-        
+
         String[] sourceDirectorySources = scanner.getIncludedFiles();
-        
+
         Set sources = new HashSet();
-        
+
         for ( int j = 0; j < sourceDirectorySources.length; j++ )
         {
-            File f = new File( sourceLocation, sourceDirectorySources[ j ] );
-            
+            File f = new File( sourceLocation, sourceDirectorySources[j] );
+
             sources.add( f.getPath() );
         }
-        
+
         return sources;
     }
 }
