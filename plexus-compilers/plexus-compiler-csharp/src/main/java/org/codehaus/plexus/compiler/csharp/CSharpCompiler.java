@@ -40,7 +40,10 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -59,7 +62,9 @@ import java.util.Set;
 public class CSharpCompiler
     extends AbstractCompiler
 {
-    private final String ARGUMENTS_FILE_NAME = "csharp-arguments";
+    private static final String ARGUMENTS_FILE_NAME = "csharp-arguments";
+
+    private static final String[] DEFAULT_INCLUDES = {"**/**"};
 
     // ----------------------------------------------------------------------
     //
@@ -319,6 +324,14 @@ Options can be of the form -option or /option
             args.add( "/nologo" );
         }
 
+        // ----------------------------------------------------------------------
+        // add any resource files
+        // ----------------------------------------------------------------------
+        this.addResourceArgs( config, args );
+
+        // ----------------------------------------------------------------------
+        // add source files
+        // ----------------------------------------------------------------------
         for ( int i = 0; i < sourceFiles.length; i++ )
         {
             String sourceFile = sourceFiles[i];
@@ -327,6 +340,66 @@ Options can be of the form -option or /option
         }
 
         return (String[]) args.toArray( new String[args.size()] );
+    }
+
+    private void addResourceArgs( CompilerConfiguration config, List args )
+    {
+        File filteredResourceDir = this.findResourceDir( config );
+        if ( ( filteredResourceDir != null ) && filteredResourceDir.exists() )
+        {
+            DirectoryScanner scanner = new DirectoryScanner();
+            scanner.setBasedir( filteredResourceDir );
+            scanner.setIncludes( DEFAULT_INCLUDES );
+            scanner.addDefaultExcludes();
+            scanner.scan();
+
+            List includedFiles = Arrays.asList( scanner.getIncludedFiles() );
+            for ( Iterator iter = includedFiles.iterator(); iter.hasNext(); )
+            {
+                String name = (String) iter.next();
+                File filteredResource = new File( filteredResourceDir, name );
+                String assemblyResourceName = this.convertNameToAssemblyResourceName( name );
+                String argLine = "/resource:\"" + filteredResource + "\",\"" + assemblyResourceName + "\"";
+                if ( config.isDebug() )
+                {
+                    System.out.println( "adding resource arg line:" + argLine );
+                }
+                args.add( argLine );
+
+            }
+        }
+    }
+
+    private File findResourceDir( CompilerConfiguration config )
+    {
+        if ( config.isDebug() )
+        {
+            System.out.println( "Looking for resourcesDir" );
+        }
+        Map compilerArguments = config.getCustomCompilerArguments();
+        String tempResourcesDirAsString = (String) compilerArguments.get( "-resourceDir" );
+        File filteredResourceDir = null;
+        if ( tempResourcesDirAsString != null )
+        {
+            filteredResourceDir = new File( tempResourcesDirAsString );
+            if ( config.isDebug() )
+            {
+                System.out.println( "Found resourceDir at: " + filteredResourceDir.toString() );
+            }
+        }
+        else
+        {
+            if ( config.isDebug() )
+            {
+                System.out.println( "No resourceDir was available." );
+            }
+        }
+        return filteredResourceDir;
+    }
+
+    private String convertNameToAssemblyResourceName( String name )
+    {
+        return name;
     }
 
     private List compileOutOfProcess( File workingDirectory, File target, String executable, String[] args )
