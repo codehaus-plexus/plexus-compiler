@@ -30,7 +30,11 @@ import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.artifact.test.ArtifactTestCase;
 import org.apache.maven.artifact.versioning.VersionRange;
 
+import org.codehaus.plexus.util.FileUtils;
+
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
