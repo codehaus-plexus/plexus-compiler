@@ -26,8 +26,16 @@ package org.codehaus.plexus.compiler.javac;
 
 import org.codehaus.plexus.compiler.AbstractCompilerTest;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
+import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.artifact.repository.DefaultArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
+import org.apache.maven.settings.Settings;
+import org.apache.maven.model.Repository;
 
 import java.io.File;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -47,7 +55,34 @@ public class JavacCompilerTest
         super.setUp();
         setCompilerDebug( true );
         setCompilerDeprecationWarnings( true );
+
+/* This code is duplicated from ArtifactTestCase, for some reason it does not work when inherited */
+        String localRepo = null;
+        File settingsFile = new File( System.getProperty( "user.home" ), ".m2/settings.xml" );
+        if ( settingsFile.exists() )
+        {
+            Settings settings = new SettingsXpp3Reader().read( new FileReader( settingsFile ) );
+            localRepo = settings.getLocalRepository();
+        }
+
+        if ( localRepo == null )
+        {
+            localRepo = System.getProperty( "user.home" ) + "/.m2/repository";
+        }
+
+        ArtifactRepositoryLayout repositoryLayout = (ArtifactRepositoryLayout) container.lookup(
+            ArtifactRepositoryLayout.ROLE, "default" );
+
+        localRepository = new DefaultArtifactRepository( "local", "file://" + localRepo, repositoryLayout );
     }
+
+    private ArtifactRepository localRepository;
+
+    protected File getLocalArtifactPath( Artifact artifact )
+    {
+        return new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
+    }
+/* End of duplicated code */
 
     protected String getRoleHint()
     {
