@@ -115,9 +115,9 @@ public class JavacCompiler
             return Collections.EMPTY_LIST;
         }
 
-        System.out.println( "Compiling " + sourceFiles.length + " " +
-                            "source file" + ( sourceFiles.length == 1 ? "" : "s" ) +
-                            " to " + destinationDir.getAbsolutePath() );
+        getLogger().info( "Compiling " + sourceFiles.length + " " +
+                          "source file" + ( sourceFiles.length == 1 ? "" : "s" ) +
+                          " to " + destinationDir.getAbsolutePath() );
 
         String[] args = buildCompilerArguments( config, sourceFiles );
 
