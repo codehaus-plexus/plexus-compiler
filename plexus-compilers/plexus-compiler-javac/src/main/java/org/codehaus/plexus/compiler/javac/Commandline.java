@@ -30,7 +30,7 @@ import org.codehaus.plexus.compiler.javac.shell.Shell;
  * as we can not upgrade plexus-utils until it's upgraded in core Maven
  * </p>
  * 
- * TODO deprecate when plexus-utils 1.2 can be used
+ * @deprecated Use {@link org.codehaus.plexus.util.cli.Commandline} from plexus-utils > 1.2
  * 
  * @author <a href="mailto:carlos@apache.org">Carlos Sanchez</a>
  */
@@ -111,7 +111,7 @@ public class Commandline
      *
      * @since 1.2
      */
-    public Shell getShell()
+    public org.codehaus.plexus.util.cli.shell.Shell getShell()
     {
         return shell;
     }
