@@ -306,7 +306,7 @@ public class JavacCompiler
     List compileOutOfProcess( File workingDirectory, String executable, String[] args )
         throws CompilerException
     {
-        org.codehaus.plexus.util.cli.Commandline cli = new org.codehaus.plexus.util.cli.Commandline();
+        Commandline cli = new Commandline();
 
         cli.setWorkingDirectory( workingDirectory.getAbsolutePath() );
 

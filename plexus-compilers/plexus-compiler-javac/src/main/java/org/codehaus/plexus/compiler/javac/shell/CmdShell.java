@@ -25,7 +25,7 @@ import java.util.List;
  * as we can not upgrade plexus-utils until it's upgraded in core Maven
  * </p>
  * 
- * @deprecated Use {@link org.codehaus.plexus.util.cli.shell.CmdShell} from plexus-utils > 1.2
+ * TODO deprecate when plexus-utils 1.2 can be used
  *
  * @author <a href="mailto:carlos@apache.org">Carlos Sanchez</a>
  */
