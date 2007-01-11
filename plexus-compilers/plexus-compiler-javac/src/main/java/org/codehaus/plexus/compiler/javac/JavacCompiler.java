@@ -215,12 +215,12 @@ public class JavacCompiler
 
         if ( !StringUtils.isEmpty( config.getMaxmem() ) )
         {
-            args.add( "-J-Xmx" + config.getMaxmem() );
+            args.add( "-Xmx" + config.getMaxmem() );
         }
 
         if ( !StringUtils.isEmpty( config.getMeminitial() ) )
         {
-            args.add( "-J-Xms" + config.getMeminitial() );
+            args.add( "-Xms" + config.getMeminitial() );
         }
 
         if ( !config.isShowWarnings() )
