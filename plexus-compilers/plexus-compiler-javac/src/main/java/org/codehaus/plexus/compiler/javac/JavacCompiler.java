@@ -339,9 +339,16 @@ public class JavacCompiler
 
         if ( returnCode != 0 && messages.isEmpty() )
         {
-            // TODO: exception?
-            messages.add( new CompilerError( "Failure executing javac,  but could not parse the error:" +  EOL +
-                                                                          err.getOutput(), true ) );
+            if ( err.getOutput().length() == 0 )
+            {
+                throw new CompilerException( "Unknown error trying to execute the external compiler: " + EOL
+                    + cli.toString() );
+            }
+            else
+            {
+                messages.add( new CompilerError( "Failure executing javac,  but could not parse the error:" + EOL
+                    + err.getOutput(), true ) );
+            }
         }
 
         return messages;
