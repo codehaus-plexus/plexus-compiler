@@ -134,7 +134,7 @@ public class JavacCompiler
                 executable = "javac";
             }
 
-            messages = compileOutOfProcess( config.getWorkingDirectory(), executable, args );
+            messages = compileOutOfProcess( config, executable, args );
         }
         else
         {
@@ -213,16 +213,6 @@ public class JavacCompiler
             config.setShowWarnings( true );
         }
 
-        if ( !StringUtils.isEmpty( config.getMaxmem() ) )
-        {
-            args.add( "-Xmx" + config.getMaxmem() );
-        }
-
-        if ( !StringUtils.isEmpty( config.getMeminitial() ) )
-        {
-            args.add( "-Xms" + config.getMeminitial() );
-        }
-
         if ( !config.isShowWarnings() )
         {
             args.add( "-nowarn" );
@@ -299,18 +289,18 @@ public class JavacCompiler
      * Compile the java sources in a external process, calling an external executable,
      * like javac.
      * 
-     * @param workingDirectory base directory where the process will be launched
+     * @param config compiler configuration
      * @param executable name of the executable to launch
      * @param args arguments for the executable launched
      * @return List of CompilerError objects with the errors encountered.
      * @throws CompilerException
      */
-    List compileOutOfProcess( File workingDirectory, String executable, String[] args )
+    List compileOutOfProcess( CompilerConfiguration config, String executable, String[] args )
         throws CompilerException
     {
         Commandline cli = new Commandline();
 
-        cli.setWorkingDirectory( workingDirectory.getAbsolutePath() );
+        cli.setWorkingDirectory( config.getWorkingDirectory().getAbsolutePath() );
 
         cli.setExecutable( executable );
 
@@ -318,6 +308,16 @@ public class JavacCompiler
         {
             File argumentsFile = createFileWithArguments( args );
             cli.addArguments( new String[] { "@" + argumentsFile.getCanonicalPath().replace( File.separatorChar, '/' ) } );
+
+            if ( !StringUtils.isEmpty( config.getMaxmem() ) )
+            {
+                cli.addArguments( new String[] { "-J-Xmx" + config.getMaxmem() } );
+            }
+
+            if ( !StringUtils.isEmpty( config.getMeminitial() ) )
+            {
+                cli.addArguments( new String[] { "-J-Xms" + config.getMeminitial() } );
+            }
         }
         catch ( IOException e )
         {

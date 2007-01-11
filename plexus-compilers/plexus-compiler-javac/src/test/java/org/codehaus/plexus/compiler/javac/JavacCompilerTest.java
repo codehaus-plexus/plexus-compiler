@@ -189,8 +189,10 @@ public class JavacCompilerTest
             args[i] = "org/codehaus/foo/Person.java";
         }
 
-        List messages = compiler.compileOutOfProcess( new File( getBasedir() + "/src/test-input/src/main" ), "javac",
-                                                      args );
+        CompilerConfiguration config = new CompilerConfiguration();
+        config.setWorkingDirectory( new File( getBasedir() + "/src/test-input/src/main" ) );
+
+        List messages = compiler.compileOutOfProcess( config, "javac", args );
 
         assertEquals( "There were errors launching the external compiler: " + messages, 0, messages.size() );
     }
