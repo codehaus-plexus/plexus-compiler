@@ -49,11 +49,13 @@ import org.codehaus.plexus.compiler.CompilerOutputStyle;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
+import org.codehaus.plexus.util.cli.Commandline;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.FileWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
@@ -312,7 +314,15 @@ public class JavacCompiler
 
         cli.setExecutable( executable );
 
-        cli.addArguments( args );
+        try
+        {
+            File argumentsFile = createFileWithArguments( args );
+            cli.addArguments( new String[] { "@" + argumentsFile.getCanonicalPath().replace( File.separatorChar, '/' ) } );
+        }
+        catch ( IOException e )
+        {
+            throw new CompilerException( "Error creating file with javac arguments", e );
+        }
 
         CommandLineUtils.StringStreamConsumer out = new CommandLineUtils.StringStreamConsumer();
 
@@ -587,6 +597,46 @@ public class JavacCompiler
         catch ( Exception e )
         {
             return new CompilerError( "could not parse error message: " + error, isError );
+        }
+    }
+
+    /**
+     * put args into a temp file to be referenced using the @ option in javac command line
+     * @param args
+     * @return the temporary file wth the arguments
+     * @throws IOException
+     */
+    private File createFileWithArguments( String[] args )
+        throws IOException
+    {
+        PrintWriter writer = null;
+        try
+        {
+            File tempFile = File.createTempFile( JavacCompiler.class.getName(), "arguments" );
+            tempFile.deleteOnExit();
+
+            writer = new PrintWriter( new FileWriter( tempFile ) );
+
+            for ( int i = 0; i < args.length; i++ )
+            {
+                String argValue = args[i].replace( File.separatorChar, '/' );
+
+                writer.write( "\"" + argValue + "\"" );
+
+                writer.write( EOL );
+            }
+
+            writer.flush();
+
+            return tempFile;
+
+        }
+        finally
+        {
+            if ( writer != null )
+            {
+                writer.close();
+            }
         }
     }
 }

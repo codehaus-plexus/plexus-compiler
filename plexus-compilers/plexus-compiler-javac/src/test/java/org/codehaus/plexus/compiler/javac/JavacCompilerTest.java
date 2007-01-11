@@ -24,21 +24,20 @@ package org.codehaus.plexus.compiler.javac;
  * SOFTWARE.
  */
 
-import org.codehaus.plexus.compiler.AbstractCompilerTest;
-import org.codehaus.plexus.compiler.CompilerConfiguration;
-import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.apache.maven.artifact.repository.DefaultArtifactRepository;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
-import org.apache.maven.settings.Settings;
-import org.apache.maven.model.Repository;
-
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.DefaultArtifactRepository;
+import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.settings.Settings;
+import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
+import org.codehaus.plexus.compiler.AbstractCompilerTest;
+import org.codehaus.plexus.compiler.CompilerConfiguration;
 
 /**
  * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>
@@ -161,6 +160,39 @@ public class JavacCompilerTest
         populateArguments( compilerConfiguration, expectedArguments, false, false );
 
         internalTest( compilerConfiguration, expectedArguments );
+    }
+
+    public void testCommandLineTooLongWhenForking()
+        throws Exception
+    {
+        List expectedArguments = new ArrayList();
+
+        CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
+
+        populateArguments( compilerConfiguration, expectedArguments, false, false );
+
+        compilerConfiguration.setFork( true );
+
+        internalTest( compilerConfiguration, expectedArguments );
+
+        JavacCompiler compiler = (JavacCompiler) lookup( org.codehaus.plexus.compiler.Compiler.ROLE, getRoleHint() );
+
+        File destDir = new File( "target/test-classes-cmd" );
+        destDir.mkdirs();
+
+        /* fill the cmd line arguments, 300 is enough to make it break */
+        String[] args = new String[400];
+        args[0] = "-d";
+        args[1] = destDir.getAbsolutePath();
+        for ( int i = 2; i < args.length; i++ )
+        {
+            args[i] = "org/codehaus/foo/Person.java";
+        }
+
+        List messages = compiler.compileOutOfProcess( new File( getBasedir() + "/src/test-input/src/main" ), "javac",
+                                                      args );
+
+        assertEquals( "There were errors launching the external compiler: " + messages, 0, messages.size() );
     }
 
     private void populateArguments( CompilerConfiguration compilerConfiguration, List expectedArguments,
