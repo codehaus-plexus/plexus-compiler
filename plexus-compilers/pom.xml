@@ -2,14 +2,14 @@
   <parent>
     <artifactId>plexus-compiler</artifactId>
     <groupId>org.codehaus.plexus</groupId>
-    <version>1.5.3</version>
+    <version>1.6-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.codehaus.plexus</groupId>
   <artifactId>plexus-compilers</artifactId>
   <packaging>pom</packaging>
   <name>Plexus Compilers Parent</name>
-  <version>1.5.3</version>
+  <version>1.6-SNAPSHOT</version>
   <ciManagement>
     <notifiers>
       <notifier>
@@ -134,8 +134,8 @@
     </developer>
   </developers>
   <scm>
-    <connection>scm:svn:https://svn.codehaus.org/plexus/tags/plexus-compiler-1.5.3</connection>
-    <developerConnection>scm:svn:https://svn.codehaus.org/plexus/tags/plexus-compiler-1.5.3</developerConnection>
+    <connection>scm:svn:https://svn.codehaus.org/plexus/trunk/plexus-components/plexus-compiler/plexus-compilers</connection>
+    <developerConnection>scm:svn:https://svn.codehaus.org/plexus/trunk/plexus-components/plexus-compiler/plexus-compilers</developerConnection>
   </scm>
   <organization>
     <name>Codehaus</name>

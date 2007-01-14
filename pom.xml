@@ -9,7 +9,7 @@
   <artifactId>plexus-compiler</artifactId>
   <packaging>pom</packaging>
   <name>Plexus Compiler Parent</name>
-  <version>1.5.3</version>
+  <version>1.6-SNAPSHOT</version>
   <build>
     <plugins>
       <plugin>
@@ -33,9 +33,4 @@
     <module>plexus-compiler-manager</module>
     <module>plexus-compilers</module>
   </modules>
-
-  <scm>
-    <connection>scm:svn:https://svn.codehaus.org/plexus/tags/plexus-compiler-1.5.3</connection>
-    <developerConnection>scm:svn:https://svn.codehaus.org/plexus/tags/plexus-compiler-1.5.3</developerConnection>
-  </scm>
 </project>
