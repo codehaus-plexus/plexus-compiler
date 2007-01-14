@@ -2,17 +2,17 @@
   <parent>
     <artifactId>plexus-compiler</artifactId>
     <groupId>org.codehaus.plexus</groupId>
-    <version>1.6-SNAPSHOT</version>
+    <version>1.5.3</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>plexus-compiler-test</artifactId>
   <name>Plexus Compiler Test Harness</name>
-  <version>1.6-SNAPSHOT</version>
+  <version>1.5.3</version>
   <dependencies>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-compiler-api</artifactId>
-      <version>1.6-SNAPSHOT</version>
+      <version>1.5.3</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

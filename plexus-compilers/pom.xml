@@ -1,16 +1,15 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <artifactId>plexus-compiler</artifactId>
     <groupId>org.codehaus.plexus</groupId>
-    <version>1.6-SNAPSHOT</version>
+    <version>1.5.3</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.codehaus.plexus</groupId>
   <artifactId>plexus-compilers</artifactId>
   <packaging>pom</packaging>
   <name>Plexus Compilers Parent</name>
-  <version>1.6-SNAPSHOT</version>
+  <version>1.5.3</version>
   <ciManagement>
     <notifiers>
       <notifier>
@@ -51,8 +50,8 @@
     <developer>
       <id>kaz</id>
       <name>Pete Kazmier</name>
-      <email></email>
-      <organization></organization>
+      <email />
+      <organization />
       <roles>
         <role>Developer</role>
       </roles>
@@ -61,7 +60,7 @@
       <id>jtaylor</id>
       <name>James Taylor</name>
       <email>james@jamestaylor.org</email>
-      <organization></organization>
+      <organization />
       <roles>
         <role>Developer</role>
       </roles>
@@ -79,7 +78,7 @@
       <id>kasper</id>
       <name>Kasper Nielsen</name>
       <email>apache@kav.dk</email>
-      <organization></organization>
+      <organization />
       <roles>
         <role>Developer</role>
       </roles>
@@ -135,8 +134,8 @@
     </developer>
   </developers>
   <scm>
-    <connection>scm:svn:https://svn.codehaus.org/plexus/trunk/plexus-components/plexus-compiler/plexus-compilers</connection>
-    <developerConnection>scm:svn:https://svn.codehaus.org/plexus/trunk/plexus-components/plexus-compiler/plexus-compilers</developerConnection>
+    <connection>scm:svn:https://svn.codehaus.org/plexus/tags/plexus-compiler-1.5.3</connection>
+    <developerConnection>scm:svn:https://svn.codehaus.org/plexus/tags/plexus-compiler-1.5.3</developerConnection>
   </scm>
   <organization>
     <name>Codehaus</name>
@@ -234,12 +233,12 @@
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-compiler-api</artifactId>
-      <version>1.6-SNAPSHOT</version>
+      <version>1.5.3</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-compiler-test</artifactId>
-      <version>1.6-SNAPSHOT</version>
+      <version>1.5.3</version>
       <scope>test</scope>
     </dependency>
     <dependency>
