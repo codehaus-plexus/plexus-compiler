@@ -19,6 +19,7 @@ import org.aspectj.bridge.AbortException;
 import org.aspectj.bridge.IMessage;
 import org.aspectj.bridge.ISourceLocation;
 import org.aspectj.bridge.MessageHandler;
+import org.aspectj.org.eclipse.jdt.internal.compiler.impl.CompilerOptions;
 import org.codehaus.plexus.compiler.AbstractCompiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerError;
@@ -272,6 +273,12 @@ public class AspectJCompiler
         if ( files != null )
         {
             buildConfig.setFiles( buildFileList( Arrays.asList( files ) ) );
+        }
+
+        if ( config.isDebug() )
+        {
+            buildConfig.getOptions().produceDebugAttributes = CompilerOptions.Source + CompilerOptions.Lines
+                + CompilerOptions.Vars;
         }
 
         Map javaOpts = config.getCustomCompilerArguments();
