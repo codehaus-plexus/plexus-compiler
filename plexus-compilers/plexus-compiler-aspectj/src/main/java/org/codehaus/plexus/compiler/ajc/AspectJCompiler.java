@@ -275,6 +275,8 @@ public class AspectJCompiler
             buildConfig.setFiles( buildFileList( Arrays.asList( files ) ) );
         }
 
+        setSourceVersion( buildConfig, config.getSourceVersion() );
+
         if ( config.isDebug() )
         {
             buildConfig.getOptions().produceDebugAttributes = CompilerOptions.Source + CompilerOptions.Lines
@@ -462,6 +464,45 @@ public class AspectJCompiler
         }
 
         return fileList;
+    }
+
+    /**
+     * Set the source version in ajc compiler
+     * 
+     * @param buildConfig
+     * @param sourceVersion
+     */
+    private void setSourceVersion( AjBuildConfig buildConfig, String sourceVersion )
+        throws CompilerException
+    {
+        if ( "1.5".equals( sourceVersion ) )
+        {
+            buildConfig.getOptions().sourceLevel = CompilerOptions.JDK1_5;
+        }
+        else if ( "5.0".equals( sourceVersion ) )
+        {
+            buildConfig.getOptions().sourceLevel = CompilerOptions.JDK1_5;
+        }
+        else if ( "1.4".equals( sourceVersion ) )
+        {
+            buildConfig.getOptions().sourceLevel = CompilerOptions.JDK1_4;
+        }
+        else if ( "1.3".equals( sourceVersion ) )
+        {
+            buildConfig.getOptions().sourceLevel = CompilerOptions.JDK1_3;
+        }
+        else if ( "1.2".equals( sourceVersion ) )
+        {
+            buildConfig.getOptions().sourceLevel = CompilerOptions.JDK1_2;
+        }
+        else if ( "1.1".equals( sourceVersion ) )
+        {
+            buildConfig.getOptions().sourceLevel = CompilerOptions.JDK1_1;
+        }
+        else
+        {
+            throw new CompilerException( "The source version was not recognized: " + sourceVersion );
+        }
     }
 
     /**
