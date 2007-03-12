@@ -165,16 +165,6 @@ public class JavacCompilerTest
     public void testCommandLineTooLongWhenForking()
         throws Exception
     {
-        List expectedArguments = new ArrayList();
-
-        CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
-
-        populateArguments( compilerConfiguration, expectedArguments, false, false );
-
-        compilerConfiguration.setFork( true );
-
-        internalTest( compilerConfiguration, expectedArguments );
-
         JavacCompiler compiler = (JavacCompiler) lookup( org.codehaus.plexus.compiler.Compiler.ROLE, getRoleHint() );
 
         File destDir = new File( "target/test-classes-cmd" );
@@ -191,6 +181,7 @@ public class JavacCompilerTest
 
         CompilerConfiguration config = new CompilerConfiguration();
         config.setWorkingDirectory( new File( getBasedir() + "/src/test-input/src/main" ) );
+        config.setFork( true );
 
         List messages = compiler.compileOutOfProcess( config, "javac", args );
 
