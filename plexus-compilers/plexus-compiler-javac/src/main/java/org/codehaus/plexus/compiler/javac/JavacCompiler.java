@@ -275,14 +275,34 @@ public class JavacCompiler
         return (String[]) args.toArray( new String[ args.size() ] );
     }
 
+    /**
+     * Determine if the compiler is a version prior to 1.4.
+     * This is needed as 1.3 and earlier did not support -source or -encoding parameters
+     *
+     * @param config The compiler configuration to test.
+     * @return true if the compiler configuration represents a Java 1.4 compiler or later, false otherwise
+     */
+    private static boolean isPreJava14( CompilerConfiguration config )
+    {
+        String v = config.getCompilerVersion();
+
+        if ( v == null )
+        {
+            return false;
+        }
+
+        return v.startsWith( "1.3" ) || v.startsWith( "1.2" )
+            || v.startsWith( "1.1" ) || v.startsWith( "1.0" );
+    }
+
     private static boolean suppressSource( CompilerConfiguration config )
     {
-        return "1.3".equals( config.getCompilerVersion() );
+        return isPreJava14( config );
     }
 
     private static boolean suppressEncoding( CompilerConfiguration config )
     {
-        return "1.3".equals( config.getCompilerVersion() );
+        return isPreJava14( config );
     }
 
     /**
