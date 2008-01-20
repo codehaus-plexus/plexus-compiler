@@ -38,6 +38,7 @@ import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.codehaus.plexus.compiler.AbstractCompilerTest;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>
@@ -162,6 +163,21 @@ public class JavacCompilerTest
         internalTest( compilerConfiguration, expectedArguments );
     }
 
+    public void testBuildCompilerDebugLevel()
+    {
+        List expectedArguments = new ArrayList();
+
+        CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
+
+        compilerConfiguration.setDebug( true );
+
+        compilerConfiguration.setDebugLevel( "none" );
+
+        populateArguments( compilerConfiguration, expectedArguments, false, false );
+
+        internalTest( compilerConfiguration, expectedArguments );
+    }
+
     /* This test fails on Java 1.4. The multiple parameters of the same source file cause an error, as it is interpreted as a DuplicateClass
      * Setting the size of the array to 3 is fine, but does not exactly test what it is supposed to - disabling the test for now
     public void testCommandLineTooLongWhenForking()
@@ -234,7 +250,14 @@ public class JavacCompilerTest
 
         compilerConfiguration.setDebug( true );
 
-        expectedArguments.add( "-g" );
+        if ( StringUtils.isNotEmpty( compilerConfiguration.getDebugLevel() ) )
+        {
+            expectedArguments.add( "-g:" + compilerConfiguration.getDebugLevel() );
+        }
+        else
+        {
+            expectedArguments.add( "-g" );
+        }
 
         // showDeprecation
 

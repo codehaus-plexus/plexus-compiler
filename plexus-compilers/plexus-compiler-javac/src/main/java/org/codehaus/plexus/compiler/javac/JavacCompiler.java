@@ -197,7 +197,14 @@ public class JavacCompiler
 
         if ( config.isDebug() )
         {
-            args.add( "-g" );
+            if ( StringUtils.isNotEmpty( config.getDebugLevel() ) )
+            {
+                args.add( "-g:" + config.getDebugLevel() );
+            }
+            else
+            {
+                args.add( "-g" );
+            }
         }
 
         if ( config.isVerbose() )
@@ -308,7 +315,7 @@ public class JavacCompiler
     /**
      * Compile the java sources in a external process, calling an external executable,
      * like javac.
-     * 
+     *
      * @param config compiler configuration
      * @param executable name of the executable to launch
      * @param args arguments for the executable launched
@@ -387,7 +394,7 @@ public class JavacCompiler
     /**
      * Compile the java sources in the current JVM, without calling an external executable,
      * using <code>com.sun.tools.javac.Main</code> class
-     * 
+     *
      * @param args arguments for the compiler as they would be used in the command line javac
      * @return List of CompilerError objects with the errors encountered.
      * @throws CompilerException
@@ -470,7 +477,7 @@ public class JavacCompiler
 
     /**
      * Parse the output from the compiler into a list of CompilerError objects
-     * 
+     *
      * @param input The output of the compiler
      * @return List of CompilerError objects
      * @throws IOException
@@ -524,8 +531,8 @@ public class JavacCompiler
 
     /**
      * Construct a CompilerError object from a line of the compiler output
-     *  
-     * @param error output line from the compiler 
+     *
+     * @param error output line from the compiler
      * @return the CompilerError object
      */
     public static CompilerError parseModernError( String error )

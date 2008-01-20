@@ -41,7 +41,7 @@ public class CompilerConfiguration
     private String outputLocation;
 
     private List classpathEntries = new LinkedList();
-    
+
     // ----------------------------------------------------------------------
     // Source Files
     // ----------------------------------------------------------------------
@@ -60,6 +60,8 @@ public class CompilerConfiguration
 
     private boolean debug;
 
+    private String debugLevel;
+
     private boolean showWarnings = true;
 
     private boolean showDeprecation;
@@ -73,7 +75,7 @@ public class CompilerConfiguration
     private LinkedHashMap customCompilerArguments = new LinkedHashMap();
 
     private boolean fork;
-    
+
     private boolean optimize;
 
     private String meminitial;
@@ -83,11 +85,11 @@ public class CompilerConfiguration
     private String executable;
 
     private File workingDirectory;
-    
+
     private String compilerVersion;
-    
+
     private boolean verbose = false;
-    
+
     /**
      * A build temporary directory, eg target/.
      *
@@ -242,6 +244,16 @@ public class CompilerConfiguration
         return debug;
     }
 
+    public void setDebugLevel( String debugLevel )
+    {
+        this.debugLevel = debugLevel;
+    }
+
+    public String getDebugLevel()
+    {
+        return debugLevel;
+    }
+
     public void setShowWarnings( boolean showWarnings )
     {
         this.showWarnings = showWarnings;
@@ -383,7 +395,7 @@ public class CompilerConfiguration
     {
         this.outputFileName = outputFileName;
     }
-    
+
     public boolean isOptimize()
     {
         return optimize;
