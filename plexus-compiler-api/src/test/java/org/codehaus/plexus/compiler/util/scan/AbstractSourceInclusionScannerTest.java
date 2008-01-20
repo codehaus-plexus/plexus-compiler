@@ -34,7 +34,7 @@ import org.codehaus.plexus.util.IOUtil;
  * @author <a href="mailto:carlos@apache.org">Carlos Sanchez</a>
  * @version $Id$
  */
-public class AbstractSourceInclusionScannerTest
+public abstract class AbstractSourceInclusionScannerTest
     extends TestCase
 {
     
