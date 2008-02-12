@@ -545,7 +545,47 @@ public class JavacCompiler
 
         try
         {
-            String file = tokens.nextToken();
+            // With Java 6 error output lines from the compiler got longer. For backward compatibility 
+            // .. and the time being, we eat up all (if any) tokens up to the erroneous file and source 
+            // .. line indicator tokens.
+
+            boolean tokenIsAnInteger;
+
+            String previousToken = null;
+
+            String currentToken = null;
+
+            do 
+            {
+                previousToken = currentToken;
+
+                currentToken = tokens.nextToken();
+
+                // Probably the only backward compatible means of checking if a string is an integer.
+
+                tokenIsAnInteger = true;
+
+                try 
+                {
+                    Integer.parseInt( currentToken );
+                } 
+                catch ( NumberFormatException e ) 
+                {
+                    tokenIsAnInteger = false;		
+                } 
+            } 
+            while ( !tokenIsAnInteger );
+
+            String file = previousToken;
+	    
+            String lineIndicator = currentToken;
+
+            int startOfFileName = previousToken.lastIndexOf( "]" );
+
+            if ( startOfFileName > -1 )
+            {
+                file = file.substring( startOfFileName + 2 );	
+            }
 
             // When will this happen?
             if ( file.length() == 1 )
@@ -553,7 +593,7 @@ public class JavacCompiler
                 file = new StringBuffer( file ).append( ":" ).append( tokens.nextToken() ).toString();
             }
 
-            int line = Integer.parseInt( tokens.nextToken() );
+            int line = Integer.parseInt( lineIndicator );
 
             msgBuffer = new StringBuffer();
 
