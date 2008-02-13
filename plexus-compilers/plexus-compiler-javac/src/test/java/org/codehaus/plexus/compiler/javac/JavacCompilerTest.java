@@ -24,12 +24,6 @@ package org.codehaus.plexus.compiler.javac;
  * SOFTWARE.
  */
 
-import java.io.File;
-import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
@@ -39,6 +33,12 @@ import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.codehaus.plexus.compiler.AbstractCompilerTest;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.util.StringUtils;
+
+import java.io.File;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>
@@ -91,7 +91,36 @@ public class JavacCompilerTest
 
     protected int expectedErrors()
     {
-        return 3;
+        String javaVersion = System.getProperty( "java.version" );
+        String realJavaVersion = javaVersion;
+
+        int dotIdx = javaVersion.indexOf( "." );
+        if ( dotIdx > -1 )
+        {
+            int lastDot = dotIdx;
+
+            // find the next dot, so we can trim up to this point.
+            dotIdx = javaVersion.indexOf( ".", lastDot + 1 );
+            if ( dotIdx > lastDot )
+            {
+                javaVersion = javaVersion.substring( 0, dotIdx );
+            }
+        }
+
+        System.out.println( "java.version is: " + realJavaVersion + "\ntrimmed java version is: "
+                            + javaVersion
+                            + "\ncomparison: \"1.5\".compareTo( \"" + javaVersion + "\" ) == "
+                            + ( "1.5".compareTo( javaVersion ) ) + "\n" );
+
+        // javac output changed for misspelled modifiers starting in 1.6...they now generate 2 errors per occurrence, not one.
+        if ( "1.5".compareTo( javaVersion ) < 0 )
+        {
+            return 4;
+        }
+        else
+        {
+            return 3;
+        }
     }
 
     protected int expectedWarnings()

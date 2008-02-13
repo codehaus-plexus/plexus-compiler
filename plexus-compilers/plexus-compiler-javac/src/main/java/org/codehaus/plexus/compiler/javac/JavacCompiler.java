@@ -53,9 +53,9 @@ import org.codehaus.plexus.util.cli.Commandline;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.FileWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
@@ -112,14 +112,17 @@ public class JavacCompiler
 
         String[] sourceFiles = getSourceFiles( config );
 
-        if ( sourceFiles.length == 0 )
+        if ( ( sourceFiles == null ) || ( sourceFiles.length == 0 ) )
         {
             return Collections.EMPTY_LIST;
         }
 
-        getLogger().info( "Compiling " + sourceFiles.length + " " +
-                          "source file" + ( sourceFiles.length == 1 ? "" : "s" ) +
-                          " to " + destinationDir.getAbsolutePath() );
+        if ( ( getLogger() != null ) && getLogger().isInfoEnabled() )
+        {
+            getLogger().info( "Compiling " + sourceFiles.length + " " +
+                              "source file" + ( sourceFiles.length == 1 ? "" : "s" ) +
+                              " to " + destinationDir.getAbsolutePath() );
+        }
 
         String[] args = buildCompilerArguments( config, sourceFiles );
 
@@ -170,7 +173,7 @@ public class JavacCompiler
         // ----------------------------------------------------------------------
 
         List classpathEntries = config.getClasspathEntries();
-        if ( classpathEntries != null && !classpathEntries.isEmpty() )
+        if ( ( classpathEntries != null ) && !classpathEntries.isEmpty() )
         {
             args.add( "-classpath" );
 
@@ -178,7 +181,7 @@ public class JavacCompiler
         }
 
         List sourceLocations = config.getSourceLocations();
-        if ( sourceLocations != null && !sourceLocations.isEmpty() && ( sourceFiles.length == 0 ) )
+        if ( ( sourceLocations != null ) && !sourceLocations.isEmpty() && ( sourceFiles.length == 0 ) )
         {
             args.add( "-sourcepath" );
 
@@ -374,7 +377,7 @@ public class JavacCompiler
             throw new CompilerException( "Error while executing the external compiler.", e );
         }
 
-        if ( returnCode != 0 && messages.isEmpty() )
+        if ( ( returnCode != 0 ) && messages.isEmpty() )
         {
             if ( err.getOutput().length() == 0 )
             {
@@ -465,7 +468,7 @@ public class JavacCompiler
             throw new CompilerException( "Error while executing the compiler.", e );
         }
 
-        if ( ok.intValue() != 0 && messages.isEmpty() )
+        if ( ( ok.intValue() != 0 ) && messages.isEmpty() )
         {
             // TODO: exception?
             messages.add( new CompilerError( "Failure executing javac, but could not parse the error:" + EOL +
@@ -507,11 +510,11 @@ public class JavacCompiler
                 }
 
                 // TODO: there should be a better way to parse these
-                if ( buffer.length() == 0 && line.startsWith( "error: " ) )
+                if ( ( buffer.length() == 0 ) && line.startsWith( "error: " ) )
                 {
                     errors.add( new CompilerError( line, true ) );
                 }
-                else if ( buffer.length() == 0 && line.startsWith( "Note: " ) )
+                else if ( ( buffer.length() == 0 ) && line.startsWith( "Note: " ) )
                 {
                     // skip this one - it is JDK 1.5 telling us that the interface is deprecated.
                 }
@@ -545,8 +548,8 @@ public class JavacCompiler
 
         try
         {
-            // With Java 6 error output lines from the compiler got longer. For backward compatibility 
-            // .. and the time being, we eat up all (if any) tokens up to the erroneous file and source 
+            // With Java 6 error output lines from the compiler got longer. For backward compatibility
+            // .. and the time being, we eat up all (if any) tokens up to the erroneous file and source
             // .. line indicator tokens.
 
             boolean tokenIsAnInteger;
@@ -555,7 +558,7 @@ public class JavacCompiler
 
             String currentToken = null;
 
-            do 
+            do
             {
                 previousToken = currentToken;
 
@@ -565,26 +568,26 @@ public class JavacCompiler
 
                 tokenIsAnInteger = true;
 
-                try 
+                try
                 {
                     Integer.parseInt( currentToken );
-                } 
-                catch ( NumberFormatException e ) 
+                }
+                catch ( NumberFormatException e )
                 {
-                    tokenIsAnInteger = false;		
-                } 
-            } 
+                    tokenIsAnInteger = false;
+                }
+            }
             while ( !tokenIsAnInteger );
 
             String file = previousToken;
-	    
+
             String lineIndicator = currentToken;
 
             int startOfFileName = previousToken.lastIndexOf( "]" );
 
             if ( startOfFileName > -1 )
             {
-                file = file.substring( startOfFileName + 2 );	
+                file = file.substring( startOfFileName + 2 );
             }
 
             // When will this happen?
