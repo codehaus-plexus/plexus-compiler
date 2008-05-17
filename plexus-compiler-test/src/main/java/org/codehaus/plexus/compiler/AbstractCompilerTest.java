@@ -75,7 +75,11 @@ public abstract class AbstractCompilerTest
 
         List cp = new ArrayList();
 
-        cp.add( getLocalArtifactPath( artifact ).getAbsolutePath() );
+        File file = getLocalArtifactPath( artifact );
+        assertTrue( "test prerequisite: commons-lang library must be available in local repository, expected "
+                    + file.getAbsolutePath(), file.canRead() );
+
+        cp.add( file.getAbsolutePath() );
 
         return cp;
     }
@@ -100,6 +104,7 @@ public abstract class AbstractCompilerTest
 
         if ( expectedErrors() != numCompilerErrors )
         {
+            System.err.println( numCompilerErrors + " error(s) found:" );
             for ( Iterator it = messages.iterator(); it.hasNext(); )
             {
                 CompilerError error = (CompilerError) it.next();
@@ -110,7 +115,8 @@ public abstract class AbstractCompilerTest
                 }
 
                 System.err.println( "----" );
-                System.err.println( error.getFile() + ":" + error.getMessage() );
+                System.err.println( error.getFile() );
+                System.err.println( error.getMessage() );
                 System.err.println( "----" );
             }
 
@@ -121,6 +127,7 @@ public abstract class AbstractCompilerTest
 
         if ( expectedWarnings() != numCompilerWarnings )
         {
+            System.err.println( numCompilerWarnings + " warning(s) found:" );
             for ( Iterator it = messages.iterator(); it.hasNext(); )
             {
                 CompilerError error = (CompilerError) it.next();
@@ -131,7 +138,8 @@ public abstract class AbstractCompilerTest
                 }
 
                 System.err.println( "----" );
-                System.err.println( error.getFile() + ":" + error.getMessage() );
+                System.err.println( error.getFile() );
+                System.err.println( error.getMessage() );
                 System.err.println( "----" );
             }
 
