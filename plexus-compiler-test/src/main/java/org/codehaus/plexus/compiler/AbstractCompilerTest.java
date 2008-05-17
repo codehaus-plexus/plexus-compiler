@@ -76,6 +76,16 @@ public abstract class AbstractCompilerTest
         List cp = new ArrayList();
 
         File file = getLocalArtifactPath( artifact );
+
+        // TODO: remove when dependency on maven-artifact-test upgraded to 2.0.10
+        String localRepo = System.getProperty( "maven.repo.local" );
+        if ( !file.exists() && ( localRepo != null ) )
+        {
+            String path = file.getAbsolutePath();
+            String pathOf = path.substring( path.indexOf( "commons-lang" ) );
+            file = new File( localRepo, pathOf );
+        }
+
         assertTrue( "test prerequisite: commons-lang library must be available in local repository, expected "
                     + file.getAbsolutePath(), file.canRead() );
 
