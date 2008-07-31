@@ -373,6 +373,29 @@ public class JavacCompiler
 
         List messages;
 
+        if ( ( getLogger() != null ) && getLogger().isDebugEnabled() )
+        {
+            File commandLineFile =
+                new File( config.getOutputLocation(), "javac." + ( Os.isFamily( "windows" ) ? "bat" : "sh" ) );
+            try
+            {
+                FileUtils.fileWrite( commandLineFile.getAbsolutePath(),
+                                     cli.toString().replaceAll( "'", "" ) );
+
+                if ( !Os.isFamily( "windows" ) )
+                {
+                    Runtime.getRuntime().exec( new String[] { "chmod", "a+x", commandLineFile.getAbsolutePath() } );
+                }
+            }
+            catch ( IOException e )
+            {
+                if ( ( getLogger() != null ) && getLogger().isWarnEnabled() )
+                {
+                    getLogger().warn( "Unable to write '" + commandLineFile.getName() + "' debug script file", e );
+                }
+            }
+        }
+
         try
         {
             returnCode = CommandLineUtils.executeCommandLine( cli, out, err );
