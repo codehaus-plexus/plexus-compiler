@@ -46,6 +46,8 @@ import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerError;
 import org.codehaus.plexus.compiler.CompilerException;
 import org.codehaus.plexus.compiler.CompilerOutputStyle;
+import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
@@ -67,6 +69,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Properties;
 import java.util.StringTokenizer;
 
 /**
@@ -134,7 +137,15 @@ public class JavacCompiler
 
             if ( StringUtils.isEmpty( executable ) )
             {
-                executable = "javac";
+                try
+                {
+                    executable = getJavacExecutable();
+                }
+                catch ( IOException e )
+                {
+                    getLogger().warn( "Unable to autodetect 'javac' path, using 'javac' from the environment." );
+                    executable = "javac";
+                }
             }
 
             messages = compileOutOfProcess( config, executable, args );
@@ -336,7 +347,7 @@ public class JavacCompiler
 
         try
         {
-            File argumentsFile = createFileWithArguments( args );
+            File argumentsFile = createFileWithArguments( args, config.getOutputLocation() );
             cli.addArguments( new String[] { "@" + argumentsFile.getCanonicalPath().replace( File.separatorChar, '/' ) } );
 
             if ( !StringUtils.isEmpty( config.getMaxmem() ) )
@@ -676,14 +687,22 @@ public class JavacCompiler
      * @return the temporary file wth the arguments
      * @throws IOException
      */
-    private File createFileWithArguments( String[] args )
+    private File createFileWithArguments( String[] args, String outputDirectory )
         throws IOException
     {
         PrintWriter writer = null;
         try
         {
-            File tempFile = File.createTempFile( JavacCompiler.class.getName(), "arguments" );
-            tempFile.deleteOnExit();
+            File tempFile;
+            if ( ( getLogger() != null ) && getLogger().isDebugEnabled() )
+            {
+                tempFile = File.createTempFile( JavacCompiler.class.getName(), "arguments", new File( outputDirectory ) );
+            }
+            else
+            {
+                tempFile = File.createTempFile( JavacCompiler.class.getName(), "arguments" );
+                tempFile.deleteOnExit();
+            }
 
             writer = new PrintWriter( new FileWriter( tempFile ) );
 
@@ -708,5 +727,65 @@ public class JavacCompiler
                 writer.close();
             }
         }
+    }
+
+    /**
+     * Get the path of the javac tool executable: try to find it depending the OS or the <code>java.home</code>
+     * system property or the <code>JAVA_HOME</code> environment variable.
+     *
+     * @return the path of the Javadoc tool
+     * @throws IOException if not found
+     */
+    private static String getJavacExecutable()
+        throws IOException
+    {
+        String javacCommand = "javac" + ( Os.isFamily( "Windows" ) ? ".exe" : "" );
+
+        String javaHome = System.getProperty( "java.home" );
+        File javacExe;
+        if ( Os.isName( "AIX" ) )
+        {
+            javacExe =
+                new File( javaHome + File.separator + ".." + File.separator + "sh",
+                          javacCommand );
+        }
+        else if ( Os.isName( "Mac OS X" ) )
+        {
+            javacExe = new File( javaHome + File.separator + "bin", javacCommand );
+        }
+        else
+        {
+            javacExe =
+                new File( javaHome + File.separator + ".." + File.separator + "bin",
+                          javacCommand );
+        }
+
+        // ----------------------------------------------------------------------
+        // Try to find javadocExe from JAVA_HOME environment variable
+        // ----------------------------------------------------------------------
+        if ( !javacExe.exists() || !javacExe.isFile() )
+        {
+            Properties env = CommandLineUtils.getSystemEnvVars();
+            javaHome = env.getProperty( "JAVA_HOME" );
+            if ( StringUtils.isEmpty( javaHome ) )
+            {
+                throw new IOException( "The environment variable JAVA_HOME is not correctly set." );
+            }
+            if ( ( !new File( javaHome ).exists() ) || ( !new File( javaHome ).isDirectory() ) )
+            {
+                throw new IOException( "The environment variable JAVA_HOME=" + javaHome
+                    + " doesn't exist or is not a valid directory." );
+            }
+
+            javacExe = new File( env.getProperty( "JAVA_HOME" ) + File.separator + "bin", javacCommand );
+        }
+
+        if ( !javacExe.exists() || !javacExe.isFile() )
+        {
+            throw new IOException( "The javadoc executable '" + javacExe
+                + "' doesn't exist or is not a file. Verify the JAVA_HOME environment variable." );
+        }
+
+        return javacExe.getAbsolutePath();
     }
 }
