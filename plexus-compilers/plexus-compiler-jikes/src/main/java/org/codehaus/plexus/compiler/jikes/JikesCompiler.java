@@ -80,6 +80,7 @@ import org.codehaus.plexus.compiler.CompilerException;
 import org.codehaus.plexus.compiler.CompilerOutputStyle;
 import org.codehaus.plexus.compiler.util.StreamPumper;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.io.BufferedInputStream;
@@ -91,8 +92,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @plexus.component role="org.codehaus.plexus.compiler.Compiler" role-hint="jikes"
@@ -192,26 +193,28 @@ public class JikesCompiler
 
         args.add( "jikes" );
 
-        args.add( "-bootclasspath" );
-
-        String bootclasspath = convertListToPath( new File( javaHome + "/lib" ).listFiles() );
-        bootclasspath = bootclasspath + convertListToPath( new File( javaHome + "/lib/ext" ).listFiles() );
-
-        args.add( bootclasspath );
+        String bootclasspath = convertListToPath( new File( javaHome, "lib" ).listFiles() );
+        bootclasspath += convertListToPath( new File( javaHome, "lib/ext" ).listFiles() );
         getLogger().debug( "Bootclasspath: " + bootclasspath );
-
-        args.add( "-classpath" );
+        if ( !StringUtils.isEmpty( bootclasspath ) )
+        {
+            args.add( "-bootclasspath" );
+            args.add( bootclasspath );
+        }
 
         String classpathEntries = getPathString( config.getClasspathEntries() );
-
-        args.add( classpathEntries );
         getLogger().debug( "Classpath: " + classpathEntries );
+        if ( !StringUtils.isEmpty( classpathEntries ) )
+        {
+            args.add( "-classpath" );
+            args.add( classpathEntries );
+        }
 
         args.add( "+E" );
 
         if ( config.getCustomCompilerArguments().size() > 0 )
         {
-            LinkedHashMap customArgs = config.getCustomCompilerArguments();
+            Map customArgs = config.getCustomCompilerArguments();
             Object[] entries = customArgs.entrySet().toArray();
             for ( int i = 0; i < customArgs.size(); i++ )
             {
@@ -263,7 +266,7 @@ public class JikesCompiler
 
         String[] _sources = getSourceFiles( config );
 
-        if ( System.getProperty( "os.name" ).indexOf( "Windows" ) > -1 )
+        if ( Os.isFamily( Os.FAMILY_WINDOWS ) )
         {
             String filelist = "";
             for ( int i = 0; i < _sources.length; i++ )
@@ -280,7 +283,7 @@ public class JikesCompiler
                 tempFileName = tempFile.getPath();
                 getLogger().debug( "create TempFile" + tempFileName );
 
-                new File( tempFile.getParent() ).mkdirs();
+                tempFile.getParentFile().mkdirs();
                 fw = new FileWriter( tempFile );
                 fw.write( filelist );
                 fw.flush();
@@ -327,15 +330,15 @@ public class JikesCompiler
 
     private String convertListToPath( File[] files )
     {
-        String filePath = "";
+        StringBuffer filePath = new StringBuffer( 256 );
         for ( int i = 0; i < files.length; i++ )
         {
             if ( files[i].getPath().endsWith( ".jar" ) )
             {
-                filePath = filePath + files[i].getPath() + pathSeperator;
+                filePath.append( files[i].getPath() ).append( pathSeperator );
             }
         }
-        return filePath;
+        return filePath.toString();
     }
 
     /**
@@ -409,9 +412,9 @@ public class JikesCompiler
         int i;
         String file;
 
-        if ( System.getProperty( "os.name" ).startsWith( "Windows" ) )
+        if ( Os.isFamily( Os.FAMILY_WINDOWS ) )
         {
-            file = errorBits[0] + ":" + errorBits[1];
+            file = errorBits[0] + ':' + errorBits[1];
             i = 2;
         }
         else
@@ -430,9 +433,13 @@ public class JikesCompiler
 
         String type = errorBits[i++];
 
-        String message = errorBits[i];
+        StringBuffer message = new StringBuffer( errorBits[i++] );
+        while ( i < errorBits.length )
+        {
+            message.append( ':' ).append( errorBits[i++] );
+        }
 
         return new CompilerError( file, type.indexOf( "Error" ) > -1, startline, startcolumn, endline, endcolumn,
-                                  message );
+                                  message.toString() );
     }
 }

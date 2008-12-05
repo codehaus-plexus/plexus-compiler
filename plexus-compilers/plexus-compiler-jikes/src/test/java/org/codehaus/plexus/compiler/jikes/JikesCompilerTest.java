@@ -26,9 +26,6 @@ package org.codehaus.plexus.compiler.jikes;
 
 import org.codehaus.plexus.compiler.AbstractCompilerTest;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>
  * @version $Id$
@@ -52,7 +49,7 @@ public class JikesCompilerTest
 
     protected int expectedErrors()
     {
-        return 4;
+        return 3;
     }
 
     protected int expectedWarnings()
@@ -60,19 +57,4 @@ public class JikesCompilerTest
         return 2;
     }
 
-    protected List getClasspath()
-        throws Exception
-    {
-        // VersionRange versionRange = VersionRange.createFromVersion("2.0");
-
-        // Artifact artifact = new DefaultArtifact("commons-lang",
-        // "commons-lang", versionRange, Artifact.SCOPE_RUNTIME, "jar", null,
-        // new DefaultArtifactHandler("jar"));
-
-        List cp = new ArrayList();
-
-        // cp.add(getLocalArtifactPath(artifact).getAbsolutePath());
-
-        return cp;
-    }
 }

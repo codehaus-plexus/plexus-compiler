@@ -3,10 +3,6 @@ package org.codehaus.plexus.compiler.ajc;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DefaultArtifact;
-import org.apache.maven.artifact.handler.DefaultArtifactHandler;
-import org.apache.maven.artifact.versioning.VersionRange;
 import org.codehaus.plexus.compiler.AbstractCompilerTest;
 
 /**
@@ -36,12 +32,7 @@ public class AspectJCompilerTest
     {
         List cp = super.getClasspath();
 
-        VersionRange versionRange = VersionRange.createFromVersion( "1.5.0" );
-
-        Artifact artifact = new DefaultArtifact( "aspectj", "aspectjrt", versionRange, Artifact.SCOPE_RUNTIME,
-                                                 "jar", null, new DefaultArtifactHandler( "jar" ) );
-
-        cp.add( getLocalArtifactPath( artifact ).getAbsolutePath() );
+        cp.add( getLocalArtifactPath( "aspectj", "aspectjrt", "1.5.0", "jar" ).getAbsolutePath() );
 
         return cp;
     }

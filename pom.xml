@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <parent>
-    <artifactId>plexus-components</artifactId>
-    <groupId>org.codehaus.plexus</groupId>
-    <version>1.1.12</version>
-  </parent>
   <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.codehaus.plexus</groupId>
+    <artifactId>plexus-components</artifactId>
+    <!-- NOTE: Newer versions include the unwanted plexus-component-api -->
+    <version>1.1.7</version>
+  </parent>
   <artifactId>plexus-compiler</artifactId>
   <packaging>pom</packaging>
   <name>Plexus Compiler Parent</name>
@@ -15,20 +16,33 @@
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>
-        <version>1.4.9</version>
+        <version>1.5.6</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-compiler-api</artifactId>
         <version>1.6-SNAPSHOT</version>
-      </dependency>      
+      </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-compiler-test</artifactId>
         <version>1.6-SNAPSHOT</version>
-      </dependency>      
+      </dependency>
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>3.8.2</version>
+        <scope>test</scope>
+      </dependency>
     </dependencies>
   </dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-container-default</artifactId>
+      <version>1.0-alpha-9-stable-1</version>
+    </dependency>
+  </dependencies>
   <build>
     <plugins>
       <plugin>

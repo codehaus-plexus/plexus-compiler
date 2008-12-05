@@ -499,6 +499,10 @@ public class AspectJCompiler
         {
             buildConfig.getOptions().sourceLevel = CompilerOptions.JDK1_1;
         }
+        else if ( sourceVersion == null || sourceVersion.length() <= 0 )
+        {
+            buildConfig.getOptions().sourceLevel = CompilerOptions.JDK1_3;
+        }
         else
         {
             throw new CompilerException( "The source version was not recognized: " + sourceVersion );
