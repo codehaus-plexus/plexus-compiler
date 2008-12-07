@@ -149,4 +149,36 @@
     <module>plexus-compiler-manager</module>
     <module>plexus-compilers</module>
   </modules>
+  <profiles>
+    <profile>
+      <!--
+      Make sure maven.repo.local is passed through to the tests if set or the tests will fail to resolve artifacts
+      (c.f. SUREFIRE-491).
+      -->
+      <id>maven.repo.local</id>
+      <activation>
+        <property>
+          <name>maven.repo.local</name>
+        </property>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-surefire-plugin</artifactId>
+              <configuration>
+                <systemProperties combine.children="append">
+                  <property>
+                    <name>maven.repo.local</name>
+                    <value>${maven.repo.local}</value>
+                  </property>
+                </systemProperties>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+  </profiles>
 </project>
