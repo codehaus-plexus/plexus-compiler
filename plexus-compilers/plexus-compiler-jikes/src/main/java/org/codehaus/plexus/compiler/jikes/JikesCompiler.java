@@ -216,6 +216,26 @@ public class JikesCompiler
             }
         }
 
+        args.add( "-target" );
+        if ( StringUtils.isNotEmpty( config.getTargetVersion() ) )
+        {
+            args.add( config.getTargetVersion() );
+        }
+        else
+        {
+            args.add( "1.1" );
+        }
+
+        args.add( "-source" );
+        if ( StringUtils.isNotEmpty( config.getSourceVersion() ) )
+        {
+            args.add( config.getSourceVersion() );
+        }
+        else
+        {
+            args.add( "1.3" );
+        }
+
         if ( !config.isShowWarnings() )
         {
             args.add( "-nowarn" );
@@ -406,6 +426,11 @@ public class JikesCompiler
      */
     private CompilerError parseError( String error )
     {
+        if ( error.startsWith( "Error:" ) )
+        {
+            return new CompilerError( error, true );
+        }
+
         String[] errorBits = StringUtils.split( error, ":" );
 
         int i;
