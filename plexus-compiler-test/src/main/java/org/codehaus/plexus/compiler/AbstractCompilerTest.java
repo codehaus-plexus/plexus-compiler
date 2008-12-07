@@ -40,8 +40,11 @@ import org.codehaus.plexus.util.ReaderFactory;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TreeSet;
 
 /**
  * @version $Id$
@@ -85,14 +88,21 @@ public abstract class AbstractCompilerTest
         throws Exception
     {
         List messages = new ArrayList();
+        Collection files = new TreeSet();
 
         for ( Iterator it = getCompilerConfigurations().iterator(); it.hasNext(); )
         {
             CompilerConfiguration compilerConfig = (CompilerConfiguration) it.next();
+            File outputDir = new File( compilerConfig.getOutputLocation() );
 
             Compiler compiler = (Compiler) lookup( Compiler.ROLE, getRoleHint() );
 
             messages.addAll( compiler.compile( compilerConfig ) );
+
+            if ( outputDir.isDirectory() )
+            {
+                files.addAll( normalizePaths( FileUtils.getFileNames( outputDir, null, null, false ) ) );
+            }
         }
 
         int numCompilerErrors = compilerErrorCount( messages );
@@ -144,6 +154,8 @@ public abstract class AbstractCompilerTest
                           expectedWarnings(),
                           numCompilerWarnings );
         }
+
+        assertEquals( new TreeSet( normalizePaths( expectedOutputFiles() ) ), files );
     }
 
     private List getCompilerConfigurations()
@@ -152,10 +164,12 @@ public abstract class AbstractCompilerTest
         String sourceDir = getBasedir() + "/src/test-input/src/main";
 
         List filenames = FileUtils.getFileNames( new File( sourceDir ), "**/*.java", null, false, true );
+        Collections.sort( filenames );
 
         List compilerConfigurations = new ArrayList();
 
-        for ( Iterator it = filenames.iterator(); it.hasNext(); )
+        int index = 0;
+        for ( Iterator it = filenames.iterator(); it.hasNext(); index++ )
         {
             String filename = (String) it.next();
 
@@ -169,7 +183,7 @@ public abstract class AbstractCompilerTest
 
             compilerConfig.addSourceLocation( sourceDir );
 
-            compilerConfig.setOutputLocation( getBasedir() + "/target/" + getRoleHint() + "/classes" );
+            compilerConfig.setOutputLocation( getBasedir() + "/target/" + getRoleHint() + "/classes-" + index );
 
             compilerConfig.addInclude( filename );
 
@@ -177,6 +191,16 @@ public abstract class AbstractCompilerTest
         }
 
         return compilerConfigurations;
+    }
+
+    private List normalizePaths( Collection relativePaths )
+    {
+        List normalizedPaths = new ArrayList();
+        for ( Iterator it = relativePaths.iterator(); it.hasNext(); )
+        {
+            normalizedPaths.add( it.next().toString().replace( File.separatorChar, '/' ) );
+        }
+        return normalizedPaths;
     }
 
     protected int compilerErrorCount( List messages )
@@ -199,6 +223,11 @@ public abstract class AbstractCompilerTest
     protected int expectedWarnings()
     {
         return 0;
+    }
+
+    protected Collection expectedOutputFiles()
+    {
+        return Collections.EMPTY_LIST;
     }
 
     protected File getLocalArtifactPath( String groupId, String artifactId, String version, String type )

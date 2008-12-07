@@ -152,7 +152,7 @@ public class EclipseJavaCompiler
             settings.put( CompilerOptions.OPTION_TargetPlatform, targetVersion );
         }
 
-        if ( !StringUtils.isEmpty( config.getSourceEncoding() ) )
+        if ( StringUtils.isNotEmpty( config.getSourceEncoding() ) )
         {
             settings.put( CompilerOptions.OPTION_Encoding, config.getSourceEncoding() );
         }
@@ -514,6 +514,7 @@ public class EclipseJavaCompiler
 
         public void cleanup()
         {
+            // nothing to do
         }
     }
 
@@ -533,6 +534,8 @@ public class EclipseJavaCompiler
 
         public void acceptResult( CompilationResult result )
         {
+            boolean hasErrors = false;
+
             if ( result.hasProblems() )
             {
                 IProblem[] problems = result.getProblems();
@@ -549,6 +552,7 @@ public class EclipseJavaCompiler
                     }
                     else
                     {
+                        hasErrors = true;
                         errors.add( handleError( name,
                                                  problem.getSourceLineNumber(),
                                                  -1,
@@ -556,7 +560,8 @@ public class EclipseJavaCompiler
                     }
                 }
             }
-            else
+
+            if ( !hasErrors )
             {
                 ClassFile[] classFiles = result.getClassFiles();
 

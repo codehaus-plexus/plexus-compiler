@@ -30,6 +30,8 @@ import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -92,6 +94,13 @@ public class JavacCompilerTest
     protected int expectedWarnings()
     {
         return 2;
+    }
+
+    protected Collection expectedOutputFiles()
+    {
+        return Arrays.asList( new String[] { "org/codehaus/foo/Deprecation.class",
+            "org/codehaus/foo/ExternalDeps.class", "org/codehaus/foo/Person.class",
+            "org/codehaus/foo/ReservedWord.class" } );
     }
 
     public void internalTest( CompilerConfiguration compilerConfiguration, List expectedArguments )

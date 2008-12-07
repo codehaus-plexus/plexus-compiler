@@ -24,6 +24,9 @@ package org.codehaus.plexus.compiler.jikes;
  * SOFTWARE.
  */
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.codehaus.plexus.compiler.AbstractCompilerTest;
 
 /**
@@ -49,12 +52,19 @@ public class JikesCompilerTest
 
     protected int expectedErrors()
     {
-        return 3;
+        return 2;
     }
 
     protected int expectedWarnings()
     {
-        return 2;
+        return 3;
+    }
+
+    protected Collection expectedOutputFiles()
+    {
+        return Arrays.asList( new String[] { "org/codehaus/foo/Deprecation.class",
+            "org/codehaus/foo/ExternalDeps.class", "org/codehaus/foo/Person.class",
+            "org/codehaus/foo/ReservedWord.class", "org/codehaus/foo/RightClassname.class" } );
     }
 
 }

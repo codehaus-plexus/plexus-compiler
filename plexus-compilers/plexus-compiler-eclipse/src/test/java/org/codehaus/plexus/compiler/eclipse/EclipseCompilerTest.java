@@ -24,6 +24,9 @@ package org.codehaus.plexus.compiler.eclipse;
  * SOFTWARE.
  */
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.codehaus.plexus.compiler.AbstractCompilerTest;
 
 /**
@@ -33,6 +36,16 @@ import org.codehaus.plexus.compiler.AbstractCompilerTest;
 public class EclipseCompilerTest
     extends AbstractCompilerTest
 {
+
+    public void setUp()
+        throws Exception
+    {
+        super.setUp();
+
+        setCompilerDebug( true );
+        setCompilerDeprecationWarnings( true );
+    }
+
     protected String getRoleHint()
     {
         return "eclipse";
@@ -40,6 +53,19 @@ public class EclipseCompilerTest
 
     protected int expectedErrors()
     {
+        return 4;
+    }
+
+    protected int expectedWarnings()
+    {
         return 2;
     }
+
+    protected Collection expectedOutputFiles()
+    {
+        return Arrays.asList( new String[] { "org/codehaus/foo/Deprecation.class",
+            "org/codehaus/foo/ExternalDeps.class", "org/codehaus/foo/Person.class",
+            "org/codehaus/foo/ReservedWord.class" } );
+    }
+
 }
