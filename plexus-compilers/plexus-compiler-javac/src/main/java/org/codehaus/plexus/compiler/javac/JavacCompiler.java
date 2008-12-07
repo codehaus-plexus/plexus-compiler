@@ -376,13 +376,13 @@ public class JavacCompiler
         if ( ( getLogger() != null ) && getLogger().isDebugEnabled() )
         {
             File commandLineFile =
-                new File( config.getOutputLocation(), "javac." + ( Os.isFamily( "windows" ) ? "bat" : "sh" ) );
+                new File( config.getOutputLocation(), "javac." + ( Os.isFamily( Os.FAMILY_WINDOWS ) ? "bat" : "sh" ) );
             try
             {
                 FileUtils.fileWrite( commandLineFile.getAbsolutePath(),
                                      cli.toString().replaceAll( "'", "" ) );
 
-                if ( !Os.isFamily( "windows" ) )
+                if ( !Os.isFamily( Os.FAMILY_WINDOWS ) )
                 {
                     Runtime.getRuntime().exec( new String[] { "chmod", "a+x", commandLineFile.getAbsolutePath() } );
                 }
@@ -735,7 +735,7 @@ public class JavacCompiler
 
                 writer.write( "\"" + argValue + "\"" );
 
-                writer.write( EOL );
+                writer.println();
             }
 
             writer.flush();
@@ -762,7 +762,7 @@ public class JavacCompiler
     private static String getJavacExecutable()
         throws IOException
     {
-        String javacCommand = "javac" + ( Os.isFamily( "Windows" ) ? ".exe" : "" );
+        String javacCommand = "javac" + ( Os.isFamily( Os.FAMILY_WINDOWS ) ? ".exe" : "" );
 
         String javaHome = System.getProperty( "java.home" );
         File javacExe;
@@ -784,9 +784,9 @@ public class JavacCompiler
         }
 
         // ----------------------------------------------------------------------
-        // Try to find javadocExe from JAVA_HOME environment variable
+        // Try to find javacExe from JAVA_HOME environment variable
         // ----------------------------------------------------------------------
-        if ( !javacExe.exists() || !javacExe.isFile() )
+        if ( !javacExe.isFile() )
         {
             Properties env = CommandLineUtils.getSystemEnvVars();
             javaHome = env.getProperty( "JAVA_HOME" );
@@ -794,7 +794,7 @@ public class JavacCompiler
             {
                 throw new IOException( "The environment variable JAVA_HOME is not correctly set." );
             }
-            if ( ( !new File( javaHome ).exists() ) || ( !new File( javaHome ).isDirectory() ) )
+            if ( !new File( javaHome ).isDirectory() )
             {
                 throw new IOException( "The environment variable JAVA_HOME=" + javaHome
                     + " doesn't exist or is not a valid directory." );
@@ -803,7 +803,7 @@ public class JavacCompiler
             javacExe = new File( env.getProperty( "JAVA_HOME" ) + File.separator + "bin", javacCommand );
         }
 
-        if ( !javacExe.exists() || !javacExe.isFile() )
+        if ( !javacExe.isFile() )
         {
             throw new IOException( "The javadoc executable '" + javacExe
                 + "' doesn't exist or is not a file. Verify the JAVA_HOME environment variable." );

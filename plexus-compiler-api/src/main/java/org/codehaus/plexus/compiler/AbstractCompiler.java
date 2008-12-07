@@ -127,7 +127,7 @@ public abstract class AbstractCompiler
 
         for ( Iterator it = pathElements.iterator(); it.hasNext(); )
         {
-            sb.append( it.next() ).append( PS );
+            sb.append( it.next() ).append( File.pathSeparator );
         }
 
         return sb.toString();

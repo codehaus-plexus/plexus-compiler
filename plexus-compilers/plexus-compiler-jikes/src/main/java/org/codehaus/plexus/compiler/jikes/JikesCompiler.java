@@ -85,13 +85,16 @@ import org.codehaus.plexus.util.StringUtils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -102,12 +105,6 @@ public class JikesCompiler
     extends AbstractCompiler
 {
     private static final int OUTPUT_BUFFER_SIZE = 1024;
-
-    private static final String pathSeperator = System.getProperty( "path.separator" );
-
-    private static final String lineSeperator = System.getProperty( "line.separator" );
-
-    private static final String fileSeperator = System.getProperty( "file.separator" );
 
     public JikesCompiler()
     {
@@ -187,27 +184,24 @@ public class JikesCompiler
     public String[] createCommandLine( CompilerConfiguration config )
         throws CompilerException
     {
-        String javaHome = System.getProperty( "java.home" );
-
         List args = new ArrayList();
 
         args.add( "jikes" );
 
-        String bootclasspath = convertListToPath( new File( javaHome, "lib" ).listFiles() );
-        bootclasspath += convertListToPath( new File( javaHome, "lib/ext" ).listFiles() );
-        getLogger().debug( "Bootclasspath: " + bootclasspath );
-        if ( !StringUtils.isEmpty( bootclasspath ) )
+        String bootClassPath = getPathString( getBootClassPath() );
+        getLogger().debug( "Bootclasspath: " + bootClassPath );
+        if ( !StringUtils.isEmpty( bootClassPath ) )
         {
             args.add( "-bootclasspath" );
-            args.add( bootclasspath );
+            args.add( bootClassPath );
         }
 
-        String classpathEntries = getPathString( config.getClasspathEntries() );
-        getLogger().debug( "Classpath: " + classpathEntries );
-        if ( !StringUtils.isEmpty( classpathEntries ) )
+        String classPath = getPathString( config.getClasspathEntries() );
+        getLogger().debug( "Classpath: " + classPath );
+        if ( !StringUtils.isEmpty( classPath ) )
         {
             args.add( "-classpath" );
-            args.add( classpathEntries );
+            args.add( classPath );
         }
 
         args.add( "+E" );
@@ -221,6 +215,7 @@ public class JikesCompiler
                 args.add( entries[i] );
             }
         }
+
         if ( !config.isShowWarnings() )
         {
             args.add( "-nowarn" );
@@ -250,48 +245,40 @@ public class JikesCompiler
 
         args.add( getDestinationDir( config ).getAbsolutePath() );
 
-        Object[] sources = config.getSourceLocations().toArray();
-
-        String sourceDir = "";
-        for ( int i = 0; i < sources.length; i++ )
-        {
-            sourceDir = sourceDir + sources[i] + pathSeperator;
-        }
-        if ( sources.length > 0 )
+        String sourcePath = getPathString( config.getSourceLocations() );
+        getLogger().debug( "Source path:" + sourcePath );
+        if ( !StringUtils.isEmpty( sourcePath ) )
         {
             args.add( "-sourcepath" );
-            args.add( sourceDir.substring( 0, sourceDir.length() - 1 ) + fileSeperator );
-            getLogger().debug( "Source path:" + sourceDir );
+            args.add( sourcePath );
         }
 
-        String[] _sources = getSourceFiles( config );
+        String[] sourceFiles = getSourceFiles( config );
 
         if ( Os.isFamily( Os.FAMILY_WINDOWS ) )
         {
-            String filelist = "";
-            for ( int i = 0; i < _sources.length; i++ )
-            {
-                filelist = filelist + _sources[i] + lineSeperator;
-            }
-
             String tempFileName = null;
-            FileWriter fw = null;
+            BufferedWriter fw = null;
 
             try
             {
                 File tempFile = File.createTempFile( "compList", ".cmp" );
-                tempFileName = tempFile.getPath();
+                tempFileName = tempFile.getAbsolutePath();
                 getLogger().debug( "create TempFile" + tempFileName );
 
                 tempFile.getParentFile().mkdirs();
-                fw = new FileWriter( tempFile );
-                fw.write( filelist );
+                fw = new BufferedWriter( new FileWriter( tempFile ) );
+                for ( int i = 0; i < sourceFiles.length; i++ )
+                {
+                    fw.write( sourceFiles[i] );
+                    fw.newLine();
+                }
                 fw.flush();
                 tempFile.deleteOnExit();
             }
             catch ( IOException e )
             {
-                throw new CompilerException( "Could not create temporary file " + tempFileName );
+                throw new CompilerException( "Could not create temporary file " + tempFileName, e );
             }
             finally
             {
@@ -302,9 +289,9 @@ public class JikesCompiler
         }
         else
         {
-            for ( int i = 0; i < _sources.length; i++ )
+            for ( int i = 0; i < sourceFiles.length; i++ )
             {
-                args.add( _sources[i] );
+                args.add( sourceFiles[i] );
             }
 
         }
@@ -328,17 +315,29 @@ public class JikesCompiler
         return destinationDir;
     }
 
-    private String convertListToPath( File[] files )
+    private List getBootClassPath()
     {
-        StringBuffer filePath = new StringBuffer( 256 );
-        for ( int i = 0; i < files.length; i++ )
+        List bootClassPath = new ArrayList();
+        FileFilter filter = new FileFilter()
         {
-            if ( files[i].getPath().endsWith( ".jar" ) )
+
+            public boolean accept( File file )
             {
-                filePath.append( files[i].getPath() ).append( pathSeperator );
+                return file.getName().endsWith( ".jar" );
             }
+
+        };
+        File javaLibDir = new File( System.getProperty( "java.home" ), "lib" );
+        if ( javaLibDir.isDirectory() )
+        {
+            bootClassPath.addAll( Arrays.asList( javaLibDir.listFiles( filter ) ) );
         }
-        return filePath.toString();
+        File javaExtDir = new File( javaLibDir, "ext" );
+        if ( javaExtDir.isDirectory() )
+        {
+            bootClassPath.addAll( Arrays.asList( javaExtDir.listFiles( filter ) ) );
+        }
+        return bootClassPath;
     }
 
     /**
