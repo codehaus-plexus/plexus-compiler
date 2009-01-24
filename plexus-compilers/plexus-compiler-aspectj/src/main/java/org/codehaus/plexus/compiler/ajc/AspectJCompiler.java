@@ -291,7 +291,32 @@ public class AspectJCompiler
         }
 
         List cp = new LinkedList( config.getClasspathEntries() );
-        cp.add( 0, System.getProperty( "java.home" ) + "/lib/rt.jar" );
+
+        File javaHomeDir = new File( System.getProperty( "java.home" ) );
+        File[] jars = new File( javaHomeDir, "lib" ).listFiles();
+        if ( jars != null )
+        {
+            for ( int i = 0; i < jars.length; i++ )
+            {
+                File jar = jars[i];
+                if ( jar.getName().endsWith( ".jar" ) || jar.getName().endsWith( ".zip" ) )
+                {
+                    cp.add( 0, jar.getAbsolutePath() );
+                }
+            }
+        }
+        jars = new File( javaHomeDir, "../Classes" ).listFiles();
+        if ( jars != null )
+        {
+            for ( int i = 0; i < jars.length; i++ )
+            {
+                File jar = jars[i];
+                if ( jar.getName().endsWith( ".jar" ) || jar.getName().endsWith( ".zip" ) )
+                {
+                    cp.add( 0, jar.getAbsolutePath() );
+                }
+            }
+        }
 
         checkForAspectJRT( cp );
         if ( cp != null && !cp.isEmpty() )
