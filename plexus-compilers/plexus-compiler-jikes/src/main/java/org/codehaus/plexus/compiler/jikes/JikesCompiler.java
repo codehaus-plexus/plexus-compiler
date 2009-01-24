@@ -343,20 +343,32 @@ public class JikesCompiler
 
             public boolean accept( File file )
             {
-                return file.getName().endsWith( ".jar" );
+                String name = file.getName();
+                return name.endsWith( ".jar" ) || name.endsWith( ".zip" );
             }
 
         };
-        File javaLibDir = new File( System.getProperty( "java.home" ), "lib" );
+
+        File javaHomeDir = new File( System.getProperty( "java.home" ) );
+
+        File javaLibDir = new File( javaHomeDir, "lib" );
         if ( javaLibDir.isDirectory() )
         {
             bootClassPath.addAll( Arrays.asList( javaLibDir.listFiles( filter ) ) );
         }
+
+        File javaClassesDir = new File( javaHomeDir, "../Classes" );
+        if ( javaClassesDir.isDirectory() )
+        {
+            bootClassPath.addAll( Arrays.asList( javaClassesDir.listFiles( filter ) ) );
+        }
+
         File javaExtDir = new File( javaLibDir, "ext" );
         if ( javaExtDir.isDirectory() )
         {
             bootClassPath.addAll( Arrays.asList( javaExtDir.listFiles( filter ) ) );
         }
+
         return bootClassPath;
     }
 
