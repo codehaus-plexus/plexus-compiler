@@ -4,27 +4,17 @@
   <parent>
     <groupId>org.codehaus.plexus</groupId>
     <artifactId>plexus-components</artifactId>
-    <!-- NOTE: Newer versions include the unwanted plexus-component-api -->
-    <version>1.1.7</version>
+    <version>1.1.14-SNAPSHOT</version>
   </parent>
   <artifactId>plexus-compiler</artifactId>
   <version>1.6-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Plexus Compiler Parent</name>
-  <issueManagement>
-    <system>JIRA</system>
-    <url>http://jira.codehaus.org/browse/PLXCOMP</url>
-  </issueManagement>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-utils</artifactId>
-        <version>1.5.6</version>
-      </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-compiler-api</artifactId>
