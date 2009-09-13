@@ -12,7 +12,7 @@
   <artifactId>plexus-compilers</artifactId>
   <packaging>pom</packaging>
 
-  <name>Plexus Compilers Parent</name>
+  <name>Plexus Compilers</name>
 
   <modules>
     <module>plexus-compiler-aspectj</module>
