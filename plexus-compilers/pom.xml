@@ -19,7 +19,6 @@
     <module>plexus-compiler-csharp</module>
     <module>plexus-compiler-eclipse</module>
     <module>plexus-compiler-javac</module>
-    <module>plexus-compiler-jikes</module>
   </modules>
 
   <scm>
@@ -43,4 +42,20 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  
+  <profiles>
+    <profile>
+      <id>jikes-enabled</id>
+      <activation>
+        <property>
+          <name>jikes-enabled</name>
+          <value>!false</value>
+        </property>
+      </activation>
+      <modules>
+        <module>plexus-compiler-jikes</module>
+      </modules>
+    </profile>
+  </profiles>
+  
 </project>
