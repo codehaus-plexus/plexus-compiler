@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.codehaus.plexus</groupId>
     <artifactId>plexus-compiler</artifactId>
-    <version>1.7-SNAPSHOT</version>
+    <version>1.6-SNAPSHOT</version>
   </parent>
 
   <groupId>org.codehaus.plexus</groupId>
@@ -18,14 +18,9 @@
     <module>plexus-compiler-aspectj</module>
     <module>plexus-compiler-csharp</module>
     <module>plexus-compiler-eclipse</module>
+    <module>plexus-compiler-jikes</module>
     <module>plexus-compiler-javac</module>
   </modules>
-
-  <scm>
-    <connection>scm:svn:https://svn.codehaus.org/plexus/trunk/plexus-components/plexus-compiler/plexus-compilers/</connection>
-    <developerConnection>scm:svn:https://svn.codehaus.org/plexus/trunk/plexus-components/plexus-compiler/plexus-compilers/</developerConnection>
-    <url>http://fisheye.codehaus.org/browse/plexus/plexus-components/tags/plexus-components-1.1.16/plexus-compiler/plexus-compilers</url>
-  </scm>
 
   <dependencies>
     <dependency>
