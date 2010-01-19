@@ -447,7 +447,7 @@ public class JavacCompiler
         {
             try
             {
-                cl.addURL( toolsJar.toURL() );
+                cl.addURL( toolsJar.toURI().toURL() );
             }
             catch ( MalformedURLException e )
             {
