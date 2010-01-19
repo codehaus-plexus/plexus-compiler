@@ -41,6 +41,7 @@ package org.codehaus.plexus.compiler.javac;
  *  limitations under the License.
  */
 
+import java.util.Arrays;
 import org.codehaus.plexus.compiler.AbstractCompiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerError;
@@ -200,11 +201,8 @@ public class JavacCompiler
 
             args.add( getPathString( sourceLocations ) );
         }
-
-        for ( int i = 0; i < sourceFiles.length; i++ )
-        {
-            args.add( sourceFiles[i] );
-        }
+        
+        args.addAll(Arrays.asList(sourceFiles));
 
         if ( config.isOptimize() )
         {
