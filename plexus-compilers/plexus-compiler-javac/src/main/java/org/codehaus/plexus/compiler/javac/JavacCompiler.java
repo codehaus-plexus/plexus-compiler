@@ -192,8 +192,10 @@ public class JavacCompiler
         }
 
         List sourceLocations = config.getSourceLocations();
-        if ( ( sourceLocations != null ) && !sourceLocations.isEmpty() && ( sourceFiles.length == 0 ) )
+        if ( ( sourceLocations != null ) && !sourceLocations.isEmpty() )
         {
+            //always pass source path, even if sourceFiles are declared,
+            //needed for jsr269 annotation processing, see MCOMPILER-98
             args.add( "-sourcepath" );
 
             args.add( getPathString( sourceLocations ) );
