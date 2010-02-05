@@ -348,7 +348,7 @@ public class JavacCompiler
         try
         {
             File argumentsFile = createFileWithArguments( args, config.getOutputLocation() );
-            cli.addArguments( new String[] { "@" + argumentsFile.getCanonicalPath().replace( File.separatorChar, '/' ) } );
+            cli.addArguments( new String[] { "@" + argumentsFile.getCanonicalPath()/*.replace( File.separatorChar, '/' )*/ } );
 
             if ( !StringUtils.isEmpty( config.getMaxmem() ) )
             {
@@ -731,7 +731,7 @@ public class JavacCompiler
 
             for ( int i = 0; i < args.length; i++ )
             {
-                String argValue = args[i].replace( File.separatorChar, '/' );
+                String argValue = args[i]/*.replace( File.separatorChar, '/' )*/;
 
                 writer.write( "\"" + argValue + "\"" );
 

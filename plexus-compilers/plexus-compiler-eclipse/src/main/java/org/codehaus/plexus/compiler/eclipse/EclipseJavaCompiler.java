@@ -150,6 +150,11 @@ public class EclipseJavaCompiler
         if ( targetVersion != null )
         {
             settings.put( CompilerOptions.OPTION_TargetPlatform, targetVersion );
+            
+            if ( config.isOptimize() )
+            {
+                settings.put( CompilerOptions.OPTION_Compliance, targetVersion );
+            }
         }
 
         if ( StringUtils.isNotEmpty( config.getSourceEncoding() ) )
@@ -173,6 +178,13 @@ public class EclipseJavaCompiler
         settings.put( CompilerOptions.OPTION_LineNumberAttribute, CompilerOptions.GENERATE );
 
         settings.put( CompilerOptions.OPTION_SourceFileAttribute, CompilerOptions.GENERATE );
+        
+        // compiler-specific extra options override anything else in the config object...
+        Map extras = config.getCustomCompilerArguments();
+        if ( extras != null && !extras.isEmpty() )
+        {
+            settings.putAll( extras );
+        }
 
         IProblemFactory problemFactory = new DefaultProblemFactory( Locale.getDefault() );
 
@@ -203,7 +215,8 @@ public class EclipseJavaCompiler
         // Compile!
         // ----------------------------------------------------------------------
 
-        Compiler compiler = new Compiler( env, policy, settings, requestor, problemFactory );
+        CompilerOptions options = new CompilerOptions( settings );
+        Compiler compiler = new Compiler( env, policy, options, requestor, problemFactory );
 
         ICompilationUnit[] units = (ICompilationUnit[])
             compilationUnits.toArray( new ICompilationUnit[ compilationUnits.size() ] );
@@ -284,6 +297,14 @@ public class EclipseJavaCompiler
         else if ( versionSpec.equals( "1.5" ) )
         {
             return CompilerOptions.VERSION_1_5;
+        }
+        else if ( versionSpec.equals( "1.6" ) )
+        {
+            return CompilerOptions.VERSION_1_6;
+        }
+        else if ( versionSpec.equals( "1.7" ) )
+        {
+            return CompilerOptions.VERSION_1_7;
         }
         else
         {
