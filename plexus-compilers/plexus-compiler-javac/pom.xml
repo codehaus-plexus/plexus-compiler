@@ -8,7 +8,7 @@
     <version>1.7</version>
   </parent>
   
-  <version>1.8-SNAPSHOT</version>
+  <version>1.7.1-SNAPSHOT</version>
 
   <artifactId>plexus-compiler-javac</artifactId>
 
