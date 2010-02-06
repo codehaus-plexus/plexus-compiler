@@ -31,6 +31,12 @@
     </dependency>
   </dependencies>
   
+  <scm>
+    <connection>scm:svn:http://svn.codehaus.org/plexus/plexus-components/trunk/plexus-compiler/plexus-compilers/plexus-compiler-javac</connection>
+    <developerConnection>scm:svn:https://svn.codehaus.org/plexus/plexus-components/trunk/plexus-compiler/plexus-compilers/plexus-compiler-javac</developerConnection>
+    <url>http://fisheye.codehaus.org/browse/plexus/plexus-components/trunk/plexus-compiler/plexus-compilers/plexus-compiler-javac</url>
+  </scm>  
+  
   <build>
     <pluginManagement>
       <plugins>
