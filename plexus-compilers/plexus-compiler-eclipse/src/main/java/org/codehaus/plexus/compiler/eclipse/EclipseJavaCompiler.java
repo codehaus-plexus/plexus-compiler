@@ -130,12 +130,15 @@ public class EclipseJavaCompiler
         if ( config.isDebug() )
         {
             settings.put( CompilerOptions.OPTION_LocalVariableAttribute, CompilerOptions.GENERATE );
+            settings.put( CompilerOptions.OPTION_LineNumberAttribute, CompilerOptions.GENERATE );
+            settings.put( CompilerOptions.OPTION_SourceFileAttribute, CompilerOptions.GENERATE );
         }
 
-        if ( config.isShowWarnings() )
+        if ( !config.isShowWarnings() )
         {
             // TODO: Implement. I'm not sure what value to pass - trygve
 //            settings.put( CompilerOptions.OPTION_SuppressWarnings,  );
+            settings.put( CompilerOptions.OPTION_SuppressWarnings, CompilerOptions.ENABLED );
         }
 
         String sourceVersion = decodeVersion( config.getSourceVersion() );
