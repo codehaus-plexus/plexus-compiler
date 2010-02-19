@@ -103,6 +103,16 @@ public class CompilerConfiguration
      */
     private String outputFileName;
 
+    /**
+     * in jdk 1.6+, used to hold value of the -s path parameter.
+     */
+    private File generatedSourcesDirectory;
+
+    /**
+     * value of the -proc parameter in jdk 1.6+
+     */
+    private String proc;
+
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
@@ -425,4 +435,26 @@ public class CompilerConfiguration
     {
         this.verbose = verbose;
     }
+
+    public void setProc(String proc)
+    {
+        this.proc = proc;
+    }
+
+    public void setGeneratedSourcesDirectory(File generatedSourcesDirectory)
+    {
+        this.generatedSourcesDirectory = generatedSourcesDirectory;
+    }
+
+    public File getGeneratedSourcesDirectory()
+    {
+        return generatedSourcesDirectory;
+    }
+
+    public String getProc()
+    {
+        return proc;
+    }
+
+
 }

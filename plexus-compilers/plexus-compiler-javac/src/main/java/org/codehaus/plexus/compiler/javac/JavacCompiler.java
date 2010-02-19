@@ -201,8 +201,25 @@ public class JavacCompiler
 
             args.add( getPathString( sourceLocations ) );
         }
-        
+
         args.addAll(Arrays.asList(sourceFiles));
+
+        if ( !isPreJava16(config) )
+        {
+            //now add jdk 1.6 annotation processing related parameters
+
+            if ( config.getGeneratedSourcesDirectory() != null )
+            {
+                config.getGeneratedSourcesDirectory().mkdirs();
+
+                args.add( "-s" );
+                args.add( config.getGeneratedSourcesDirectory().getAbsolutePath() );
+            }
+            if ( config.getProc() != null )
+            {
+                args.add( "-proc:" + config.getProc() );
+            }
+        }
 
         if ( config.isOptimize() )
         {
@@ -315,6 +332,37 @@ public class JavacCompiler
         return v.startsWith( "1.3" ) || v.startsWith( "1.2" )
             || v.startsWith( "1.1" ) || v.startsWith( "1.0" );
     }
+
+    /**
+     * Determine if the compiler is a version prior to 1.6.
+     * This is needed for annotation processing parameters.
+     *
+     * @param config The compiler configuration to test.
+     * @return true if the compiler configuration represents a Java 1.6 compiler or later, false otherwise
+     */
+    private static boolean isPreJava16( CompilerConfiguration config )
+    {
+        String v = config.getCompilerVersion();
+
+        if ( v == null )
+        {
+            //mkleint: i haven't completely understood the reason for the
+            //compiler version parameter, checking source as well, as most projects will have this one set, not the compiler
+            String s = config.getSourceVersion();
+            if ( s == null )
+            {
+                return false;
+            }
+            return s.startsWith( "1.5" ) || s.startsWith( "1.4" )
+                || s.startsWith( "1.3" ) || s.startsWith( "1.2" )
+                || s.startsWith( "1.1" ) || s.startsWith( "1.0" );
+        }
+
+        return v.startsWith( "1.5" ) || v.startsWith( "1.4" )
+            || v.startsWith( "1.3" ) || v.startsWith( "1.2" )
+            || v.startsWith( "1.1" ) || v.startsWith( "1.0" );
+    }
+
 
     private static boolean suppressSource( CompilerConfiguration config )
     {
