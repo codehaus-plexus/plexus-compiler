@@ -185,7 +185,7 @@ public class JavacCompiler
         // ----------------------------------------------------------------------
 
         List classpathEntries = config.getClasspathEntries();
-        if ( ( classpathEntries != null ) && !classpathEntries.isEmpty() )
+        if ( classpathEntries != null && !classpathEntries.isEmpty() )
         {
             args.add( "-classpath" );
 
@@ -193,7 +193,7 @@ public class JavacCompiler
         }
 
         List sourceLocations = config.getSourceLocations();
-        if ( ( sourceLocations != null ) && !sourceLocations.isEmpty() )
+        if ( sourceLocations != null && !sourceLocations.isEmpty() )
         {
             //always pass source path, even if sourceFiles are declared,
             //needed for jsr269 annotation processing, see MCOMPILER-98
