@@ -219,6 +219,22 @@ public class JavacCompiler
             {
                 args.add( "-proc:" + config.getProc() );
             }
+            if ( config.getAnnotationProcessors() != null )
+            {
+                args.add("-processor");
+                String[] procs = config.getAnnotationProcessors();
+                StringBuffer buffer = new StringBuffer();
+                for (int i = 0; i < procs.length; i++)
+                {
+                    if (i > 0)
+                    {
+                        buffer.append( "," );
+                    }
+
+                    buffer.append( procs[i] );
+                }
+                args.add( buffer.toString() );
+            }
         }
 
         if ( config.isOptimize() )

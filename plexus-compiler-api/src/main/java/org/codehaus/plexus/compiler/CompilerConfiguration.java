@@ -113,6 +113,11 @@ public class CompilerConfiguration
      */
     private String proc;
 
+    /**
+     * -processor parameters in jdk 1.6+
+     */
+    private String[] annotationProcessors;
+
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
@@ -456,5 +461,14 @@ public class CompilerConfiguration
         return proc;
     }
 
+    public void setAnnotationProcessors( String[] annotationProcessors )
+    {
+        this.annotationProcessors = annotationProcessors;
+    }
+
+    public String[] getAnnotationProcessors()
+    {
+        return annotationProcessors;
+    }
 
 }
