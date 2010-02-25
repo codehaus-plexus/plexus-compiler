@@ -367,7 +367,8 @@ public class JavacCompiler
             String s = config.getSourceVersion();
             if ( s == null )
             {
-                return false;
+                //now return true, as the 1.6 version is not the default - 1.4 is.
+                return true;
             }
             return s.startsWith( "1.5" ) || s.startsWith( "1.4" )
                 || s.startsWith( "1.3" ) || s.startsWith( "1.2" )
