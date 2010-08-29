@@ -86,7 +86,12 @@ import java.util.StringTokenizer;
 public class JavacCompiler
     extends AbstractCompiler
 {
-    private static final String WARNING_PREFIX = "warning: ";
+
+    // see compiler.warn.warning in compiler.properties of javac sources
+    private static final String[] WARNING_PREFIXES = { "warning: ", "\u8b66\u544a: ", "\u8b66\u544a\uff1a " };
+
+    // see compiler.note.note in compiler.properties of javac sources
+    private static final String[] NOTE_PREFIXES = { "Note: ", "\u6ce8: ", "\u6ce8\u610f\uff1a " };
 
     // ----------------------------------------------------------------------
     //
@@ -465,7 +470,7 @@ public class JavacCompiler
         {
             returnCode = CommandLineUtils.executeCommandLine( cli, out, err );
 
-            messages = parseModernStream( new BufferedReader( new StringReader( err.getOutput() ) ) );
+            messages = parseModernStream( returnCode, new BufferedReader( new StringReader( err.getOutput() ) ) );
         }
         catch ( CommandLineException e )
         {
@@ -548,7 +553,7 @@ public class JavacCompiler
 
             ok = (Integer) compile.invoke( null, new Object[] { args, new PrintWriter( out ) } );
 
-            messages = parseModernStream( new BufferedReader( new StringReader( out.toString() ) ) );
+            messages = parseModernStream( ok.intValue(), new BufferedReader( new StringReader( out.toString() ) ) );
         }
         catch ( NoSuchMethodException e )
         {
@@ -580,11 +585,12 @@ public class JavacCompiler
     /**
      * Parse the output from the compiler into a list of CompilerError objects
      *
+     * @param exitCode The exit code of javac.
      * @param input The output of the compiler
      * @return List of CompilerError objects
      * @throws IOException
      */
-    protected static List parseModernStream( BufferedReader input )
+    static List parseModernStream( int exitCode, BufferedReader input )
         throws IOException
     {
         List errors = new ArrayList();
@@ -613,9 +619,9 @@ public class JavacCompiler
                 {
                     errors.add( new CompilerError( line, true ) );
                 }
-                else if ( ( buffer.length() == 0 ) && line.startsWith( "Note: " ) )
+                else if ( ( buffer.length() == 0 ) && isNote( line ) )
                 {
-                    // skip this one - it is JDK 1.5 telling us that the interface is deprecated.
+                    // skip, JDK 1.5 telling us deprecated APIs are used but -Xlint:deprecation isn't set
                 }
                 else
                 {
@@ -627,21 +633,34 @@ public class JavacCompiler
             while ( !line.endsWith( "^" ) );
 
             // add the error bean
-            errors.add( parseModernError( buffer.toString() ) );
+            errors.add( parseModernError( exitCode, buffer.toString() ) );
         }
+    }
+
+    private static boolean isNote( String line )
+    {
+        for ( int i = 0; i < NOTE_PREFIXES.length; i++ )
+        {
+            if ( line.startsWith( NOTE_PREFIXES[i] ) )
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
      * Construct a CompilerError object from a line of the compiler output
      *
+     * @param exitCode The exit code from javac.
      * @param error output line from the compiler
      * @return the CompilerError object
      */
-    public static CompilerError parseModernError( String error )
+    static CompilerError parseModernError( int exitCode, String error )
     {
         StringTokenizer tokens = new StringTokenizer( error, ":" );
 
-        boolean isError = true;
+        boolean isError = exitCode != 0;
 
         StringBuffer msgBuffer;
 
@@ -701,12 +720,14 @@ public class JavacCompiler
 
             String msg = tokens.nextToken( EOL ).substring( 2 );
 
-            isError = !msg.startsWith( WARNING_PREFIX );
+            isError = exitCode != 0;
 
             // Remove the 'warning: ' prefix
-            if ( !isError )
+            String warnPrefix = getWarnPrefix( msg );
+            if ( warnPrefix != null )
             {
-                msg = msg.substring( WARNING_PREFIX.length() );
+                isError = false;
+                msg = msg.substring( warnPrefix.length() );
             }
 
             msgBuffer.append( msg );
@@ -753,7 +774,7 @@ public class JavacCompiler
                 endcolumn = context.length();
             }
 
-            return new CompilerError( file, isError, line, startcolumn, line, endcolumn, message );
+            return new CompilerError( file, isError, line, startcolumn, line, endcolumn, message.trim() );
         }
         catch ( NoSuchElementException e )
         {
@@ -767,6 +788,18 @@ public class JavacCompiler
         {
             return new CompilerError( "could not parse error message: " + error, isError );
         }
+    }
+
+    private static String getWarnPrefix( String msg )
+    {
+        for ( int i = 0; i < WARNING_PREFIXES.length; i++ )
+        {
+            if ( msg.startsWith( WARNING_PREFIXES[i] ) )
+            {
+                return WARNING_PREFIXES[i];
+            }
+        }
+        return null;
     }
 
     /**

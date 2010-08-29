@@ -49,13 +49,13 @@ public class ErrorMessageParserTest
                        "import java.util.Date;public class Foo{    private Date date = new Date( \"foo\");}" + EOL +
                        "                                                               ^" + EOL;
 
-        CompilerError compilerError = JavacCompiler.parseModernError( error );
+        CompilerError compilerError = JavacCompiler.parseModernError( 0, error );
 
         assertNotNull( compilerError );
 
         assertFalse( compilerError.isError() );
 
-        assertEquals( "Date(java.lang.String) in java.util.Date has been deprecated" + EOL, compilerError.getMessage() );
+        assertEquals( "Date(java.lang.String) in java.util.Date has been deprecated", compilerError.getMessage() );
 
         assertEquals( 63, compilerError.getStartColumn() );
 
@@ -72,13 +72,13 @@ public class ErrorMessageParserTest
                        "        finally { return; }" + EOL +
                        "                          ^" + EOL;
 
-        CompilerError compilerError = JavacCompiler.parseModernError( error );
+        CompilerError compilerError = JavacCompiler.parseModernError( 0, error );
 
         assertNotNull( compilerError );
 
         assertFalse( compilerError.isError() );
 
-        assertEquals( "finally clause cannot complete normally" + EOL, compilerError.getMessage() );
+        assertEquals( "finally clause cannot complete normally", compilerError.getMessage() );
 
         assertEquals( 26, compilerError.getStartColumn() );
 
@@ -95,13 +95,13 @@ public class ErrorMessageParserTest
                        "         i;" + EOL +
                        "         ^" + EOL;
 
-        CompilerError compilerError = JavacCompiler.parseModernError( error );
+        CompilerError compilerError = JavacCompiler.parseModernError( 1, error );
 
         assertNotNull( compilerError );
 
         assertTrue( compilerError.isError() );
 
-        assertEquals( "not a statement" + EOL, compilerError.getMessage() );
+        assertEquals( "not a statement", compilerError.getMessage() );
 
         assertEquals( 9, compilerError.getStartColumn() );
 
@@ -120,7 +120,7 @@ public class ErrorMessageParserTest
                        "        foo();" + EOL +
                        "        ^" + EOL;
 
-        CompilerError compilerError = JavacCompiler.parseModernError( error );
+        CompilerError compilerError = JavacCompiler.parseModernError( 1, error );
 
         assertNotNull( compilerError );
 
@@ -128,7 +128,7 @@ public class ErrorMessageParserTest
 
         assertEquals( "cannot find symbol" + EOL +
             "symbol  : method foo()" + EOL +
-            "location: class org.codehaus.foo.UnknownSymbol" + EOL,
+            "location: class org.codehaus.foo.UnknownSymbol",
             compilerError.getMessage()
         );
 
@@ -140,8 +140,6 @@ public class ErrorMessageParserTest
 
         assertEquals( 7, compilerError.getEndLine() );
     }
-
-
 
     public void testTwoErrors()
         throws IOException
@@ -156,22 +154,10 @@ public class ErrorMessageParserTest
                         "                              ^" + EOL +
                         "2 errors" + EOL;
 
-        class MyTestJavacCompiler extends JavacCompiler
-        {
-            public List parseErrors( BufferedReader reader )
-                throws IOException
-            {
-                return parseModernStream( reader );
-            }
-        }
-
-        MyTestJavacCompiler myTestCompiler = new MyTestJavacCompiler();
-
-        List messages = myTestCompiler.parseErrors( new BufferedReader( new StringReader( errors ) ) );
+        List messages = JavacCompiler.parseModernStream( 1, new BufferedReader( new StringReader( errors ) ) );
 
         assertEquals( 2, messages.size() );
     }
-
 
     public void testAnotherTwoErrors()
         throws IOException
@@ -186,18 +172,7 @@ public class ErrorMessageParserTest
                         "                              ^" + EOL +
                         "2 errors" + EOL;
 
-        class MyTestJavacCompiler extends JavacCompiler
-        {
-            public List parseErrors( BufferedReader reader )
-                throws IOException
-            {
-                return parseModernStream( reader );
-            }
-        }
-
-        MyTestJavacCompiler myTestCompiler = new MyTestJavacCompiler();
-
-        List messages = myTestCompiler.parseErrors( new BufferedReader( new StringReader( errors ) ) );
+        List messages = JavacCompiler.parseModernStream( 1, new BufferedReader( new StringReader( errors ) ) );
 
         assertEquals( 2, messages.size() );
     }
@@ -211,20 +186,23 @@ public class ErrorMessageParserTest
                         "               ^" + EOL +
                         "1 error" + EOL;
 
-        class MyTestJavacCompiler extends JavacCompiler
-        {
-            public List parseErrors( BufferedReader reader )
-                throws IOException
-            {
-                return parseModernStream( reader );
-            }
-        }
-
-        MyTestJavacCompiler myTestCompiler = new MyTestJavacCompiler();
-
-        List messages = myTestCompiler.parseErrors( new BufferedReader( new StringReader( errors ) ) );
+        List messages = JavacCompiler.parseModernStream( 1, new BufferedReader( new StringReader( errors ) ) );
 
         assertEquals( 1, messages.size() );
+    }
+
+    public void testLocalizedWarningNotTreatedAsError()
+        throws IOException
+    {
+        String errors = "./src/main/java/Main.java:9: \u8b66\u544a:[deprecation] java.io.File \u306e toURL() \u306f\u63a8\u5968\u3055\u308c\u307e\u305b\u3093\u3002" + EOL +
+                        "    new File( path ).toURL()" + EOL +
+                        "                    ^" + EOL +
+                        "\u8b66\u544a 1 \u500b" + EOL;
+
+        List messages = JavacCompiler.parseModernStream( 0, new BufferedReader( new StringReader( errors ) ) );
+
+        assertEquals( 1, messages.size() );
+        assertFalse( ( (CompilerError) messages.get( 0 ) ).isError() );
     }
 
 }
