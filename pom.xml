@@ -23,10 +23,14 @@
   </modules>
   
   <scm>
-    <connection>scm:svn:http://svn.codehaus.org/plexus/plexus-components/trunk/plexus-compiler</connection>
-    <developerConnection>scm:svn:https://svn.codehaus.org/plexus/plexus-components/trunk/plexus-compiler</developerConnection>
-    <url>http://fisheye.codehaus.org/browse/plexus/plexus-components/trunk/plexus-compiler</url>
-  </scm>  
+    <connection>scm:git:git@github.com:sonatype/plexus-compiler.git</connection>
+    <developerConnection>scm:git:git@github.com:sonatype/plexus-compiler.git</developerConnection>
+    <url>http://github.com/sonatype/plexus-compiler</url>
+  </scm>
+  <issueManagement>
+    <system>jira</system>
+    <url>http://jira.codehaus.org/browse/PLXCOMP/component/12541</url>
+  </issueManagement>
 
   <dependencyManagement>
     <dependencies>
