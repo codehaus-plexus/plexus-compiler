@@ -720,8 +720,6 @@ public class JavacCompiler
 
             String msg = tokens.nextToken( EOL ).substring( 2 );
 
-            isError = exitCode != 0;
-
             // Remove the 'warning: ' prefix
             String warnPrefix = getWarnPrefix( msg );
             if ( warnPrefix != null )
@@ -729,6 +727,8 @@ public class JavacCompiler
                 isError = false;
                 msg = msg.substring( warnPrefix.length() );
             }
+
+            isError = exitCode != 0;
 
             msgBuffer.append( msg );
 
