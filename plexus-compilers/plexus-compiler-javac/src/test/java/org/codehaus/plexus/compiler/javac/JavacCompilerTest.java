@@ -181,6 +181,38 @@ public class JavacCompilerTest
 
         internalTest( compilerConfiguration, expectedArguments );
     }
+    
+    // PLXCOMP-190
+    public void testJRuntimeArguments()
+    {
+    	List expectedArguments = new ArrayList();
+
+        CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
+
+        // outputLocation
+        compilerConfiguration.setOutputLocation( "/output" );
+        expectedArguments.add( "-d" );
+        expectedArguments.add( new File( "/output" ).getAbsolutePath() );
+        
+        // targetVersion
+        compilerConfiguration.setTargetVersion( "1.3" );
+        expectedArguments.add( "-target" );
+        expectedArguments.add( "1.3" );
+
+        // sourceVersion
+        compilerConfiguration.setSourceVersion( "1.3" );
+        expectedArguments.add( "-source" );
+        expectedArguments.add( "1.3" );
+
+        // customCompilerArguments
+        LinkedHashMap customCompilerArguments = new LinkedHashMap();
+        customCompilerArguments.put("-J-Duser.language=en_us", null );
+        compilerConfiguration.setCustomCompilerArguments( customCompilerArguments );
+        // don't expect this argument!!
+        
+        internalTest( compilerConfiguration, expectedArguments );
+    }
+    
 
     /* This test fails on Java 1.4. The multiple parameters of the same source file cause an error, as it is interpreted as a DuplicateClass
      * Setting the size of the array to 3 is fine, but does not exactly test what it is supposed to - disabling the test for now
@@ -300,6 +332,7 @@ public class JavacCompilerTest
         }
 
         // customerCompilerArguments
+        
 
         LinkedHashMap customerCompilerArguments = new LinkedHashMap();
 
