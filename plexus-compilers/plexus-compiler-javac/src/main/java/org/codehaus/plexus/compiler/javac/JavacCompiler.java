@@ -314,7 +314,7 @@ public class JavacCompiler
 
             String key = (String) entry.getKey();
 
-            if ( StringUtils.isEmpty( key ) )
+            if ( StringUtils.isEmpty( key ) || key.startsWith( "-J" ) )
             {
                 continue;
             }
@@ -428,6 +428,18 @@ public class JavacCompiler
             if ( !StringUtils.isEmpty( config.getMeminitial() ) )
             {
                 cli.addArguments( new String[] { "-J-Xms" + config.getMeminitial() } );
+            }
+            
+            for ( Iterator it = config.getCustomCompilerArguments().entrySet().iterator(); it.hasNext(); )
+            {
+                Map.Entry entry = (Map.Entry) it.next();
+
+                String key = (String) entry.getKey();
+
+                if ( StringUtils.isNotEmpty( key ) && key.startsWith( "-J") )
+                {
+                    cli.addArguments( new String[] { key } );
+                }
             }
         }
         catch ( IOException e )
