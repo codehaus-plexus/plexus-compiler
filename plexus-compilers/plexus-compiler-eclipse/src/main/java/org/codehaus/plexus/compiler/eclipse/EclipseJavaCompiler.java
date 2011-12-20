@@ -179,7 +179,6 @@ public class EclipseJavaCompiler
         // ----------------------------------------------------------------------
 
         settings.put( CompilerOptions.OPTION_LineNumberAttribute, CompilerOptions.GENERATE );
-
         settings.put( CompilerOptions.OPTION_SourceFileAttribute, CompilerOptions.GENERATE );
         
         // compiler-specific extra options override anything else in the config object...
@@ -345,7 +344,16 @@ public class EclipseJavaCompiler
 
         public char[] getFileName()
         {
-            return className.toCharArray();
+            String fileName = sourceFile;
+
+            int lastSeparator = fileName.lastIndexOf(File.separatorChar);
+          
+            if (lastSeparator > 0)
+            {
+                fileName = fileName.substring(lastSeparator+1);
+            }
+
+            return fileName.toCharArray();
         }
 
         public char[] getContents()
