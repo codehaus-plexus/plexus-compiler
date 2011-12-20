@@ -237,6 +237,10 @@ public class EclipseJavaCompiler
 
     private CompilerError handleError( String className, int line, int column, Object errorMessage )
     {
+        if(className.endsWith(".java"))
+        {
+            className = className.substring(0, className.lastIndexOf('.'));
+        }
         String fileName = className.replace( '.', File.separatorChar ) + ".java";
 
         if ( column < 0 )
