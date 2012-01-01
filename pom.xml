@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>plexus-compiler</artifactId>
-  <version>1.8.3</version>
+  <version>1.8.4-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Plexus Compiler</name>
