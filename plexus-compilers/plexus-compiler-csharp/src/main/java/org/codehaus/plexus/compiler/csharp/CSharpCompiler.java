@@ -44,8 +44,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -522,12 +520,12 @@ Options can be of the form -option or /option
     {
         String type = getType( configuration.getCustomCompilerArguments() );
 
-        if ( type.equals( "exe" ) || type.equals( "winexe" ) )
+        if ( "exe".equals( type  ) || "winexe".equals( type  ) )
         {
             return "exe";
         }
 
-        if ( type.equals( "library" ) || type.equals( "module" ) )
+        if ( "library".equals( type  ) || "module".equals( type  ) )
         {
             return "dll";
         }

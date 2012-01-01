@@ -284,31 +284,31 @@ public class EclipseJavaCompiler
         {
             return null;
         }
-        else if ( versionSpec.equals( "1.1" ) )
+        else if ( "1.1".equals( versionSpec ) )
         {
             return CompilerOptions.VERSION_1_1;
         }
-        else if ( versionSpec.equals( "1.2" ) )
+        else if ( "1.2".equals( versionSpec ) )
         {
             return CompilerOptions.VERSION_1_2;
         }
-        else if ( versionSpec.equals( "1.3" ) )
+        else if ( "1.3".equals( versionSpec ) )
         {
             return CompilerOptions.VERSION_1_3;
         }
-        else if ( versionSpec.equals( "1.4" ) )
+        else if ( "1.4".equals( versionSpec ) )
         {
             return CompilerOptions.VERSION_1_4;
         }
-        else if ( versionSpec.equals( "1.5" ) )
+        else if ( "1.5".equals( versionSpec ) )
         {
             return CompilerOptions.VERSION_1_5;
         }
-        else if ( versionSpec.equals( "1.6" ) )
+        else if ( "1.6" .equals( versionSpec ) )
         {
             return CompilerOptions.VERSION_1_6;
         }
-        else if ( versionSpec.equals( "1.7" ) )
+        else if ( "1.7".equals( versionSpec ) )
         {
             return CompilerOptions.VERSION_1_7;
         }

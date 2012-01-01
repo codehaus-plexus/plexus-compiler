@@ -284,8 +284,10 @@ public abstract class AbstractCompiler
     protected static String[] toStringArray( List arguments )
     {
         String[] args = new String[arguments.size()];
+        
+        int argLength = arguments.size(); 
 
-        for ( int i = 0; i < arguments.size(); i++ )
+        for ( int i = 0; i < argLength; i++ )
         {
             args[i] = (String) arguments.get( i );
         }
