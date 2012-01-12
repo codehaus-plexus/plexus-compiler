@@ -1,5 +1,18 @@
 package org.codehaus.plexus.compiler.ajc;
 
+import org.aspectj.ajdt.internal.core.builder.AjBuildConfig;
+import org.aspectj.ajdt.internal.core.builder.AjBuildManager;
+import org.aspectj.bridge.AbortException;
+import org.aspectj.bridge.IMessage;
+import org.aspectj.bridge.ISourceLocation;
+import org.aspectj.bridge.MessageHandler;
+import org.aspectj.org.eclipse.jdt.internal.compiler.classfmt.ClassFileConstants;
+import org.codehaus.plexus.compiler.AbstractCompiler;
+import org.codehaus.plexus.compiler.CompilerConfiguration;
+import org.codehaus.plexus.compiler.CompilerError;
+import org.codehaus.plexus.compiler.CompilerException;
+import org.codehaus.plexus.compiler.CompilerOutputStyle;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -12,19 +25,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import org.aspectj.ajdt.internal.core.builder.AjBuildConfig;
-import org.aspectj.ajdt.internal.core.builder.AjBuildManager;
-import org.aspectj.bridge.AbortException;
-import org.aspectj.bridge.IMessage;
-import org.aspectj.bridge.ISourceLocation;
-import org.aspectj.bridge.MessageHandler;
-import org.aspectj.org.eclipse.jdt.internal.compiler.impl.CompilerOptions;
-import org.codehaus.plexus.compiler.AbstractCompiler;
-import org.codehaus.plexus.compiler.CompilerConfiguration;
-import org.codehaus.plexus.compiler.CompilerError;
-import org.codehaus.plexus.compiler.CompilerException;
-import org.codehaus.plexus.compiler.CompilerOutputStyle;
 
 /**
  * @plexus.component
@@ -279,8 +279,8 @@ public class AspectJCompiler
 
         if ( config.isDebug() )
         {
-            buildConfig.getOptions().produceDebugAttributes = CompilerOptions.Source + CompilerOptions.Lines
-                + CompilerOptions.Vars;
+            buildConfig.getOptions().produceDebugAttributes = ClassFileConstants.ATTR_SOURCE + ClassFileConstants.ATTR_LINES
+                + ClassFileConstants.ATTR_VARS;
         }
 
         Map javaOpts = config.getCustomCompilerArguments();
@@ -500,33 +500,41 @@ public class AspectJCompiler
     private void setSourceVersion( AjBuildConfig buildConfig, String sourceVersion )
         throws CompilerException
     {
-        if ( "1.5".equals( sourceVersion ) )
+        if ( "1.7".equals( sourceVersion ) )
         {
-            buildConfig.getOptions().sourceLevel = CompilerOptions.JDK1_5;
+            buildConfig.getOptions().sourceLevel = ClassFileConstants.JDK1_7;
+        }
+        else if ( "1.6".equals( sourceVersion ) )
+        {
+            buildConfig.getOptions().sourceLevel = ClassFileConstants.JDK1_6;
+        }
+        else if ( "1.5".equals( sourceVersion ) )
+        {
+            buildConfig.getOptions().sourceLevel = ClassFileConstants.JDK1_5;
         }
         else if ( "5.0".equals( sourceVersion ) )
         {
-            buildConfig.getOptions().sourceLevel = CompilerOptions.JDK1_5;
+            buildConfig.getOptions().sourceLevel = ClassFileConstants.JDK1_5;
         }
         else if ( "1.4".equals( sourceVersion ) )
         {
-            buildConfig.getOptions().sourceLevel = CompilerOptions.JDK1_4;
+            buildConfig.getOptions().sourceLevel = ClassFileConstants.JDK1_4;
         }
         else if ( "1.3".equals( sourceVersion ) )
         {
-            buildConfig.getOptions().sourceLevel = CompilerOptions.JDK1_3;
+            buildConfig.getOptions().sourceLevel = ClassFileConstants.JDK1_3;
         }
         else if ( "1.2".equals( sourceVersion ) )
         {
-            buildConfig.getOptions().sourceLevel = CompilerOptions.JDK1_2;
+            buildConfig.getOptions().sourceLevel = ClassFileConstants.JDK1_2;
         }
         else if ( "1.1".equals( sourceVersion ) )
         {
-            buildConfig.getOptions().sourceLevel = CompilerOptions.JDK1_1;
+            buildConfig.getOptions().sourceLevel = ClassFileConstants.JDK1_1;
         }
         else if ( sourceVersion == null || sourceVersion.length() <= 0 )
         {
-            buildConfig.getOptions().sourceLevel = CompilerOptions.JDK1_3;
+            buildConfig.getOptions().sourceLevel = ClassFileConstants.JDK1_3;
         }
         else
         {
