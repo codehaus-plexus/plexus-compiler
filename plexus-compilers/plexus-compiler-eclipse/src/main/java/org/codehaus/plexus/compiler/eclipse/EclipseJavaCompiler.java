@@ -24,6 +24,23 @@ package org.codehaus.plexus.compiler.eclipse;
  * SOFTWARE.
  */
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
 import org.codehaus.plexus.compiler.AbstractCompiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerError;
@@ -32,6 +49,7 @@ import org.codehaus.plexus.compiler.CompilerOutputStyle;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
+
 import org.eclipse.jdt.core.compiler.IProblem;
 import org.eclipse.jdt.internal.compiler.ClassFile;
 import org.eclipse.jdt.internal.compiler.CompilationResult;
@@ -47,24 +65,6 @@ import org.eclipse.jdt.internal.compiler.env.INameEnvironment;
 import org.eclipse.jdt.internal.compiler.env.NameEnvironmentAnswer;
 import org.eclipse.jdt.internal.compiler.impl.CompilerOptions;
 import org.eclipse.jdt.internal.compiler.problem.DefaultProblemFactory;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
 
 /**
  * @plexus.component
@@ -207,7 +207,7 @@ public class EclipseJavaCompiler
 
                 CompilationUnit unit = new CompilationUnit( source,
                                                             makeClassName( source, sourceRoot ),
-                                                            errors );
+                                                            errors, config.getSourceEncoding() );
 
                 compilationUnits.add( unit );
             }
@@ -327,19 +327,28 @@ public class EclipseJavaCompiler
     private class CompilationUnit
         implements ICompilationUnit
     {
-        private String className;
+        private final String className;
 
-        private String sourceFile;
+        private final String sourceFile;
+        
+        private final String sourceEncoding;
 
-        private List errors;
+        private final List errors;
 
         CompilationUnit( String sourceFile,
+                String className,
+                List errors	) {
+        	this(sourceFile, className, errors, null);
+        }
+        
+        CompilationUnit( String sourceFile,
                          String className,
-                         List errors )
+                         List errors, String sourceEncoding)
         {
             this.className = className;
             this.sourceFile = sourceFile;
             this.errors = errors;
+            this.sourceEncoding = sourceEncoding;
         }
 
         public char[] getFileName()
@@ -360,7 +369,7 @@ public class EclipseJavaCompiler
         {
             try
             {
-                return FileUtils.fileRead( sourceFile ).toCharArray();
+            	return FileUtils.fileRead( sourceFile, sourceEncoding).toCharArray();
             }
             catch ( FileNotFoundException e )
             {
@@ -467,7 +476,7 @@ public class EclipseJavaCompiler
                 {
                     ICompilationUnit compilationUnit = new CompilationUnit( f.getAbsolutePath(),
                                                                             className,
-                                                                            errors );
+                                                                            errors);
 
                     return new NameEnvironmentAnswer( compilationUnit, null );
                 }
