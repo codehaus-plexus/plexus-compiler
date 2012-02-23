@@ -684,13 +684,23 @@ public class JavacCompiler
 
             boolean tokenIsAnInteger;
 
-            String previousToken = null;
+            String file = null;
 
             String currentToken = null;
 
             do
             {
-                previousToken = currentToken;
+                if ( currentToken != null )
+                {
+                    if ( file == null )
+                    {
+                        file = currentToken;
+                    }
+                    else
+                    {
+                        file = file + ':' + currentToken;
+                    }
+                }
 
                 currentToken = tokens.nextToken();
 
@@ -709,21 +719,13 @@ public class JavacCompiler
             }
             while ( !tokenIsAnInteger );
 
-            String file = previousToken;
-
             String lineIndicator = currentToken;
 
-            int startOfFileName = previousToken.lastIndexOf( "]" );
+            int startOfFileName = file.lastIndexOf( ']' );
 
             if ( startOfFileName > -1 )
             {
                 file = file.substring( startOfFileName + 2 );
-            }
-
-            // When will this happen?
-            if ( file.length() == 1 )
-            {
-                file = new StringBuffer( file ).append( ":" ).append( tokens.nextToken() ).toString();
             }
 
             int line = Integer.parseInt( lineIndicator );

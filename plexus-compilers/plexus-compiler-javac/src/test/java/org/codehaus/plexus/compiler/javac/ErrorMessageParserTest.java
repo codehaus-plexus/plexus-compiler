@@ -205,4 +205,26 @@ public class ErrorMessageParserTest
         assertFalse( ( (CompilerError) messages.get( 0 ) ).isError() );
     }
 
+    public void testUnixFileNames()
+    {
+        String error = "/my/prj/src/main/java/test/prj/App.java:11: not a statement" + EOL +
+                        "        System.out.println( \"Hello World!\" );x" + EOL +
+                        "                                             ^" + EOL;
+
+        CompilerError compilerError = JavacCompiler.parseModernError( 1, error );
+
+        assertEquals( "/my/prj/src/main/java/test/prj/App.java:[11,45] not a statement", String.valueOf( compilerError ) );
+    }
+
+    public void testWindowsDriveLettersMCOMPILER140()
+    {
+        String error = "c:\\Documents and Settings\\My Self\\Documents\\prj\\src\\main\\java\\test\\prj\\App.java:11: not a statement" + EOL +
+                        "        System.out.println( \"Hello World!\" );x" + EOL +
+                        "                                             ^" + EOL;
+
+        CompilerError compilerError = JavacCompiler.parseModernError( 1, error );
+
+        assertEquals( "c:\\Documents and Settings\\My Self\\Documents\\prj\\src\\main\\java\\test\\prj\\App.java:[11,45] not a statement", String.valueOf( compilerError ) );
+    }
+
 }
