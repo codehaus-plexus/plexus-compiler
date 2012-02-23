@@ -1,5 +1,6 @@
 package org.codehaus.plexus.compiler.ajc;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -38,7 +39,8 @@ public class AspectJCompilerTest
     {
         List cp = super.getClasspath();
 
-        cp.add( getLocalArtifactPath( "aspectj", "aspectjrt", "1.5.0", "jar" ).getAbsolutePath() );
+        File localArtifactPath = getLocalArtifactPath("org.aspectj", "aspectjrt", "1.6.0", "jar");
+        cp.add(localArtifactPath.getAbsolutePath());
 
         return cp;
     }
