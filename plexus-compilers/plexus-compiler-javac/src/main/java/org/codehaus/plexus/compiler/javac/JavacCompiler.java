@@ -946,7 +946,8 @@ public class JavacCompiler
         try
         {
             // look whether JavaC is on Maven's classpath
-            return Class.forName( JavacCompiler.JAVAC_CLASSNAME, true, JavacCompiler.class.getClassLoader() );
+            //return Class.forName( JavacCompiler.JAVAC_CLASSNAME, true, JavacCompiler.class.getClassLoader() );
+            return JavacCompiler.class.getClassLoader().loadClass( JavacCompiler.JAVAC_CLASSNAME );
         }
         catch ( ClassNotFoundException ex )
         {
@@ -969,7 +970,8 @@ public class JavacCompiler
             thread.setContextClassLoader( javacClassLoader );
             try
             {
-                return Class.forName( JavacCompiler.JAVAC_CLASSNAME, true, javacClassLoader );
+                //return Class.forName( JavacCompiler.JAVAC_CLASSNAME, true, javacClassLoader );
+                return javacClassLoader.loadClass( JavacCompiler.JAVAC_CLASSNAME );
             }
             finally
             {
