@@ -64,6 +64,8 @@ import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -80,6 +82,7 @@ import java.util.StringTokenizer;
  *
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  * @author <a href="mailto:matthew.pocock@ncl.ac.uk">Matthew Pocock</a>
+ * @author <a href="mailto:joerg.wassmer@web.de">J&ouml;rg Wa&szlig;mer</a>
  * @author Others
  * @version $Id$
  */
@@ -92,6 +95,13 @@ public class JavacCompiler
 
     // see compiler.note.note in compiler.properties of javac sources
     private static final String[] NOTE_PREFIXES = { "Note: ", "\u6ce8: ", "\u6ce8\u610f\uff1a " };
+
+    private static final Object LOCK = new Object();
+
+    private static final String JAVAC_CLASSNAME = "com.sun.tools.javac.Main";
+
+    private static Class javacClass;
+
 
     // ----------------------------------------------------------------------
     //
@@ -521,38 +531,26 @@ public class JavacCompiler
     List compileInProcess( String[] args )
         throws CompilerException
     {
-        IsolatedClassLoader cl = new IsolatedClassLoader();
-
-        File toolsJar = new File( System.getProperty( "java.home" ), "../lib/tools.jar" );
-
-        if ( toolsJar.exists() )
-        {
+        final Class javacClass = getJavacClass();
+        final Thread thread = Thread.currentThread();
+        final ClassLoader contextClassLoader = thread.getContextClassLoader();
+        thread.setContextClassLoader( javacClass.getClassLoader() );
             try
             {
-                cl.addURL( toolsJar.toURI().toURL() );
+            return compileInProcess0( javacClass, args );
             }
-            catch ( MalformedURLException e )
+        finally
             {
-                throw new CompilerException( "Could not convert the file reference to tools.jar to a URL, path to tools.jar: '" + toolsJar.getAbsolutePath() + "'." );
+          thread.setContextClassLoader( contextClassLoader );
             }
         }
 
-        Class c;
-
-        try
+    /**
+     * Helper method for compileInProcess()
+     */
+    private static List compileInProcess0( Class javacClass, String[] args )
+        throws CompilerException
         {
-            c = cl.loadClass( "com.sun.tools.javac.Main" );
-        }
-        catch ( ClassNotFoundException e )
-        {
-            String message = "Unable to locate the Javac Compiler in:" + EOL + "  " + toolsJar + EOL
-                             + "Please ensure you are using JDK 1.4 or above and" + EOL
-                             + "not a JRE (the com.sun.tools.javac.Main class is required)." + EOL
-                             + "In most cases you can change the location of your Java" + EOL
-                             + "installation by setting the JAVA_HOME environment variable.";
-            return Collections.singletonList( new CompilerError( message, true ) );
-        }
-
         StringWriter out = new StringWriter();
 
         Integer ok;
@@ -561,7 +559,7 @@ public class JavacCompiler
 
         try
         {
-            Method compile = c.getMethod( "compile", new Class[] { String[].class, PrintWriter.class } );
+            Method compile = javacClass.getMethod( "compile", new Class[] { String[].class, PrintWriter.class } );
 
             ok = (Integer) compile.invoke( null, new Object[] { args, new PrintWriter( out ) } );
 
@@ -923,4 +921,88 @@ public class JavacCompiler
 
         return javacExe.getAbsolutePath();
     }
+
+
+
+    /**
+     * Find the main class of JavaC. Return the same class for subsequent calls.
+     *
+     * @return
+     *  the non-null class.
+     *
+     * @throws CompilerException
+     *  if the class has not been found.
+     */
+    private static Class getJavacClass() throws CompilerException
+    {
+        synchronized ( JavacCompiler.LOCK )
+        {
+            Class c = JavacCompiler.javacClass;
+            if ( c == null )
+              JavacCompiler.javacClass = c = getJavacClass0();
+            return c;
+}
+    }
+
+
+
+    /**
+     * Helper method for getJavacClass().
+     */
+    private static Class getJavacClass0() throws CompilerException
+    {
+        try
+        {
+            // look whether JavaC is on Maven's classpath
+            return Class.forName( JavacCompiler.JAVAC_CLASSNAME, true, JavacCompiler.class.getClassLoader() );
+        }
+        catch ( ClassNotFoundException ex )
+        {
+          // ok
+        }
+
+        final File toolsJar = new File( System.getProperty("java.home"), "../lib/tools.jar" );
+        if (!toolsJar.exists())
+            throw new CompilerException( "tools.jar not found: " + toolsJar );
+
+        try
+        {
+            final ClassLoader javacClassLoader = new URLClassLoader(
+                new URL[] {toolsJar.toURI().toURL()},
+                JavacCompiler.class.getClassLoader()
+            );
+
+            final Thread thread = Thread.currentThread();
+            final ClassLoader contextClassLoader = thread.getContextClassLoader();
+            thread.setContextClassLoader( javacClassLoader );
+            try
+            {
+              return Class.forName( JavacCompiler.JAVAC_CLASSNAME, true, javacClassLoader );
+            }
+            finally
+            {
+              thread.setContextClassLoader( contextClassLoader );
+            }
+        }
+        catch ( MalformedURLException ex )
+        {
+            throw new CompilerException(
+                "Could not convert the file reference to tools.jar to a URL, path to tools.jar: '"
+                  + toolsJar.getAbsolutePath() + "'.",
+                ex
+            );
+        }
+        catch ( ClassNotFoundException ex )
+        {
+          throw new CompilerException(
+              "Unable to locate the Javac Compiler in:" + EOL + "  " + toolsJar + EOL
+                + "Please ensure you are using JDK 1.4 or above and" + EOL
+                + "not a JRE (the com.sun.tools.javac.Main class is required)." + EOL
+                + "In most cases you can change the location of your Java" + EOL
+                + "installation by setting the JAVA_HOME environment variable.",
+              ex
+          );
+        }
+    }
+
 }
