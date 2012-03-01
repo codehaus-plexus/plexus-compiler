@@ -98,7 +98,7 @@ public class JavacCompiler
 
     private static final String JAVAC_CLASSNAME = "com.sun.tools.javac.Main";
 
-    private static Class JAVAC_CLASS;
+    private static volatile Class JAVAC_CLASS;
 
     // ----------------------------------------------------------------------
     //
@@ -920,9 +920,14 @@ public class JavacCompiler
     private static Class getJavacClass()
         throws CompilerException
     {
+
+        Class c = JavacCompiler.JAVAC_CLASS;
+        if ( c != null )
+        {
+            return c;
+        }
         synchronized ( JavacCompiler.LOCK )
         {
-            Class c = JavacCompiler.JAVAC_CLASS;
             if ( c == null )
             {
                 JavacCompiler.JAVAC_CLASS = c = getJavacClass0();
