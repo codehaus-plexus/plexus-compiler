@@ -41,7 +41,6 @@ package org.codehaus.plexus.compiler.javac;
  *  limitations under the License.
  */
 
-import java.util.Arrays;
 import org.codehaus.plexus.compiler.AbstractCompiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerError;
@@ -67,6 +66,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -76,15 +76,13 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 
 /**
- * @plexus.component
- *   role="org.codehaus.plexus.compiler.Compiler"
- *   role-hint="javac"
- *
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  * @author <a href="mailto:matthew.pocock@ncl.ac.uk">Matthew Pocock</a>
  * @author <a href="mailto:joerg.wassmer@web.de">J&ouml;rg Wa&szlig;mer</a>
  * @author Others
  * @version $Id$
+ * @plexus.component role="org.codehaus.plexus.compiler.Compiler"
+ * role-hint="javac"
  */
 public class JavacCompiler
     extends AbstractCompiler
@@ -100,8 +98,7 @@ public class JavacCompiler
 
     private static final String JAVAC_CLASSNAME = "com.sun.tools.javac.Main";
 
-    private static Class javacClass;
-
+    private static Class JAVAC_CLASS;
 
     // ----------------------------------------------------------------------
     //
@@ -109,10 +106,7 @@ public class JavacCompiler
 
     public JavacCompiler()
     {
-        super( CompilerOutputStyle.ONE_OUTPUT_FILE_PER_INPUT_FILE,
-               ".java",
-               ".class",
-               null );
+        super( CompilerOutputStyle.ONE_OUTPUT_FILE_PER_INPUT_FILE, ".java", ".class", null );
     }
 
     // ----------------------------------------------------------------------
@@ -139,8 +133,8 @@ public class JavacCompiler
         if ( ( getLogger() != null ) && getLogger().isInfoEnabled() )
         {
             getLogger().info( "Compiling " + sourceFiles.length + " " +
-                              "source file" + ( sourceFiles.length == 1 ? "" : "s" ) +
-                              " to " + destinationDir.getAbsolutePath() );
+                                  "source file" + ( sourceFiles.length == 1 ? "" : "s" ) +
+                                  " to " + destinationDir.getAbsolutePath() );
         }
 
         String[] args = buildCompilerArguments( config, sourceFiles );
@@ -175,13 +169,12 @@ public class JavacCompiler
     }
 
     public String[] createCommandLine( CompilerConfiguration config )
-            throws CompilerException
+        throws CompilerException
     {
         return buildCompilerArguments( config, getSourceFiles( config ) );
     }
 
-    public static String[] buildCompilerArguments( CompilerConfiguration config,
-                                                   String[] sourceFiles )
+    public static String[] buildCompilerArguments( CompilerConfiguration config, String[] sourceFiles )
     {
         List args = new ArrayList();
 
@@ -217,9 +210,9 @@ public class JavacCompiler
             args.add( getPathString( sourceLocations ) );
         }
 
-        args.addAll(Arrays.asList(sourceFiles));
+        args.addAll( Arrays.asList( sourceFiles ) );
 
-        if ( !isPreJava16(config) )
+        if ( !isPreJava16( config ) )
         {
             //now add jdk 1.6 annotation processing related parameters
 
@@ -236,12 +229,12 @@ public class JavacCompiler
             }
             if ( config.getAnnotationProcessors() != null )
             {
-                args.add("-processor");
+                args.add( "-processor" );
                 String[] procs = config.getAnnotationProcessors();
                 StringBuffer buffer = new StringBuffer();
-                for (int i = 0; i < procs.length; i++)
+                for ( int i = 0; i < procs.length; i++ )
                 {
-                    if (i > 0)
+                    if ( i > 0 )
                     {
                         buffer.append( "," );
                     }
@@ -341,7 +334,7 @@ public class JavacCompiler
             args.add( value );
         }
 
-        return (String[]) args.toArray( new String[ args.size() ] );
+        return (String[]) args.toArray( new String[args.size()] );
     }
 
     /**
@@ -360,8 +353,7 @@ public class JavacCompiler
             return false;
         }
 
-        return v.startsWith( "1.3" ) || v.startsWith( "1.2" )
-            || v.startsWith( "1.1" ) || v.startsWith( "1.0" );
+        return v.startsWith( "1.3" ) || v.startsWith( "1.2" ) || v.startsWith( "1.1" ) || v.startsWith( "1.0" );
     }
 
     /**
@@ -385,13 +377,11 @@ public class JavacCompiler
                 //now return true, as the 1.6 version is not the default - 1.4 is.
                 return true;
             }
-            return s.startsWith( "1.5" ) || s.startsWith( "1.4" )
-                || s.startsWith( "1.3" ) || s.startsWith( "1.2" )
+            return s.startsWith( "1.5" ) || s.startsWith( "1.4" ) || s.startsWith( "1.3" ) || s.startsWith( "1.2" )
                 || s.startsWith( "1.1" ) || s.startsWith( "1.0" );
         }
 
-        return v.startsWith( "1.5" ) || v.startsWith( "1.4" )
-            || v.startsWith( "1.3" ) || v.startsWith( "1.2" )
+        return v.startsWith( "1.5" ) || v.startsWith( "1.4" ) || v.startsWith( "1.3" ) || v.startsWith( "1.2" )
             || v.startsWith( "1.1" ) || v.startsWith( "1.0" );
     }
 
@@ -410,9 +400,9 @@ public class JavacCompiler
      * Compile the java sources in a external process, calling an external executable,
      * like javac.
      *
-     * @param config compiler configuration
+     * @param config     compiler configuration
      * @param executable name of the executable to launch
-     * @param args arguments for the executable launched
+     * @param args       arguments for the executable launched
      * @return List of CompilerError objects with the errors encountered.
      * @throws CompilerException
      */
@@ -428,27 +418,28 @@ public class JavacCompiler
         try
         {
             File argumentsFile = createFileWithArguments( args, config.getOutputLocation() );
-            cli.addArguments( new String[] { "@" + argumentsFile.getCanonicalPath().replace( File.separatorChar, '/' ) } );
+            cli.addArguments(
+                new String[]{ "@" + argumentsFile.getCanonicalPath().replace( File.separatorChar, '/' ) } );
 
             if ( !StringUtils.isEmpty( config.getMaxmem() ) )
             {
-                cli.addArguments( new String[] { "-J-Xmx" + config.getMaxmem() } );
+                cli.addArguments( new String[]{ "-J-Xmx" + config.getMaxmem() } );
             }
 
             if ( !StringUtils.isEmpty( config.getMeminitial() ) )
             {
-                cli.addArguments( new String[] { "-J-Xms" + config.getMeminitial() } );
+                cli.addArguments( new String[]{ "-J-Xms" + config.getMeminitial() } );
             }
-            
+
             for ( Iterator it = config.getCustomCompilerArguments().entrySet().iterator(); it.hasNext(); )
             {
                 Map.Entry entry = (Map.Entry) it.next();
 
                 String key = (String) entry.getKey();
 
-                if ( StringUtils.isNotEmpty( key ) && key.startsWith( "-J") )
+                if ( StringUtils.isNotEmpty( key ) && key.startsWith( "-J" ) )
                 {
-                    cli.addArguments( new String[] { key } );
+                    cli.addArguments( new String[]{ key } );
                 }
             }
         }
@@ -471,12 +462,11 @@ public class JavacCompiler
                 new File( config.getOutputLocation(), "javac." + ( Os.isFamily( Os.FAMILY_WINDOWS ) ? "bat" : "sh" ) );
             try
             {
-                FileUtils.fileWrite( commandLineFile.getAbsolutePath(),
-                                     cli.toString().replaceAll( "'", "" ) );
+                FileUtils.fileWrite( commandLineFile.getAbsolutePath(), cli.toString().replaceAll( "'", "" ) );
 
                 if ( !Os.isFamily( Os.FAMILY_WINDOWS ) )
                 {
-                    Runtime.getRuntime().exec( new String[] { "chmod", "a+x", commandLineFile.getAbsolutePath() } );
+                    Runtime.getRuntime().exec( new String[]{ "chmod", "a+x", commandLineFile.getAbsolutePath() } );
                 }
             }
             catch ( IOException e )
@@ -507,13 +497,13 @@ public class JavacCompiler
         {
             if ( err.getOutput().length() == 0 )
             {
-                throw new CompilerException( "Unknown error trying to execute the external compiler: " + EOL
-                    + cli.toString() );
+                throw new CompilerException(
+                    "Unknown error trying to execute the external compiler: " + EOL + cli.toString() );
             }
             else
             {
-                messages.add( new CompilerError( "Failure executing javac,  but could not parse the error:" + EOL
-                    + err.getOutput(), true ) );
+                messages.add( new CompilerError(
+                    "Failure executing javac,  but could not parse the error:" + EOL + err.getOutput(), true ) );
             }
         }
 
@@ -535,22 +525,22 @@ public class JavacCompiler
         final Thread thread = Thread.currentThread();
         final ClassLoader contextClassLoader = thread.getContextClassLoader();
         thread.setContextClassLoader( javacClass.getClassLoader() );
-            try
-            {
+        try
+        {
             return compileInProcess0( javacClass, args );
-            }
-        finally
-            {
-          thread.setContextClassLoader( contextClassLoader );
-            }
         }
+        finally
+        {
+            thread.setContextClassLoader( contextClassLoader );
+        }
+    }
 
     /**
      * Helper method for compileInProcess()
      */
     private static List compileInProcess0( Class javacClass, String[] args )
         throws CompilerException
-        {
+    {
         StringWriter out = new StringWriter();
 
         Integer ok;
@@ -559,9 +549,9 @@ public class JavacCompiler
 
         try
         {
-            Method compile = javacClass.getMethod( "compile", new Class[] { String[].class, PrintWriter.class } );
+            Method compile = javacClass.getMethod( "compile", new Class[]{ String[].class, PrintWriter.class } );
 
-            ok = (Integer) compile.invoke( null, new Object[] { args, new PrintWriter( out ) } );
+            ok = (Integer) compile.invoke( null, new Object[]{ args, new PrintWriter( out ) } );
 
             messages = parseModernStream( ok.intValue(), new BufferedReader( new StringReader( out.toString() ) ) );
         }
@@ -586,7 +576,7 @@ public class JavacCompiler
         {
             // TODO: exception?
             messages.add( new CompilerError( "Failure executing javac, but could not parse the error:" + EOL +
-                                             out.toString(), true ) );
+                                                 out.toString(), true ) );
         }
 
         return messages;
@@ -596,7 +586,7 @@ public class JavacCompiler
      * Parse the output from the compiler into a list of CompilerError objects
      *
      * @param exitCode The exit code of javac.
-     * @param input The output of the compiler
+     * @param input    The output of the compiler
      * @return List of CompilerError objects
      * @throws IOException
      */
@@ -663,7 +653,7 @@ public class JavacCompiler
      * Construct a CompilerError object from a line of the compiler output
      *
      * @param exitCode The exit code from javac.
-     * @param error output line from the compiler
+     * @param error    output line from the compiler
      * @return the CompilerError object
      */
     static CompilerError parseModernError( int exitCode, String error )
@@ -816,6 +806,7 @@ public class JavacCompiler
 
     /**
      * put args into a temp file to be referenced using the @ option in javac command line
+     *
      * @param args
      * @return the temporary file wth the arguments
      * @throws IOException
@@ -829,7 +820,8 @@ public class JavacCompiler
             File tempFile;
             if ( ( getLogger() != null ) && getLogger().isDebugEnabled() )
             {
-                tempFile = File.createTempFile( JavacCompiler.class.getName(), "arguments", new File( outputDirectory ) );
+                tempFile =
+                    File.createTempFile( JavacCompiler.class.getName(), "arguments", new File( outputDirectory ) );
             }
             else
             {
@@ -878,9 +870,7 @@ public class JavacCompiler
         File javacExe;
         if ( Os.isName( "AIX" ) )
         {
-            javacExe =
-                new File( javaHome + File.separator + ".." + File.separator + "sh",
-                          javacCommand );
+            javacExe = new File( javaHome + File.separator + ".." + File.separator + "sh", javacCommand );
         }
         else if ( Os.isName( "Mac OS X" ) )
         {
@@ -888,9 +878,7 @@ public class JavacCompiler
         }
         else
         {
-            javacExe =
-                new File( javaHome + File.separator + ".." + File.separator + "bin",
-                          javacCommand );
+            javacExe = new File( javaHome + File.separator + ".." + File.separator + "bin", javacCommand );
         }
 
         // ----------------------------------------------------------------------
@@ -906,8 +894,8 @@ public class JavacCompiler
             }
             if ( !new File( javaHome ).isDirectory() )
             {
-                throw new IOException( "The environment variable JAVA_HOME=" + javaHome
-                    + " doesn't exist or is not a valid directory." );
+                throw new IOException(
+                    "The environment variable JAVA_HOME=" + javaHome + " doesn't exist or is not a valid directory." );
             }
 
             javacExe = new File( env.getProperty( "JAVA_HOME" ) + File.separator + "bin", javacCommand );
@@ -916,40 +904,39 @@ public class JavacCompiler
         if ( !javacExe.isFile() )
         {
             throw new IOException( "The javadoc executable '" + javacExe
-                + "' doesn't exist or is not a file. Verify the JAVA_HOME environment variable." );
+                                       + "' doesn't exist or is not a file. Verify the JAVA_HOME environment variable." );
         }
 
         return javacExe.getAbsolutePath();
     }
 
 
-
     /**
      * Find the main class of JavaC. Return the same class for subsequent calls.
      *
-     * @return
-     *  the non-null class.
-     *
-     * @throws CompilerException
-     *  if the class has not been found.
+     * @return the non-null class.
+     * @throws CompilerException if the class has not been found.
      */
-    private static Class getJavacClass() throws CompilerException
+    private static Class getJavacClass()
+        throws CompilerException
     {
         synchronized ( JavacCompiler.LOCK )
         {
-            Class c = JavacCompiler.javacClass;
+            Class c = JavacCompiler.JAVAC_CLASS;
             if ( c == null )
-              JavacCompiler.javacClass = c = getJavacClass0();
+            {
+                JavacCompiler.JAVAC_CLASS = c = getJavacClass0();
+            }
             return c;
-}
+        }
     }
-
 
 
     /**
      * Helper method for getJavacClass().
      */
-    private static Class getJavacClass0() throws CompilerException
+    private static Class getJavacClass0()
+        throws CompilerException
     {
         try
         {
@@ -958,50 +945,45 @@ public class JavacCompiler
         }
         catch ( ClassNotFoundException ex )
         {
-          // ok
+            // ok
         }
 
-        final File toolsJar = new File( System.getProperty("java.home"), "../lib/tools.jar" );
-        if (!toolsJar.exists())
+        final File toolsJar = new File( System.getProperty( "java.home" ), "../lib/tools.jar" );
+        if ( !toolsJar.exists() )
+        {
             throw new CompilerException( "tools.jar not found: " + toolsJar );
+        }
 
         try
         {
-            final ClassLoader javacClassLoader = new URLClassLoader(
-                new URL[] {toolsJar.toURI().toURL()},
-                JavacCompiler.class.getClassLoader()
-            );
+            final ClassLoader javacClassLoader =
+                new URLClassLoader( new URL[]{ toolsJar.toURI().toURL() }, JavacCompiler.class.getClassLoader() );
 
             final Thread thread = Thread.currentThread();
             final ClassLoader contextClassLoader = thread.getContextClassLoader();
             thread.setContextClassLoader( javacClassLoader );
             try
             {
-              return Class.forName( JavacCompiler.JAVAC_CLASSNAME, true, javacClassLoader );
+                return Class.forName( JavacCompiler.JAVAC_CLASSNAME, true, javacClassLoader );
             }
             finally
             {
-              thread.setContextClassLoader( contextClassLoader );
+                thread.setContextClassLoader( contextClassLoader );
             }
         }
         catch ( MalformedURLException ex )
         {
             throw new CompilerException(
                 "Could not convert the file reference to tools.jar to a URL, path to tools.jar: '"
-                  + toolsJar.getAbsolutePath() + "'.",
-                ex
-            );
+                    + toolsJar.getAbsolutePath() + "'.", ex );
         }
         catch ( ClassNotFoundException ex )
         {
-          throw new CompilerException(
-              "Unable to locate the Javac Compiler in:" + EOL + "  " + toolsJar + EOL
-                + "Please ensure you are using JDK 1.4 or above and" + EOL
-                + "not a JRE (the com.sun.tools.javac.Main class is required)." + EOL
-                + "In most cases you can change the location of your Java" + EOL
-                + "installation by setting the JAVA_HOME environment variable.",
-              ex
-          );
+            throw new CompilerException( "Unable to locate the Javac Compiler in:" + EOL + "  " + toolsJar + EOL
+                                             + "Please ensure you are using JDK 1.4 or above and" + EOL
+                                             + "not a JRE (the com.sun.tools.javac.Main class is required)." + EOL
+                                             + "In most cases you can change the location of your Java" + EOL
+                                             + "installation by setting the JAVA_HOME environment variable.", ex );
         }
     }
 
