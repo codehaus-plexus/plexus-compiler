@@ -939,7 +939,20 @@ public class JavacCompiler
         {
             case AlwaysNew:
                 return createJavacClass();
+            case ReuseCreated:
+                synchronized ( javaccClasses )
+                {
+                    if ( javaccClasses.size() > 0 )
+                    {
+                        c = javaccClasses.get( 0 );
+                        javaccClasses.remove( c );
+                        return c;
+                    }
+                }
+                c = createJavacClass();
+                return c;
             case ReuseSame:
+            default:
                 c = JavacCompiler.JAVAC_CLASS;
                 if ( c != null )
                 {
@@ -953,19 +966,8 @@ public class JavacCompiler
                     }
                     return c;
                 }
-            case ReuseCreated:
-            default:
-                synchronized ( javaccClasses )
-                {
-                    if ( javaccClasses.size() > 0 )
-                    {
-                        c = javaccClasses.get( 0 );
-                        javaccClasses.remove( c );
-                        return c;
-                    }
-                }
-                c = createJavacClass();
-                return c;
+
+
         }
     }
 
