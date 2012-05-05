@@ -120,11 +120,11 @@ public class CompilerConfiguration
     private String[] annotationProcessors;
 
     /**
-     * default value {@link CompilerReuseStrategy.ReuseCreated}
+     * default value {@link CompilerReuseStrategy.ReuseSame}
      *
      * @since 1.9
      */
-    private CompilerReuseStrategy compilerReuseStrategy = CompilerReuseStrategy.ReuseCreated;
+    private CompilerReuseStrategy compilerReuseStrategy = CompilerReuseStrategy.ReuseSame;
 
     // ----------------------------------------------------------------------
     //
@@ -496,6 +496,7 @@ public class CompilerConfiguration
     {
         /**
          * always reuse the same
+         * <b>default strategy</b>
          */
         ReuseSame( "reuseSame" ),
         /**
@@ -505,7 +506,6 @@ public class CompilerConfiguration
         /**
          * re use already created compiler, create new one if non already exists
          * <b>Will mimic a kind of pool to prevent different threads use the same</b>
-         * <b>default strategy</b>
          */
         ReuseCreated( "reuseCreated" );
 
