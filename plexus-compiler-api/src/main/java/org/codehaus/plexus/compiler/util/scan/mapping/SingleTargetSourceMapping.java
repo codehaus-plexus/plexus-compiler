@@ -50,12 +50,12 @@ public class SingleTargetSourceMapping
         this.outputFile = outputFile;
     }
 
-    public Set getTargetFiles( File targetDir, String source )
+    public Set<File> getTargetFiles( File targetDir, String source )
         throws InclusionScanException
     {
         if ( !source.endsWith( sourceSuffix ) )
         {
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
         }
 
         return Collections.singleton( new File( targetDir, outputFile ) );

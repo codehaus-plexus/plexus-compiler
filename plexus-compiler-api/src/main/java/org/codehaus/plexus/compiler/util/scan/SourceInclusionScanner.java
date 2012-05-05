@@ -34,6 +34,6 @@ public interface SourceInclusionScanner
      * @return <code>Set</code> of <code>File</code> objects
      * @throws InclusionScanException
      */
-    Set getIncludedSources( File sourceDir, File targetDir )
+    Set<File> getIncludedSources( File sourceDir, File targetDir )
         throws InclusionScanException;
 }

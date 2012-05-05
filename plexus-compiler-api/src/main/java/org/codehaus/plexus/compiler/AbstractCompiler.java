@@ -60,10 +60,8 @@ public abstract class AbstractCompiler
     //
     // ----------------------------------------------------------------------
 
-    protected AbstractCompiler( CompilerOutputStyle compilerOutputStyle,
-                                String inputFileEnding,
-                                String outputFileEnding,
-                                String outputFile )
+    protected AbstractCompiler( CompilerOutputStyle compilerOutputStyle, String inputFileEnding,
+                                String outputFileEnding, String outputFile )
     {
         this.compilerOutputStyle = compilerOutputStyle;
 
@@ -133,30 +131,29 @@ public abstract class AbstractCompiler
         return sb.toString();
     }
 
-    protected static Set getSourceFilesForSourceRoot( CompilerConfiguration config,
-                                                      String sourceLocation )
+    protected static Set<String> getSourceFilesForSourceRoot( CompilerConfiguration config, String sourceLocation )
     {
         DirectoryScanner scanner = new DirectoryScanner();
 
         scanner.setBasedir( sourceLocation );
 
-        Set includes = config.getIncludes();
+        Set<String> includes = config.getIncludes();
 
         if ( includes != null && !includes.isEmpty() )
         {
-            String[] inclStrs = (String[]) includes.toArray( new String[includes.size()] );
+            String[] inclStrs = includes.toArray( new String[includes.size()] );
             scanner.setIncludes( inclStrs );
         }
         else
         {
-            scanner.setIncludes( new String[]{"**/*.java"} );
+            scanner.setIncludes( new String[]{ "**/*.java" } );
         }
 
-        Set excludes = config.getExcludes();
+        Set<String> excludes = config.getExcludes();
 
         if ( excludes != null && !excludes.isEmpty() )
         {
-            String[] exclStrs = (String[]) excludes.toArray( new String[excludes.size()] );
+            String[] exclStrs = excludes.toArray( new String[excludes.size()] );
             scanner.setIncludes( exclStrs );
         }
 
@@ -164,11 +161,11 @@ public abstract class AbstractCompiler
 
         String[] sourceDirectorySources = scanner.getIncludedFiles();
 
-        Set sources = new HashSet();
+        Set<String> sources = new HashSet<String>();
 
         for ( int j = 0; j < sourceDirectorySources.length; j++ )
         {
-            File f = new File( sourceLocation, sourceDirectorySources[ j ] );
+            File f = new File( sourceLocation, sourceDirectorySources[j] );
 
             sources.add( f.getPath() );
         }
@@ -180,22 +177,22 @@ public abstract class AbstractCompiler
     {
         Set sources = new HashSet();
 
-        Set sourceFiles = config.getSourceFiles();
+        Set<File> sourceFiles = config.getSourceFiles();
 
         if ( sourceFiles != null && !sourceFiles.isEmpty() )
         {
-            for ( Iterator it = sourceFiles.iterator(); it.hasNext(); )
+            for ( Iterator<File> it = sourceFiles.iterator(); it.hasNext(); )
             {
-                File sourceFile = (File) it.next();
+                File sourceFile = it.next();
 
                 sources.add( sourceFile.getAbsolutePath() );
             }
         }
         else
         {
-            for ( Iterator it = config.getSourceLocations().iterator(); it.hasNext(); )
+            for ( Iterator<String> it = config.getSourceLocations().iterator(); it.hasNext(); )
             {
-                String sourceLocation = (String) it.next();
+                String sourceLocation =it.next();
 
                 sources.addAll( getSourceFilesForSourceRoot( config, sourceLocation ) );
             }
@@ -274,7 +271,8 @@ public abstract class AbstractCompiler
         }
         catch ( IOException e )
         {
-            throw new CompilerException( "Error while getting the canonical path of '" + origFile.getAbsolutePath() + "'.", e );
+            throw new CompilerException(
+                "Error while getting the canonical path of '" + origFile.getAbsolutePath() + "'.", e );
         }
     }
 
@@ -284,8 +282,8 @@ public abstract class AbstractCompiler
     protected static String[] toStringArray( List arguments )
     {
         String[] args = new String[arguments.size()];
-        
-        int argLength = arguments.size(); 
+
+        int argLength = arguments.size();
 
         for ( int i = 0; i < argLength; i++ )
         {

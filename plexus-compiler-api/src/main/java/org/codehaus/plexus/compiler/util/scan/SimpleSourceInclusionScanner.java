@@ -24,6 +24,8 @@ package org.codehaus.plexus.compiler.util.scan;
  * SOFTWARE.
  */
 
+import org.codehaus.plexus.compiler.util.scan.mapping.SourceMapping;
+
 import java.io.File;
 import java.util.Collections;
 import java.util.HashSet;
@@ -41,36 +43,35 @@ public class SimpleSourceInclusionScanner
 
     private Set sourceExcludes;
 
-    public SimpleSourceInclusionScanner( Set sourceIncludes,
-                                         Set sourceExcludes )
+    public SimpleSourceInclusionScanner( Set sourceIncludes, Set sourceExcludes )
     {
         this.sourceIncludes = sourceIncludes;
 
         this.sourceExcludes = sourceExcludes;
     }
 
-    public Set getIncludedSources( File sourceDir, File targetDir )
+    public Set<File> getIncludedSources( File sourceDir, File targetDir )
         throws InclusionScanException
     {
-        List srcMappings = getSourceMappings();
+        List<SourceMapping> srcMappings = getSourceMappings();
 
         if ( srcMappings.isEmpty() )
         {
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
         }
 
         String[] potentialSources = scanForSources( sourceDir, sourceIncludes, sourceExcludes );
 
-        Set matchingSources = new HashSet();
+        Set<File> matchingSources = new HashSet<File>( potentialSources != null ? potentialSources.length : 0 );
 
         if ( potentialSources != null )
         {
-            for ( int i = 0; i < potentialSources.length; ++i )
+            for ( String potentialSource : potentialSources )
             {
-                matchingSources.add( new File( sourceDir, potentialSources[i] ) );
+                matchingSources.add( new File( sourceDir, potentialSource ) );
             }
         }
-        
+
         return matchingSources;
     }
 }

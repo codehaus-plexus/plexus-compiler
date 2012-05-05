@@ -27,6 +27,6 @@ import java.util.Set;
  */
 public interface SourceMapping
 {
-    Set getTargetFiles( File targetDir, String source )
+    Set<File> getTargetFiles( File targetDir, String source )
         throws InclusionScanException;
 }

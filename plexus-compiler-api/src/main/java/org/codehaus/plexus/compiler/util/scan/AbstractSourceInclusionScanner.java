@@ -32,14 +32,14 @@ import java.util.Set;
 public abstract class AbstractSourceInclusionScanner
     implements SourceInclusionScanner
 {
-    private final List sourceMappings = new ArrayList();
+    private final List<SourceMapping> sourceMappings = new ArrayList<SourceMapping>();
 
     public final void addSourceMapping( SourceMapping sourceMapping )
     {
         sourceMappings.add( sourceMapping );
     }
 
-    protected final List getSourceMappings()
+    protected final List<SourceMapping> getSourceMappings()
     {
         return Collections.unmodifiableList( sourceMappings );
     }

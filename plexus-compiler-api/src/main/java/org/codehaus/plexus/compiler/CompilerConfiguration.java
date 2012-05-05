@@ -40,19 +40,19 @@ public class CompilerConfiguration
 {
     private String outputLocation;
 
-    private List classpathEntries = new LinkedList();
+    private List<String> classpathEntries = new LinkedList<String>();
 
     // ----------------------------------------------------------------------
     // Source Files
     // ----------------------------------------------------------------------
 
-    private Set sourceFiles = new HashSet();
+    private Set<File> sourceFiles = new HashSet<File>();
 
-    private List sourceLocations = new LinkedList();
+    private List<String> sourceLocations = new LinkedList<String>();
 
-    private Set includes = new HashSet();
+    private Set<String> includes = new HashSet<String>();
 
-    private Set excludes = new HashSet();
+    private Set<String> excludes = new HashSet<String>();
 
     // ----------------------------------------------------------------------
     // Compiler Settings
@@ -141,19 +141,19 @@ public class CompilerConfiguration
         classpathEntries.add( classpathEntry );
     }
 
-    public void setClasspathEntries( List classpathEntries )
+    public void setClasspathEntries( List<String> classpathEntries )
     {
         if ( classpathEntries == null )
         {
-            this.classpathEntries = Collections.EMPTY_LIST;
+            this.classpathEntries = Collections.emptyList();
         }
         else
         {
-            this.classpathEntries = new LinkedList( classpathEntries );
+            this.classpathEntries = new LinkedList<String>( classpathEntries );
         }
     }
 
-    public List getClasspathEntries()
+    public List<String> getClasspathEntries()
     {
         return Collections.unmodifiableList( classpathEntries );
     }
@@ -162,19 +162,19 @@ public class CompilerConfiguration
     // Source files
     // ----------------------------------------------------------------------
 
-    public void setSourceFiles( Set sourceFiles )
+    public void setSourceFiles( Set<File> sourceFiles )
     {
         if ( sourceFiles == null )
         {
-            this.sourceFiles = Collections.EMPTY_SET;
+            this.sourceFiles = Collections.emptySet();
         }
         else
         {
-            this.sourceFiles = new HashSet( sourceFiles );
+            this.sourceFiles = new HashSet<File>( sourceFiles );
         }
     }
 
-    public Set getSourceFiles()
+    public Set<File> getSourceFiles()
     {
         return sourceFiles;
     }
@@ -184,19 +184,19 @@ public class CompilerConfiguration
         sourceLocations.add( sourceLocation );
     }
 
-    public void setSourceLocations( List sourceLocations )
+    public void setSourceLocations( List<String> sourceLocations )
     {
         if ( sourceLocations == null )
         {
-            this.sourceLocations = Collections.EMPTY_LIST;
+            this.sourceLocations = Collections.emptyList();
         }
         else
         {
-            this.sourceLocations = new LinkedList( sourceLocations );
+            this.sourceLocations = new LinkedList<String>( sourceLocations );
         }
     }
 
-    public List getSourceLocations()
+    public List<String> getSourceLocations()
     {
         return Collections.unmodifiableList( sourceLocations );
     }
@@ -206,19 +206,19 @@ public class CompilerConfiguration
         includes.add( include );
     }
 
-    public void setIncludes( Set includes )
+    public void setIncludes( Set<String> includes )
     {
         if ( includes == null )
         {
-            this.includes = Collections.EMPTY_SET;
+            this.includes = Collections.emptySet();
         }
         else
         {
-            this.includes = new HashSet( includes );
+            this.includes = new HashSet<String>( includes );
         }
     }
 
-    public Set getIncludes()
+    public Set<String> getIncludes()
     {
         return Collections.unmodifiableSet( includes );
     }
@@ -228,19 +228,19 @@ public class CompilerConfiguration
         excludes.add( exclude );
     }
 
-    public void setExcludes( Set excludes )
+    public void setExcludes( Set<String> excludes )
     {
         if ( excludes == null )
         {
-            this.excludes = Collections.EMPTY_SET;
+            this.excludes = Collections.emptySet();
         }
         else
         {
-            this.excludes = new HashSet( excludes );
+            this.excludes = new HashSet<String>( excludes );
         }
     }
 
-    public Set getExcludes()
+    public Set<String> getExcludes()
     {
         return Collections.unmodifiableSet( excludes );
     }

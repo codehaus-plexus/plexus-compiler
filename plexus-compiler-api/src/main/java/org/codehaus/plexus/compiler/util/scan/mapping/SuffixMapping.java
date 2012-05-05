@@ -31,7 +31,7 @@ public final class SuffixMapping
 {
     private final String sourceSuffix;
 
-    private final Set targetSuffixes;
+    private final Set<String> targetSuffixes;
 
     public SuffixMapping( String sourceSuffix, String targetSuffix )
     {
@@ -47,7 +47,7 @@ public final class SuffixMapping
         this.targetSuffixes = Collections.unmodifiableSet( targetSuffixes );
     }
 
-    public Set getTargetFiles( File targetDir, String source )
+    public Set<File> getTargetFiles( File targetDir, String source )
     {
         Set targetFiles = new HashSet();
 
@@ -55,9 +55,9 @@ public final class SuffixMapping
         {
             String base = source.substring( 0, source.length() - sourceSuffix.length() );
 
-            for ( Iterator it = targetSuffixes.iterator(); it.hasNext(); )
+            for ( Iterator<String> it = targetSuffixes.iterator(); it.hasNext(); )
             {
-                String suffix = (String) it.next();
+                String suffix = it.next();
 
                 targetFiles.add( new File( targetDir, base + suffix ) );
             }

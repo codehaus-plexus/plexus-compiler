@@ -44,21 +44,15 @@ public class StaleSourceScanner
 
     public StaleSourceScanner()
     {
-        this( 0,
-              Collections.singleton( "**/*" ),
-              Collections.EMPTY_SET );
+        this( 0, Collections.singleton( "**/*" ), Collections.EMPTY_SET );
     }
 
     public StaleSourceScanner( long lastUpdatedWithinMsecs )
     {
-        this( lastUpdatedWithinMsecs,
-              Collections.singleton( "**/*" ),
-              Collections.EMPTY_SET );
+        this( lastUpdatedWithinMsecs, Collections.singleton( "**/*" ), Collections.EMPTY_SET );
     }
 
-    public StaleSourceScanner( long lastUpdatedWithinMsecs,
-                               Set sourceIncludes,
-                               Set sourceExcludes )
+    public StaleSourceScanner( long lastUpdatedWithinMsecs, Set sourceIncludes, Set sourceExcludes )
     {
         this.lastUpdatedWithinMsecs = lastUpdatedWithinMsecs;
 
@@ -71,19 +65,19 @@ public class StaleSourceScanner
     // SourceInclusionScanner Implementation
     // ----------------------------------------------------------------------
 
-    public Set getIncludedSources( File sourceDir, File targetDir )
+    public Set<File> getIncludedSources( File sourceDir, File targetDir )
         throws InclusionScanException
     {
-        List srcMappings = getSourceMappings();
+        List<SourceMapping> srcMappings = getSourceMappings();
 
         if ( srcMappings.isEmpty() )
         {
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
         }
 
         String[] potentialIncludes = scanForSources( sourceDir, sourceIncludes, sourceExcludes );
 
-        Set matchingSources = new HashSet();
+        Set<File> matchingSources = new HashSet<File>();
 
         for ( int i = 0; i < potentialIncludes.length; i++ )
         {
@@ -91,21 +85,22 @@ public class StaleSourceScanner
 
             File sourceFile = new File( sourceDir, path );
 
-            staleSourceFileTesting: for ( Iterator patternIt = srcMappings.iterator(); patternIt.hasNext(); )
+            staleSourceFileTesting:
+            for ( Iterator<SourceMapping> patternIt = srcMappings.iterator(); patternIt.hasNext(); )
             {
-                SourceMapping mapping = (SourceMapping) patternIt.next();
+                SourceMapping mapping = patternIt.next();
 
-                Set targetFiles = mapping.getTargetFiles( targetDir, path );
+                Set<File> targetFiles = mapping.getTargetFiles( targetDir, path );
 
                 // never include files that don't have corresponding target mappings.
                 // the targets don't have to exist on the filesystem, but the
                 // mappers must tell us to look for them.
-                for ( Iterator targetIt = targetFiles.iterator(); targetIt.hasNext(); )
+                for ( Iterator<File> targetIt = targetFiles.iterator(); targetIt.hasNext(); )
                 {
-                    File targetFile = (File) targetIt.next();
+                    File targetFile = targetIt.next();
 
-                    if ( !targetFile.exists() ||
-                        ( targetFile.lastModified() + lastUpdatedWithinMsecs < sourceFile.lastModified() ) )
+                    if ( !targetFile.exists() || ( targetFile.lastModified() + lastUpdatedWithinMsecs
+                        < sourceFile.lastModified() ) )
                     {
                         matchingSources.add( sourceFile );
                         break staleSourceFileTesting;
