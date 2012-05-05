@@ -27,11 +27,11 @@ package org.codehaus.plexus.compiler;
 import java.io.File;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.LinkedHashMap;
 
 /**
  * @author jdcasey
@@ -73,7 +73,7 @@ public class CompilerConfiguration
 
     private String sourceEncoding;
 
-    private Map<String,String> customCompilerArguments = new LinkedHashMap<String,String>();
+    private Map<String, String> customCompilerArguments = new LinkedHashMap<String, String>();
 
     private boolean fork;
 
@@ -93,7 +93,7 @@ public class CompilerConfiguration
 
     /**
      * A build temporary directory, eg target/.
-     *
+     * <p/>
      * Used by the compiler implementation to put temporary files.
      */
     private File buildDirectory;
@@ -118,6 +118,11 @@ public class CompilerConfiguration
      * -processor parameters in jdk 1.6+
      */
     private String[] annotationProcessors;
+
+    /**
+     * @since 1.9
+     */
+    private CompilerReuseStrategy compilerReuseStrategy;
 
     // ----------------------------------------------------------------------
     //
@@ -325,12 +330,12 @@ public class CompilerConfiguration
         customCompilerArguments.put( customArgument, value );
     }
 
-    public Map<String,String> getCustomCompilerArguments()
+    public Map<String, String> getCustomCompilerArguments()
     {
         return new LinkedHashMap( customCompilerArguments );
     }
 
-    public void setCustomCompilerArguments( Map<String,String> customCompilerArguments )
+    public void setCustomCompilerArguments( Map<String, String> customCompilerArguments )
     {
         if ( customCompilerArguments == null )
         {
@@ -437,17 +442,17 @@ public class CompilerConfiguration
         return verbose;
     }
 
-    public void setVerbose(boolean verbose)
+    public void setVerbose( boolean verbose )
     {
         this.verbose = verbose;
     }
 
-    public void setProc(String proc)
+    public void setProc( String proc )
     {
         this.proc = proc;
     }
 
-    public void setGeneratedSourcesDirectory(File generatedSourcesDirectory)
+    public void setGeneratedSourcesDirectory( File generatedSourcesDirectory )
     {
         this.generatedSourcesDirectory = generatedSourcesDirectory;
     }
@@ -470,6 +475,45 @@ public class CompilerConfiguration
     public String[] getAnnotationProcessors()
     {
         return annotationProcessors;
+    }
+
+    public CompilerReuseStrategy getCompilerReuseStrategy()
+    {
+        return compilerReuseStrategy;
+    }
+
+    public void setCompilerReuseStrategy( CompilerReuseStrategy compilerReuseStrategy )
+    {
+        this.compilerReuseStrategy = compilerReuseStrategy;
+    }
+
+    /**
+     * re use strategy of the compiler (implement for java only)
+     */
+    public static enum CompilerReuseStrategy
+    {
+        /**
+         * always reuse the same
+         */
+        ReuseSame( "reuseSame" ),
+        /**
+         * re create a new compiler for each use
+         */
+        AlwaysNew( "AlwaysNew" ),
+        /**
+         * re use already created compiler, create new one if non already exists
+         * <b>Will mimic a kind of pool to prevent different threads use the same</b>
+         * <b>default strategy</b>
+         */
+        ReuseCreated( "ReuseCreated" );
+
+        private String strategy;
+
+        CompilerReuseStrategy( String strategy )
+        {
+            this.strategy = strategy;
+        }
+
     }
 
 }

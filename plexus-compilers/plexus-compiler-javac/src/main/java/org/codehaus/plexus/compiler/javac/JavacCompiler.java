@@ -162,7 +162,7 @@ public class JavacCompiler
         }
         else
         {
-            messages = compileInProcess( args );
+            messages = compileInProcess( args, config );
         }
 
         return messages;
@@ -311,9 +311,10 @@ public class JavacCompiler
             args.add( config.getSourceEncoding() );
         }
 
-        for ( Iterator<Map.Entry<String,String>> it = config.getCustomCompilerArguments().entrySet().iterator(); it.hasNext(); )
+        for ( Iterator<Map.Entry<String, String>> it = config.getCustomCompilerArguments().entrySet().iterator();
+              it.hasNext(); )
         {
-            Map.Entry<String,String> entry = it.next();
+            Map.Entry<String, String> entry = it.next();
 
             String key = entry.getKey();
 
@@ -518,7 +519,7 @@ public class JavacCompiler
      * @return List of CompilerError objects with the errors encountered.
      * @throws CompilerException
      */
-    List<CompilerError> compileInProcess( String[] args )
+    List<CompilerError> compileInProcess( String[] args, CompilerConfiguration config )
         throws CompilerException
     {
         final Class javacClass = getJavacClass();
@@ -917,7 +918,7 @@ public class JavacCompiler
      * @return the non-null class.
      * @throws CompilerException if the class has not been found.
      */
-    private static Class getJavacClass()
+    private Class getJavacClass()
         throws CompilerException
     {
 
@@ -930,7 +931,7 @@ public class JavacCompiler
         {
             if ( c == null )
             {
-                JavacCompiler.JAVAC_CLASS = c = getJavacClass0();
+                JavacCompiler.JAVAC_CLASS = c = createJavacClass();
             }
             return c;
         }
@@ -938,9 +939,9 @@ public class JavacCompiler
 
 
     /**
-     * Helper method for getJavacClass().
+     * Helper method for create Javac class
      */
-    private static Class getJavacClass0()
+    private Class createJavacClass()
         throws CompilerException
     {
         try
