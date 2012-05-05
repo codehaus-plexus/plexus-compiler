@@ -120,9 +120,11 @@ public class CompilerConfiguration
     private String[] annotationProcessors;
 
     /**
+     * default value {@link CompilerReuseStrategy.ReuseCreated}
+     *
      * @since 1.9
      */
-    private CompilerReuseStrategy compilerReuseStrategy;
+    private CompilerReuseStrategy compilerReuseStrategy = CompilerReuseStrategy.ReuseCreated;
 
     // ----------------------------------------------------------------------
     //
@@ -490,7 +492,7 @@ public class CompilerConfiguration
     /**
      * re use strategy of the compiler (implement for java only)
      */
-    public static enum CompilerReuseStrategy
+    public enum CompilerReuseStrategy
     {
         /**
          * always reuse the same
@@ -499,13 +501,13 @@ public class CompilerConfiguration
         /**
          * re create a new compiler for each use
          */
-        AlwaysNew( "AlwaysNew" ),
+        AlwaysNew( "alwaysNew" ),
         /**
          * re use already created compiler, create new one if non already exists
          * <b>Will mimic a kind of pool to prevent different threads use the same</b>
          * <b>default strategy</b>
          */
-        ReuseCreated( "ReuseCreated" );
+        ReuseCreated( "reuseCreated" );
 
         private String strategy;
 
@@ -514,6 +516,16 @@ public class CompilerConfiguration
             this.strategy = strategy;
         }
 
+        public String getStrategy()
+        {
+            return strategy;
+        }
+
+        @Override
+        public String toString()
+        {
+            return "CompilerReuseStrategy:" + this.strategy;
+        }
     }
 
 }

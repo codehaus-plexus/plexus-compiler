@@ -74,6 +74,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
@@ -99,6 +100,8 @@ public class JavacCompiler
     private static final String JAVAC_CLASSNAME = "com.sun.tools.javac.Main";
 
     private static volatile Class JAVAC_CLASS;
+
+    private List<Class> javaccClasses = new CopyOnWriteArrayList<Class>();
 
     // ----------------------------------------------------------------------
     //
@@ -522,7 +525,7 @@ public class JavacCompiler
     List<CompilerError> compileInProcess( String[] args, CompilerConfiguration config )
         throws CompilerException
     {
-        final Class javacClass = getJavacClass();
+        final Class javacClass = getJavacClass( config );
         final Thread thread = Thread.currentThread();
         final ClassLoader contextClassLoader = thread.getContextClassLoader();
         thread.setContextClassLoader( javacClass.getClassLoader() );
@@ -532,6 +535,7 @@ public class JavacCompiler
         }
         finally
         {
+            releaseJavaccClass( javacClass, config );
             thread.setContextClassLoader( contextClassLoader );
         }
     }
@@ -911,6 +915,15 @@ public class JavacCompiler
         return javacExe.getAbsolutePath();
     }
 
+    private void releaseJavaccClass( Class javaccClass, CompilerConfiguration compilerConfiguration )
+    {
+        if ( compilerConfiguration.getCompilerReuseStrategy()
+            == CompilerConfiguration.CompilerReuseStrategy.ReuseCreated )
+        {
+            javaccClasses.add( javaccClass );
+        }
+
+    }
 
     /**
      * Find the main class of JavaC. Return the same class for subsequent calls.
@@ -918,22 +931,41 @@ public class JavacCompiler
      * @return the non-null class.
      * @throws CompilerException if the class has not been found.
      */
-    private Class getJavacClass()
+    private Class getJavacClass( CompilerConfiguration compilerConfiguration )
         throws CompilerException
     {
-
-        Class c = JavacCompiler.JAVAC_CLASS;
-        if ( c != null )
+        Class c = null;
+        switch ( compilerConfiguration.getCompilerReuseStrategy() )
         {
-            return c;
-        }
-        synchronized ( JavacCompiler.LOCK )
-        {
-            if ( c == null )
-            {
-                JavacCompiler.JAVAC_CLASS = c = createJavacClass();
-            }
-            return c;
+            case AlwaysNew:
+                return createJavacClass();
+            case ReuseSame:
+                c = JavacCompiler.JAVAC_CLASS;
+                if ( c != null )
+                {
+                    return c;
+                }
+                synchronized ( JavacCompiler.LOCK )
+                {
+                    if ( c == null )
+                    {
+                        JavacCompiler.JAVAC_CLASS = c = createJavacClass();
+                    }
+                    return c;
+                }
+            case ReuseCreated:
+            default:
+                synchronized ( javaccClasses )
+                {
+                    if ( javaccClasses.size() > 0 )
+                    {
+                        c = javaccClasses.get( 0 );
+                        javaccClasses.remove( c );
+                        return c;
+                    }
+                }
+                c = createJavacClass();
+                return c;
         }
     }
 
