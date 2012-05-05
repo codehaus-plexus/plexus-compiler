@@ -231,7 +231,7 @@ public class JavacCompiler
             {
                 args.add( "-processor" );
                 String[] procs = config.getAnnotationProcessors();
-                StringBuffer buffer = new StringBuffer();
+                StringBuilder buffer = new StringBuilder();
                 for ( int i = 0; i < procs.length; i++ )
                 {
                     if ( i > 0 )
@@ -597,12 +597,12 @@ public class JavacCompiler
 
         String line;
 
-        StringBuffer buffer;
+        StringBuilder buffer;
 
         while ( true )
         {
             // cleanup the buffer
-            buffer = new StringBuffer(); // this is quicker than clearing it
+            buffer = new StringBuilder(); // this is quicker than clearing it
 
             // most errors terminate with the '^' char
             do
@@ -662,7 +662,7 @@ public class JavacCompiler
 
         boolean isError = exitCode != 0;
 
-        StringBuffer msgBuffer;
+        StringBuilder msgBuffer;
 
         try
         {
@@ -718,7 +718,7 @@ public class JavacCompiler
 
             int line = Integer.parseInt( lineIndicator );
 
-            msgBuffer = new StringBuffer();
+            msgBuffer = new StringBuilder();
 
             String msg = tokens.nextToken( EOL ).substring( 2 );
 

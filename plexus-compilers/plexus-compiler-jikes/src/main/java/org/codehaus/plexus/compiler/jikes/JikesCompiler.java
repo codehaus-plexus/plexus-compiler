@@ -384,12 +384,12 @@ public class JikesCompiler
         throws IOException
     {
         String line = null;
-        StringBuffer buffer;
+        StringBuilder buffer;
 
         while ( true )
         {
             // cleanup the buffer
-            buffer = new StringBuffer(); // this is faster than clearing it
+            buffer = new StringBuilder(); // this is faster than clearing it
 
             // first line is not space-starting
             if ( line == null )
@@ -469,7 +469,7 @@ public class JikesCompiler
 
         String type = errorBits[i++];
 
-        StringBuffer message = new StringBuffer( errorBits[i++] );
+        StringBuilder message = new StringBuilder( errorBits[i++] );
         while ( i < errorBits.length )
         {
             message.append( ':' ).append( errorBits[i++] );

@@ -123,7 +123,7 @@ public abstract class AbstractCompiler
 
     public static String getPathString( List pathElements )
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         for ( Iterator it = pathElements.iterator(); it.hasNext(); )
         {
