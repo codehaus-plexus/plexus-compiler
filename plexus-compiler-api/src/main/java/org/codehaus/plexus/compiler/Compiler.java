@@ -50,7 +50,7 @@ public interface Compiler
     boolean canUpdateTarget( CompilerConfiguration configuration )
         throws CompilerException;
 
-    List compile( CompilerConfiguration configuration )
+    List<CompilerError> compile( CompilerConfiguration configuration )
         throws CompilerException;
 
     /**

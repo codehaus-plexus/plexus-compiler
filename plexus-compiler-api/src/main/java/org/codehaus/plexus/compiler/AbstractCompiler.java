@@ -119,7 +119,7 @@ public abstract class AbstractCompiler
     // Utility Methods
     // ----------------------------------------------------------------------
 
-    public static String getPathString( List pathElements )
+    public static String getPathString( List<String> pathElements )
     {
         StringBuilder sb = new StringBuilder();
 

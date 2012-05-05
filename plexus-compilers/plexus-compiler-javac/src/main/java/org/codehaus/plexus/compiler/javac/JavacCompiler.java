@@ -113,7 +113,7 @@ public class JavacCompiler
     // Compiler Implementation
     // ----------------------------------------------------------------------
 
-    public List compile( CompilerConfiguration config )
+    public List<CompilerError> compile( CompilerConfiguration config )
         throws CompilerException
     {
         File destinationDir = new File( config.getOutputLocation() );
@@ -192,7 +192,7 @@ public class JavacCompiler
         // Set the class and source paths
         // ----------------------------------------------------------------------
 
-        List classpathEntries = config.getClasspathEntries();
+        List<String> classpathEntries = config.getClasspathEntries();
         if ( classpathEntries != null && !classpathEntries.isEmpty() )
         {
             args.add( "-classpath" );
@@ -200,7 +200,7 @@ public class JavacCompiler
             args.add( getPathString( classpathEntries ) );
         }
 
-        List sourceLocations = config.getSourceLocations();
+        List<String> sourceLocations = config.getSourceLocations();
         if ( sourceLocations != null && !sourceLocations.isEmpty() )
         {
             //always pass source path, even if sourceFiles are declared,
@@ -311,11 +311,11 @@ public class JavacCompiler
             args.add( config.getSourceEncoding() );
         }
 
-        for ( Iterator it = config.getCustomCompilerArguments().entrySet().iterator(); it.hasNext(); )
+        for ( Iterator<Map.Entry<String,String>> it = config.getCustomCompilerArguments().entrySet().iterator(); it.hasNext(); )
         {
-            Map.Entry entry = (Map.Entry) it.next();
+            Map.Entry<String,String> entry = it.next();
 
-            String key = (String) entry.getKey();
+            String key = entry.getKey();
 
             if ( StringUtils.isEmpty( key ) || key.startsWith( "-J" ) )
             {
@@ -324,7 +324,7 @@ public class JavacCompiler
 
             args.add( key );
 
-            String value = (String) entry.getValue();
+            String value = entry.getValue();
 
             if ( StringUtils.isEmpty( value ) )
             {
@@ -406,7 +406,7 @@ public class JavacCompiler
      * @return List of CompilerError objects with the errors encountered.
      * @throws CompilerException
      */
-    List compileOutOfProcess( CompilerConfiguration config, String executable, String[] args )
+    List<CompilerError> compileOutOfProcess( CompilerConfiguration config, String executable, String[] args )
         throws CompilerException
     {
         Commandline cli = new Commandline();
@@ -518,7 +518,7 @@ public class JavacCompiler
      * @return List of CompilerError objects with the errors encountered.
      * @throws CompilerException
      */
-    List compileInProcess( String[] args )
+    List<CompilerError> compileInProcess( String[] args )
         throws CompilerException
     {
         final Class javacClass = getJavacClass();
@@ -538,7 +538,7 @@ public class JavacCompiler
     /**
      * Helper method for compileInProcess()
      */
-    private static List compileInProcess0( Class javacClass, String[] args )
+    private static List<CompilerError> compileInProcess0( Class javacClass, String[] args )
         throws CompilerException
     {
         StringWriter out = new StringWriter();
@@ -590,7 +590,7 @@ public class JavacCompiler
      * @return List of CompilerError objects
      * @throws IOException
      */
-    static List parseModernStream( int exitCode, BufferedReader input )
+    static List<CompilerError> parseModernStream( int exitCode, BufferedReader input )
         throws IOException
     {
         List errors = new ArrayList();

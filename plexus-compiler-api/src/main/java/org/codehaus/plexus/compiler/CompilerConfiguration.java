@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.LinkedHashMap;
 
@@ -72,7 +73,7 @@ public class CompilerConfiguration
 
     private String sourceEncoding;
 
-    private LinkedHashMap customCompilerArguments = new LinkedHashMap();
+    private Map<String,String> customCompilerArguments = new LinkedHashMap<String,String>();
 
     private boolean fork;
 
@@ -324,12 +325,12 @@ public class CompilerConfiguration
         customCompilerArguments.put( customArgument, value );
     }
 
-    public LinkedHashMap getCustomCompilerArguments()
+    public Map<String,String> getCustomCompilerArguments()
     {
         return new LinkedHashMap( customCompilerArguments );
     }
 
-    public void setCustomCompilerArguments( LinkedHashMap customCompilerArguments )
+    public void setCustomCompilerArguments( Map<String,String> customCompilerArguments )
     {
         if ( customCompilerArguments == null )
         {
