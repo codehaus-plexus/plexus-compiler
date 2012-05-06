@@ -120,11 +120,11 @@ public class CompilerConfiguration
     private String[] annotationProcessors;
 
     /**
-     * default value {@link CompilerReuseStrategy.ReuseSame}
+     * default value {@link CompilerReuseStrategy.ReuseCreated}
      *
      * @since 1.9
      */
-    private CompilerReuseStrategy compilerReuseStrategy = CompilerReuseStrategy.ReuseSame;
+    private CompilerReuseStrategy compilerReuseStrategy = CompilerReuseStrategy.ReuseCreated;
 
     // ----------------------------------------------------------------------
     //
