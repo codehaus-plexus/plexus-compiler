@@ -43,7 +43,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -89,7 +88,7 @@ public class CSharpCompiler
         return configuration.getOutputFileName() + "." + getTypeExtension( configuration );
     }
 
-    public List compile( CompilerConfiguration config )
+    public List<CompilerError> compile( CompilerConfiguration config )
         throws CompilerException
     {
         File destinationDir = new File( config.getOutputLocation() );
@@ -105,7 +104,7 @@ public class CSharpCompiler
 
         if ( sourceFiles.length == 0 )
         {
-            return Collections.EMPTY_LIST;
+            return Collections.<CompilerError>emptyList();
         }
 
         System.out.println( "Compiling " + sourceFiles.length + " " + "source file" +
@@ -113,7 +112,7 @@ public class CSharpCompiler
 
         String[] args = buildCompilerArguments( config, sourceFiles );
 
-        List messages;
+        List<CompilerError> messages;
 
         if ( config.isFork() )
         {
@@ -201,7 +200,7 @@ Options can be of the form -option or /option
     private String[] buildCompilerArguments( CompilerConfiguration config, String[] sourceFiles )
         throws CompilerException
     {
-        List args = new ArrayList();
+        List<String> args = new ArrayList<String>();
 
         if ( config.isDebug() )
         {
@@ -221,10 +220,8 @@ Options can be of the form -option or /option
         //
         // ----------------------------------------------------------------------
 
-        for ( Iterator it = config.getClasspathEntries().iterator(); it.hasNext(); )
+        for ( String element : config.getClasspathEntries() )
         {
-            String element = (String) it.next();
-
             File f = new File( element );
 
             if ( !f.isFile() )
@@ -239,9 +236,9 @@ Options can be of the form -option or /option
         // Main class
         // ----------------------------------------------------------------------
 
-        Map compilerArguments = config.getCustomCompilerArguments();
+        Map<String, String> compilerArguments = config.getCustomCompilerArguments();
 
-        String mainClass = (String) compilerArguments.get( "-main" );
+        String mainClass = compilerArguments.get( "-main" );
 
         if ( !StringUtils.isEmpty( mainClass ) )
         {
@@ -252,7 +249,7 @@ Options can be of the form -option or /option
         // Xml Doc output
         // ----------------------------------------------------------------------
 
-        String doc = (String) compilerArguments.get( "-doc" );
+        String doc = compilerArguments.get( "-doc" );
 
         if ( !StringUtils.isEmpty( doc ) )
         {
@@ -264,7 +261,7 @@ Options can be of the form -option or /option
         // Xml Doc output
         // ----------------------------------------------------------------------
 
-        String nowarn = (String) compilerArguments.get( "-nowarn" );
+        String nowarn = compilerArguments.get( "-nowarn" );
 
         if ( !StringUtils.isEmpty( nowarn ) )
         {
@@ -275,7 +272,7 @@ Options can be of the form -option or /option
         // Out - Override output name, this is required for generating the unit test dll
         // ----------------------------------------------------------------------
 
-        String out = (String) compilerArguments.get( "-out" );
+        String out = compilerArguments.get( "-out" );
 
         if ( !StringUtils.isEmpty( out ) )
         {
@@ -289,7 +286,7 @@ Options can be of the form -option or /option
         // ----------------------------------------------------------------------
         // Resource File - compile in a resource file into the assembly being created
         // ----------------------------------------------------------------------
-        String resourcefile = (String) compilerArguments.get( "-resourcefile" );
+        String resourcefile = compilerArguments.get( "-resourcefile" );
 
         if ( !StringUtils.isEmpty( resourcefile ) )
         {
@@ -301,7 +298,7 @@ Options can be of the form -option or /option
         // Target - type of assembly to produce, lib,exe,winexe etc... 
         // ----------------------------------------------------------------------
 
-        String target = (String) compilerArguments.get( "-target" );
+        String target = compilerArguments.get( "-target" );
 
         if ( StringUtils.isEmpty( target ) )
         {
@@ -315,7 +312,7 @@ Options can be of the form -option or /option
         // ----------------------------------------------------------------------
         // remove MS logo from output (not applicable for mono)
         // ----------------------------------------------------------------------
-        String nologo = (String) compilerArguments.get( "-nologo" );
+        String nologo = compilerArguments.get( "-nologo" );
 
         if ( !StringUtils.isEmpty( nologo ) )
         {
@@ -330,17 +327,15 @@ Options can be of the form -option or /option
         // ----------------------------------------------------------------------
         // add source files
         // ----------------------------------------------------------------------
-        for ( int i = 0; i < sourceFiles.length; i++ )
+        for ( String sourceFile : sourceFiles )
         {
-            String sourceFile = sourceFiles[i];
-
             args.add( sourceFile );
         }
 
-        return (String[]) args.toArray( new String[args.size()] );
+        return args.toArray( new String[args.size()] );
     }
 
-    private void addResourceArgs( CompilerConfiguration config, List args )
+    private void addResourceArgs( CompilerConfiguration config, List<String> args )
     {
         File filteredResourceDir = this.findResourceDir( config );
         if ( ( filteredResourceDir != null ) && filteredResourceDir.exists() )
@@ -351,10 +346,9 @@ Options can be of the form -option or /option
             scanner.addDefaultExcludes();
             scanner.scan();
 
-            List includedFiles = Arrays.asList( scanner.getIncludedFiles() );
-            for ( Iterator iter = includedFiles.iterator(); iter.hasNext(); )
+            List<String> includedFiles = Arrays.asList( scanner.getIncludedFiles() );
+            for ( String name : includedFiles )
             {
-                String name = (String) iter.next();
                 File filteredResource = new File( filteredResourceDir, name );
                 String assemblyResourceName = this.convertNameToAssemblyResourceName( name );
                 String argLine = "/resource:\"" + filteredResource + "\",\"" + assemblyResourceName + "\"";
@@ -374,7 +368,7 @@ Options can be of the form -option or /option
         {
             System.out.println( "Looking for resourcesDir" );
         }
-        Map compilerArguments = config.getCustomCompilerArguments();
+        Map<String, String> compilerArguments = config.getCustomCompilerArguments();
         String tempResourcesDirAsString = (String) compilerArguments.get( "-resourceDir" );
         File filteredResourceDir = null;
         if ( tempResourcesDirAsString != null )
@@ -400,7 +394,9 @@ Options can be of the form -option or /option
         return name.replace( File.separatorChar, '.' );
     }
 
-    private List compileOutOfProcess( File workingDirectory, File target, String executable, String[] args )
+    @SuppressWarnings( "deprecation" )
+    private List<CompilerError> compileOutOfProcess( File workingDirectory, File target, String executable,
+                                                     String[] args )
         throws CompilerException
     {
         // ----------------------------------------------------------------------
@@ -417,10 +413,8 @@ Options can be of the form -option or /option
 
             output = new PrintWriter( new FileWriter( file ) );
 
-            for ( int i = 0; i < args.length; i++ )
+            for ( String arg : args )
             {
-                String arg = args[i];
-
                 output.println( arg );
             }
         }
@@ -453,7 +447,7 @@ Options can be of the form -option or /option
 
         int returnCode;
 
-        List messages;
+        List<CompilerError> messages;
 
         try
         {
@@ -481,10 +475,10 @@ Options can be of the form -option or /option
         return messages;
     }
 
-    public static List parseCompilerOutput( BufferedReader bufferedReader )
+    public static List<CompilerError> parseCompilerOutput( BufferedReader bufferedReader )
         throws IOException
     {
-        List messages = new ArrayList();
+        List<CompilerError> messages = new ArrayList<CompilerError>();
 
         String line = bufferedReader.readLine();
 
@@ -503,9 +497,9 @@ Options can be of the form -option or /option
         return messages;
     }
 
-    private String getType( Map compilerArguments )
+    private String getType( Map<String, String> compilerArguments )
     {
-        String type = (String) compilerArguments.get( "-target" );
+        String type = compilerArguments.get( "-target" );
 
         if ( StringUtils.isEmpty( type ) )
         {
@@ -536,43 +530,23 @@ Options can be of the form -option or /option
     // added for debug purposes.... 
     protected static String[] getSourceFiles( CompilerConfiguration config )
     {
-        Set sources = new HashSet();
+        Set<String> sources = new HashSet<String>();
 
         //Set sourceFiles = null;
         //was:
-        Set sourceFiles = config.getSourceFiles();
+        Set<File> sourceFiles = config.getSourceFiles();
 
         if ( sourceFiles != null && !sourceFiles.isEmpty() )
         {
-            for ( Iterator it = sourceFiles.iterator(); it.hasNext(); )
+            for ( File sourceFile : sourceFiles )
             {
-                Object o = it.next();
-
-                File sourceFile = null;
-
-                if ( o instanceof String )
-                {
-                    sourceFile = new File( (String) o );
-                    System.out.println( (String) o );
-                }
-                else if ( o instanceof File )
-                {
-                    sourceFile = (File) o;
-                }
-                else
-                {
-                    break; //ignore it
-                }
-
                 sources.add( sourceFile.getAbsolutePath() );
             }
         }
         else
         {
-            for ( Iterator it = config.getSourceLocations().iterator(); it.hasNext(); )
+            for ( String sourceLocation : config.getSourceLocations() )
             {
-                String sourceLocation = (String) it.next();
-
                 sources.addAll( getSourceFilesForSourceRoot( config, sourceLocation ) );
             }
         }
@@ -603,17 +577,17 @@ Options can be of the form -option or /option
         return DefaultCSharpCompilerParser.parseLine( line );
     }
 
-    protected static Set getSourceFilesForSourceRoot( CompilerConfiguration config, String sourceLocation )
+    protected static Set<String> getSourceFilesForSourceRoot( CompilerConfiguration config, String sourceLocation )
     {
         DirectoryScanner scanner = new DirectoryScanner();
 
         scanner.setBasedir( sourceLocation );
 
-        Set includes = config.getIncludes();
+        Set<String> includes = config.getIncludes();
 
         if ( includes != null && !includes.isEmpty() )
         {
-            String[] inclStrs = (String[]) includes.toArray( new String[includes.size()] );
+            String[] inclStrs = includes.toArray( new String[includes.size()] );
             scanner.setIncludes( inclStrs );
         }
         else
@@ -621,11 +595,11 @@ Options can be of the form -option or /option
             scanner.setIncludes( new String[]{"**/*.cs"} );
         }
 
-        Set excludes = config.getExcludes();
+        Set<String> excludes = config.getExcludes();
 
         if ( excludes != null && !excludes.isEmpty() )
         {
-            String[] exclStrs = (String[]) excludes.toArray( new String[excludes.size()] );
+            String[] exclStrs = excludes.toArray( new String[excludes.size()] );
             scanner.setIncludes( exclStrs );
         }
 
@@ -633,11 +607,11 @@ Options can be of the form -option or /option
 
         String[] sourceDirectorySources = scanner.getIncludedFiles();
 
-        Set sources = new HashSet();
+        Set<String> sources = new HashSet<String>();
 
-        for ( int j = 0; j < sourceDirectorySources.length; j++ )
+        for ( String source : sourceDirectorySources )
         {
-            File f = new File( sourceLocation, sourceDirectorySources[j] );
+            File f = new File( sourceLocation, source );
 
             sources.add( f.getPath() );
         }

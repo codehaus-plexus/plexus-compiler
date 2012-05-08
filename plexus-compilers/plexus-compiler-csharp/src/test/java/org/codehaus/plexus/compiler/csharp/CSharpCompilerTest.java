@@ -98,7 +98,8 @@ public class CSharpCompilerTest
                 "/home/trygvis/dev/com.myrealbox/trunk/mcs/nunit20/core/./Reflect.cs(4) error CS0246: The namespace `NUnit.Framework' can not be found (missing assembly reference?)\n" +
                 "Compilation failed: 14 error(s), 0 warnings";
 
-        List messages = CSharpCompiler.parseCompilerOutput( new BufferedReader( new StringReader( input ) ) );
+        List<CompilerError> messages =
+            CSharpCompiler.parseCompilerOutput( new BufferedReader( new StringReader( input ) ) );
 
         assertNotNull( messages );
 
@@ -135,7 +136,8 @@ public class CSharpCompilerTest
                 "src\\main\\csharp\\Ctl\\ThrowawayForm.cs(30,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly refere\n" +
                 "src\\main\\csharp\\AssemblyInfo.cs(68,12): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly reference?)\n";
 
-        List messagesWinCsc = CSharpCompiler.parseCompilerOutput( new BufferedReader( new StringReader( cscWin ) ) );
+        List<CompilerError> messagesWinCsc =
+            CSharpCompiler.parseCompilerOutput( new BufferedReader( new StringReader( cscWin ) ) );
 
         assertNotNull( messagesWinCsc );
 
@@ -160,7 +162,7 @@ public class CSharpCompilerTest
                 "C:\\Work\\SCM\\SVN\\javaforge\\maven-csharp\\trunk\\maverick-net\\src\\main\\csharp\\Shunt\\LanguageShuntFactory.cs(67,27): error CS0246: The type or namespace name `log4net' could not be found. Are you missing a using directive or an assembly reference? error CS0234: No such name or typespace log4net\n" +
                 "Compilation failed: 28 error(s), 0 warnings";
 
-        List messagesMonoWin = CSharpCompiler.parseCompilerOutput( new BufferedReader( new StringReader( monoWin ) ) );
+        List<CompilerError> messagesMonoWin = CSharpCompiler.parseCompilerOutput( new BufferedReader( new StringReader( monoWin ) ) );
 
         assertNotNull( messagesMonoWin );
 
