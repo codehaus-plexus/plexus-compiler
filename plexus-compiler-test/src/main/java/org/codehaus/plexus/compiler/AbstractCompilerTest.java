@@ -63,10 +63,10 @@ public abstract class AbstractCompilerTest
     }
 
 
-    protected List getClasspath()
+    protected List<String> getClasspath()
         throws Exception
     {
-        List cp = new ArrayList();
+        List<String> cp = new ArrayList<String>();
 
         File file = getLocalArtifactPath( "commons-lang", "commons-lang", "2.0", "jar" );
 
@@ -81,12 +81,11 @@ public abstract class AbstractCompilerTest
     public void testCompilingSources()
         throws Exception
     {
-        List messages = new ArrayList();
+        List<CompilerError> messages = new ArrayList<CompilerError>();
         Collection files = new TreeSet();
 
-        for ( Iterator it = getCompilerConfigurations().iterator(); it.hasNext(); )
+        for ( CompilerConfiguration compilerConfig : getCompilerConfigurations() )
         {
-            CompilerConfiguration compilerConfig = (CompilerConfiguration) it.next();
             File outputDir = new File( compilerConfig.getOutputLocation() );
 
             Compiler compiler = (Compiler) lookup( Compiler.ROLE, getRoleHint() );
@@ -106,10 +105,8 @@ public abstract class AbstractCompilerTest
         if ( expectedErrors() != numCompilerErrors )
         {
             System.err.println( numCompilerErrors + " error(s) found:" );
-            for ( Iterator it = messages.iterator(); it.hasNext(); )
+            for ( CompilerError error : messages )
             {
-                CompilerError error = (CompilerError) it.next();
-
                 if ( !error.isError() )
                 {
                     continue;
@@ -129,10 +126,8 @@ public abstract class AbstractCompilerTest
         if ( expectedWarnings() != numCompilerWarnings )
         {
             System.err.println( numCompilerWarnings + " warning(s) found:" );
-            for ( Iterator it = messages.iterator(); it.hasNext(); )
+            for ( CompilerError error : messages )
             {
-                CompilerError error = (CompilerError) it.next();
-
                 if ( error.isError() )
                 {
                     continue;
@@ -152,20 +147,21 @@ public abstract class AbstractCompilerTest
         assertEquals( new TreeSet( normalizePaths( expectedOutputFiles() ) ), files );
     }
 
-    private List getCompilerConfigurations()
+    private List<CompilerConfiguration> getCompilerConfigurations()
         throws Exception
     {
         String sourceDir = getBasedir() + "/src/test-input/src/main";
 
-        List filenames = FileUtils.getFileNames( new File( sourceDir ), "**/*.java", null, false, true );
+        @SuppressWarnings( "unchecked" )
+        List<String> filenames = FileUtils.getFileNames( new File( sourceDir ), "**/*.java", null, false, true );
         Collections.sort( filenames );
 
-        List compilerConfigurations = new ArrayList();
+        List<CompilerConfiguration> compilerConfigurations = new ArrayList<CompilerConfiguration>();
 
         int index = 0;
-        for ( Iterator it = filenames.iterator(); it.hasNext(); index++ )
+        for ( Iterator<String> it = filenames.iterator(); it.hasNext(); index++ )
         {
-            String filename = (String) it.next();
+            String filename = it.next();
 
             CompilerConfiguration compilerConfig = new CompilerConfiguration();
 
@@ -197,13 +193,13 @@ public abstract class AbstractCompilerTest
         return normalizedPaths;
     }
 
-    protected int compilerErrorCount( List messages )
+    protected int compilerErrorCount( List<CompilerError> messages )
     {
         int count = 0;
 
-        for ( int i = 0; i < messages.size(); i++ )
+        for ( CompilerError message : messages )
         {
-            count += ( (CompilerError) messages.get( i ) ).isError() ? 1 : 0;
+            count += message.isError() ? 1 : 0;
         }
 
         return count;

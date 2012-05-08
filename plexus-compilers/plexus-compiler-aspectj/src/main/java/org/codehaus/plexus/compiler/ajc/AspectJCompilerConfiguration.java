@@ -1,6 +1,7 @@
 /* Created on Oct 4, 2004 */
 package org.codehaus.plexus.compiler.ajc;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,21 +17,21 @@ public class AspectJCompilerConfiguration
     extends CompilerConfiguration
 {
 
-    private List aspectPath = new LinkedList();
+    private List<String> aspectPath = new LinkedList<String>();
 
-    private List inJars = new LinkedList();
+    private List<String> inJars = new LinkedList<String>();
 
-    private List inPath = new LinkedList();
+    private List<String> inPath = new LinkedList<String>();
 
     private String outputJar;
 
-    private Map ajOptions = new TreeMap();
+    private Map<String, String> ajOptions = new TreeMap<String, String>();
 
-    private Map sourcePathResources;
+    private Map<String, File> sourcePathResources;
 
-    public void setAspectPath( List aspectPath )
+    public void setAspectPath( List<String> aspectPath )
     {
-        this.aspectPath = new LinkedList( aspectPath );
+        this.aspectPath = new LinkedList<String>( aspectPath );
     }
 
     public void addAspectPath( String aspectPath )
@@ -38,14 +39,14 @@ public class AspectJCompilerConfiguration
         this.aspectPath.add( aspectPath );
     }
 
-    public List getAspectPath()
+    public List<String> getAspectPath()
     {
         return Collections.unmodifiableList( aspectPath );
     }
 
-    public void setInJars( List inJars )
+    public void setInJars( List<String> inJars )
     {
-        this.inJars = new LinkedList( inJars );
+        this.inJars = new LinkedList<String>( inJars );
     }
 
     public void addInJar( String inJar )
@@ -53,14 +54,14 @@ public class AspectJCompilerConfiguration
         this.inJars.add( inJar );
     }
 
-    public List getInJars()
+    public List<String> getInJars()
     {
         return Collections.unmodifiableList( inJars );
     }
 
-    public void setInPath( List inPath )
+    public void setInPath( List<String> inPath )
     {
-        this.inPath = new LinkedList( inPath );
+        this.inPath = new LinkedList<String>( inPath );
     }
 
     public void addInPath( String inPath )
@@ -68,7 +69,7 @@ public class AspectJCompilerConfiguration
         this.inPath.add( inPath );
     }
 
-    public List getInPath()
+    public List<String> getInPath()
     {
         return Collections.unmodifiableList( inPath );
     }
@@ -87,7 +88,7 @@ public class AspectJCompilerConfiguration
      * Ignored, not supported yet
      * @param ajOptions
      */
-    public void setAJOptions( Map ajOptions )
+    public void setAJOptions( Map<String, String> ajOptions )
     {
         //TODO
         //this.ajOptions = new TreeMap( ajOptions );
@@ -102,17 +103,17 @@ public class AspectJCompilerConfiguration
      * Ignored, not supported yet
      * @return empty Map
      */
-    public Map getAJOptions()
+    public Map<String, String> getAJOptions()
     {
         return Collections.unmodifiableMap( ajOptions );
     }
 
-    public void setSourcePathResources( Map sourcePathResources )
+    public void setSourcePathResources( Map<String, File> sourcePathResources )
     {
-        this.sourcePathResources = new TreeMap( sourcePathResources );
+        this.sourcePathResources = new TreeMap<String, File>( sourcePathResources );
     }
 
-    public Map getSourcePathResources()
+    public Map<String, File> getSourcePathResources()
     {
         return sourcePathResources;
     }

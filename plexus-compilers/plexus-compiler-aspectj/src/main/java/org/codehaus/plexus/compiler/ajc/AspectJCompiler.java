@@ -21,7 +21,6 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -238,7 +237,7 @@ public class AspectJCompiler
         super( CompilerOutputStyle.ONE_OUTPUT_FILE_PER_INPUT_FILE, ".java", ".class", null );
     }
 
-    public List compile( CompilerConfiguration config )
+    public List<CompilerError> compile( CompilerConfiguration config )
         throws CompilerException
     {
         File destinationDir = new File( config.getOutputLocation() );
@@ -252,7 +251,7 @@ public class AspectJCompiler
 
         if ( sourceFiles.length == 0 )
         {
-            return Collections.EMPTY_LIST;
+            return Collections.<CompilerError>emptyList();
         }
 
         System.out.println( "Compiling " + sourceFiles.length + " " + "source file"
@@ -283,22 +282,21 @@ public class AspectJCompiler
                 + ClassFileConstants.ATTR_VARS;
         }
 
-        Map javaOpts = config.getCustomCompilerArguments();
+        Map<String, String> javaOpts = config.getCustomCompilerArguments();
         if ( javaOpts != null && !javaOpts.isEmpty() )
         {
             // TODO support customCompilerArguments
             // buildConfig.setJavaOptions( javaOpts );
         }
 
-        List cp = new LinkedList( config.getClasspathEntries() );
+        List<String> cp = new LinkedList<String>( config.getClasspathEntries() );
 
         File javaHomeDir = new File( System.getProperty( "java.home" ) );
         File[] jars = new File( javaHomeDir, "lib" ).listFiles();
         if ( jars != null )
         {
-            for ( int i = 0; i < jars.length; i++ )
+            for ( File jar : jars )
             {
-                File jar = jars[i];
                 if ( jar.getName().endsWith( ".jar" ) || jar.getName().endsWith( ".zip" ) )
                 {
                     cp.add( 0, jar.getAbsolutePath() );
@@ -308,9 +306,8 @@ public class AspectJCompiler
         jars = new File( javaHomeDir, "../Classes" ).listFiles();
         if ( jars != null )
         {
-            for ( int i = 0; i < jars.length; i++ )
+            for ( File jar : jars )
             {
-                File jar = jars[i];
                 if ( jar.getName().endsWith( ".jar" ) || jar.getName().endsWith( ".zip" ) )
                 {
                     cp.add( 0, jar.getAbsolutePath() );
@@ -321,10 +318,10 @@ public class AspectJCompiler
         checkForAspectJRT( cp );
         if ( cp != null && !cp.isEmpty() )
         {
-            List elements = new ArrayList( cp.size() );
-            for ( Iterator i = cp.iterator(); i.hasNext(); )
+            List<String> elements = new ArrayList<String>( cp.size() );
+            for ( String path : cp )
             {
-                elements.add( ( new File( (String) i.next() ) ).getAbsolutePath() );
+                elements.add( ( new File( path ) ).getAbsolutePath() );
             }
 
             buildConfig.setClasspath( elements );
@@ -346,32 +343,32 @@ public class AspectJCompiler
         {
             AspectJCompilerConfiguration ajCfg = (AspectJCompilerConfiguration) config;
 
-            Map sourcePathResources = ajCfg.getSourcePathResources();
+            Map<String, File> sourcePathResources = ajCfg.getSourcePathResources();
             if ( sourcePathResources != null && !sourcePathResources.isEmpty() )
             {
                 buildConfig.setSourcePathResources( sourcePathResources );
             }
 
-            Map ajOptions = ajCfg.getAJOptions();
+            Map<String, String> ajOptions = ajCfg.getAJOptions();
             if ( ajOptions != null && !ajOptions.isEmpty() )
             {
                 // TODO not supported
                 //buildConfig.setAjOptions( ajCfg.getAJOptions() );
             }
 
-            List aspectPath = buildFileList( ajCfg.getAspectPath() );
+            List<File> aspectPath = buildFileList( ajCfg.getAspectPath() );
             if ( aspectPath != null && !aspectPath.isEmpty() )
             {
                 buildConfig.setAspectpath( buildFileList( ajCfg.getAspectPath() ) );
             }
 
-            List inJars = buildFileList( ajCfg.getInJars() );
+            List<File> inJars = buildFileList( ajCfg.getInJars() );
             if ( inJars != null && !inJars.isEmpty() )
             {
                 buildConfig.setInJars( buildFileList( ajCfg.getInJars() ) );
             }
 
-            List inPaths = buildFileList( ajCfg.getInPath() );
+            List<File> inPaths = buildFileList( ajCfg.getInPath() );
             if ( inPaths != null && !inPaths.isEmpty() )
             {
                 buildConfig.setInPath( buildFileList( ajCfg.getInPath() ) );
@@ -387,7 +384,7 @@ public class AspectJCompiler
         return buildConfig;
     }
 
-    private List compileInProcess( AjBuildConfig buildConfig )
+    private List<CompilerError> compileInProcess( AjBuildConfig buildConfig )
         throws CompilerException
     {
 
@@ -419,15 +416,13 @@ public class AspectJCompiler
 
         boolean errors = messageHandler.hasAnyMessage( IMessage.ERROR, true );
 
-        List messages = new ArrayList();
+        List<CompilerError> messages = new ArrayList<CompilerError>();
         if ( errors )
         {
             IMessage[] errorMessages = messageHandler.getMessages( IMessage.ERROR, true );
 
-            for ( int i = 0; i < errorMessages.length; i++ )
+            for ( IMessage m : errorMessages )
             {
-                IMessage m = errorMessages[i];
-
                 ISourceLocation sourceLocation = m.getSourceLocation();
                 CompilerError error;
 
@@ -448,7 +443,7 @@ public class AspectJCompiler
         return messages;
     }
 
-    private void checkForAspectJRT( List cp )
+    private void checkForAspectJRT( List<String> cp )
     {
         if ( cp == null || cp.isEmpty() )
         {
@@ -461,7 +456,7 @@ public class AspectJCompiler
                 URL[] urls = new URL[cp.size()];
                 for ( int i = 0; i < urls.length; i++ )
                 {
-                    urls[i] = ( new File( (String) cp.get( i ) ) ).toURL();
+                    urls[i] = ( new File( cp.get( i ) ) ).toURL();
                 }
 
                 URLClassLoader cloader = new URLClassLoader( urls );
@@ -479,12 +474,11 @@ public class AspectJCompiler
         }
     }
 
-    private List buildFileList( List locations )
+    private List<File> buildFileList( List<String> locations )
     {
-        List fileList = new LinkedList();
-        for ( Iterator it = locations.iterator(); it.hasNext(); )
+        List<File> fileList = new LinkedList<File>();
+        for ( String location : locations )
         {
-            String location = (String) it.next();
             fileList.add( new File( location ) );
         }
 

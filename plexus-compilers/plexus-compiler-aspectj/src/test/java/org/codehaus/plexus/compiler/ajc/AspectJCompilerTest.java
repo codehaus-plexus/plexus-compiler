@@ -29,18 +29,18 @@ public class AspectJCompilerTest
         return 1;
     }
 
-    protected Collection expectedOutputFiles()
+    protected Collection<String> expectedOutputFiles()
     {
         return Arrays.asList( new String[] { "org/codehaus/foo/ExternalDeps.class", "org/codehaus/foo/Person.class" } );
     }
 
-    protected List getClasspath()
+    protected List<String> getClasspath()
         throws Exception
     {
-        List cp = super.getClasspath();
+        List<String> cp = super.getClasspath();
 
-        File localArtifactPath = getLocalArtifactPath("org.aspectj", "aspectjrt", "1.6.0", "jar");
-        cp.add(localArtifactPath.getAbsolutePath());
+        File localArtifactPath = getLocalArtifactPath( "org.aspectj", "aspectjrt", "1.6.0", "jar" );
+        cp.add( localArtifactPath.getAbsolutePath() );
 
         return cp;
     }
