@@ -38,15 +38,15 @@ Plexus Compiler
 
   * {{{./plexus-compilers/}<<<plexus-compilers>>>}}: different compilers
 
-    * {{{./plexus-compilers/aspectj/}<<<plexus-compiler-aspectj>>>}}: AspectJ compiler,
+    * {{{./plexus-compilers/plexus-compiler-aspectj/}<<<plexus-compiler-aspectj>>>}}: AspectJ compiler,
 
-    * {{{./plexus-compilers/csharp/}<<<plexus-compiler-csharp>>>}}: C#/Mono compiler,
+    * {{{./plexus-compilers/plexus-compiler-csharp/}<<<plexus-compiler-csharp>>>}}: C#/Mono compiler,
 
-    * {{{./plexus-compilers/eclipse/}<<<plexus-compiler-eclipse>>>}}: Eclipse compiler,
+    * {{{./plexus-compilers/plexus-compiler-eclipse/}<<<plexus-compiler-eclipse>>>}}: Eclipse compiler,
 
-    * {{{./plexus-compilers/javac/}<<<plexus-compiler-javac>>>}}: javac compiler,
+    * {{{./plexus-compilers/plexus-compiler-javac/}<<<plexus-compiler-javac>>>}}: javac compiler,
 
-    * {{{./plexus-compilers/jikes/}<<<plexus-compiler-jikes>>>}}: jikes compiler,
+    * {{{./plexus-compilers/plexus-compiler-jikes/}<<<plexus-compiler-jikes>>>}}: jikes compiler,
 
     []
 
