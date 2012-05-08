@@ -30,7 +30,6 @@ import org.codehaus.plexus.util.DirectoryScanner;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -123,9 +122,9 @@ public abstract class AbstractCompiler
     {
         StringBuilder sb = new StringBuilder();
 
-        for ( Iterator it = pathElements.iterator(); it.hasNext(); )
+        for ( String pathElement : pathElements )
         {
-            sb.append( it.next() ).append( File.pathSeparator );
+            sb.append( pathElement ).append( File.pathSeparator );
         }
 
         return sb.toString();
@@ -175,25 +174,21 @@ public abstract class AbstractCompiler
 
     protected static String[] getSourceFiles( CompilerConfiguration config )
     {
-        Set sources = new HashSet();
+        Set<String> sources = new HashSet<String>();
 
         Set<File> sourceFiles = config.getSourceFiles();
 
         if ( sourceFiles != null && !sourceFiles.isEmpty() )
         {
-            for ( Iterator<File> it = sourceFiles.iterator(); it.hasNext(); )
+            for ( File sourceFile : sourceFiles )
             {
-                File sourceFile = it.next();
-
                 sources.add( sourceFile.getAbsolutePath() );
             }
         }
         else
         {
-            for ( Iterator<String> it = config.getSourceLocations().iterator(); it.hasNext(); )
+            for ( String sourceLocation : config.getSourceLocations() )
             {
-                String sourceLocation =it.next();
-
                 sources.addAll( getSourceFilesForSourceRoot( config, sourceLocation ) );
             }
         }
@@ -279,7 +274,7 @@ public abstract class AbstractCompiler
     /**
      * @deprecated use (String[]) arguments.toArray( new String[ arguments.size() ] ); instead
      */
-    protected static String[] toStringArray( List arguments )
+    protected static String[] toStringArray( List<String> arguments )
     {
         String[] args = new String[arguments.size()];
 
@@ -287,7 +282,7 @@ public abstract class AbstractCompiler
 
         for ( int i = 0; i < argLength; i++ )
         {
-            args[i] = (String) arguments.get( i );
+            args[i] = arguments.get( i );
         }
 
         return args;

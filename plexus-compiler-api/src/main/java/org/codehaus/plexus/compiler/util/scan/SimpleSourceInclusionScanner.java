@@ -39,11 +39,11 @@ import java.util.Set;
 public class SimpleSourceInclusionScanner
     extends AbstractSourceInclusionScanner
 {
-    private Set sourceIncludes;
+    private Set<String> sourceIncludes;
 
-    private Set sourceExcludes;
+    private Set<String> sourceExcludes;
 
-    public SimpleSourceInclusionScanner( Set sourceIncludes, Set sourceExcludes )
+    public SimpleSourceInclusionScanner( Set<String> sourceIncludes, Set<String> sourceExcludes )
     {
         this.sourceIncludes = sourceIncludes;
 

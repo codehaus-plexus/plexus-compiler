@@ -64,7 +64,7 @@ public class StaleSourceScannerTest
 
         scanner.addSourceMapping( mapping );
 
-        Set result = scanner.getIncludedSources( base, base );
+        Set<File> result = scanner.getIncludedSources( base, base );
 
         assertEquals( "wrong number of stale sources returned.", 1, result.size() );
 
@@ -95,7 +95,7 @@ public class StaleSourceScannerTest
 
         scanner.addSourceMapping( mapping );
 
-        Set result = scanner.getIncludedSources( base, base );
+        Set<File> result = scanner.getIncludedSources( base, base );
 
         assertEquals( "wrong number of stale sources returned.", 0, result.size() );
 
@@ -116,7 +116,7 @@ public class StaleSourceScannerTest
 
         scanner.addSourceMapping( mapping );
 
-        Set result = scanner.getIncludedSources( base, base );
+        Set<File> result = scanner.getIncludedSources( base, base );
 
         assertEquals( "wrong number of stale sources returned.", 1, result.size() );
 
@@ -151,7 +151,7 @@ public class StaleSourceScannerTest
 
         scanner.addSourceMapping( mapping );
 
-        Set result = scanner.getIncludedSources( base, base );
+        Set<File> result = scanner.getIncludedSources( base, base );
 
         assertEquals( "wrong number of stale sources returned.", 2, result.size() );
 
@@ -206,7 +206,7 @@ public class StaleSourceScannerTest
 
         scanner.addSourceMapping( mapping );
 
-        Set result = scanner.getIncludedSources( base, base );
+        Set<File> result = scanner.getIncludedSources( base, base );
 
         assertEquals( "wrong number of stale sources returned.", 1, result.size() );
 
@@ -254,7 +254,7 @@ public class StaleSourceScannerTest
 
         scanner.addSourceMapping( mapping );
 
-        Set result = scanner.getIncludedSources( base, base );
+        Set<File> result = scanner.getIncludedSources( base, base );
 
         assertEquals( "wrong number of stale sources returned.", 1, result.size() );
 
@@ -313,11 +313,11 @@ public class StaleSourceScannerTest
 
         SuffixMapping mapping = new SuffixMapping( ".java", ".xml" );
 
-        scanner = new StaleSourceScanner( 0, Collections.singleton( "*3.java" ), Collections.EMPTY_SET );
+        scanner = new StaleSourceScanner( 0, Collections.singleton( "*3.java" ), Collections.<String>emptySet() );
 
         scanner.addSourceMapping( mapping );
 
-        Set result = scanner.getIncludedSources( base, base );
+        Set<File> result = scanner.getIncludedSources( base, base );
 
         assertEquals( "wrong number of stale sources returned.", 1, result.size() );
 
@@ -382,7 +382,7 @@ public class StaleSourceScannerTest
 
         scanner.addSourceMapping( mapping );
 
-        Set result = scanner.getIncludedSources( base, base );
+        Set<File> result = scanner.getIncludedSources( base, base );
 
         assertEquals( "wrong number of stale sources returned.", 2, result.size() );
 
@@ -419,7 +419,7 @@ public class StaleSourceScannerTest
 
         scanner.addSourceMapping( mapping );
 
-        Set result = scanner.getIncludedSources( src, target );
+        Set<File> result = scanner.getIncludedSources( src, target );
 
         assertEquals( 1, result.size() );
 

@@ -38,7 +38,7 @@ public class SuffixMappingTest
 
         SuffixMapping mapping = new SuffixMapping( ".java", ".class" );
 
-        Set results = mapping.getTargetFiles( basedir, base + ".java" );
+        Set<File> results = mapping.getTargetFiles( basedir, base + ".java" );
 
         assertEquals( "Returned wrong number of target files.", 1, results.size() );
 
@@ -54,7 +54,7 @@ public class SuffixMappingTest
 
         SuffixMapping mapping = new SuffixMapping( ".java", ".class" );
 
-        Set results = mapping.getTargetFiles( basedir, base + ".xml" );
+        Set<File> results = mapping.getTargetFiles( basedir, base + ".xml" );
 
         assertTrue( "Returned wrong number of target files.", results.isEmpty() );
     }
@@ -66,13 +66,13 @@ public class SuffixMappingTest
 
         File basedir = new File( "." );
 
-        Set targets = new HashSet();
+        Set<String> targets = new HashSet<String>();
         targets.add( ".class" );
         targets.add( ".xml" );
 
         SuffixMapping mapping = new SuffixMapping( ".java", targets );
 
-        Set results = mapping.getTargetFiles( basedir, base + ".java" );
+        Set<File> results = mapping.getTargetFiles( basedir, base + ".java" );
 
         assertEquals( "Returned wrong number of target files.", 2, results.size() );
 
@@ -88,13 +88,13 @@ public class SuffixMappingTest
 
         File basedir = new File( "." );
 
-        Set targets = new HashSet();
+        Set<String> targets = new HashSet<String>();
         targets.add( ".class" );
         targets.add( ".xml" );
 
         SuffixMapping mapping = new SuffixMapping( ".java", targets );
 
-        Set results = mapping.getTargetFiles( basedir, base + ".apt" );
+        Set<File> results = mapping.getTargetFiles( basedir, base + ".apt" );
 
         assertTrue( "Returned wrong number of target files.", results.isEmpty() );
     }
@@ -108,7 +108,7 @@ public class SuffixMappingTest
 
         SingleTargetSourceMapping mapping = new SingleTargetSourceMapping( ".cs", "/foo" );
 
-        Set results = mapping.getTargetFiles( basedir, base + ".apt" );
+        Set<File> results = mapping.getTargetFiles( basedir, base + ".apt" );
 
         assertTrue( results.isEmpty() );
 

@@ -334,14 +334,14 @@ public class CompilerConfiguration
 
     public Map<String, String> getCustomCompilerArguments()
     {
-        return new LinkedHashMap( customCompilerArguments );
+        return new LinkedHashMap<String, String>( customCompilerArguments );
     }
 
     public void setCustomCompilerArguments( Map<String, String> customCompilerArguments )
     {
         if ( customCompilerArguments == null )
         {
-            this.customCompilerArguments = new LinkedHashMap();
+            this.customCompilerArguments = new LinkedHashMap<String, String>();
         }
         else
         {

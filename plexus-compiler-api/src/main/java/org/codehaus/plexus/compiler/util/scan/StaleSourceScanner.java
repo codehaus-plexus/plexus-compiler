@@ -21,7 +21,6 @@ import org.codehaus.plexus.compiler.util.scan.mapping.SourceMapping;
 import java.io.File;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -34,9 +33,9 @@ public class StaleSourceScanner
 {
     private final long lastUpdatedWithinMsecs;
 
-    private final Set sourceIncludes;
+    private final Set<String> sourceIncludes;
 
-    private final Set sourceExcludes;
+    private final Set<String> sourceExcludes;
 
     // ----------------------------------------------------------------------
     //
@@ -44,15 +43,15 @@ public class StaleSourceScanner
 
     public StaleSourceScanner()
     {
-        this( 0, Collections.singleton( "**/*" ), Collections.EMPTY_SET );
+        this( 0, Collections.singleton( "**/*" ), Collections.<String>emptySet() );
     }
 
     public StaleSourceScanner( long lastUpdatedWithinMsecs )
     {
-        this( lastUpdatedWithinMsecs, Collections.singleton( "**/*" ), Collections.EMPTY_SET );
+        this( lastUpdatedWithinMsecs, Collections.singleton( "**/*" ), Collections.<String>emptySet() );
     }
 
-    public StaleSourceScanner( long lastUpdatedWithinMsecs, Set sourceIncludes, Set sourceExcludes )
+    public StaleSourceScanner( long lastUpdatedWithinMsecs, Set<String> sourceIncludes, Set<String> sourceExcludes )
     {
         this.lastUpdatedWithinMsecs = lastUpdatedWithinMsecs;
 
@@ -79,28 +78,22 @@ public class StaleSourceScanner
 
         Set<File> matchingSources = new HashSet<File>();
 
-        for ( int i = 0; i < potentialIncludes.length; i++ )
+        for ( String path : potentialIncludes )
         {
-            String path = potentialIncludes[i];
-
             File sourceFile = new File( sourceDir, path );
 
             staleSourceFileTesting:
-            for ( Iterator<SourceMapping> patternIt = srcMappings.iterator(); patternIt.hasNext(); )
+            for ( SourceMapping mapping : srcMappings )
             {
-                SourceMapping mapping = patternIt.next();
-
                 Set<File> targetFiles = mapping.getTargetFiles( targetDir, path );
 
                 // never include files that don't have corresponding target mappings.
                 // the targets don't have to exist on the filesystem, but the
                 // mappers must tell us to look for them.
-                for ( Iterator<File> targetIt = targetFiles.iterator(); targetIt.hasNext(); )
+                for ( File targetFile : targetFiles )
                 {
-                    File targetFile = targetIt.next();
-
-                    if ( !targetFile.exists() || ( targetFile.lastModified() + lastUpdatedWithinMsecs
-                        < sourceFile.lastModified() ) )
+                    if ( !targetFile.exists()
+                        || ( targetFile.lastModified() + lastUpdatedWithinMsecs < sourceFile.lastModified() ) )
                     {
                         matchingSources.add( sourceFile );
                         break staleSourceFileTesting;

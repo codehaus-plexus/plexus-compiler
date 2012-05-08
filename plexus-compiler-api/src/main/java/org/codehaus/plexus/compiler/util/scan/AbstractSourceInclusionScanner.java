@@ -44,7 +44,7 @@ public abstract class AbstractSourceInclusionScanner
         return Collections.unmodifiableList( sourceMappings );
     }
 
-    protected String[] scanForSources( File sourceDir, Set sourceIncludes, Set sourceExcludes )
+    protected String[] scanForSources( File sourceDir, Set<String> sourceIncludes, Set<String> sourceExcludes )
     {
         DirectoryScanner ds = new DirectoryScanner();
         ds.setFollowSymlinks( true );
@@ -57,7 +57,7 @@ public abstract class AbstractSourceInclusionScanner
         }
         else
         {
-            includes = (String[]) sourceIncludes.toArray( new String[sourceIncludes.size()] );
+            includes = sourceIncludes.toArray( new String[sourceIncludes.size()] );
         }
 
         ds.setIncludes( includes );
@@ -69,7 +69,7 @@ public abstract class AbstractSourceInclusionScanner
         }
         else
         {
-            excludes = (String[]) sourceExcludes.toArray( new String[sourceExcludes.size()] );
+            excludes = sourceExcludes.toArray( new String[sourceExcludes.size()] );
         }
 
         ds.setExcludes( excludes );

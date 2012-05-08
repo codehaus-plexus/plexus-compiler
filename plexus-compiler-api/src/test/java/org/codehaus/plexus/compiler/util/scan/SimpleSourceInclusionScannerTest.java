@@ -30,7 +30,7 @@ public class SimpleSourceInclusionScannerTest
     extends AbstractSourceInclusionScannerTest
 {
     
-    private Set includes, excludes;
+    private Set<String> includes, excludes;
 
     protected void setUp()
         throws Exception
@@ -38,7 +38,7 @@ public class SimpleSourceInclusionScannerTest
         super.setUp();
         
         includes = Collections.singleton( "*.java" );
-        excludes = new HashSet();
+        excludes = new HashSet<String>();
         scanner = new SimpleSourceInclusionScanner( includes, excludes );
     }
 

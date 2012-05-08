@@ -19,7 +19,6 @@ package org.codehaus.plexus.compiler.util.scan.mapping;
 import java.io.File;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -40,7 +39,7 @@ public final class SuffixMapping
         this.targetSuffixes = Collections.singleton( targetSuffix );
     }
 
-    public SuffixMapping( String sourceSuffix, Set targetSuffixes )
+    public SuffixMapping( String sourceSuffix, Set<String> targetSuffixes )
     {
         this.sourceSuffix = sourceSuffix;
 
@@ -49,16 +48,14 @@ public final class SuffixMapping
 
     public Set<File> getTargetFiles( File targetDir, String source )
     {
-        Set targetFiles = new HashSet();
+        Set<File> targetFiles = new HashSet<File>();
 
         if ( source.endsWith( sourceSuffix ) )
         {
             String base = source.substring( 0, source.length() - sourceSuffix.length() );
 
-            for ( Iterator<String> it = targetSuffixes.iterator(); it.hasNext(); )
+            for ( String suffix : targetSuffixes )
             {
-                String suffix = it.next();
-
                 targetFiles.add( new File( targetDir, base + suffix ) );
             }
         }
