@@ -14,12 +14,13 @@
   <packaging>pom</packaging>
 
   <name>Plexus Compiler</name>
+  <description>Plexus Compiler is a Plexus component to use different compilers through a uniform API.</description>
 
   <modules>
     <module>plexus-compiler-api</module>
-    <module>plexus-compiler-test</module>
     <module>plexus-compiler-manager</module>
     <module>plexus-compilers</module>
+    <module>plexus-compiler-test</module>
   </modules>
   
   <scm>
