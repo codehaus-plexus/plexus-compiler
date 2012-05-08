@@ -25,7 +25,6 @@ package org.codehaus.plexus.compiler.eclipse;
  */
 
 import java.util.List;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
 import java.io.File;
@@ -36,20 +35,20 @@ import java.io.File;
  */
 public class SourceCodeLocator
 {
-    private List sourceRoots;
+    private List<String> sourceRoots;
 
-    private Map cache;
+    private Map<String, File> cache;
 
-    public SourceCodeLocator( List sourceRoots )
+    public SourceCodeLocator( List<String> sourceRoots )
     {
         this.sourceRoots = sourceRoots;
 
-        cache = new HashMap();
+        cache = new HashMap<String, File>();
     }
 
     public File findSourceCodeForClass( String className )
     {
-        File f = (File) cache.get( className );
+        File f = cache.get( className );
 
         if ( f != null )
         {
@@ -69,10 +68,8 @@ public class SourceCodeLocator
 
     private File findInRoots( String s )
     {
-        for ( Iterator it = sourceRoots.iterator(); it.hasNext(); )
+        for ( String root : sourceRoots )
         {
-            String root = (String) it.next();
-
             File f = new File( root, s );
 
             if ( f.exists() )

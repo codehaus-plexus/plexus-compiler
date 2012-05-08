@@ -61,7 +61,7 @@ public class EclipseCompilerTest
         return 2;
     }
 
-    protected Collection expectedOutputFiles()
+    protected Collection<String> expectedOutputFiles()
     {
         return Arrays.asList( new String[] { "org/codehaus/foo/Deprecation.class",
             "org/codehaus/foo/ExternalDeps.class", "org/codehaus/foo/Person.class",

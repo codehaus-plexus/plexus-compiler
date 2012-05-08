@@ -34,7 +34,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -86,12 +85,12 @@ public class EclipseJavaCompiler
     // Compiler Implementation
     // ----------------------------------------------------------------------
 
-    public List compile( CompilerConfiguration config )
+    public List<CompilerError> compile( CompilerConfiguration config )
         throws CompilerException
     {
-        List errors = new LinkedList();
+        List<CompilerError> errors = new LinkedList<CompilerError>();
 
-        List classpathEntries = config.getClasspathEntries();
+        List<String> classpathEntries = config.getClasspathEntries();
 
         URL[] urls = new URL[ 1 + classpathEntries.size() ];
 
@@ -101,9 +100,9 @@ public class EclipseJavaCompiler
         {
             urls[ i++ ] = new File( config.getOutputLocation() ).toURL();
 
-            for ( Iterator it = classpathEntries.iterator(); it.hasNext(); )
+            for ( String entry : classpathEntries )
             {
-                urls[ i++ ] = new File( (String) it.next() ).toURL();
+                urls[ i++ ] = new File( entry ).toURL();
             }
         }
         catch ( MalformedURLException e )
@@ -125,7 +124,7 @@ public class EclipseJavaCompiler
         // Build settings from configuration
         // ----------------------------------------------------------------------
 
-        Map settings = new HashMap();
+        Map<String, String> settings = new HashMap<String, String>();
 
         if ( config.isDebug() )
         {
@@ -182,7 +181,7 @@ public class EclipseJavaCompiler
         settings.put( CompilerOptions.OPTION_SourceFileAttribute, CompilerOptions.GENERATE );
         
         // compiler-specific extra options override anything else in the config object...
-        Map extras = config.getCustomCompilerArguments();
+        Map<String, String> extras = config.getCustomCompilerArguments();
         if ( extras != null && !extras.isEmpty() )
         {
             settings.putAll( extras );
@@ -193,18 +192,14 @@ public class EclipseJavaCompiler
         ICompilerRequestor requestor = new EclipseCompilerICompilerRequestor( config.getOutputLocation(),
                                                                               errors );
 
-        List compilationUnits = new ArrayList();
+        List<CompilationUnit> compilationUnits = new ArrayList<CompilationUnit>();
 
-        for ( Iterator it = config.getSourceLocations().iterator(); it.hasNext(); )
+        for ( String sourceRoot : config.getSourceLocations() )
         {
-            String sourceRoot = (String) it.next();
+            Set<String> sources = getSourceFilesForSourceRoot( config, sourceRoot );
 
-            Set sources = getSourceFilesForSourceRoot( config, sourceRoot );
-
-            for ( Iterator it2 = sources.iterator(); it2.hasNext(); )
+            for ( String source : sources )
             {
-                String source = (String) it2.next();
-
                 CompilationUnit unit = new CompilationUnit( source,
                                                             makeClassName( source, sourceRoot ),
                                                             errors, config.getSourceEncoding() );
@@ -236,9 +231,9 @@ public class EclipseJavaCompiler
 
     private CompilerError handleError( String className, int line, int column, Object errorMessage )
     {
-        if(className.endsWith(".java"))
+        if ( className.endsWith( ".java" ) )
         {
-            className = className.substring(0, className.lastIndexOf('.'));
+            className = className.substring( 0, className.lastIndexOf( '.' ) );
         }
         String fileName = className.replace( '.', File.separatorChar ) + ".java";
 
@@ -333,17 +328,14 @@ public class EclipseJavaCompiler
         
         private final String sourceEncoding;
 
-        private final List errors;
+        private final List<CompilerError> errors;
 
-        CompilationUnit( String sourceFile,
-                String className,
-                List errors	) {
-        	this(sourceFile, className, errors, null);
+        CompilationUnit( String sourceFile, String className, List<CompilerError> errors )
+        {
+            this( sourceFile, className, errors, null );
         }
         
-        CompilationUnit( String sourceFile,
-                         String className,
-                         List errors, String sourceEncoding)
+        CompilationUnit( String sourceFile, String className, List<CompilerError> errors, String sourceEncoding )
         {
             this.className = className;
             this.sourceFile = sourceFile;
@@ -355,11 +347,11 @@ public class EclipseJavaCompiler
         {
             String fileName = sourceFile;
 
-            int lastSeparator = fileName.lastIndexOf(File.separatorChar);
-          
-            if (lastSeparator > 0)
+            int lastSeparator = fileName.lastIndexOf( File.separatorChar );
+
+            if ( lastSeparator > 0 )
             {
-                fileName = fileName.substring(lastSeparator+1);
+                fileName = fileName.substring( lastSeparator + 1 );
             }
 
             return fileName.toCharArray();
@@ -369,7 +361,7 @@ public class EclipseJavaCompiler
         {
             try
             {
-            	return FileUtils.fileRead( sourceFile, sourceEncoding).toCharArray();
+                return FileUtils.fileRead( sourceFile, sourceEncoding ).toCharArray();
             }
             catch ( FileNotFoundException e )
             {
@@ -421,11 +413,11 @@ public class EclipseJavaCompiler
 
         private ClassLoader classLoader;
 
-        private List errors;
+        private List<CompilerError> errors;
 
         public EclipseCompilerINameEnvironment( SourceCodeLocator sourceCodeLocator,
                                                 ClassLoader classLoader,
-                                                List errors )
+                                                List<CompilerError> errors )
         {
             this.sourceCodeLocator = sourceCodeLocator;
             this.classLoader = classLoader;
@@ -568,10 +560,10 @@ public class EclipseJavaCompiler
     {
         private String destinationDirectory;
 
-        private List errors;
+        private List<CompilerError> errors;
 
         public EclipseCompilerICompilerRequestor( String destinationDirectory,
-                                                  List errors )
+                                                  List<CompilerError> errors )
         {
             this.destinationDirectory = destinationDirectory;
             this.errors = errors;
@@ -585,11 +577,9 @@ public class EclipseJavaCompiler
             {
                 IProblem[] problems = result.getProblems();
 
-                for ( int i = 0; i < problems.length; i++ )
+                for ( IProblem problem : problems )
                 {
-                    IProblem problem = problems[ i ];
-
-                    String name = new String( problems[ i ].getOriginatingFileName() );
+                    String name = new String( problem.getOriginatingFileName() );
 
                     if ( problem.isWarning() )
                     {
@@ -610,9 +600,8 @@ public class EclipseJavaCompiler
             {
                 ClassFile[] classFiles = result.getClassFiles();
 
-                for ( int i = 0; i < classFiles.length; i++ )
+                for ( ClassFile classFile : classFiles )
                 {
-                    ClassFile classFile = classFiles[ i ];
                     char[][] compoundName = classFile.getCompoundName();
                     String className = "";
                     String sep = "";
