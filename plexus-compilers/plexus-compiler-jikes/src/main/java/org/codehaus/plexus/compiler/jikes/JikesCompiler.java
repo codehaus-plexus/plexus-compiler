@@ -94,7 +94,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -118,7 +117,7 @@ public class JikesCompiler
     // Compiler Implementation
     // -----------------------------------------------------------------------
 
-    public List compile( CompilerConfiguration config )
+    public List<CompilerError> compile( CompilerConfiguration config )
         throws CompilerException
     {
         // Ensures that the directory exist.
@@ -160,7 +159,7 @@ public class JikesCompiler
 
             BufferedReader input = new BufferedReader( new InputStreamReader( new ByteArrayInputStream( tmpErr.toByteArray() ) ) );
 
-            List messages = new ArrayList();
+            List<CompilerError> messages = new ArrayList<CompilerError>();
 
             parseStream( input, messages );
 
@@ -184,7 +183,7 @@ public class JikesCompiler
     public String[] createCommandLine( CompilerConfiguration config )
         throws CompilerException
     {
-        List args = new ArrayList();
+        List<String> args = new ArrayList<String>();
 
         args.add( "jikes" );
 
@@ -208,11 +207,10 @@ public class JikesCompiler
 
         if ( config.getCustomCompilerArguments().size() > 0 )
         {
-            Map customArgs = config.getCustomCompilerArguments();
-            Object[] entries = customArgs.entrySet().toArray();
-            for ( int i = 0; i < customArgs.size(); i++ )
+            for ( Map.Entry<String, String> arg : config.getCustomCompilerArguments().entrySet() )
             {
-                args.add( entries[i] );
+                args.add( arg.getKey() );
+                args.add( arg.getValue() );
             }
         }
 
@@ -335,9 +333,9 @@ public class JikesCompiler
         return destinationDir;
     }
 
-    private List getBootClassPath()
+    private List<String> getBootClassPath()
     {
-        List bootClassPath = new ArrayList();
+        List<String> bootClassPath = new ArrayList<String>();
         FileFilter filter = new FileFilter()
         {
 
@@ -354,22 +352,32 @@ public class JikesCompiler
         File javaLibDir = new File( javaHomeDir, "lib" );
         if ( javaLibDir.isDirectory() )
         {
-            bootClassPath.addAll( Arrays.asList( javaLibDir.listFiles( filter ) ) );
+            bootClassPath.addAll( asList( javaLibDir.listFiles( filter ) ) );
         }
 
         File javaClassesDir = new File( javaHomeDir, "../Classes" );
         if ( javaClassesDir.isDirectory() )
         {
-            bootClassPath.addAll( Arrays.asList( javaClassesDir.listFiles( filter ) ) );
+            bootClassPath.addAll( asList( javaClassesDir.listFiles( filter ) ) );
         }
 
         File javaExtDir = new File( javaLibDir, "ext" );
         if ( javaExtDir.isDirectory() )
         {
-            bootClassPath.addAll( Arrays.asList( javaExtDir.listFiles( filter ) ) );
+            bootClassPath.addAll( asList( javaExtDir.listFiles( filter ) ) );
         }
 
         return bootClassPath;
+    }
+
+    private List<String> asList( File[] files )
+    {
+        List<String> filenames = new ArrayList<String>( files.length );
+        for ( File file : files )
+        {
+            filenames.add( file.toString() );
+        }
+        return filenames;
     }
 
     /**
@@ -380,7 +388,7 @@ public class JikesCompiler
      * @return The list of compiler error messages
      * @throws IOException If an error occurs during message collection
      */
-    protected List parseStream( BufferedReader input, List messages )
+    protected List<CompilerError> parseStream( BufferedReader input, List<CompilerError> messages )
         throws IOException
     {
         String line = null;
