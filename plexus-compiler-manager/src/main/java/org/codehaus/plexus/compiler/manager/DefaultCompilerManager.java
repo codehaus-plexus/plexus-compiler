@@ -42,7 +42,7 @@ public class DefaultCompilerManager
     /**
      * @plexus.requirement role="org.codehaus.plexus.compiler.Compiler"
      */
-    private Map compilers;
+    private Map<String, Compiler> compilers;
 
     // ----------------------------------------------------------------------
     // CompilerManager Implementation
@@ -51,7 +51,7 @@ public class DefaultCompilerManager
     public Compiler getCompiler( String compilerId )
         throws NoSuchCompilerException
     {
-        Compiler compiler = (Compiler) compilers.get( compilerId );
+        Compiler compiler = compilers.get( compilerId );
 
         if ( compiler == null )
         {
