@@ -11,6 +11,7 @@
   <artifactId>plexus-compiler-api</artifactId>
 
   <name>Plexus Compiler Api</name>
+  <description>Plexus Compilers component's API to manipulate compilers.</description>
 
   <dependencies>
     <dependency>
