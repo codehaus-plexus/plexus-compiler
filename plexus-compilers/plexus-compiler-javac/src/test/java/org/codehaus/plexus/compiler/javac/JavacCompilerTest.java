@@ -34,6 +34,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>
@@ -96,14 +97,14 @@ public class JavacCompilerTest
         return 2;
     }
 
-    protected Collection expectedOutputFiles()
+    protected Collection<String> expectedOutputFiles()
     {
         return Arrays.asList( new String[] { "org/codehaus/foo/Deprecation.class",
             "org/codehaus/foo/ExternalDeps.class", "org/codehaus/foo/Person.class",
             "org/codehaus/foo/ReservedWord.class" } );
     }
 
-    public void internalTest( CompilerConfiguration compilerConfiguration, List expectedArguments )
+    public void internalTest( CompilerConfiguration compilerConfiguration, List<String> expectedArguments )
     {
         String[] actualArguments = JavacCompiler.buildCompilerArguments( compilerConfiguration, new String[0] );
 
@@ -111,7 +112,7 @@ public class JavacCompilerTest
                       expectedArguments.size(),
                       actualArguments.length );
 
-        for ( int i=0; i<actualArguments.length; i++ )
+        for ( int i = 0; i < actualArguments.length; i++ )
         {
             assertEquals( "Unexpected argument", expectedArguments.get(i), actualArguments[i] );
         }
@@ -119,7 +120,7 @@ public class JavacCompilerTest
 
     public void testBuildCompilerArgs13()
     {
-        List expectedArguments = new ArrayList();
+        List<String> expectedArguments = new ArrayList<String>();
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
@@ -132,7 +133,7 @@ public class JavacCompilerTest
 
     public void testBuildCompilerArgs14()
     {
-        List expectedArguments = new ArrayList();
+        List<String> expectedArguments = new ArrayList<String>();
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
@@ -145,7 +146,7 @@ public class JavacCompilerTest
 
     public void testBuildCompilerArgs15()
     {
-        List expectedArguments = new ArrayList();
+        List<String> expectedArguments = new ArrayList<String>();
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
@@ -158,7 +159,7 @@ public class JavacCompilerTest
 
     public void testBuildCompilerArgsUnspecifiedVersion()
     {
-        List expectedArguments = new ArrayList();
+        List<String> expectedArguments = new ArrayList<String>();
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
@@ -169,7 +170,7 @@ public class JavacCompilerTest
 
     public void testBuildCompilerDebugLevel()
     {
-        List expectedArguments = new ArrayList();
+        List<String> expectedArguments = new ArrayList<String>();
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
@@ -185,7 +186,7 @@ public class JavacCompilerTest
     // PLXCOMP-190
     public void testJRuntimeArguments()
     {
-    	List expectedArguments = new ArrayList();
+    	List<String> expectedArguments = new ArrayList<String>();
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
@@ -205,8 +206,8 @@ public class JavacCompilerTest
         expectedArguments.add( "1.3" );
 
         // customCompilerArguments
-        LinkedHashMap customCompilerArguments = new LinkedHashMap();
-        customCompilerArguments.put("-J-Duser.language=en_us", null );
+        Map<String, String> customCompilerArguments = new LinkedHashMap<String, String>();
+        customCompilerArguments.put( "-J-Duser.language=en_us", null );
         compilerConfiguration.setCustomCompilerArguments( customCompilerArguments );
         // don't expect this argument!!
         
@@ -243,7 +244,7 @@ public class JavacCompilerTest
     }
     */
 
-    private void populateArguments( CompilerConfiguration compilerConfiguration, List expectedArguments,
+    private void populateArguments( CompilerConfiguration compilerConfiguration, List<String> expectedArguments,
                                     boolean suppressSourceVersion, boolean suppressEncoding )
     {
         // outputLocation
@@ -256,7 +257,7 @@ public class JavacCompilerTest
 
         // classpathEntires
 
-        List classpathEntries = new ArrayList();
+        List<String> classpathEntries = new ArrayList<String>();
 
         classpathEntries.add( "/myjar1.jar" );
 
@@ -270,7 +271,7 @@ public class JavacCompilerTest
 
         // sourceRoots
 
-        List compileSourceRoots = new ArrayList();
+        List<String> compileSourceRoots = new ArrayList<String>();
 
         compileSourceRoots.add( "/src/main/one" );
 
@@ -334,7 +335,7 @@ public class JavacCompilerTest
         // customerCompilerArguments
         
 
-        LinkedHashMap customerCompilerArguments = new LinkedHashMap();
+        Map<String, String> customerCompilerArguments = new LinkedHashMap<String, String>();
 
         customerCompilerArguments.put( "arg1", null );
 

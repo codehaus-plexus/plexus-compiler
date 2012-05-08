@@ -154,7 +154,8 @@ public class ErrorMessageParserTest
                         "                              ^" + EOL +
                         "2 errors" + EOL;
 
-        List messages = JavacCompiler.parseModernStream( 1, new BufferedReader( new StringReader( errors ) ) );
+        List<CompilerError> messages =
+            JavacCompiler.parseModernStream( 1, new BufferedReader( new StringReader( errors ) ) );
 
         assertEquals( 2, messages.size() );
     }
@@ -172,7 +173,8 @@ public class ErrorMessageParserTest
                         "                              ^" + EOL +
                         "2 errors" + EOL;
 
-        List messages = JavacCompiler.parseModernStream( 1, new BufferedReader( new StringReader( errors ) ) );
+        List<CompilerError> messages =
+            JavacCompiler.parseModernStream( 1, new BufferedReader( new StringReader( errors ) ) );
 
         assertEquals( 2, messages.size() );
     }
@@ -186,7 +188,8 @@ public class ErrorMessageParserTest
                         "               ^" + EOL +
                         "1 error" + EOL;
 
-        List messages = JavacCompiler.parseModernStream( 1, new BufferedReader( new StringReader( errors ) ) );
+        List<CompilerError> messages =
+            JavacCompiler.parseModernStream( 1, new BufferedReader( new StringReader( errors ) ) );
 
         assertEquals( 1, messages.size() );
     }
@@ -199,7 +202,8 @@ public class ErrorMessageParserTest
                         "                    ^" + EOL +
                         "\u8b66\u544a 1 \u500b" + EOL;
 
-        List messages = JavacCompiler.parseModernStream( 0, new BufferedReader( new StringReader( errors ) ) );
+        List<CompilerError> messages =
+            JavacCompiler.parseModernStream( 0, new BufferedReader( new StringReader( errors ) ) );
 
         assertEquals( 1, messages.size() );
         assertFalse( ( (CompilerError) messages.get( 0 ) ).isError() );

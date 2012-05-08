@@ -42,10 +42,10 @@ public class IsolatedClassLoader
         super.addURL( url );
     }
 
-    public synchronized Class loadClass( String className )
+    public synchronized Class<?> loadClass( String className )
         throws ClassNotFoundException
     {
-        Class c = findLoadedClass( className );
+        Class<?> c = findLoadedClass( className );
 
         ClassNotFoundException ex = null;
 

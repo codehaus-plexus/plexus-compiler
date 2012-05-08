@@ -68,7 +68,6 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -99,9 +98,9 @@ public class JavacCompiler
 
     private static final String JAVAC_CLASSNAME = "com.sun.tools.javac.Main";
 
-    private static volatile Class JAVAC_CLASS;
+    private static volatile Class<?> JAVAC_CLASS;
 
-    private List<Class> javaccClasses = new CopyOnWriteArrayList<Class>();
+    private List<Class<?>> javaccClasses = new CopyOnWriteArrayList<Class<?>>();
 
     // ----------------------------------------------------------------------
     //
@@ -130,7 +129,7 @@ public class JavacCompiler
 
         if ( ( sourceFiles == null ) || ( sourceFiles.length == 0 ) )
         {
-            return Collections.EMPTY_LIST;
+            return Collections.<CompilerError>emptyList();
         }
 
         if ( ( getLogger() != null ) && getLogger().isInfoEnabled() )
@@ -142,7 +141,7 @@ public class JavacCompiler
 
         String[] args = buildCompilerArguments( config, sourceFiles );
 
-        List messages;
+        List<CompilerError> messages;
 
         if ( config.isFork() )
         {
@@ -179,7 +178,7 @@ public class JavacCompiler
 
     public static String[] buildCompilerArguments( CompilerConfiguration config, String[] sourceFiles )
     {
-        List args = new ArrayList();
+        List<String> args = new ArrayList<String>();
 
         // ----------------------------------------------------------------------
         // Set output
@@ -314,11 +313,8 @@ public class JavacCompiler
             args.add( config.getSourceEncoding() );
         }
 
-        for ( Iterator<Map.Entry<String, String>> it = config.getCustomCompilerArguments().entrySet().iterator();
-              it.hasNext(); )
+        for ( Map.Entry<String, String> entry : config.getCustomCompilerArguments().entrySet() )
         {
-            Map.Entry<String, String> entry = it.next();
-
             String key = entry.getKey();
 
             if ( StringUtils.isEmpty( key ) || key.startsWith( "-J" ) )
@@ -435,12 +431,8 @@ public class JavacCompiler
                 cli.addArguments( new String[]{ "-J-Xms" + config.getMeminitial() } );
             }
 
-            for ( Iterator it = config.getCustomCompilerArguments().entrySet().iterator(); it.hasNext(); )
+            for ( String key : config.getCustomCompilerArguments().keySet() )
             {
-                Map.Entry entry = (Map.Entry) it.next();
-
-                String key = (String) entry.getKey();
-
                 if ( StringUtils.isNotEmpty( key ) && key.startsWith( "-J" ) )
                 {
                     cli.addArguments( new String[]{ key } );
@@ -458,7 +450,7 @@ public class JavacCompiler
 
         int returnCode;
 
-        List messages;
+        List<CompilerError> messages;
 
         if ( ( getLogger() != null ) && getLogger().isDebugEnabled() )
         {
@@ -525,7 +517,7 @@ public class JavacCompiler
     List<CompilerError> compileInProcess( String[] args, CompilerConfiguration config )
         throws CompilerException
     {
-        final Class javacClass = getJavacClass( config );
+        final Class<?> javacClass = getJavacClass( config );
         final Thread thread = Thread.currentThread();
         final ClassLoader contextClassLoader = thread.getContextClassLoader();
         thread.setContextClassLoader( javacClass.getClassLoader() );
@@ -543,14 +535,14 @@ public class JavacCompiler
     /**
      * Helper method for compileInProcess()
      */
-    private static List<CompilerError> compileInProcess0( Class javacClass, String[] args )
+    private static List<CompilerError> compileInProcess0( Class<?> javacClass, String[] args )
         throws CompilerException
     {
         StringWriter out = new StringWriter();
 
         Integer ok;
 
-        List messages;
+        List<CompilerError> messages;
 
         try
         {
@@ -598,7 +590,7 @@ public class JavacCompiler
     static List<CompilerError> parseModernStream( int exitCode, BufferedReader input )
         throws IOException
     {
-        List errors = new ArrayList();
+        List<CompilerError> errors = new ArrayList<CompilerError>();
 
         String line;
 
@@ -915,7 +907,7 @@ public class JavacCompiler
         return javacExe.getAbsolutePath();
     }
 
-    private void releaseJavaccClass( Class javaccClass, CompilerConfiguration compilerConfiguration )
+    private void releaseJavaccClass( Class<?> javaccClass, CompilerConfiguration compilerConfiguration )
     {
         if ( compilerConfiguration.getCompilerReuseStrategy()
             == CompilerConfiguration.CompilerReuseStrategy.ReuseCreated )
@@ -931,10 +923,10 @@ public class JavacCompiler
      * @return the non-null class.
      * @throws CompilerException if the class has not been found.
      */
-    private Class getJavacClass( CompilerConfiguration compilerConfiguration )
+    private Class<?> getJavacClass( CompilerConfiguration compilerConfiguration )
         throws CompilerException
     {
-        Class c = null;
+        Class<?> c = null;
         switch ( compilerConfiguration.getCompilerReuseStrategy() )
         {
             case AlwaysNew:
@@ -975,7 +967,7 @@ public class JavacCompiler
     /**
      * Helper method for create Javac class
      */
-    private Class createJavacClass()
+    private Class<?> createJavacClass()
         throws CompilerException
     {
         try
