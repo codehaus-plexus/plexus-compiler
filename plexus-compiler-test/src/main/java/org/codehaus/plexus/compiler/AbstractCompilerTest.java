@@ -78,11 +78,12 @@ public abstract class AbstractCompilerTest
         return cp;
     }
 
+    @SuppressWarnings( "unchecked" )
     public void testCompilingSources()
         throws Exception
     {
         List<CompilerError> messages = new ArrayList<CompilerError>();
-        Collection files = new TreeSet();
+        Collection<String> files = new TreeSet<String>();
 
         for ( CompilerConfiguration compilerConfig : getCompilerConfigurations() )
         {
@@ -144,7 +145,7 @@ public abstract class AbstractCompilerTest
                           numCompilerWarnings );
         }
 
-        assertEquals( new TreeSet( normalizePaths( expectedOutputFiles() ) ), files );
+        assertEquals( new TreeSet<String>( normalizePaths( expectedOutputFiles() ) ), files );
     }
 
     private List<CompilerConfiguration> getCompilerConfigurations()
@@ -183,12 +184,12 @@ public abstract class AbstractCompilerTest
         return compilerConfigurations;
     }
 
-    private List normalizePaths( Collection relativePaths )
+    private List<String> normalizePaths( Collection<String> relativePaths )
     {
-        List normalizedPaths = new ArrayList();
-        for ( Iterator it = relativePaths.iterator(); it.hasNext(); )
+        List<String> normalizedPaths = new ArrayList<String>();
+        for ( String relativePath : relativePaths )
         {
-            normalizedPaths.add( it.next().toString().replace( File.separatorChar, '/' ) );
+            normalizedPaths.add( relativePath.replace( File.separatorChar, '/' ) );
         }
         return normalizedPaths;
     }
@@ -215,9 +216,9 @@ public abstract class AbstractCompilerTest
         return 0;
     }
 
-    protected Collection expectedOutputFiles()
+    protected Collection<String> expectedOutputFiles()
     {
-        return Collections.EMPTY_LIST;
+        return Collections.<String>emptyList();
     }
 
     protected File getLocalArtifactPath( String groupId, String artifactId, String version, String type )

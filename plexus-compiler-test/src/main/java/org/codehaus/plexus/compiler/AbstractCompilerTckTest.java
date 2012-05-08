@@ -64,7 +64,7 @@ public abstract class AbstractCompilerTckTest
 
         configuration.addSourceLocation( getSrc().getAbsolutePath() );
 
-        List result = compile( configuration );
+        List<CompilerError> result = compile( configuration );
 
         // ----------------------------------------------------------------------
         //
@@ -72,7 +72,7 @@ public abstract class AbstractCompilerTckTest
 
         assertEquals( 1, result.size() );
 
-        CompilerError error = (CompilerError) result.get( 0 );
+        CompilerError error = result.get( 0 );
 
         System.out.println( error.getMessage() );
 
@@ -100,7 +100,7 @@ public abstract class AbstractCompilerTckTest
 
         configuration.addSourceLocation( getSrc().getAbsolutePath() );
 
-        List result = compile( configuration );
+        List<CompilerError> result = compile( configuration );
 
         // ----------------------------------------------------------------------
         //
@@ -108,14 +108,14 @@ public abstract class AbstractCompilerTckTest
 
         assertEquals( 1, result.size() );
 
-        CompilerError error = (CompilerError) result.get( 0 );
+        CompilerError error = result.get( 0 );
 
         assertFalse( error.isError() );
 
         assertTrue( error.getMessage().indexOf( "finally block does not complete normally" ) != -1 );
     }
 
-    protected List compile( CompilerConfiguration configuration )
+    protected List<CompilerError> compile( CompilerConfiguration configuration )
         throws Exception
     {
         // ----------------------------------------------------------------------
@@ -137,7 +137,7 @@ public abstract class AbstractCompilerTckTest
 
         Compiler compiler = (Compiler) lookup( Compiler.ROLE, roleHint );
 
-        List result = compiler.compile( configuration );
+        List<CompilerError> result = compiler.compile( configuration );
 
         assertNotNull( result );
 
