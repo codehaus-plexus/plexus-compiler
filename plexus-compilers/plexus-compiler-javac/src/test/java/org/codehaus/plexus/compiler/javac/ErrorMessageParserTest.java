@@ -32,6 +32,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.codehaus.plexus.compiler.CompilerError;
+import org.codehaus.plexus.util.Os;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
@@ -235,9 +236,14 @@ public class ErrorMessageParserTest
      * Test that CRLF is parsed correctly wrt. the filename in warnings.
      * @throws Exception
      */
-    public void testCRLF()
+    public void testCRLF_windows()
         throws Exception
     {
+        // This test is only relevant on windows (test hardcodes EOL)
+        if (!Os.isFamily("windows")) {
+            return;
+        }
+
         String CRLF = new String(new byte[]{(byte) 0x0D, (byte) 0x0A});
         String errors = "warning: [options] bootstrap class path not set in conjunction with -source 1.6" + CRLF +
             "[parsing started RegularFileObject[C:\\commander\\pre\\ec\\ec-http\\src\\main\\java\\com\\electriccloud\\http\\HttpServerImpl.java]]" + CRLF +
@@ -433,44 +439,36 @@ public class ErrorMessageParserTest
             "[wrote RegularFileObject[C:\\commander\\pre\\ec\\ec-http\\target\\classes\\com\\electriccloud\\http\\HttpUtil.class]]" + CRLF +
             "[total 654ms]" + CRLF +
             "4 warnings" + CRLF;
-        
-
-        List<CompilerError> compilerErrors 
-		    = JavacCompiler.parseModernStream(0, new BufferedReader(new StringReader(errors)));
-        
+        List<CompilerError> compilerErrors = JavacCompiler.parseModernStream(0,
+            new BufferedReader(new StringReader(errors)));
         assertEquals("count", 3, compilerErrors.size());
-        
         CompilerError error1 = compilerErrors.get(0);
-        
-        assertEquals("file", "C:\\commander\\pre\\ec\\ec-http\\src\\main\\java\\com\\electriccloud\\http\\HttpUtil.java", error1.getFile());
-        
-        assertEquals("message", "[deprecation] ThreadSafeClientConnManager in org.apache.http.impl.conn.tsccm has been deprecated", error1.getMessage());
-        
+        assertEquals("file",
+            "C:\\commander\\pre\\ec\\ec-http\\src\\main\\java\\com\\electriccloud\\http\\HttpUtil.java",
+            error1.getFile());
+        assertEquals("message",
+            "[deprecation] ThreadSafeClientConnManager in org.apache.http.impl.conn.tsccm has been deprecated",
+            error1.getMessage());
         assertEquals("line", 31, error1.getStartLine());
-        
         assertEquals("column", 38, error1.getStartColumn());
-        
         CompilerError error2 = compilerErrors.get(1);
-        
-        assertEquals("file", "C:\\commander\\pre\\ec\\ec-http\\src\\main\\java\\com\\electriccloud\\http\\HttpUtil.java", error2.getFile());
-        
-        assertEquals("message", "[deprecation] ThreadSafeClientConnManager in org.apache.http.impl.conn.tsccm has been deprecated", error2.getMessage());
-        
+        assertEquals("file",
+            "C:\\commander\\pre\\ec\\ec-http\\src\\main\\java\\com\\electriccloud\\http\\HttpUtil.java",
+            error2.getFile());
+        assertEquals("message",
+            "[deprecation] ThreadSafeClientConnManager in org.apache.http.impl.conn.tsccm has been deprecated",
+            error2.getMessage());
         assertEquals("line", 151, error2.getStartLine());
-        
         assertEquals("column", 8, error2.getStartColumn());
-        
-
         CompilerError error3 = compilerErrors.get(2);
-        
-        assertEquals("file", "C:\\commander\\pre\\ec\\ec-http\\src\\main\\java\\com\\electriccloud\\http\\HttpUtil.java", error3.getFile());
-        
-        assertEquals("message", "[deprecation] ThreadSafeClientConnManager in org.apache.http.impl.conn.tsccm has been deprecated", error3.getMessage());
-        
+        assertEquals("file",
+            "C:\\commander\\pre\\ec\\ec-http\\src\\main\\java\\com\\electriccloud\\http\\HttpUtil.java",
+            error3.getFile());
+        assertEquals("message",
+            "[deprecation] ThreadSafeClientConnManager in org.apache.http.impl.conn.tsccm has been deprecated",
+            error3.getMessage());
         assertEquals("line", 152, error3.getStartLine());
-        
         assertEquals("column", 16, error3.getStartColumn());
-        
     }
 
 }
