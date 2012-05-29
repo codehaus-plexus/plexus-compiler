@@ -723,7 +723,7 @@ public class JavacCompiler
 
             if ( startOfFileName > -1 )
             {
-                file = file.substring( startOfFileName + 2 );
+                file = file.substring( startOfFileName + 1 + EOL.length() );
             }
 
             int line = Integer.parseInt( lineIndicator );
