@@ -208,7 +208,7 @@ public class JavacCompilerTest
         // customCompilerArguments
         Map<String, String> customCompilerArguments = new LinkedHashMap<String, String>();
         customCompilerArguments.put( "-J-Duser.language=en_us", null );
-        compilerConfiguration.setCustomCompilerArguments( customCompilerArguments );
+        compilerConfiguration.setCustomCompilerArgumentsAsMap( customCompilerArguments );
         // don't expect this argument!!
         
         internalTest( compilerConfiguration, expectedArguments );
@@ -341,7 +341,7 @@ public class JavacCompilerTest
 
         customerCompilerArguments.put( "foo", "bar" );
 
-        compilerConfiguration.setCustomCompilerArguments( customerCompilerArguments );
+        compilerConfiguration.setCustomCompilerArgumentsAsMap( customerCompilerArguments );
 
         expectedArguments.add( "arg1" );
 

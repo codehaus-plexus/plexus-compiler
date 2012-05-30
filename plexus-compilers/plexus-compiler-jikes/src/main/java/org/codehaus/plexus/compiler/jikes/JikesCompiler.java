@@ -207,7 +207,7 @@ public class JikesCompiler
 
         if ( config.getCustomCompilerArguments().size() > 0 )
         {
-            for ( Map.Entry<String, String> arg : config.getCustomCompilerArguments().entrySet() )
+            for ( Map.Entry<String, String> arg : config.getCustomCompilerArgumentsAsMap().entrySet() )
             {
                 args.add( arg.getKey() );
                 args.add( arg.getValue() );
