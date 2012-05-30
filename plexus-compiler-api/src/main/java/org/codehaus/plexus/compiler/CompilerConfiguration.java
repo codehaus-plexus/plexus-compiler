@@ -332,12 +332,29 @@ public class CompilerConfiguration
         customCompilerArguments.put( customArgument, value );
     }
 
-    public Map<String, String> getCustomCompilerArguments()
+    public LinkedHashMap getCustomCompilerArguments()
+    {
+        return new LinkedHashMap( customCompilerArguments );
+    }
+
+    public void setCustomCompilerArguments( LinkedHashMap customCompilerArguments )
+    {
+        if ( customCompilerArguments == null )
+        {
+            this.customCompilerArguments = new LinkedHashMap();
+        }
+        else
+        {
+            this.customCompilerArguments = customCompilerArguments;
+        }
+    }    
+    
+    public Map<String, String> getCustomCompilerArgumentsAsMap()
     {
         return new LinkedHashMap<String, String>( customCompilerArguments );
     }
 
-    public void setCustomCompilerArguments( Map<String, String> customCompilerArguments )
+    public void setCustomCompilerArgumentsAsMap( Map<String, String> customCompilerArguments )
     {
         if ( customCompilerArguments == null )
         {
