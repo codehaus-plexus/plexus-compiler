@@ -332,11 +332,19 @@ public class CompilerConfiguration
         customCompilerArguments.put( customArgument, value );
     }
 
+    /**
+     * @deprecated will be removed in 2.X use #getCustomCompilerArgumentsAsMap
+     * @return
+     */
     public LinkedHashMap getCustomCompilerArguments()
     {
         return new LinkedHashMap( customCompilerArguments );
     }
 
+    /**
+     * @deprecated will be removed in 2.X use #setCustomCompilerArgumentsAsMap
+     * @param customCompilerArguments
+     */
     public void setCustomCompilerArguments( LinkedHashMap customCompilerArguments )
     {
         if ( customCompilerArguments == null )
