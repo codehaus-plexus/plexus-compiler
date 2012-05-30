@@ -313,7 +313,7 @@ public class JavacCompiler
             args.add( config.getSourceEncoding() );
         }
 
-        for ( Map.Entry<String, String> entry : config.getCustomCompilerArguments().entrySet() )
+        for ( Map.Entry<String, String> entry : config.getCustomCompilerArgumentsAsMap().entrySet() )
         {
             String key = entry.getKey();
 
@@ -431,7 +431,7 @@ public class JavacCompiler
                 cli.addArguments( new String[]{ "-J-Xms" + config.getMeminitial() } );
             }
 
-            for ( String key : config.getCustomCompilerArguments().keySet() )
+            for ( String key : config.getCustomCompilerArgumentsAsMap().keySet() )
             {
                 if ( StringUtils.isNotEmpty( key ) && key.startsWith( "-J" ) )
                 {
