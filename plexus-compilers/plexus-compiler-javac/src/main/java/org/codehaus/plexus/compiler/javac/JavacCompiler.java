@@ -726,8 +726,10 @@ public class JavacCompiler
                 isError = false;
                 msg = msg.substring( warnPrefix.length() );
             }
-
-            isError = exitCode != 0;
+            else
+            {
+                isError = exitCode != 0;
+            }
 
             msgBuffer.append( msg );
 
