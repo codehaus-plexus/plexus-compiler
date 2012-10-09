@@ -569,7 +569,7 @@ public class JavacCompiler
             throw new CompilerException( "Error while executing the compiler.", e );
         }
 
-        if ( ( ok.intValue() != 0 ) && messages.isEmpty() )
+        if ( ( ok.intValue() != 0 ) && !containsErrorMessage( messages ) )
         {
             // TODO: exception?
             messages.add( new CompilerError( "Failure executing javac, but could not parse the error:" + EOL +
@@ -579,6 +579,19 @@ public class JavacCompiler
         return messages;
     }
 
+    private static boolean containsErrorMessage( List<CompilerError> messages )
+    {
+        for ( CompilerError message : messages )
+        {
+            if ( message.isError() )
+            {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
     /**
      * Parse the output from the compiler into a list of CompilerError objects
      *
