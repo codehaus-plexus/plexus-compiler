@@ -489,7 +489,7 @@ public class JavacCompiler
             throw new CompilerException( "Error while executing the external compiler.", e );
         }
 
-        if ( ( returnCode != 0 ) && messages.isEmpty() )
+        if ( ( returnCode != 0 ) && !containsErrorMessage( messages ) )
         {
             if ( err.getOutput().length() == 0 )
             {
