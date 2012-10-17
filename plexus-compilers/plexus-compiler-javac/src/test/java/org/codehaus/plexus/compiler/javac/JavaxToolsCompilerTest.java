@@ -21,14 +21,8 @@ package org.codehaus.plexus.compiler.javac;
 /**
  * @author Olivier Lamy
  */
-public class JavacCompilerTest
+public class JavaxToolsCompilerTest
     extends AbstractJavacCompilerTest
 {
-    public void setUp()
-        throws Exception
-    {
-        super.setUp();
-        setForceJavacCompilerUse( true );
-
-    }
+    // no op default is to javax.tools if available
 }

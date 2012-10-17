@@ -129,7 +129,7 @@ public class JavacCompiler
 
         if ( ( sourceFiles == null ) || ( sourceFiles.length == 0 ) )
         {
-            return Collections.<CompilerError>emptyList();
+            return Collections.emptyList();
         }
 
         if ( ( getLogger() != null ) && getLogger().isInfoEnabled() )
@@ -164,10 +164,28 @@ public class JavacCompiler
         }
         else
         {
+            if ( isJava16() && !config.isForceJavacCompilerUse() )
+            {
+                return org.codehaus.plexus.compiler.javac.JavaxToolsCompiler.compileInProcess( args, config,
+                                                                                               sourceFiles );
+            }
             messages = compileInProcess( args, config );
         }
 
         return messages;
+    }
+
+    protected static boolean isJava16()
+    {
+        try
+        {
+            Thread.currentThread().getContextClassLoader().loadClass( "javax.tools.ToolProvider" );
+            return true;
+        }
+        catch ( Exception e )
+        {
+            return false;
+        }
     }
 
     public String[] createCommandLine( CompilerConfiguration config )
@@ -211,8 +229,10 @@ public class JavacCompiler
 
             args.add( getPathString( sourceLocations ) );
         }
-
-        args.addAll( Arrays.asList( sourceFiles ) );
+        if ( !isJava16() || config.isForceJavacCompilerUse() || config.isFork() )
+        {
+            args.addAll( Arrays.asList( sourceFiles ) );
+        }
 
         if ( !isPreJava16( config ) )
         {
@@ -334,7 +354,7 @@ public class JavacCompiler
             args.add( value );
         }
 
-        return (String[]) args.toArray( new String[args.size()] );
+        return args.toArray( new String[args.size()] );
     }
 
     /**
@@ -588,10 +608,10 @@ public class JavacCompiler
                 return true;
             }
         }
-        
+
         return false;
     }
-    
+
     /**
      * Parse the output from the compiler into a list of CompilerError objects
      *

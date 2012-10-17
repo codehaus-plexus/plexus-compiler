@@ -44,6 +44,7 @@ package org.codehaus.plexus.compiler;
 /**
  * This class encapsulates an error message produced by a programming language
  * processor (whether interpreted or compiled)
+ *
  * @author <a href="mailto:stefano@apache.org">Stefano Mazzocchi</a>
  * @version $Id$
  * @since 2.0
@@ -52,8 +53,10 @@ public class CompilerError
 {
     /**
      * Is this a severe error or a warning?
+     *
+     * @since 2.0
      */
-    private boolean error;
+    private Kind kind;
 
     /**
      * The start line number of the offending program text
@@ -85,27 +88,35 @@ public class CompilerError
      */
     private String message;
 
+
     /**
      * The error message constructor.
      *
-     * @param file The name of the file containing the offending program text
-     * @param error Is this a severe error or a warning?
-     * @param startline The start line number of the offending program text
+     * @param file        The name of the file containing the offending program text
+     * @param error       Is this a severe error or a warning?
+     * @param startline   The start line number of the offending program text
      * @param startcolumn The start column number of the offending program text
-     * @param endline The end line number of the offending program text
-     * @param endcolumn The end column number of the offending program text
-     * @param message The actual error text produced by the language processor
+     * @param endline     The end line number of the offending program text
+     * @param endcolumn   The end column number of the offending program text
+     * @param message     The actual error text produced by the language processor
      */
-    public CompilerError( String file,
-                          boolean error,
-                          int startline,
-                          int startcolumn,
-                          int endline,
-                          int endcolumn,
+    public CompilerError( String file, boolean error, int startline, int startcolumn, int endline, int endcolumn,
                           String message )
     {
         this.file = file;
-        this.error = error;
+        this.kind = error ? Kind.ERROR : Kind.WARNING;
+        this.startline = startline;
+        this.startcolumn = startcolumn;
+        this.endline = endline;
+        this.endcolumn = endcolumn;
+        this.message = message;
+    }
+
+    public CompilerError( String file, Kind kind, int startline, int startcolumn, int endline, int endcolumn,
+                          String message )
+    {
+        this.file = file;
+        this.kind = kind;
         this.startline = startline;
         this.startcolumn = startcolumn;
         this.endline = endline;
@@ -127,12 +138,24 @@ public class CompilerError
      * The error message constructor.
      *
      * @param message The actual error text produced by the language processor
-     * @param error whether it was an error or informational
+     * @param error   whether it was an error or informational
      */
     public CompilerError( String message, boolean error )
     {
         this.message = message;
-        this.error = error;
+        this.kind = error ? Kind.ERROR : Kind.WARNING;
+    }
+
+    /**
+     *
+     * @param message The actual error text produced by the language processor
+     * @param kind    The error kind
+     * @since 2.0
+     */
+    public CompilerError( String message, Kind kind )
+    {
+        this.message = message;
+        this.kind = kind;
     }
 
     /**
@@ -152,7 +175,7 @@ public class CompilerError
      */
     public boolean isError()
     {
-        return error;
+        return kind == Kind.ERROR;
     }
 
     /**
@@ -170,7 +193,7 @@ public class CompilerError
      * error
      *
      * @return The starting column number of the program text originating this
-     * error
+     *         error
      */
     public int getStartColumn()
     {
@@ -192,7 +215,7 @@ public class CompilerError
      * error
      *
      * @return The ending column number of the program text originating this
-     * error
+     *         error
      */
     public int getEndColumn()
     {
@@ -209,15 +232,60 @@ public class CompilerError
         return message;
     }
 
+    /**
+     * Get the kind of message.
+     *
+     * @return the kind of message
+     * @since 2.0
+     */
+    public Kind getKind()
+    {
+        return kind;
+    }
+
     public String toString()
     {
         if ( file != null )
         {
-            return file + ":" + "[" + startline + "," + startcolumn + "] " + message;
+            if ( startline != 0 )
+            {
+                if ( startcolumn != 0 )
+                {
+                    return file + ":" + "[" + startline + "," + startcolumn + "] " + message;
+                }
+                else
+                {
+                    return file + ":" + "[" + startline + "] " + message;
+                }
+            }
+            else
+            {
+                return file + ": " + message;
+            }
         }
         else
         {
             return message;
         }
+    }
+
+    /**
+     * as we are still 1.5 required we use a wrapper to Diagnostic.Kind and some compilers don't know jdk constants
+     *
+     * @since 2.0
+     */
+    public enum Kind
+    {
+
+        ERROR( "error" ), MANDATORY_WARNING( "mandatory_warning" ), NOTE( "note" ), OTHER( "other" ), WARNING(
+        "warning" );
+
+        private String type;
+
+        private Kind( String type )
+        {
+            this.type = type;
+        }
+
     }
 }

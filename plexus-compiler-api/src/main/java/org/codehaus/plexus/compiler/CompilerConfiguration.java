@@ -126,6 +126,12 @@ public class CompilerConfiguration
      */
     private CompilerReuseStrategy compilerReuseStrategy = CompilerReuseStrategy.ReuseCreated;
 
+    /**
+     * force usage of old JavacCompiler even if javax.tools is detected
+     * @since 2.0
+     */
+    private boolean forceJavacCompilerUse=false;
+
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
@@ -553,4 +559,13 @@ public class CompilerConfiguration
         }
     }
 
+    public boolean isForceJavacCompilerUse()
+    {
+        return forceJavacCompilerUse;
+    }
+
+    public void setForceJavacCompilerUse( boolean forceJavacCompilerUse )
+    {
+        this.forceJavacCompilerUse = forceJavacCompilerUse;
+    }
 }
