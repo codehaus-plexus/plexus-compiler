@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author Olivier Lamy
@@ -44,15 +45,56 @@ public class JavaxToolsCompiler
     /**
      * is that thread safe ???
      */
-    static final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+    static final JavaCompiler COMPILER = ToolProvider.getSystemJavaCompiler();
+
+    private static List<JavaCompiler> javaCompilers = new CopyOnWriteArrayList<JavaCompiler>();
+
+    protected static JavaCompiler getJavaCompiler( CompilerConfiguration compilerConfiguration )
+    {
+        switch ( compilerConfiguration.getCompilerReuseStrategy() )
+        {
+            case AlwaysNew:
+                return ToolProvider.getSystemJavaCompiler();
+            case ReuseCreated:
+                JavaCompiler javaCompiler;
+                synchronized ( javaCompilers )
+                {
+                    if ( javaCompilers.size() > 0 )
+                    {
+                        javaCompiler = javaCompilers.get( 0 );
+                        javaCompilers.remove( javaCompiler );
+                        return javaCompiler;
+                    }
+                }
+                javaCompiler = ToolProvider.getSystemJavaCompiler();
+                return javaCompiler;
+            case ReuseSame:
+            default:
+                return COMPILER;
+        }
+
+    }
+
+    static void releaseJavaCompiler( JavaCompiler javaCompiler, CompilerConfiguration compilerConfiguration )
+    {
+        if ( javaCompiler == null )
+        {
+            return;
+        }
+        if ( compilerConfiguration.getCompilerReuseStrategy()
+            == CompilerConfiguration.CompilerReuseStrategy.ReuseCreated )
+        {
+            javaCompilers.add( javaCompiler );
+        }
+    }
 
     static List<CompilerError> compileInProcess( String[] args, final CompilerConfiguration config,
                                                  String[] sourceFiles )
         throws CompilerException
     {
+        JavaCompiler compiler = getJavaCompiler( config );
         try
         {
-
             if ( compiler == null )
             {
                 return Collections.singletonList( new CompilerError(
@@ -142,6 +184,11 @@ public class JavaxToolsCompiler
         catch ( Exception e )
         {
             throw new CompilerException( e.getMessage(), e );
+        }
+        finally
+        {
+            releaseJavaCompiler( compiler, config );
+
         }
     }
 }
