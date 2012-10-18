@@ -41,13 +41,18 @@ import java.util.List;
  */
 public class JavaxToolsCompiler
 {
+    /**
+     * is that thread safe ???
+     */
+    static final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+
     static List<CompilerError> compileInProcess( String[] args, final CompilerConfiguration config,
                                                  String[] sourceFiles )
         throws CompilerException
     {
         try
         {
-            final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+
             if ( compiler == null )
             {
                 return Collections.singletonList( new CompilerError(
