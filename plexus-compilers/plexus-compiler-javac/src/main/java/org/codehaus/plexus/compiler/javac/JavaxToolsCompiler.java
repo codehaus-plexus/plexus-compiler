@@ -47,7 +47,7 @@ public class JavaxToolsCompiler
      */
     static final JavaCompiler COMPILER = ToolProvider.getSystemJavaCompiler();
 
-    private static List<JavaCompiler> javaCompilers = new CopyOnWriteArrayList<JavaCompiler>();
+    private static List<JavaCompiler> JAVA_COMPILERS = new CopyOnWriteArrayList<JavaCompiler>();
 
     protected static JavaCompiler getJavaCompiler( CompilerConfiguration compilerConfiguration )
     {
@@ -57,12 +57,12 @@ public class JavaxToolsCompiler
                 return ToolProvider.getSystemJavaCompiler();
             case ReuseCreated:
                 JavaCompiler javaCompiler;
-                synchronized ( javaCompilers )
+                synchronized ( JAVA_COMPILERS )
                 {
-                    if ( javaCompilers.size() > 0 )
+                    if ( JAVA_COMPILERS.size() > 0 )
                     {
-                        javaCompiler = javaCompilers.get( 0 );
-                        javaCompilers.remove( javaCompiler );
+                        javaCompiler = JAVA_COMPILERS.get( 0 );
+                        JAVA_COMPILERS.remove( javaCompiler );
                         return javaCompiler;
                     }
                 }
@@ -84,7 +84,7 @@ public class JavaxToolsCompiler
         if ( compilerConfiguration.getCompilerReuseStrategy()
             == CompilerConfiguration.CompilerReuseStrategy.ReuseCreated )
         {
-            javaCompilers.add( javaCompiler );
+            JAVA_COMPILERS.add( javaCompiler );
         }
     }
 
