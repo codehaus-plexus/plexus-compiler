@@ -166,6 +166,7 @@ public class JavacCompiler
         {
             if ( isJava16() && !config.isForceJavacCompilerUse() )
             {
+                // use fqcn to prevent loading of the class on 1.5 environement !
                 return org.codehaus.plexus.compiler.javac.JavaxToolsCompiler.compileInProcess( args, config,
                                                                                                sourceFiles );
             }
