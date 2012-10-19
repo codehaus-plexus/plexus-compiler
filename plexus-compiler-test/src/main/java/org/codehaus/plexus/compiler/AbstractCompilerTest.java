@@ -50,6 +50,8 @@ public abstract class AbstractCompilerTest
 
     private boolean compilerDeprecationWarnings = false;
 
+    private boolean forceJavacCompilerUse = false;
+
     protected abstract String getRoleHint();
 
     protected void setCompilerDebug( boolean flag )
@@ -62,6 +64,10 @@ public abstract class AbstractCompilerTest
         compilerDeprecationWarnings = flag;
     }
 
+    public void setForceJavacCompilerUse( boolean forceJavacCompilerUse )
+    {
+        this.forceJavacCompilerUse = forceJavacCompilerUse;
+    }
 
     protected List<String> getClasspath()
         throws Exception
@@ -178,7 +184,11 @@ public abstract class AbstractCompilerTest
 
             compilerConfig.addInclude( filename );
 
+            compilerConfig.setForceJavacCompilerUse( this.forceJavacCompilerUse );
+
             compilerConfigurations.add( compilerConfig );
+
+
         }
 
         return compilerConfigurations;
