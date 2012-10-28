@@ -49,7 +49,7 @@ package org.codehaus.plexus.compiler;
  * @version $Id$
  * @since 2.0
  */
-public class CompilerError
+public class CompilerMessage
 {
     /**
      * Is this a severe error or a warning?
@@ -100,8 +100,8 @@ public class CompilerError
      * @param endcolumn   The end column number of the offending program text
      * @param message     The actual error text produced by the language processor
      */
-    public CompilerError( String file, boolean error, int startline, int startcolumn, int endline, int endcolumn,
-                          String message )
+    public CompilerMessage( String file, boolean error, int startline, int startcolumn, int endline, int endcolumn,
+                            String message )
     {
         this.file = file;
         this.kind = error ? Kind.ERROR : Kind.WARNING;
@@ -112,8 +112,8 @@ public class CompilerError
         this.message = message;
     }
 
-    public CompilerError( String file, Kind kind, int startline, int startcolumn, int endline, int endcolumn,
-                          String message )
+    public CompilerMessage( String file, Kind kind, int startline, int startcolumn, int endline, int endcolumn,
+                            String message )
     {
         this.file = file;
         this.kind = kind;
@@ -129,7 +129,7 @@ public class CompilerError
      *
      * @param message The actual error text produced by the language processor
      */
-    public CompilerError( String message )
+    public CompilerMessage( String message )
     {
         this.message = message;
     }
@@ -140,7 +140,7 @@ public class CompilerError
      * @param message The actual error text produced by the language processor
      * @param error   whether it was an error or informational
      */
-    public CompilerError( String message, boolean error )
+    public CompilerMessage( String message, boolean error )
     {
         this.message = message;
         this.kind = error ? Kind.ERROR : Kind.WARNING;
@@ -152,7 +152,7 @@ public class CompilerError
      * @param kind    The error kind
      * @since 2.0
      */
-    public CompilerError( String message, Kind kind )
+    public CompilerMessage( String message, Kind kind )
     {
         this.message = message;
         this.kind = kind;

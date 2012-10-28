@@ -19,7 +19,7 @@ package org.codehaus.plexus.compiler.javac;
  */
 
 import org.codehaus.plexus.compiler.CompilerConfiguration;
-import org.codehaus.plexus.compiler.CompilerError;
+import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.compiler.CompilerException;
 
 import javax.tools.Diagnostic;
@@ -88,7 +88,7 @@ public class JavaxToolsCompiler
         }
     }
 
-    static List<CompilerError> compileInProcess( String[] args, final CompilerConfiguration config,
+    static List<CompilerMessage> compileInProcess( String[] args, final CompilerConfiguration config,
                                                  String[] sourceFiles )
         throws CompilerException
     {
@@ -97,7 +97,7 @@ public class JavaxToolsCompiler
         {
             if ( compiler == null )
             {
-                return Collections.singletonList( new CompilerError(
+                return Collections.singletonList( new CompilerMessage(
                     "No compiler is provided in this environment.  Perhaps you are running on a JRE rather than a JDK?" ) );
             }
             final String sourceEncoding = config.getSourceEncoding();
@@ -120,26 +120,26 @@ public class JavaxToolsCompiler
 
                 compiler.getTask( null, standardFileManager, collector, Arrays.asList( args ), null, fileObjects );
             final Boolean result = task.call();
-            final ArrayList<CompilerError> compilerErrors = new ArrayList<CompilerError>();
+            final ArrayList<CompilerMessage> compilerErrors = new ArrayList<CompilerMessage>();
             for ( Diagnostic<? extends JavaFileObject> diagnostic : collector.getDiagnostics() )
             {
-                CompilerError.Kind kind;
+                CompilerMessage.Kind kind;
                 switch ( diagnostic.getKind() )
                 {
                     case ERROR:
-                        kind = CompilerError.Kind.ERROR;
+                        kind = CompilerMessage.Kind.ERROR;
                         break;
                     case WARNING:
-                        kind = CompilerError.Kind.WARNING;
+                        kind = CompilerMessage.Kind.WARNING;
                         break;
                     case MANDATORY_WARNING:
-                        kind = CompilerError.Kind.MANDATORY_WARNING;
+                        kind = CompilerMessage.Kind.MANDATORY_WARNING;
                         break;
                     case NOTE:
-                        kind = CompilerError.Kind.NOTE;
+                        kind = CompilerMessage.Kind.NOTE;
                         break;
                     default:
-                        kind = CompilerError.Kind.OTHER;
+                        kind = CompilerMessage.Kind.OTHER;
                         break;
                 }
                 String baseMessage = diagnostic.getMessage( null );
@@ -171,13 +171,13 @@ public class JavaxToolsCompiler
                     }
                 }
                 compilerErrors.add(
-                    new CompilerError( longFileName, kind, lineNumber, columnNumber, lineNumber, columnNumber,
+                    new CompilerMessage( longFileName, kind, lineNumber, columnNumber, lineNumber, columnNumber,
                                        formattedMessage ) );
             }
             if ( result != Boolean.TRUE && compilerErrors.isEmpty() )
             {
                 compilerErrors.add(
-                    new CompilerError( "An unknown compilation problem occurred", CompilerError.Kind.ERROR ) );
+                    new CompilerMessage( "An unknown compilation problem occurred", CompilerMessage.Kind.ERROR ) );
             }
             return compilerErrors;
         }

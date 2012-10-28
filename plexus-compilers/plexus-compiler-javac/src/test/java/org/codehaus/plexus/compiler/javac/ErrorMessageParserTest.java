@@ -31,7 +31,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.codehaus.plexus.compiler.CompilerError;
+import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.util.Os;
 
 /**
@@ -50,7 +50,7 @@ public class ErrorMessageParserTest
                        "import java.util.Date;public class Foo{    private Date date = new Date( \"foo\");}" + EOL +
                        "                                                               ^" + EOL;
 
-        CompilerError compilerError = JavacCompiler.parseModernError( 0, error );
+        CompilerMessage compilerError = JavacCompiler.parseModernError( 0, error );
 
         assertNotNull( compilerError );
 
@@ -73,7 +73,7 @@ public class ErrorMessageParserTest
                        "        finally { return; }" + EOL +
                        "                          ^" + EOL;
 
-        CompilerError compilerError = JavacCompiler.parseModernError( 0, error );
+        CompilerMessage compilerError = JavacCompiler.parseModernError( 0, error );
 
         assertNotNull( compilerError );
 
@@ -96,7 +96,7 @@ public class ErrorMessageParserTest
                        "         i;" + EOL +
                        "         ^" + EOL;
 
-        CompilerError compilerError = JavacCompiler.parseModernError( 1, error );
+        CompilerMessage compilerError = JavacCompiler.parseModernError( 1, error );
 
         assertNotNull( compilerError );
 
@@ -121,7 +121,7 @@ public class ErrorMessageParserTest
                        "        foo();" + EOL +
                        "        ^" + EOL;
 
-        CompilerError compilerError = JavacCompiler.parseModernError( 1, error );
+        CompilerMessage compilerError = JavacCompiler.parseModernError( 1, error );
 
         assertNotNull( compilerError );
 
@@ -155,7 +155,7 @@ public class ErrorMessageParserTest
                         "                              ^" + EOL +
                         "2 errors" + EOL;
 
-        List<CompilerError> messages =
+        List<CompilerMessage> messages =
             JavacCompiler.parseModernStream( 1, new BufferedReader( new StringReader( errors ) ) );
 
         assertEquals( 2, messages.size() );
@@ -174,7 +174,7 @@ public class ErrorMessageParserTest
                         "                              ^" + EOL +
                         "2 errors" + EOL;
 
-        List<CompilerError> messages =
+        List<CompilerMessage> messages =
             JavacCompiler.parseModernStream( 1, new BufferedReader( new StringReader( errors ) ) );
 
         assertEquals( 2, messages.size() );
@@ -189,7 +189,7 @@ public class ErrorMessageParserTest
                         "               ^" + EOL +
                         "1 error" + EOL;
 
-        List<CompilerError> messages =
+        List<CompilerMessage> messages =
             JavacCompiler.parseModernStream( 1, new BufferedReader( new StringReader( errors ) ) );
 
         assertEquals( 1, messages.size() );
@@ -203,11 +203,11 @@ public class ErrorMessageParserTest
                         "                    ^" + EOL +
                         "\u8b66\u544a 1 \u500b" + EOL;
 
-        List<CompilerError> messages =
+        List<CompilerMessage> messages =
             JavacCompiler.parseModernStream( 0, new BufferedReader( new StringReader( errors ) ) );
 
         assertEquals( 1, messages.size() );
-        assertFalse( ( (CompilerError) messages.get( 0 ) ).isError() );
+        assertFalse( ( (CompilerMessage) messages.get( 0 ) ).isError() );
     }
 
     public void testUnixFileNames()
@@ -216,7 +216,7 @@ public class ErrorMessageParserTest
                         "        System.out.println( \"Hello World!\" );x" + EOL +
                         "                                             ^" + EOL;
 
-        CompilerError compilerError = JavacCompiler.parseModernError( 1, error );
+        CompilerMessage compilerError = JavacCompiler.parseModernError( 1, error );
 
         assertEquals( "/my/prj/src/main/java/test/prj/App.java:[11,45] not a statement", String.valueOf( compilerError ) );
     }
@@ -227,7 +227,7 @@ public class ErrorMessageParserTest
                         "        System.out.println( \"Hello World!\" );x" + EOL +
                         "                                             ^" + EOL;
 
-        CompilerError compilerError = JavacCompiler.parseModernError( 1, error );
+        CompilerMessage compilerError = JavacCompiler.parseModernError( 1, error );
 
         assertEquals( "c:\\Documents and Settings\\My Self\\Documents\\prj\\src\\main\\java\\test\\prj\\App.java:[11,45] not a statement", String.valueOf( compilerError ) );
     }
@@ -439,10 +439,10 @@ public class ErrorMessageParserTest
             "[wrote RegularFileObject[C:\\commander\\pre\\ec\\ec-http\\target\\classes\\com\\electriccloud\\http\\HttpUtil.class]]" + CRLF +
             "[total 654ms]" + CRLF +
             "4 warnings" + CRLF;
-        List<CompilerError> compilerErrors = JavacCompiler.parseModernStream(0,
+        List<CompilerMessage> compilerErrors = JavacCompiler.parseModernStream(0,
             new BufferedReader(new StringReader(errors)));
         assertEquals("count", 3, compilerErrors.size());
-        CompilerError error1 = compilerErrors.get(0);
+        CompilerMessage error1 = compilerErrors.get(0);
         assertEquals("file",
             "C:\\commander\\pre\\ec\\ec-http\\src\\main\\java\\com\\electriccloud\\http\\HttpUtil.java",
             error1.getFile());
@@ -451,7 +451,7 @@ public class ErrorMessageParserTest
             error1.getMessage());
         assertEquals("line", 31, error1.getStartLine());
         assertEquals("column", 38, error1.getStartColumn());
-        CompilerError error2 = compilerErrors.get(1);
+        CompilerMessage error2 = compilerErrors.get(1);
         assertEquals("file",
             "C:\\commander\\pre\\ec\\ec-http\\src\\main\\java\\com\\electriccloud\\http\\HttpUtil.java",
             error2.getFile());
@@ -460,7 +460,7 @@ public class ErrorMessageParserTest
             error2.getMessage());
         assertEquals("line", 151, error2.getStartLine());
         assertEquals("column", 8, error2.getStartColumn());
-        CompilerError error3 = compilerErrors.get(2);
+        CompilerMessage error3 = compilerErrors.get(2);
         assertEquals("file",
             "C:\\commander\\pre\\ec\\ec-http\\src\\main\\java\\com\\electriccloud\\http\\HttpUtil.java",
             error3.getFile());

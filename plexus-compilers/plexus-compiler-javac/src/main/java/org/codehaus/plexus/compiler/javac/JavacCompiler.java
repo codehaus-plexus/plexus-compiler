@@ -43,9 +43,10 @@ package org.codehaus.plexus.compiler.javac;
 
 import org.codehaus.plexus.compiler.AbstractCompiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
-import org.codehaus.plexus.compiler.CompilerError;
 import org.codehaus.plexus.compiler.CompilerException;
+import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.compiler.CompilerOutputStyle;
+import org.codehaus.plexus.compiler.CompilerResult;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
@@ -67,7 +68,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -115,7 +115,7 @@ public class JavacCompiler
     // Compiler Implementation
     // ----------------------------------------------------------------------
 
-    public List<CompilerError> compile( CompilerConfiguration config )
+    public CompilerResult compile( CompilerConfiguration config )
         throws CompilerException
     {
         File destinationDir = new File( config.getOutputLocation() );
@@ -129,7 +129,7 @@ public class JavacCompiler
 
         if ( ( sourceFiles == null ) || ( sourceFiles.length == 0 ) )
         {
-            return Collections.emptyList();
+            return new CompilerResult();
         }
 
         if ( ( getLogger() != null ) && getLogger().isInfoEnabled() )
@@ -141,7 +141,7 @@ public class JavacCompiler
 
         String[] args = buildCompilerArguments( config, sourceFiles );
 
-        List<CompilerError> messages;
+        List<CompilerMessage> messages;
 
         if ( config.isFork() )
         {
@@ -167,13 +167,14 @@ public class JavacCompiler
             if ( isJava16() && !config.isForceJavacCompilerUse() )
             {
                 // use fqcn to prevent loading of the class on 1.5 environement !
-                return org.codehaus.plexus.compiler.javac.JavaxToolsCompiler.compileInProcess( args, config,
-                                                                                               sourceFiles );
+                return new CompilerResult().compilerMessages(
+                    org.codehaus.plexus.compiler.javac.JavaxToolsCompiler.compileInProcess( args, config,
+                                                                                            sourceFiles ) );
             }
             messages = compileInProcess( args, config );
         }
 
-        return messages;
+        return new CompilerResult().compilerMessages( messages );
     }
 
     protected static boolean isJava16()
@@ -424,10 +425,10 @@ public class JavacCompiler
      * @param config     compiler configuration
      * @param executable name of the executable to launch
      * @param args       arguments for the executable launched
-     * @return List of CompilerError objects with the errors encountered.
+     * @return List of CompilerMessage objects with the errors encountered.
      * @throws CompilerException
      */
-    List<CompilerError> compileOutOfProcess( CompilerConfiguration config, String executable, String[] args )
+    List<CompilerMessage> compileOutOfProcess( CompilerConfiguration config, String executable, String[] args )
         throws CompilerException
     {
         Commandline cli = new Commandline();
@@ -471,7 +472,7 @@ public class JavacCompiler
 
         int returnCode;
 
-        List<CompilerError> messages;
+        List<CompilerMessage> messages;
 
         if ( ( getLogger() != null ) && getLogger().isDebugEnabled() )
         {
@@ -519,7 +520,7 @@ public class JavacCompiler
             }
             else
             {
-                messages.add( new CompilerError(
+                messages.add( new CompilerMessage(
                     "Failure executing javac,  but could not parse the error:" + EOL + err.getOutput(), true ) );
             }
         }
@@ -532,10 +533,10 @@ public class JavacCompiler
      * using <code>com.sun.tools.javac.Main</code> class
      *
      * @param args arguments for the compiler as they would be used in the command line javac
-     * @return List of CompilerError objects with the errors encountered.
+     * @return List of CompilerMessage objects with the errors encountered.
      * @throws CompilerException
      */
-    List<CompilerError> compileInProcess( String[] args, CompilerConfiguration config )
+    List<CompilerMessage> compileInProcess( String[] args, CompilerConfiguration config )
         throws CompilerException
     {
         final Class<?> javacClass = getJavacClass( config );
@@ -556,14 +557,14 @@ public class JavacCompiler
     /**
      * Helper method for compileInProcess()
      */
-    private static List<CompilerError> compileInProcess0( Class<?> javacClass, String[] args )
+    private static List<CompilerMessage> compileInProcess0( Class<?> javacClass, String[] args )
         throws CompilerException
     {
         StringWriter out = new StringWriter();
 
         Integer ok;
 
-        List<CompilerError> messages;
+        List<CompilerMessage> messages;
 
         try
         {
@@ -593,16 +594,16 @@ public class JavacCompiler
         if ( ( ok.intValue() != 0 ) && !containsErrorMessage( messages ) )
         {
             // TODO: exception?
-            messages.add( new CompilerError( "Failure executing javac, but could not parse the error:" + EOL +
-                                                 out.toString(), true ) );
+            messages.add( new CompilerMessage( "Failure executing javac, but could not parse the error:" + EOL +
+                                                   out.toString(), true ) );
         }
 
         return messages;
     }
 
-    private static boolean containsErrorMessage( List<CompilerError> messages )
+    private static boolean containsErrorMessage( List<CompilerMessage> messages )
     {
-        for ( CompilerError message : messages )
+        for ( CompilerMessage message : messages )
         {
             if ( message.isError() )
             {
@@ -614,17 +615,17 @@ public class JavacCompiler
     }
 
     /**
-     * Parse the output from the compiler into a list of CompilerError objects
+     * Parse the output from the compiler into a list of CompilerMessage objects
      *
      * @param exitCode The exit code of javac.
      * @param input    The output of the compiler
-     * @return List of CompilerError objects
+     * @return List of CompilerMessage objects
      * @throws IOException
      */
-    static List<CompilerError> parseModernStream( int exitCode, BufferedReader input )
+    static List<CompilerMessage> parseModernStream( int exitCode, BufferedReader input )
         throws IOException
     {
-        List<CompilerError> errors = new ArrayList<CompilerError>();
+        List<CompilerMessage> errors = new ArrayList<CompilerMessage>();
 
         String line;
 
@@ -648,7 +649,7 @@ public class JavacCompiler
                 // TODO: there should be a better way to parse these
                 if ( ( buffer.length() == 0 ) && line.startsWith( "error: " ) )
                 {
-                    errors.add( new CompilerError( line, true ) );
+                    errors.add( new CompilerMessage( line, true ) );
                 }
                 else if ( ( buffer.length() == 0 ) && isNote( line ) )
                 {
@@ -681,13 +682,13 @@ public class JavacCompiler
     }
 
     /**
-     * Construct a CompilerError object from a line of the compiler output
+     * Construct a CompilerMessage object from a line of the compiler output
      *
      * @param exitCode The exit code from javac.
      * @param error    output line from the compiler
-     * @return the CompilerError object
+     * @return the CompilerMessage object
      */
-    static CompilerError parseModernError( int exitCode, String error )
+    static CompilerMessage parseModernError( int exitCode, String error )
     {
         StringTokenizer tokens = new StringTokenizer( error, ":" );
 
@@ -809,19 +810,19 @@ public class JavacCompiler
                 endcolumn = context.length();
             }
 
-            return new CompilerError( file, isError, line, startcolumn, line, endcolumn, message.trim() );
+            return new CompilerMessage( file, isError, line, startcolumn, line, endcolumn, message.trim() );
         }
         catch ( NoSuchElementException e )
         {
-            return new CompilerError( "no more tokens - could not parse error message: " + error, isError );
+            return new CompilerMessage( "no more tokens - could not parse error message: " + error, isError );
         }
         catch ( NumberFormatException e )
         {
-            return new CompilerError( "could not parse error message: " + error, isError );
+            return new CompilerMessage( "could not parse error message: " + error, isError );
         }
         catch ( Exception e )
         {
-            return new CompilerError( "could not parse error message: " + error, isError );
+            return new CompilerMessage( "could not parse error message: " + error, isError );
         }
     }
 

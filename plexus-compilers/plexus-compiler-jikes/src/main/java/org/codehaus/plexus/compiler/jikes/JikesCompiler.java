@@ -75,9 +75,10 @@ package org.codehaus.plexus.compiler.jikes;
 
 import org.codehaus.plexus.compiler.AbstractCompiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
-import org.codehaus.plexus.compiler.CompilerError;
 import org.codehaus.plexus.compiler.CompilerException;
+import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.compiler.CompilerOutputStyle;
+import org.codehaus.plexus.compiler.CompilerResult;
 import org.codehaus.plexus.compiler.util.StreamPumper;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.Os;
@@ -107,17 +108,14 @@ public class JikesCompiler
 
     public JikesCompiler()
     {
-        super( CompilerOutputStyle.ONE_OUTPUT_FILE_PER_INPUT_FILE,
-               ".java",
-               ".class",
-               null );
+        super( CompilerOutputStyle.ONE_OUTPUT_FILE_PER_INPUT_FILE, ".java", ".class", null );
     }
 
     // -----------------------------------------------------------------------
     // Compiler Implementation
     // -----------------------------------------------------------------------
 
-    public List<CompilerError> compile( CompilerConfiguration config )
+    public CompilerResult compile( CompilerConfiguration config )
         throws CompilerException
     {
         // Ensures that the directory exist.
@@ -157,18 +155,19 @@ public class JikesCompiler
             // Parse the output
             // -----------------------------------------------------------------------
 
-            BufferedReader input = new BufferedReader( new InputStreamReader( new ByteArrayInputStream( tmpErr.toByteArray() ) ) );
+            BufferedReader input =
+                new BufferedReader( new InputStreamReader( new ByteArrayInputStream( tmpErr.toByteArray() ) ) );
 
-            List<CompilerError> messages = new ArrayList<CompilerError>();
+            List<CompilerMessage> messages = new ArrayList<CompilerMessage>();
 
             parseStream( input, messages );
 
             if ( exitValue != 0 && exitValue != 1 )
             {
-                messages.add( new CompilerError( "Exit code from jikes was not 0 or 1 ->" + exitValue, true ) );
+                messages.add( new CompilerMessage( "Exit code from jikes was not 0 or 1 ->" + exitValue, true ) );
             }
 
-            return messages;
+            return new CompilerResult().compilerMessages( messages );
         }
         catch ( IOException e )
         {
@@ -314,7 +313,7 @@ public class JikesCompiler
 
         }
 
-        return (String[]) args.toArray( new String[ args.size() ] );
+        return (String[]) args.toArray( new String[args.size()] );
     }
 
     // -----------------------------------------------------------------------
@@ -382,13 +381,13 @@ public class JikesCompiler
 
     /**
      * Parse the compiler error stream to produce a list of
-     * <code>CompilerError</code>s
+     * <code>CompilerMessage</code>s
      *
      * @param input The error stream
      * @return The list of compiler error messages
      * @throws IOException If an error occurs during message collection
      */
-    protected List<CompilerError> parseStream( BufferedReader input, List<CompilerError> messages )
+    protected List<CompilerMessage> parseStream( BufferedReader input, List<CompilerMessage> messages )
         throws IOException
     {
         String line = null;
@@ -442,13 +441,13 @@ public class JikesCompiler
      * Parse an individual compiler error message
      *
      * @param error The error text
-     * @return A mssaged <code>CompilerError</code>
+     * @return A mssaged <code>CompilerMessage</code>
      */
-    private CompilerError parseError( String error )
+    private CompilerMessage parseError( String error )
     {
         if ( error.startsWith( "Error:" ) )
         {
-            return new CompilerError( error, true );
+            return new CompilerMessage( error, true );
         }
 
         String[] errorBits = StringUtils.split( error, ":" );
@@ -483,7 +482,7 @@ public class JikesCompiler
             message.append( ':' ).append( errorBits[i++] );
         }
 
-        return new CompilerError( file, type.indexOf( "Error" ) > -1, startline, startcolumn, endline, endcolumn,
-                                  message.toString() );
+        return new CompilerMessage( file, type.indexOf( "Error" ) > -1, startline, startcolumn, endline, endcolumn,
+                                    message.toString() );
     }
 }

@@ -18,9 +18,10 @@ package org.codehaus.plexus.compiler.csharp;
 
 import org.codehaus.plexus.compiler.AbstractCompiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
-import org.codehaus.plexus.compiler.CompilerError;
 import org.codehaus.plexus.compiler.CompilerException;
+import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.compiler.CompilerOutputStyle;
+import org.codehaus.plexus.compiler.CompilerResult;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.Os;
@@ -41,7 +42,6 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +61,7 @@ public class CSharpCompiler
 {
     private static final String ARGUMENTS_FILE_NAME = "csharp-arguments";
 
-    private static final String[] DEFAULT_INCLUDES = {"**/**"};
+    private static final String[] DEFAULT_INCLUDES = { "**/**" };
 
     // ----------------------------------------------------------------------
     //
@@ -88,7 +88,7 @@ public class CSharpCompiler
         return configuration.getOutputFileName() + "." + getTypeExtension( configuration );
     }
 
-    public List<CompilerError> compile( CompilerConfiguration config )
+    public CompilerResult compile( CompilerConfiguration config )
         throws CompilerException
     {
         File destinationDir = new File( config.getOutputLocation() );
@@ -104,27 +104,28 @@ public class CSharpCompiler
 
         if ( sourceFiles.length == 0 )
         {
-            return Collections.<CompilerError>emptyList();
+            return new CompilerResult().success( true );
         }
 
         System.out.println( "Compiling " + sourceFiles.length + " " + "source file" +
-            ( sourceFiles.length == 1 ? "" : "s" ) + " to " + destinationDir.getAbsolutePath() );
+                                ( sourceFiles.length == 1 ? "" : "s" ) + " to " + destinationDir.getAbsolutePath() );
 
         String[] args = buildCompilerArguments( config, sourceFiles );
 
-        List<CompilerError> messages;
+        List<CompilerMessage> messages;
 
         if ( config.isFork() )
         {
-            messages = compileOutOfProcess( config.getWorkingDirectory(), config.getBuildDirectory(),
-                                            findExecutable( config ), args );
+            messages =
+                compileOutOfProcess( config.getWorkingDirectory(), config.getBuildDirectory(), findExecutable( config ),
+                                     args );
         }
         else
         {
             throw new CompilerException( "This compiler doesn't support in-process compilation." );
         }
 
-        return messages;
+        return new CompilerResult().compilerMessages( messages );
     }
 
     public String[] createCommandLine( CompilerConfiguration config )
@@ -253,8 +254,8 @@ Options can be of the form -option or /option
 
         if ( !StringUtils.isEmpty( doc ) )
         {
-            args.add( "/doc:" +
-                new File( config.getOutputLocation(), config.getOutputFileName() + ".xml" ).getAbsolutePath() );
+            args.add( "/doc:" + new File( config.getOutputLocation(),
+                                          config.getOutputFileName() + ".xml" ).getAbsolutePath() );
         }
 
         // ----------------------------------------------------------------------
@@ -394,9 +395,9 @@ Options can be of the form -option or /option
         return name.replace( File.separatorChar, '.' );
     }
 
-    @SuppressWarnings( "deprecation" )
-    private List<CompilerError> compileOutOfProcess( File workingDirectory, File target, String executable,
-                                                     String[] args )
+    @SuppressWarnings ( "deprecation" )
+    private List<CompilerMessage> compileOutOfProcess( File workingDirectory, File target, String executable,
+                                                       String[] args )
         throws CompilerException
     {
         // ----------------------------------------------------------------------
@@ -447,7 +448,7 @@ Options can be of the form -option or /option
 
         int returnCode;
 
-        List<CompilerError> messages;
+        List<CompilerMessage> messages;
 
         try
         {
@@ -467,7 +468,7 @@ Options can be of the form -option or /option
         if ( returnCode != 0 && messages.isEmpty() )
         {
             // TODO: exception?
-            messages.add( new CompilerError(
+            messages.add( new CompilerMessage(
                 "Failure executing the compiler, but could not parse the error:" + EOL + stringWriter.toString(),
                 true ) );
         }
@@ -475,16 +476,16 @@ Options can be of the form -option or /option
         return messages;
     }
 
-    public static List<CompilerError> parseCompilerOutput( BufferedReader bufferedReader )
+    public static List<CompilerMessage> parseCompilerOutput( BufferedReader bufferedReader )
         throws IOException
     {
-        List<CompilerError> messages = new ArrayList<CompilerError>();
+        List<CompilerMessage> messages = new ArrayList<CompilerMessage>();
 
         String line = bufferedReader.readLine();
 
         while ( line != null )
         {
-            CompilerError compilerError = DefaultCSharpCompilerParser.parseLine( line );
+            CompilerMessage compilerError = DefaultCSharpCompilerParser.parseLine( line );
 
             if ( compilerError != null )
             {
@@ -514,12 +515,12 @@ Options can be of the form -option or /option
     {
         String type = getType( configuration.getCustomCompilerArguments() );
 
-        if ( "exe".equals( type  ) || "winexe".equals( type  ) )
+        if ( "exe".equals( type ) || "winexe".equals( type ) )
         {
             return "exe";
         }
 
-        if ( "library".equals( type  ) || "module".equals( type  ) )
+        if ( "library".equals( type ) || "module".equals( type ) )
         {
             return "dll";
         }
@@ -572,7 +573,7 @@ Options can be of the form -option or /option
      * @author Chris Stevenson
      * @deprecated
      */
-    public static CompilerError parseLine( String line )
+    public static CompilerMessage parseLine( String line )
     {
         return DefaultCSharpCompilerParser.parseLine( line );
     }
@@ -592,7 +593,7 @@ Options can be of the form -option or /option
         }
         else
         {
-            scanner.setIncludes( new String[]{"**/*.cs"} );
+            scanner.setIncludes( new String[]{ "**/*.cs" } );
         }
 
         Set<String> excludes = config.getExcludes();
