@@ -11,6 +11,7 @@
   <artifactId>plexus-compiler-jikes</artifactId>
 
   <name>Plexus Jikes Compiler</name>
+  <description>Jikes Compiler support for Plexus Compiler component.</description>
 
   <dependencies>
     <dependency>
