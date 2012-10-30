@@ -115,7 +115,7 @@ public class JavacCompiler
     // Compiler Implementation
     // ----------------------------------------------------------------------
 
-    public CompilerResult compile( CompilerConfiguration config )
+    public CompilerResult performCompile( CompilerConfiguration config )
         throws CompilerException
     {
         File destinationDir = new File( config.getOutputLocation() );

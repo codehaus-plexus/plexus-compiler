@@ -88,7 +88,7 @@ public class CSharpCompiler
         return configuration.getOutputFileName() + "." + getTypeExtension( configuration );
     }
 
-    public CompilerResult compile( CompilerConfiguration config )
+    public CompilerResult performCompile( CompilerConfiguration config )
         throws CompilerException
     {
         File destinationDir = new File( config.getOutputLocation() );

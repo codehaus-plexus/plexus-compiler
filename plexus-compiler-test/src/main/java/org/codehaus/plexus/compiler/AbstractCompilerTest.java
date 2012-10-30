@@ -97,7 +97,7 @@ public abstract class AbstractCompilerTest
 
             Compiler compiler = (Compiler) lookup( Compiler.ROLE, getRoleHint() );
 
-            messages.addAll( compiler.compile( compilerConfig ).getCompilerMessages() );
+            messages.addAll( compiler.performCompile( compilerConfig ).getCompilerMessages() );
 
             if ( outputDir.isDirectory() )
             {

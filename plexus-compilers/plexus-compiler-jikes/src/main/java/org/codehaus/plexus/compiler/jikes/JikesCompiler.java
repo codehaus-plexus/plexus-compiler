@@ -115,7 +115,7 @@ public class JikesCompiler
     // Compiler Implementation
     // -----------------------------------------------------------------------
 
-    public CompilerResult compile( CompilerConfiguration config )
+    public CompilerResult performCompile( CompilerConfiguration config )
         throws CompilerException
     {
         // Ensures that the directory exist.

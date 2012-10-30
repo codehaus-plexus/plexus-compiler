@@ -82,7 +82,7 @@ public class EclipseJavaCompiler
     // Compiler Implementation
     // ----------------------------------------------------------------------
 
-    public CompilerResult compile( CompilerConfiguration config )
+    public CompilerResult performCompile( CompilerConfiguration config )
         throws CompilerException
     {
         List<CompilerMessage> errors = new LinkedList<CompilerMessage>();
