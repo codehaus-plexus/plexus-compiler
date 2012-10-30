@@ -235,7 +235,7 @@ public class AspectJCompiler
         super( CompilerOutputStyle.ONE_OUTPUT_FILE_PER_INPUT_FILE, ".java", ".class", null );
     }
 
-    public CompilerResult compile( CompilerConfiguration config )
+    public CompilerResult performCompile( CompilerConfiguration config )
         throws CompilerException
     {
         File destinationDir = new File( config.getOutputLocation() );

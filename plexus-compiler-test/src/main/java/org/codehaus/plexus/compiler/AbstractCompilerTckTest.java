@@ -137,7 +137,7 @@ public abstract class AbstractCompilerTckTest
 
         Compiler compiler = (Compiler) lookup( Compiler.ROLE, roleHint );
 
-        List<CompilerMessage> result = compiler.compile( configuration ).getCompilerMessages();
+        List<CompilerMessage> result = compiler.performCompile( configuration ).getCompilerMessages();
 
         assertNotNull( result );
 
