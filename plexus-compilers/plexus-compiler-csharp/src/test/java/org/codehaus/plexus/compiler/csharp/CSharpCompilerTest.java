@@ -25,7 +25,7 @@ package org.codehaus.plexus.compiler.csharp;
  */
 
 import junit.framework.TestCase;
-import org.codehaus.plexus.compiler.CompilerError;
+import org.codehaus.plexus.compiler.CompilerMessage;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -42,7 +42,7 @@ public class CSharpCompilerTest
     public void testParser()
         throws IOException
     {
-        CompilerError error;
+        CompilerMessage error;
 
         // ----------------------------------------------------------------------
         // Test a few concrete lines
@@ -98,7 +98,7 @@ public class CSharpCompilerTest
                 "/home/trygvis/dev/com.myrealbox/trunk/mcs/nunit20/core/./Reflect.cs(4) error CS0246: The namespace `NUnit.Framework' can not be found (missing assembly reference?)\n" +
                 "Compilation failed: 14 error(s), 0 warnings";
 
-        List<CompilerError> messages =
+        List<CompilerMessage> messages =
             CSharpCompiler.parseCompilerOutput( new BufferedReader( new StringReader( input ) ) );
 
         assertNotNull( messages );
@@ -136,7 +136,7 @@ public class CSharpCompilerTest
                 "src\\main\\csharp\\Ctl\\ThrowawayForm.cs(30,27): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly refere\n" +
                 "src\\main\\csharp\\AssemblyInfo.cs(68,12): error CS0246: The type or namespace name 'log4net' could not be found (are you missing a using directive or an assembly reference?)\n";
 
-        List<CompilerError> messagesWinCsc =
+        List<CompilerMessage> messagesWinCsc =
             CSharpCompiler.parseCompilerOutput( new BufferedReader( new StringReader( cscWin ) ) );
 
         assertNotNull( messagesWinCsc );
@@ -144,9 +144,9 @@ public class CSharpCompilerTest
         assertEquals( 24, messagesWinCsc.size() );
 
         assertTrue( "Check that the line number is not -1",
-                    ( (CompilerError) messagesWinCsc.get( 0 ) ).getStartLine() != -1 );
+                    ( (CompilerMessage) messagesWinCsc.get( 0 ) ).getStartLine() != -1 );
         assertTrue( "Check that the column number is not -1",
-                    ( (CompilerError) messagesWinCsc.get( 0 ) ).getStartColumn() != -1 );
+                    ( (CompilerMessage) messagesWinCsc.get( 0 ) ).getStartColumn() != -1 );
 
     }
 
@@ -162,16 +162,16 @@ public class CSharpCompilerTest
                 "C:\\Work\\SCM\\SVN\\javaforge\\maven-csharp\\trunk\\maverick-net\\src\\main\\csharp\\Shunt\\LanguageShuntFactory.cs(67,27): error CS0246: The type or namespace name `log4net' could not be found. Are you missing a using directive or an assembly reference? error CS0234: No such name or typespace log4net\n" +
                 "Compilation failed: 28 error(s), 0 warnings";
 
-        List<CompilerError> messagesMonoWin = CSharpCompiler.parseCompilerOutput( new BufferedReader( new StringReader( monoWin ) ) );
+        List<CompilerMessage> messagesMonoWin = CSharpCompiler.parseCompilerOutput( new BufferedReader( new StringReader( monoWin ) ) );
 
         assertNotNull( messagesMonoWin );
 
         assertEquals( 5, messagesMonoWin.size() );
 
         assertTrue( "Check that the line number is not -1",
-                    ( (CompilerError) messagesMonoWin.get( 0 ) ).getStartLine() != -1 );
+                    ( (CompilerMessage) messagesMonoWin.get( 0 ) ).getStartLine() != -1 );
         assertTrue( "Check that the column number is not -1",
-                    ( (CompilerError) messagesMonoWin.get( 0 ) ).getStartColumn() != -1 );
+                    ( (CompilerMessage) messagesMonoWin.get( 0 ) ).getStartColumn() != -1 );
 
     }
 

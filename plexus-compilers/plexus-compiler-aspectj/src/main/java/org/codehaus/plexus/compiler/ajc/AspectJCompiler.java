@@ -9,9 +9,10 @@ import org.aspectj.bridge.MessageHandler;
 import org.aspectj.org.eclipse.jdt.internal.compiler.classfmt.ClassFileConstants;
 import org.codehaus.plexus.compiler.AbstractCompiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
-import org.codehaus.plexus.compiler.CompilerError;
 import org.codehaus.plexus.compiler.CompilerException;
+import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.compiler.CompilerOutputStyle;
+import org.codehaus.plexus.compiler.CompilerResult;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,16 +21,16 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 /**
- * @plexus.component
- *   role="org.codehaus.plexus.compiler.Compiler"
- *   role-hint="aspectj"
- *
+ * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @version $Id$
+ * @plexus.component role="org.codehaus.plexus.compiler.Compiler"
+ * role-hint="aspectj"
+ * <p/>
  * Options
  * <p/>
  * -injars JarList
@@ -220,9 +221,6 @@ import java.util.Map;
  * -XserializableAspects
  * <p/>
  * (Experimental) Normally it is an error to declare aspects Serializable. This option removes that restriction.
- *
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- * @version $Id$
  */
 public class AspectJCompiler
     extends AbstractCompiler
@@ -237,7 +235,7 @@ public class AspectJCompiler
         super( CompilerOutputStyle.ONE_OUTPUT_FILE_PER_INPUT_FILE, ".java", ".class", null );
     }
 
-    public List<CompilerError> compile( CompilerConfiguration config )
+    public CompilerResult performCompile( CompilerConfiguration config )
         throws CompilerException
     {
         File destinationDir = new File( config.getOutputLocation() );
@@ -251,15 +249,16 @@ public class AspectJCompiler
 
         if ( sourceFiles.length == 0 )
         {
-            return Collections.<CompilerError>emptyList();
+            return new CompilerResult();
         }
 
-        System.out.println( "Compiling " + sourceFiles.length + " " + "source file"
-            + ( sourceFiles.length == 1 ? "" : "s" ) + " to " + destinationDir.getAbsolutePath() );
+        System.out.println(
+            "Compiling " + sourceFiles.length + " " + "source file" + ( sourceFiles.length == 1 ? "" : "s" ) + " to "
+                + destinationDir.getAbsolutePath() );
 
         //        String[] args = buildCompilerArguments( config, sourceFiles );
         AjBuildConfig buildConfig = buildCompilerConfig( config );
-        return compileInProcess( buildConfig );
+        return new CompilerResult().compilerMessages( compileInProcess( buildConfig ) );
     }
 
     private AjBuildConfig buildCompilerConfig( CompilerConfiguration config )
@@ -278,8 +277,8 @@ public class AspectJCompiler
 
         if ( config.isDebug() )
         {
-            buildConfig.getOptions().produceDebugAttributes = ClassFileConstants.ATTR_SOURCE + ClassFileConstants.ATTR_LINES
-                + ClassFileConstants.ATTR_VARS;
+            buildConfig.getOptions().produceDebugAttributes =
+                ClassFileConstants.ATTR_SOURCE + ClassFileConstants.ATTR_LINES + ClassFileConstants.ATTR_VARS;
         }
 
         Map<String, String> javaOpts = config.getCustomCompilerArguments();
@@ -384,7 +383,7 @@ public class AspectJCompiler
         return buildConfig;
     }
 
-    private List<CompilerError> compileInProcess( AjBuildConfig buildConfig )
+    private List<CompilerMessage> compileInProcess( AjBuildConfig buildConfig )
         throws CompilerException
     {
 
@@ -416,7 +415,7 @@ public class AspectJCompiler
 
         boolean errors = messageHandler.hasAnyMessage( IMessage.ERROR, true );
 
-        List<CompilerError> messages = new ArrayList<CompilerError>();
+        List<CompilerMessage> messages = new ArrayList<CompilerMessage>();
         if ( errors )
         {
             IMessage[] errorMessages = messageHandler.getMessages( IMessage.ERROR, true );
@@ -424,19 +423,20 @@ public class AspectJCompiler
             for ( IMessage m : errorMessages )
             {
                 ISourceLocation sourceLocation = m.getSourceLocation();
-                CompilerError error;
+                CompilerMessage error;
 
                 if ( sourceLocation == null )
                 {
-                    error = new CompilerError( m.getMessage(), true );
+                    error = new CompilerMessage( m.getMessage(), true );
                 }
                 else
                 {
-                    error = new CompilerError( sourceLocation.getSourceFile().getPath(), true,
-                                               sourceLocation.getLine(), sourceLocation.getColumn(), sourceLocation
-                                                   .getEndLine(), sourceLocation.getColumn(), m.getMessage() );
+                    error =
+                        new CompilerMessage( sourceLocation.getSourceFile().getPath(), true, sourceLocation.getLine(),
+                                             sourceLocation.getColumn(), sourceLocation.getEndLine(),
+                                             sourceLocation.getColumn(), m.getMessage() );
                 }
-                messages.add( error ); 
+                messages.add( error );
             }
         }
 
@@ -487,7 +487,7 @@ public class AspectJCompiler
 
     /**
      * Set the source version in ajc compiler
-     * 
+     *
      * @param buildConfig
      * @param sourceVersion
      */

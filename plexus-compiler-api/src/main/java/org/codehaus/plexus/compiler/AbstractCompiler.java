@@ -75,6 +75,19 @@ public abstract class AbstractCompiler
     //
     // ----------------------------------------------------------------------
 
+    public CompilerResult performCompile(CompilerConfiguration configuration)
+            throws CompilerException 
+    {
+        throw new CompilerNotImplementedException("The preformCompile method has not been implemented.");
+    }
+
+    @Deprecated
+    public List<CompilerError> compile(CompilerConfiguration configuration)
+            throws CompilerException
+    {
+        throw new CompilerNotImplementedException("The compile method has not been implemented.");
+    }
+
     public CompilerOutputStyle getCompilerOutputStyle()
     {
         return compilerOutputStyle;

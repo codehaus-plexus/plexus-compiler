@@ -88,7 +88,7 @@ public abstract class AbstractCompilerTest
     public void testCompilingSources()
         throws Exception
     {
-        List<CompilerError> messages = new ArrayList<CompilerError>();
+        List<CompilerMessage> messages = new ArrayList<CompilerMessage>();
         Collection<String> files = new TreeSet<String>();
 
         for ( CompilerConfiguration compilerConfig : getCompilerConfigurations() )
@@ -97,7 +97,7 @@ public abstract class AbstractCompilerTest
 
             Compiler compiler = (Compiler) lookup( Compiler.ROLE, getRoleHint() );
 
-            messages.addAll( compiler.compile( compilerConfig ) );
+            messages.addAll( compiler.performCompile( compilerConfig ).getCompilerMessages() );
 
             if ( outputDir.isDirectory() )
             {
@@ -112,7 +112,7 @@ public abstract class AbstractCompilerTest
         if ( expectedErrors() != numCompilerErrors )
         {
             System.err.println( numCompilerErrors + " error(s) found:" );
-            for ( CompilerError error : messages )
+            for ( CompilerMessage error : messages )
             {
                 if ( !error.isError() )
                 {
@@ -133,7 +133,7 @@ public abstract class AbstractCompilerTest
         if ( expectedWarnings() != numCompilerWarnings )
         {
             System.err.println( numCompilerWarnings + " warning(s) found:" );
-            for ( CompilerError error : messages )
+            for ( CompilerMessage error : messages )
             {
                 if ( error.isError() )
                 {
@@ -204,11 +204,11 @@ public abstract class AbstractCompilerTest
         return normalizedPaths;
     }
 
-    protected int compilerErrorCount( List<CompilerError> messages )
+    protected int compilerErrorCount( List<CompilerMessage> messages )
     {
         int count = 0;
 
-        for ( CompilerError message : messages )
+        for ( CompilerMessage message : messages )
         {
             count += message.isError() ? 1 : 0;
         }

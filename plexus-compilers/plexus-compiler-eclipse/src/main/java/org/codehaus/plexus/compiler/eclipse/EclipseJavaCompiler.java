@@ -24,31 +24,15 @@ package org.codehaus.plexus.compiler.eclipse;
  * SOFTWARE.
  */
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
 import org.codehaus.plexus.compiler.AbstractCompiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
-import org.codehaus.plexus.compiler.CompilerError;
 import org.codehaus.plexus.compiler.CompilerException;
+import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.compiler.CompilerOutputStyle;
+import org.codehaus.plexus.compiler.CompilerResult;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
-
 import org.eclipse.jdt.core.compiler.IProblem;
 import org.eclipse.jdt.internal.compiler.ClassFile;
 import org.eclipse.jdt.internal.compiler.CompilationResult;
@@ -65,44 +49,57 @@ import org.eclipse.jdt.internal.compiler.env.NameEnvironmentAnswer;
 import org.eclipse.jdt.internal.compiler.impl.CompilerOptions;
 import org.eclipse.jdt.internal.compiler.problem.DefaultProblemFactory;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+
 /**
- * @plexus.component
- *   role="org.codehaus.plexus.compiler.Compiler"
- *   role-hint="eclipse"
+ * @plexus.component role="org.codehaus.plexus.compiler.Compiler"
+ * role-hint="eclipse"
  */
 public class EclipseJavaCompiler
     extends AbstractCompiler
 {
     public EclipseJavaCompiler()
     {
-        super( CompilerOutputStyle.ONE_OUTPUT_FILE_PER_INPUT_FILE,
-               ".java",
-               ".class",
-               null );
+        super( CompilerOutputStyle.ONE_OUTPUT_FILE_PER_INPUT_FILE, ".java", ".class", null );
     }
 
     // ----------------------------------------------------------------------
     // Compiler Implementation
     // ----------------------------------------------------------------------
 
-    public List<CompilerError> compile( CompilerConfiguration config )
+    public CompilerResult performCompile( CompilerConfiguration config )
         throws CompilerException
     {
-        List<CompilerError> errors = new LinkedList<CompilerError>();
+        List<CompilerMessage> errors = new LinkedList<CompilerMessage>();
 
         List<String> classpathEntries = config.getClasspathEntries();
 
-        URL[] urls = new URL[ 1 + classpathEntries.size() ];
+        URL[] urls = new URL[1 + classpathEntries.size()];
 
         int i = 0;
 
         try
         {
-            urls[ i++ ] = new File( config.getOutputLocation() ).toURL();
+            urls[i++] = new File( config.getOutputLocation() ).toURL();
 
             for ( String entry : classpathEntries )
             {
-                urls[ i++ ] = new File( entry ).toURL();
+                urls[i++] = new File( entry ).toURL();
             }
         }
         catch ( MalformedURLException e )
@@ -114,9 +111,7 @@ public class EclipseJavaCompiler
 
         SourceCodeLocator sourceCodeLocator = new SourceCodeLocator( config.getSourceLocations() );
 
-        INameEnvironment env = new EclipseCompilerINameEnvironment( sourceCodeLocator,
-                                                                    classLoader,
-                                                                    errors );
+        INameEnvironment env = new EclipseCompilerINameEnvironment( sourceCodeLocator, classLoader, errors );
 
         IErrorHandlingPolicy policy = DefaultErrorHandlingPolicies.proceedWithAllProblems();
 
@@ -152,7 +147,7 @@ public class EclipseJavaCompiler
         if ( targetVersion != null )
         {
             settings.put( CompilerOptions.OPTION_TargetPlatform, targetVersion );
-            
+
             if ( config.isOptimize() )
             {
                 settings.put( CompilerOptions.OPTION_Compliance, targetVersion );
@@ -179,7 +174,7 @@ public class EclipseJavaCompiler
 
         settings.put( CompilerOptions.OPTION_LineNumberAttribute, CompilerOptions.GENERATE );
         settings.put( CompilerOptions.OPTION_SourceFileAttribute, CompilerOptions.GENERATE );
-        
+
         // compiler-specific extra options override anything else in the config object...
         Map<String, String> extras = config.getCustomCompilerArguments();
         if ( extras != null && !extras.isEmpty() )
@@ -189,8 +184,7 @@ public class EclipseJavaCompiler
 
         IProblemFactory problemFactory = new DefaultProblemFactory( Locale.getDefault() );
 
-        ICompilerRequestor requestor = new EclipseCompilerICompilerRequestor( config.getOutputLocation(),
-                                                                              errors );
+        ICompilerRequestor requestor = new EclipseCompilerICompilerRequestor( config.getOutputLocation(), errors );
 
         List<CompilationUnit> compilationUnits = new ArrayList<CompilationUnit>();
 
@@ -200,9 +194,8 @@ public class EclipseJavaCompiler
 
             for ( String source : sources )
             {
-                CompilationUnit unit = new CompilationUnit( source,
-                                                            makeClassName( source, sourceRoot ),
-                                                            errors, config.getSourceEncoding() );
+                CompilationUnit unit = new CompilationUnit( source, makeClassName( source, sourceRoot ), errors,
+                                                            config.getSourceEncoding() );
 
                 compilationUnits.add( unit );
             }
@@ -215,21 +208,21 @@ public class EclipseJavaCompiler
         CompilerOptions options = new CompilerOptions( settings );
         Compiler compiler = new Compiler( env, policy, options, requestor, problemFactory );
 
-        ICompilationUnit[] units = (ICompilationUnit[])
-            compilationUnits.toArray( new ICompilationUnit[ compilationUnits.size() ] );
+        ICompilationUnit[] units =
+            (ICompilationUnit[]) compilationUnits.toArray( new ICompilationUnit[compilationUnits.size()] );
 
         compiler.compile( units );
 
-        return errors;
+        return new CompilerResult().compilerMessages( errors );
     }
 
     public String[] createCommandLine( CompilerConfiguration config )
-            throws CompilerException
+        throws CompilerException
     {
         return null;
     }
 
-    private CompilerError handleError( String className, int line, int column, Object errorMessage )
+    private CompilerMessage handleError( String className, int line, int column, Object errorMessage )
     {
         if ( className.endsWith( ".java" ) )
         {
@@ -253,24 +246,14 @@ public class EclipseJavaCompiler
             message = "No message";
         }
 
-        return new CompilerError( fileName,
-                                  true,
-                                  line,
-                                  column,
-                                  line,
-                                  column,
-                                  message );
+        return new CompilerMessage( fileName, true, line, column, line, column, message );
     }
 
-    private CompilerError handleWarning( IProblem warning )
+    private CompilerMessage handleWarning( IProblem warning )
     {
-        return new CompilerError( new String( warning.getOriginatingFileName() ),
-                                  false,
-                                  warning.getSourceLineNumber(),
-                                  warning.getSourceStart(),
-                                  warning.getSourceLineNumber(),
-                                  warning.getSourceEnd(),
-                                  warning.getMessage() );
+        return new CompilerMessage( new String( warning.getOriginatingFileName() ), false,
+                                    warning.getSourceLineNumber(), warning.getSourceStart(),
+                                    warning.getSourceLineNumber(), warning.getSourceEnd(), warning.getMessage() );
     }
 
     private String decodeVersion( String versionSpec )
@@ -299,7 +282,7 @@ public class EclipseJavaCompiler
         {
             return CompilerOptions.VERSION_1_5;
         }
-        else if ( "1.6" .equals( versionSpec ) )
+        else if ( "1.6".equals( versionSpec ) )
         {
             return CompilerOptions.VERSION_1_6;
         }
@@ -309,7 +292,8 @@ public class EclipseJavaCompiler
         }
         else
         {
-            getLogger().warn( "Unknown version '" + versionSpec + "', no version setting will be given to the compiler." );
+            getLogger().warn(
+                "Unknown version '" + versionSpec + "', no version setting will be given to the compiler." );
 
             return null;
         }
@@ -325,17 +309,17 @@ public class EclipseJavaCompiler
         private final String className;
 
         private final String sourceFile;
-        
+
         private final String sourceEncoding;
 
-        private final List<CompilerError> errors;
+        private final List<CompilerMessage> errors;
 
-        CompilationUnit( String sourceFile, String className, List<CompilerError> errors )
+        CompilationUnit( String sourceFile, String className, List<CompilerMessage> errors )
         {
             this( sourceFile, className, errors, null );
         }
-        
-        CompilationUnit( String sourceFile, String className, List<CompilerError> errors, String sourceEncoding )
+
+        CompilationUnit( String sourceFile, String className, List<CompilerMessage> errors, String sourceEncoding )
         {
             this.className = className;
             this.sourceFile = sourceFile;
@@ -399,7 +383,7 @@ public class EclipseJavaCompiler
             {
                 String tok = izer.nextToken();
 
-                result[ i ] = tok.toCharArray();
+                result[i] = tok.toCharArray();
             }
 
             return result;
@@ -413,11 +397,10 @@ public class EclipseJavaCompiler
 
         private ClassLoader classLoader;
 
-        private List<CompilerError> errors;
+        private List<CompilerMessage> errors;
 
-        public EclipseCompilerINameEnvironment( SourceCodeLocator sourceCodeLocator,
-                                                ClassLoader classLoader,
-                                                List<CompilerError> errors )
+        public EclipseCompilerINameEnvironment( SourceCodeLocator sourceCodeLocator, ClassLoader classLoader,
+                                                List<CompilerMessage> errors )
         {
             this.sourceCodeLocator = sourceCodeLocator;
             this.classLoader = classLoader;
@@ -433,7 +416,7 @@ public class EclipseJavaCompiler
             for ( int i = 0; i < compoundTypeName.length; i++ )
             {
                 result += sep;
-                result += new String( compoundTypeName[ i ] );
+                result += new String( compoundTypeName[i] );
                 sep = ".";
             }
 
@@ -449,7 +432,7 @@ public class EclipseJavaCompiler
             for ( int i = 0; i < packageName.length; i++ )
             {
                 result += sep;
-                result += new String( packageName[ i ] );
+                result += new String( packageName[i] );
                 sep = ".";
             }
 
@@ -466,9 +449,7 @@ public class EclipseJavaCompiler
 
                 if ( f != null )
                 {
-                    ICompilationUnit compilationUnit = new CompilationUnit( f.getAbsolutePath(),
-                                                                            className,
-                                                                            errors);
+                    ICompilationUnit compilationUnit = new CompilationUnit( f.getAbsolutePath(), className, errors );
 
                     return new NameEnvironmentAnswer( compilationUnit, null );
                 }
@@ -518,8 +499,7 @@ public class EclipseJavaCompiler
             return is == null;
         }
 
-        public boolean isPackage( char[][] parentPackageName,
-                                  char[] packageName )
+        public boolean isPackage( char[][] parentPackageName, char[] packageName )
         {
             String result = "";
 
@@ -530,12 +510,12 @@ public class EclipseJavaCompiler
                 for ( int i = 0; i < parentPackageName.length; i++ )
                 {
                     result += sep;
-                    result += new String( parentPackageName[ i ] );
+                    result += new String( parentPackageName[i] );
                     sep = ".";
                 }
             }
 
-            if ( Character.isUpperCase( packageName[ 0 ] ) )
+            if ( Character.isUpperCase( packageName[0] ) )
             {
                 return false;
             }
@@ -560,10 +540,9 @@ public class EclipseJavaCompiler
     {
         private String destinationDirectory;
 
-        private List<CompilerError> errors;
+        private List<CompilerMessage> errors;
 
-        public EclipseCompilerICompilerRequestor( String destinationDirectory,
-                                                  List<CompilerError> errors )
+        public EclipseCompilerICompilerRequestor( String destinationDirectory, List<CompilerMessage> errors )
         {
             this.destinationDirectory = destinationDirectory;
             this.errors = errors;
@@ -588,10 +567,7 @@ public class EclipseJavaCompiler
                     else
                     {
                         hasErrors = true;
-                        errors.add( handleError( name,
-                                                 problem.getSourceLineNumber(),
-                                                 -1,
-                                                 problem.getMessage() ) );
+                        errors.add( handleError( name, problem.getSourceLineNumber(), -1, problem.getMessage() ) );
                     }
                 }
             }
@@ -609,7 +585,7 @@ public class EclipseJavaCompiler
                     for ( int j = 0; j < compoundName.length; j++ )
                     {
                         className += sep;
-                        className += new String( compoundName[ j ] );
+                        className += new String( compoundName[j] );
                         sep = ".";
                     }
 

@@ -1,6 +1,6 @@
 package org.codehaus.plexus.compiler.csharp;
 
-import org.codehaus.plexus.compiler.CompilerError;
+import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
@@ -29,9 +29,9 @@ public class DefaultCSharpCompilerParser
     private static String MAGIC_LINE_MARKER_2 = ")";
 
 
-    public static CompilerError parseLine( String line )
+    public static CompilerMessage parseLine( String line )
     {
-        CompilerError ce = null;
+        CompilerMessage ce = null;
 
         if ( isOutputWithNoColumnNumber( line ) )
         {
@@ -64,7 +64,7 @@ public class DefaultCSharpCompilerParser
         return ( chunk2.indexOf( "," ) == -1 );
     }
 
-    private static CompilerError parseLineWithNoColumnNumber( String line )
+    private static CompilerMessage parseLineWithNoColumnNumber( String line )
     {
 
         String file = null;
@@ -110,11 +110,11 @@ public class DefaultCSharpCompilerParser
             return null;
         }
 
-        return new CompilerError( file, error, startline, startcolumn, endline, endcolumn, message );
+        return new CompilerMessage( file, error, startline, startcolumn, endline, endcolumn, message );
 
     }
 
-    private static CompilerError parseLineWithColumnNumberAndLineNumber( String line )
+    private static CompilerMessage parseLineWithColumnNumberAndLineNumber( String line )
     {
 
         String file = null;
@@ -181,7 +181,7 @@ public class DefaultCSharpCompilerParser
             return null;
         }
 
-        return new CompilerError( file, error, startline, startcolumn, endline, endcolumn, message );
+        return new CompilerMessage( file, error, startline, startcolumn, endline, endcolumn, message );
     }
 
 }
