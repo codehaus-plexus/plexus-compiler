@@ -342,20 +342,20 @@ public class CompilerConfiguration
      * @deprecated will be removed in 2.X use #getCustomCompilerArgumentsAsMap
      * @return
      */
-    public LinkedHashMap getCustomCompilerArguments()
+    public LinkedHashMap<String, String> getCustomCompilerArguments()
     {
-        return new LinkedHashMap( customCompilerArguments );
+        return new LinkedHashMap<String, String>( customCompilerArguments );
     }
 
     /**
      * @deprecated will be removed in 2.X use #setCustomCompilerArgumentsAsMap
      * @param customCompilerArguments
      */
-    public void setCustomCompilerArguments( LinkedHashMap customCompilerArguments )
+    public void setCustomCompilerArguments( LinkedHashMap<String, String> customCompilerArguments )
     {
         if ( customCompilerArguments == null )
         {
-            this.customCompilerArguments = new LinkedHashMap();
+            this.customCompilerArguments = new LinkedHashMap<String, String>();
         }
         else
         {
