@@ -22,6 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * The result returned from a compiling language processor (aka compiler), possibly including
+ * some messages.
+ * 
  * @author Olivier Lamy
  * @since 2.0
  */
@@ -34,11 +37,20 @@ public class CompilerResult
 
     private List<CompilerMessage> compilerMessages;
 
+    /**
+     * Constructs a successful compiler result with no messages.
+     */
     public CompilerResult()
     {
         // no op
     }
 
+    /**
+     * Constructs a compiler result.
+     * 
+     * @param success if the compiler process was successful or not
+     * @param compilerMessages a list of messages from the compiler process
+     */
     public CompilerResult( boolean success, List<CompilerMessage> compilerMessages )
     {
         this.success = success;
