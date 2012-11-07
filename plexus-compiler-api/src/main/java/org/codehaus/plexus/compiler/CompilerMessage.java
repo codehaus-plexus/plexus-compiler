@@ -42,8 +42,8 @@ package org.codehaus.plexus.compiler;
  */
 
 /**
- * This class encapsulates an error message produced by a programming language
- * processor (whether interpreted or compiled)
+ * This class encapsulates a message produced by a programming language
+ * processor (whether interpreted or compiled).
  *
  * @author <a href="mailto:stefano@apache.org">Stefano Mazzocchi</a>
  * @version $Id$
@@ -52,7 +52,7 @@ package org.codehaus.plexus.compiler;
 public class CompilerMessage
 {
     /**
-     * Is this a severe error or a warning?
+     * The kind of message.
      *
      * @since 2.0
      */
@@ -84,21 +84,22 @@ public class CompilerMessage
     private String file;
 
     /**
-     * The actual error text produced by the language processor
+     * The actual message text produced by the language processor
      */
     private String message;
 
 
     /**
-     * The error message constructor.
+     * Constructs a compiler message.
      *
      * @param file        The name of the file containing the offending program text
-     * @param error       Is this a severe error or a warning?
+     * @param error       <code>true</code> if this is a error message, or <code>false</code> if it
+     *                    is a warning message
      * @param startline   The start line number of the offending program text
      * @param startcolumn The start column number of the offending program text
      * @param endline     The end line number of the offending program text
      * @param endcolumn   The end column number of the offending program text
-     * @param message     The actual error text produced by the language processor
+     * @param message     The actual message text produced by the language processor
      */
     public CompilerMessage( String file, boolean error, int startline, int startcolumn, int endline, int endcolumn,
                             String message )
@@ -112,6 +113,17 @@ public class CompilerMessage
         this.message = message;
     }
 
+    /**
+     * Constructs a compiler message.
+     *
+     * @param file        The name of the file containing the offending program text
+     * @param kind        The kind of message
+     * @param startline   The start line number of the offending program text
+     * @param startcolumn The start column number of the offending program text
+     * @param endline     The end line number of the offending program text
+     * @param endcolumn   The end column number of the offending program text
+     * @param message     The actual message text produced by the language processor
+     */
     public CompilerMessage( String file, Kind kind, int startline, int startcolumn, int endline, int endcolumn,
                             String message )
     {
@@ -127,7 +139,7 @@ public class CompilerMessage
     /**
      * The warning message constructor.
      *
-     * @param message The actual error text produced by the language processor
+     * @param message The actual message text produced by the language processor
      */
     public CompilerMessage( String message )
     {
@@ -135,10 +147,11 @@ public class CompilerMessage
     }
 
     /**
-     * The error message constructor.
+     * Constructs a compiler message.
      *
-     * @param message The actual error text produced by the language processor
-     * @param error   whether it was an error or informational
+     * @param message The actual message text produced by the language processor
+     * @param error   <code>true</code> if this is a error message, or <code>false</code> if it
+     *                is a warning message
      */
     public CompilerMessage( String message, boolean error )
     {
@@ -147,9 +160,10 @@ public class CompilerMessage
     }
 
     /**
-     *
-     * @param message The actual error text produced by the language processor
-     * @param kind    The error kind
+     * Constructs a compiler message.
+     * 
+     * @param message The actual message text produced by the language processor
+     * @param kind    The kind of message
      * @since 2.0
      */
     public CompilerMessage( String message, Kind kind )
@@ -159,9 +173,9 @@ public class CompilerMessage
     }
 
     /**
-     * Return the filename associated with this compiler error.
+     * Returns the filename associated with this compiler message.
      *
-     * @return The filename associated with this compiler error
+     * @return The filename associated with this compiler message
      */
     public String getFile()
     {
@@ -169,9 +183,9 @@ public class CompilerMessage
     }
 
     /**
-     * Assert whether this is a severe error or a warning
+     * Asserts whether this is an error message or not.
      *
-     * @return Whether the error is severe
+     * @return Whether the message is an error message
      */
     public boolean isError()
     {
@@ -179,9 +193,10 @@ public class CompilerMessage
     }
 
     /**
-     * Return the starting line number of the program text originating this error
+     * Returns the starting line number of the program text originating this compiler
+     * message.
      *
-     * @return The starting line number of the program text originating this error
+     * @return The starting line number of the program text originating this message
      */
     public int getStartLine()
     {
@@ -189,11 +204,11 @@ public class CompilerMessage
     }
 
     /**
-     * Return the starting column number of the program text originating this
-     * error
+     * Returns the starting column number of the program text originating this
+     * compiler message.
      *
      * @return The starting column number of the program text originating this
-     *         error
+     *         message
      */
     public int getStartColumn()
     {
@@ -201,9 +216,10 @@ public class CompilerMessage
     }
 
     /**
-     * Return the ending line number of the program text originating this error
+     * Return the ending line number of the program text originating this compiler
+     * message.
      *
-     * @return The ending line number of the program text originating this error
+     * @return The ending line number of the program text originating this message
      */
     public int getEndLine()
     {
@@ -211,11 +227,11 @@ public class CompilerMessage
     }
 
     /**
-     * Return the ending column number of the program text originating this
-     * error
+     * Returns the ending column number of the program text originating this
+     * compiler message.
      *
      * @return The ending column number of the program text originating this
-     *         error
+     *         message
      */
     public int getEndColumn()
     {
@@ -223,7 +239,7 @@ public class CompilerMessage
     }
 
     /**
-     * Return the message produced by the language processor
+     * Returns the message produced by the language processor.
      *
      * @return The message produced by the language processor
      */
@@ -233,9 +249,9 @@ public class CompilerMessage
     }
 
     /**
-     * Get the kind of message.
+     * Returns the kind of the compiler message.
      *
-     * @return the kind of message
+     * @return the kind of the message
      * @since 2.0
      */
     public Kind getKind()
@@ -270,15 +286,32 @@ public class CompilerMessage
     }
 
     /**
-     * as we are still 1.5 required we use a wrapper to Diagnostic.Kind and some compilers don't know jdk constants
+     * As we are still 1.5 required we use a wrapper to Diagnostic.Kind and some compilers don't know jdk constants.
      *
      * @since 2.0
      */
     public enum Kind
     {
-
-        ERROR( "error" ), MANDATORY_WARNING( "mandatory_warning" ), NOTE( "note" ), OTHER( "other" ), WARNING(
-        "warning" );
+        /**
+         * Problem which prevents the tool's normal completion.
+         */
+        ERROR( "error" ),
+        /**
+         * Problem similar to a warning, but is mandated by the tool's specification.
+         */
+        MANDATORY_WARNING( "mandatory_warning" ),
+        /**
+         * Informative message from the tool.
+         */
+        NOTE( "note" ),
+        /**
+         * Diagnostic which does not fit within the other kinds.
+         */
+        OTHER( "other" ),
+        /**
+         * Problem which does not usually prevent the tool from completing normally.
+         */
+        WARNING( "warning" );
 
         private String type;
 
@@ -286,6 +319,5 @@ public class CompilerMessage
         {
             this.type = type;
         }
-
     }
 }
