@@ -27,6 +27,8 @@ package org.codehaus.plexus.compiler;
 import java.util.List;
 
 /**
+ * The interface of an compiling language processor (aka compiler).
+ * 
  * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  * @author <a href="mailto:matthew.pocock@ncl.ac.uk">Matthew Pocock</a>
@@ -51,9 +53,12 @@ public interface Compiler
         throws CompilerException;
 
     /**
-     * Performs the compile of the project. Clients must implement this method.
-     * @param configuration
-     * @return
+     * Performs the compilation of the project. Clients must implement this
+     * method.
+     * 
+     * @param configuration   the configuration description of the compilation
+     *   to perform
+     * @return the result of the compilation returned by the language processor
      * @throws CompilerException
      */
     CompilerResult performCompile( CompilerConfiguration configuration )
@@ -62,8 +67,10 @@ public interface Compiler
     /**
      * This method is provided for backwards compatibility only. Clients should
      * use {@link #performCompile(CompilerConfiguration)} instead.
-     * @param configuration
-     * @return
+     * 
+     * @param configuration   the configuration description of the compilation
+     *   to perform
+     * @return the result of the compilation returned by the language processor
      * @throws CompilerException
      */
     @Deprecated
@@ -75,13 +82,12 @@ public interface Compiler
      * If this particular compiler has no concept of a command line then returns
      * null.
      *
-     * @param config     the CompilerConfiguration describing the
-     *   compilation
+     * @param config     the CompilerConfiguration describing the compilation
      * @return an array of Strings that make up the command line, or null if
      *   this compiler has no concept of command line
      * @throws CompilerException  if there was an error generating the command
      *   line
      */
-    String[] createCommandLine(CompilerConfiguration config )
+    String[] createCommandLine( CompilerConfiguration config )
         throws CompilerException;
 }

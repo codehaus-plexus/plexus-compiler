@@ -521,22 +521,22 @@ public class CompilerConfiguration
     }
 
     /**
-     * re use strategy of the compiler (implement for java only)
+     * Re-use strategy of the compiler (implement for java only).
      */
     public enum CompilerReuseStrategy
     {
         /**
-         * always reuse the same
-         * <b>default strategy</b>
+         * Always reuse the same.
+         * <b>Default strategy.</b>
          */
         ReuseSame( "reuseSame" ),
         /**
-         * re create a new compiler for each use
+         * Re-create a new compiler for each use.
          */
         AlwaysNew( "alwaysNew" ),
         /**
-         * re use already created compiler, create new one if non already exists
-         * <b>Will mimic a kind of pool to prevent different threads use the same</b>
+         * Re-use already created compiler, create new one if non already exists.
+         * <b>Will mimic a kind of pool to prevent different threads use the same.</b>
          */
         ReuseCreated( "reuseCreated" );
 
