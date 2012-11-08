@@ -53,8 +53,6 @@ public class CompilerMessage
 {
     /**
      * The kind of message.
-     *
-     * @since 2.0
      */
     private Kind kind;
 
@@ -92,6 +90,7 @@ public class CompilerMessage
     /**
      * Constructs a compiler message.
      *
+     * @deprecated        Use {@link #CompilerMessage(String,Kind,int,int,int,int,String)} instead
      * @param file        The name of the file containing the offending program text
      * @param error       <code>true</code> if this is a error message, or <code>false</code> if it
      *                    is a warning message
@@ -101,6 +100,7 @@ public class CompilerMessage
      * @param endcolumn   The end column number of the offending program text
      * @param message     The actual message text produced by the language processor
      */
+    @Deprecated
     public CompilerMessage( String file, boolean error, int startline, int startcolumn, int endline, int endcolumn,
                             String message )
     {
@@ -139,20 +139,25 @@ public class CompilerMessage
     /**
      * The warning message constructor.
      *
+     * @deprecated    Use {@link #CompilerMessage(String,Kind)} instead
      * @param message The actual message text produced by the language processor
      */
+    @Deprecated
     public CompilerMessage( String message )
     {
         this.message = message;
+        this.kind = Kind.WARNING;
     }
 
     /**
      * Constructs a compiler message.
      *
+     * @deprecated    Use {@link #CompilerMessage(String,Kind)} instead
      * @param message The actual message text produced by the language processor
      * @param error   <code>true</code> if this is a error message, or <code>false</code> if it
      *                is a warning message
      */
+    @Deprecated
     public CompilerMessage( String message, boolean error )
     {
         this.message = message;

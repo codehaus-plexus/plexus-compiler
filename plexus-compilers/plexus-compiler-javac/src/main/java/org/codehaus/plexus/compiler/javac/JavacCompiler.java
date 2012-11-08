@@ -141,7 +141,7 @@ public class JavacCompiler
 
         String[] args = buildCompilerArguments( config, sourceFiles );
 
-        List<CompilerMessage> messages;
+        CompilerResult result;
 
         if ( config.isFork() )
         {
@@ -160,21 +160,22 @@ public class JavacCompiler
                 }
             }
 
-            messages = compileOutOfProcess( config, executable, args );
+            result = compileOutOfProcess( config, executable, args );
         }
         else
         {
             if ( isJava16() && !config.isForceJavacCompilerUse() )
             {
-                // use fqcn to prevent loading of the class on 1.5 environement !
-                return new CompilerResult().compilerMessages(
-                    org.codehaus.plexus.compiler.javac.JavaxToolsCompiler.compileInProcess( args, config,
-                                                                                            sourceFiles ) );
+                // use fqcn to prevent loading of the class on 1.5 environment !
+                result =  org.codehaus.plexus.compiler.javac.JavaxToolsCompiler.compileInProcess( args, config,
+                                                                                                  sourceFiles );
             }
-            messages = compileInProcess( args, config );
+            else {
+                result = compileInProcess( args, config );
+            }
         }
 
-        return new CompilerResult().compilerMessages( messages );
+        return result;
     }
 
     protected static boolean isJava16()
@@ -425,10 +426,10 @@ public class JavacCompiler
      * @param config     compiler configuration
      * @param executable name of the executable to launch
      * @param args       arguments for the executable launched
-     * @return List of CompilerMessage objects with the errors encountered.
+     * @return a CompilerResult object encapsulating the result of the compilation and any compiler messages
      * @throws CompilerException
      */
-    List<CompilerMessage> compileOutOfProcess( CompilerConfiguration config, String executable, String[] args )
+    CompilerResult compileOutOfProcess( CompilerConfiguration config, String executable, String[] args )
         throws CompilerException
     {
         Commandline cli = new Commandline();
@@ -511,32 +512,20 @@ public class JavacCompiler
             throw new CompilerException( "Error while executing the external compiler.", e );
         }
 
-        if ( ( returnCode != 0 ) && !containsErrorMessage( messages ) )
-        {
-            if ( err.getOutput().length() == 0 )
-            {
-                throw new CompilerException(
-                    "Unknown error trying to execute the external compiler: " + EOL + cli.toString() );
-            }
-            else
-            {
-                messages.add( new CompilerMessage(
-                    "Failure executing javac,  but could not parse the error:" + EOL + err.getOutput(), true ) );
-            }
-        }
-
-        return messages;
+        boolean success = returnCode == 0;
+        return new CompilerResult( success, messages );
     }
 
     /**
      * Compile the java sources in the current JVM, without calling an external executable,
      * using <code>com.sun.tools.javac.Main</code> class
      *
-     * @param args arguments for the compiler as they would be used in the command line javac
-     * @return List of CompilerMessage objects with the errors encountered.
+     * @param args    arguments for the compiler as they would be used in the command line javac
+     * @param config  compiler configuration
+     * @return a CompilerResult object encapsulating the result of the compilation and any compiler messages
      * @throws CompilerException
      */
-    List<CompilerMessage> compileInProcess( String[] args, CompilerConfiguration config )
+    CompilerResult compileInProcess( String[] args, CompilerConfiguration config )
         throws CompilerException
     {
         final Class<?> javacClass = getJavacClass( config );
@@ -557,7 +546,7 @@ public class JavacCompiler
     /**
      * Helper method for compileInProcess()
      */
-    private static List<CompilerMessage> compileInProcess0( Class<?> javacClass, String[] args )
+    private static CompilerResult compileInProcess0( Class<?> javacClass, String[] args )
         throws CompilerException
     {
         StringWriter out = new StringWriter();
@@ -591,27 +580,8 @@ public class JavacCompiler
             throw new CompilerException( "Error while executing the compiler.", e );
         }
 
-        if ( ( ok.intValue() != 0 ) && !containsErrorMessage( messages ) )
-        {
-            // TODO: exception?
-            messages.add( new CompilerMessage( "Failure executing javac, but could not parse the error:" + EOL +
-                                                   out.toString(), true ) );
-        }
-
-        return messages;
-    }
-
-    private static boolean containsErrorMessage( List<CompilerMessage> messages )
-    {
-        for ( CompilerMessage message : messages )
-        {
-            if ( message.isError() )
-            {
-                return true;
-            }
-        }
-
-        return false;
+        boolean success = ok.intValue() == 0;
+        return new CompilerResult( success, messages );
     }
 
     /**

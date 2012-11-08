@@ -21,6 +21,7 @@ package org.codehaus.plexus.compiler.javac;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.compiler.CompilerException;
+import org.codehaus.plexus.compiler.CompilerResult;
 
 import javax.tools.Diagnostic;
 import javax.tools.DiagnosticCollector;
@@ -88,7 +89,7 @@ public class JavaxToolsCompiler
         }
     }
 
-    static List<CompilerMessage> compileInProcess( String[] args, final CompilerConfiguration config,
+    static CompilerResult compileInProcess( String[] args, final CompilerConfiguration config,
                                                  String[] sourceFiles )
         throws CompilerException
     {
@@ -97,8 +98,11 @@ public class JavaxToolsCompiler
         {
             if ( compiler == null )
             {
-                return Collections.singletonList( new CompilerMessage(
-                    "No compiler is provided in this environment.  Perhaps you are running on a JRE rather than a JDK?" ) );
+                CompilerMessage message =
+                                new CompilerMessage( "No compiler is provided in this environment. "
+                                                     + "Perhaps you are running on a JRE rather than a JDK?",
+                                                     CompilerMessage.Kind.ERROR );
+                return new CompilerResult( false, Collections.singletonList( message ) );
             }
             final String sourceEncoding = config.getSourceEncoding();
             final Charset sourceCharset = sourceEncoding == null ? null : Charset.forName( sourceEncoding );
@@ -120,7 +124,7 @@ public class JavaxToolsCompiler
 
                 compiler.getTask( null, standardFileManager, collector, Arrays.asList( args ), null, fileObjects );
             final Boolean result = task.call();
-            final ArrayList<CompilerMessage> compilerErrors = new ArrayList<CompilerMessage>();
+            final ArrayList<CompilerMessage> compilerMsgs = new ArrayList<CompilerMessage>();
             for ( Diagnostic<? extends JavaFileObject> diagnostic : collector.getDiagnostics() )
             {
                 CompilerMessage.Kind kind;
@@ -170,16 +174,17 @@ public class JavaxToolsCompiler
                         }
                     }
                 }
-                compilerErrors.add(
+                compilerMsgs.add(
                     new CompilerMessage( longFileName, kind, lineNumber, columnNumber, lineNumber, columnNumber,
                                        formattedMessage ) );
             }
-            if ( result != Boolean.TRUE && compilerErrors.isEmpty() )
+            if ( result != Boolean.TRUE && compilerMsgs.isEmpty() )
             {
-                compilerErrors.add(
+                compilerMsgs.add(
                     new CompilerMessage( "An unknown compilation problem occurred", CompilerMessage.Kind.ERROR ) );
             }
-            return compilerErrors;
+            
+            return new CompilerResult( result, compilerMsgs);
         }
         catch ( Exception e )
         {
