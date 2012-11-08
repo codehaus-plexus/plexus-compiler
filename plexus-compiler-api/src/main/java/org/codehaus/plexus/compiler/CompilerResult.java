@@ -30,10 +30,7 @@ import java.util.List;
  */
 public class CompilerResult
 {
-    /**
-     * true per default
-     */
-    private boolean success = true;
+    private boolean success;
 
     private List<CompilerMessage> compilerMessages;
 
@@ -42,7 +39,7 @@ public class CompilerResult
      */
     public CompilerResult()
     {
-        // no op
+        this.success = true;
     }
 
     /**
