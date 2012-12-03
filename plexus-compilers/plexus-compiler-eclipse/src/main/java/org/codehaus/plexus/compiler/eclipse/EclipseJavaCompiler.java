@@ -208,8 +208,7 @@ public class EclipseJavaCompiler
         CompilerOptions options = new CompilerOptions( settings );
         Compiler compiler = new Compiler( env, policy, options, requestor, problemFactory );
 
-        ICompilationUnit[] units =
-            (ICompilationUnit[]) compilationUnits.toArray( new ICompilationUnit[compilationUnits.size()] );
+        ICompilationUnit[] units = compilationUnits.toArray( new ICompilationUnit[compilationUnits.size()] );
 
         compiler.compile( units );
 
