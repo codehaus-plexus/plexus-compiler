@@ -411,7 +411,6 @@ public class EclipseJavaCompiler
 
         public boolean ignoreOptionalProblems()
         {
-            // TODO Auto-generated method stub
             return false;
         }
     }
