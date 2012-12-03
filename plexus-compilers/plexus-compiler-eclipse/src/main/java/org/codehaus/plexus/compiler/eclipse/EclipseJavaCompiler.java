@@ -49,7 +49,9 @@ import org.eclipse.jdt.internal.compiler.env.NameEnvironmentAnswer;
 import org.eclipse.jdt.internal.compiler.impl.CompilerOptions;
 import org.eclipse.jdt.internal.compiler.problem.DefaultProblemFactory;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -59,10 +61,12 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -179,6 +183,11 @@ public class EclipseJavaCompiler
         if ( extras != null && !extras.isEmpty() )
         {
             settings.putAll( extras );
+        }
+
+        if(settings.containsKey("-properties")) {
+        	initializeWarnings(settings.get("-properties"), settings);
+        	settings.remove("-properties");
         }
 
         IProblemFactory problemFactory = new DefaultProblemFactory( Locale.getDefault() );
@@ -398,6 +407,11 @@ public class EclipseJavaCompiler
 
             return result;
         }
+
+		public boolean ignoreOptionalProblems() {
+			// TODO Auto-generated method stub
+			return false;
+		}
     }
 
     private class EclipseCompilerINameEnvironment
@@ -631,5 +645,35 @@ public class EclipseJavaCompiler
                 }
             }
         }
+    }
+    
+    private void initializeWarnings(String propertiesFile, Map<String, String> setting) {
+    	File file = new File(propertiesFile);
+    	if (!file.exists()) {
+    		throw new IllegalArgumentException("Properties file not exist"); 
+    	}
+    	BufferedInputStream stream = null;
+    	Properties properties = null;
+    	try {
+    		stream = new BufferedInputStream(new FileInputStream(propertiesFile));
+    		properties = new Properties();
+    		properties.load(stream);
+    	} catch(IOException e) {
+    		e.printStackTrace();
+    		throw new IllegalArgumentException("Properties file load error"); 
+    	} finally {
+    		if (stream != null) {
+    			try {
+    				stream.close();
+    			} catch(IOException e) {
+    				// ignore
+    			}
+    		}
+    	}
+    	for (Iterator iterator = properties.entrySet().iterator(); iterator.hasNext(); ) {
+    		Map.Entry entry = (Map.Entry) iterator.next();
+    		final String key = (String) entry.getKey();
+			setting.put(key, entry.getValue().toString());
+    	}
     }
 }
