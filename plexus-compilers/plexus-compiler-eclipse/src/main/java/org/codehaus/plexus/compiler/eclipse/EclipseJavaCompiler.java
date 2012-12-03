@@ -67,8 +67,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 /**
- * @plexus.component role="org.codehaus.plexus.compiler.Compiler"
- * role-hint="eclipse"
+ * @plexus.component role="org.codehaus.plexus.compiler.Compiler" role-hint="eclipse"
  */
 public class EclipseJavaCompiler
     extends AbstractCompiler
@@ -212,7 +211,18 @@ public class EclipseJavaCompiler
 
         compiler.compile( units );
 
-        return new CompilerResult().compilerMessages( errors );
+        CompilerResult compilerResult = new CompilerResult().compilerMessages( errors );
+
+        for ( CompilerMessage compilerMessage : errors )
+        {
+            if ( compilerMessage.isError() )
+            {
+                compilerResult.setSuccess( false );
+                continue;
+            }
+        }
+
+        return compilerResult;
     }
 
     public String[] createCommandLine( CompilerConfiguration config )
