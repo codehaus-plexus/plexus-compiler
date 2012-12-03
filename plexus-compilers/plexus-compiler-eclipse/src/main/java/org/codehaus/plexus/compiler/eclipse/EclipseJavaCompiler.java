@@ -255,12 +255,13 @@ public class EclipseJavaCompiler
             message = "No message";
         }
 
-        return new CompilerMessage( fileName, true, line, column, line, column, message );
+        return new CompilerMessage( fileName, CompilerMessage.Kind.ERROR, line, column, line, column, message );
+
     }
 
     private CompilerMessage handleWarning( IProblem warning )
     {
-        return new CompilerMessage( new String( warning.getOriginatingFileName() ), false,
+        return new CompilerMessage( new String( warning.getOriginatingFileName() ), CompilerMessage.Kind.WARNING,
                                     warning.getSourceLineNumber(), warning.getSourceStart(),
                                     warning.getSourceLineNumber(), warning.getSourceEnd(), warning.getMessage() );
     }
