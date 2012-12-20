@@ -167,10 +167,11 @@ public class JavacCompiler
             if ( isJava16() && !config.isForceJavacCompilerUse() )
             {
                 // use fqcn to prevent loading of the class on 1.5 environment !
-                result =  org.codehaus.plexus.compiler.javac.JavaxToolsCompiler.compileInProcess( args, config,
-                                                                                                  sourceFiles );
+                result =
+                    org.codehaus.plexus.compiler.javac.JavaxToolsCompiler.compileInProcess( args, config, sourceFiles );
             }
-            else {
+            else
+            {
                 result = compileInProcess( args, config );
             }
         }
@@ -520,8 +521,8 @@ public class JavacCompiler
      * Compile the java sources in the current JVM, without calling an external executable,
      * using <code>com.sun.tools.javac.Main</code> class
      *
-     * @param args    arguments for the compiler as they would be used in the command line javac
-     * @param config  compiler configuration
+     * @param args   arguments for the compiler as they would be used in the command line javac
+     * @param config compiler configuration
      * @return a CompilerResult object encapsulating the result of the compilation and any compiler messages
      * @throws CompilerException
      */
@@ -613,6 +614,11 @@ public class JavacCompiler
 
                 if ( line == null )
                 {
+                    // javac output not detected by other parsing
+                    if ( buffer.length() > 0 && buffer.toString().startsWith( "javac:" ) )
+                    {
+                        errors.add( new CompilerMessage( buffer.toString(), CompilerMessage.Kind.ERROR ) );
+                    }
                     return errors;
                 }
 
