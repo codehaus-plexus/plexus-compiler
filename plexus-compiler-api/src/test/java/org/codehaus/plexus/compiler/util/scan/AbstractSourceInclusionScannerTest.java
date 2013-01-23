@@ -29,20 +29,20 @@ import org.codehaus.plexus.util.IOUtil;
 
 /**
  * Tests for all the implementations of <code>SourceInclusionScanner</code>
- * 
+ *
  * @author <a href="mailto:carlos@apache.org">Carlos Sanchez</a>
- * @version $Id$
  */
 public abstract class AbstractSourceInclusionScannerTest
     extends TestCase
 {
-    
+
     private static final String TESTFILE_DEST_MARKER_FILE =
         SourceInclusionScanner.class.getName().replace( '.', '/' ) + "-testMarker.txt";
 
     protected SourceInclusionScanner scanner;
 
-    public void testGetIncludedSources() throws Exception
+    public void testGetIncludedSources()
+        throws Exception
     {
         File base = new File( getTestBaseDir(), "testGetIncludedSources" );
 
@@ -56,9 +56,9 @@ public abstract class AbstractSourceInclusionScannerTest
 
         scanner.addSourceMapping( mapping );
 
-        Set<File>includedSources = scanner.getIncludedSources( base, base );
+        Set<File> includedSources = scanner.getIncludedSources( base, base );
 
-        assertTrue( "no sources were included", !includedSources.isEmpty());
+        assertTrue( "no sources were included", !includedSources.isEmpty() );
 
         for ( File file : includedSources )
         {
@@ -87,7 +87,7 @@ public abstract class AbstractSourceInclusionScannerTest
         {
             // punt.
             System.out.println( "Cannot find marker file: \'" + TESTFILE_DEST_MARKER_FILE + "\' in classpath. " +
-                                "Using '.' for basedir." );
+                                    "Using '.' for basedir." );
 
             basedir = new File( "." ).getAbsoluteFile();
         }

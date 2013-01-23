@@ -32,7 +32,6 @@ import java.util.List;
  * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  * @author <a href="mailto:matthew.pocock@ncl.ac.uk">Matthew Pocock</a>
- * @version $Id$
  */
 public interface Compiler
 {

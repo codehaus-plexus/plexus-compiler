@@ -1,9 +1,5 @@
 package org.codehaus.plexus.compiler.util.scan;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 /*
  * Copyright 2006 The Apache Software Foundation.
  *
@@ -20,23 +16,27 @@ import java.util.Set;
  * limitations under the License.
  */
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
+
 /**
- * Test for 
- * 
+ * Test for
+ *
  * @author <a href="mailto:carlos@apache.org">Carlos Sanchez</a>
- * @version $Id$
  */
 public class SimpleSourceInclusionScannerTest
     extends AbstractSourceInclusionScannerTest
 {
-    
+
     private Set<String> includes, excludes;
 
     protected void setUp()
         throws Exception
     {
         super.setUp();
-        
+
         includes = Collections.singleton( "*.java" );
         excludes = new HashSet<String>();
         scanner = new SimpleSourceInclusionScanner( includes, excludes );

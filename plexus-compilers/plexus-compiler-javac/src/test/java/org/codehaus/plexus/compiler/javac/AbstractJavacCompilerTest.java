@@ -38,7 +38,6 @@ import java.util.Map;
 
 /**
  * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>
- * @version $Id$
  */
 public abstract class AbstractJavacCompilerTest
     extends AbstractCompilerTest
@@ -77,10 +76,9 @@ public abstract class AbstractJavacCompilerTest
             }
         }
 
-        System.out.println( "java.version is: " + realJavaVersion + "\ntrimmed java version is: "
-                            + javaVersion
-                            + "\ncomparison: \"1.5\".compareTo( \"" + javaVersion + "\" ) == "
-                            + ( "1.5".compareTo( javaVersion ) ) + "\n" );
+        System.out.println( "java.version is: " + realJavaVersion + "\ntrimmed java version is: " + javaVersion
+                                + "\ncomparison: \"1.5\".compareTo( \"" + javaVersion + "\" ) == " + ( "1.5".compareTo(
+            javaVersion ) ) + "\n" );
 
         // javac output changed for misspelled modifiers starting in 1.6...they now generate 2 errors per occurrence, not one.
         if ( "1.5".compareTo( javaVersion ) < 0 )
@@ -100,22 +98,20 @@ public abstract class AbstractJavacCompilerTest
 
     protected Collection<String> expectedOutputFiles()
     {
-        return Arrays.asList( new String[] { "org/codehaus/foo/Deprecation.class",
-            "org/codehaus/foo/ExternalDeps.class", "org/codehaus/foo/Person.class",
-            "org/codehaus/foo/ReservedWord.class" } );
+        return Arrays.asList( new String[]{ "org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ExternalDeps.class",
+            "org/codehaus/foo/Person.class", "org/codehaus/foo/ReservedWord.class" } );
     }
 
     public void internalTest( CompilerConfiguration compilerConfiguration, List<String> expectedArguments )
     {
         String[] actualArguments = JavacCompiler.buildCompilerArguments( compilerConfiguration, new String[0] );
 
-        assertEquals( "The expected and actual argument list sizes differ.",
-                      expectedArguments.size(),
+        assertEquals( "The expected and actual argument list sizes differ.", expectedArguments.size(),
                       actualArguments.length );
 
         for ( int i = 0; i < actualArguments.length; i++ )
         {
-            assertEquals( "Unexpected argument", expectedArguments.get(i), actualArguments[i] );
+            assertEquals( "Unexpected argument", expectedArguments.get( i ), actualArguments[i] );
         }
     }
 
@@ -183,11 +179,11 @@ public abstract class AbstractJavacCompilerTest
 
         internalTest( compilerConfiguration, expectedArguments );
     }
-    
+
     // PLXCOMP-190
     public void testJRuntimeArguments()
     {
-    	List<String> expectedArguments = new ArrayList<String>();
+        List<String> expectedArguments = new ArrayList<String>();
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
@@ -195,7 +191,7 @@ public abstract class AbstractJavacCompilerTest
         compilerConfiguration.setOutputLocation( "/output" );
         expectedArguments.add( "-d" );
         expectedArguments.add( new File( "/output" ).getAbsolutePath() );
-        
+
         // targetVersion
         compilerConfiguration.setTargetVersion( "1.3" );
         expectedArguments.add( "-target" );
@@ -211,7 +207,7 @@ public abstract class AbstractJavacCompilerTest
         customCompilerArguments.put( "-J-Duser.language=en_us", null );
         compilerConfiguration.setCustomCompilerArgumentsAsMap( customCompilerArguments );
         // don't expect this argument!!
-        
+
         internalTest( compilerConfiguration, expectedArguments );
     }
     
@@ -334,7 +330,6 @@ public abstract class AbstractJavacCompilerTest
         }
 
         // customerCompilerArguments
-        
 
         Map<String, String> customerCompilerArguments = new LinkedHashMap<String, String>();
 

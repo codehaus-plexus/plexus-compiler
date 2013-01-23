@@ -18,7 +18,6 @@ package org.codehaus.plexus.compiler.util.scan;
 
 /**
  * @author jdcasey
- * @version $Id$
  */
 public class InclusionScanException
     extends Exception

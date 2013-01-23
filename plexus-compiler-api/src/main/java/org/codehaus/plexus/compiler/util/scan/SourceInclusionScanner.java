@@ -21,14 +21,12 @@ import java.util.Set;
 
 /**
  * @author jdcasey
- * @version $Id$
  */
 public interface SourceInclusionScanner
 {
     void addSourceMapping( SourceMapping sourceMapping );
 
     /**
-     * 
      * @param sourceDir
      * @param targetDir
      * @return <code>Set</code> of <code>File</code> objects

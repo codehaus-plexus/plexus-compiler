@@ -33,7 +33,6 @@ import java.util.List;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
- * @version $Id$
  */
 public abstract class AbstractCompilerTckTest
     extends PlexusTestCase
@@ -165,17 +164,17 @@ public abstract class AbstractCompilerTckTest
         }
 
         String source = "import java.util.Date;" + EOL +
-                        "" + EOL +
-                        "public class " + className + "" + EOL +
-                        "{" + EOL +
-                        "    private static Date date = new Date( \"foo\" );" + EOL +
-                        "    static " + EOL +
-                        "    { " + EOL +
-                        "        Date date = " + className + ".date; " + EOL +
-                        "        Date date2 = date; " + EOL +
-                        "        date = date2; " + EOL +
-                        "    }" + EOL +
-                        "}";
+            "" + EOL +
+            "public class " + className + "" + EOL +
+            "{" + EOL +
+            "    private static Date date = new Date( \"foo\" );" + EOL +
+            "    static " + EOL +
+            "    { " + EOL +
+            "        Date date = " + className + ".date; " + EOL +
+            "        Date date2 = date; " + EOL +
+            "        date = date2; " + EOL +
+            "    }" + EOL +
+            "}";
 
         FileUtils.fileWrite( path.getAbsolutePath(), source );
     }
@@ -191,13 +190,13 @@ public abstract class AbstractCompilerTckTest
         }
 
         String source = "public class " + className + "" + EOL +
-                        "{" + EOL +
-                        "    public void foo()" + EOL +
-                        "    {" + EOL +
-                        "        try{ throw new java.io.IOException(); }" + EOL +
-                        "        finally { return; }" + EOL +
-                        "    }" + EOL +
-                        "}";
+            "{" + EOL +
+            "    public void foo()" + EOL +
+            "    {" + EOL +
+            "        try{ throw new java.io.IOException(); }" + EOL +
+            "        finally { return; }" + EOL +
+            "    }" + EOL +
+            "}";
 
         FileUtils.fileWrite( path.getAbsolutePath(), source );
     }

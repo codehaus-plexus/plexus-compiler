@@ -35,7 +35,6 @@ import java.util.Set;
 
 /**
  * @author jdcasey
- * @version $Id$
  */
 public class CompilerConfiguration
 {

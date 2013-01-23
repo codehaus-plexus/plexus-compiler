@@ -26,13 +26,14 @@ package org.codehaus.plexus.compiler;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
- * @version $Id$
  */
 public final class CompilerOutputStyle
 {
-    public final static CompilerOutputStyle ONE_OUTPUT_FILE_PER_INPUT_FILE = new CompilerOutputStyle( "one-output-file-per-input-file" );
+    public final static CompilerOutputStyle ONE_OUTPUT_FILE_PER_INPUT_FILE =
+        new CompilerOutputStyle( "one-output-file-per-input-file" );
 
-    public final static CompilerOutputStyle ONE_OUTPUT_FILE_FOR_ALL_INPUT_FILES = new CompilerOutputStyle( "one-output-file" );
+    public final static CompilerOutputStyle ONE_OUTPUT_FILE_FOR_ALL_INPUT_FILES =
+        new CompilerOutputStyle( "one-output-file" );
 
     // ----------------------------------------------------------------------
     //
@@ -56,12 +57,12 @@ public final class CompilerOutputStyle
 
     public boolean equals( Object other )
     {
-        if ( other == null || !(other instanceof CompilerOutputStyle) )
+        if ( other == null || !( other instanceof CompilerOutputStyle ) )
         {
             return false;
         }
 
-        return id.equals( ((CompilerOutputStyle)other ).id );
+        return id.equals( ( (CompilerOutputStyle) other ).id );
     }
 
     public int hashCode()

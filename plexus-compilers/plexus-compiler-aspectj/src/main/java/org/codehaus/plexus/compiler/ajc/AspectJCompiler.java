@@ -219,7 +219,6 @@ import java.util.Map;
  * (Experimental) Normally it is an error to declare aspects Serializable. This option removes that restriction.
  *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- * @version $Id$
  * @plexus.component role="org.codehaus.plexus.compiler.Compiler" role-hint="aspectj"
  */
 public class AspectJCompiler

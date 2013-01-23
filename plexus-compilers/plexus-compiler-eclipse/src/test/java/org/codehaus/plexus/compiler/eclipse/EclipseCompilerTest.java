@@ -31,7 +31,6 @@ import org.codehaus.plexus.compiler.AbstractCompilerTest;
 
 /**
  * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>
- * @version $Id$
  */
 public class EclipseCompilerTest
     extends AbstractCompilerTest
@@ -63,9 +62,8 @@ public class EclipseCompilerTest
 
     protected Collection<String> expectedOutputFiles()
     {
-        return Arrays.asList( new String[] { "org/codehaus/foo/Deprecation.class",
-            "org/codehaus/foo/ExternalDeps.class", "org/codehaus/foo/Person.class",
-            "org/codehaus/foo/ReservedWord.class" } );
+        return Arrays.asList( new String[]{ "org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ExternalDeps.class",
+            "org/codehaus/foo/Person.class", "org/codehaus/foo/ReservedWord.class" } );
     }
 
 }

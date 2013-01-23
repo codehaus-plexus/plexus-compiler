@@ -34,7 +34,6 @@ import java.io.File;
  * Maps a set of input files to a single output file.
  *
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
- * @version $Id$
  */
 public class SingleTargetSourceMapping
     implements SourceMapping

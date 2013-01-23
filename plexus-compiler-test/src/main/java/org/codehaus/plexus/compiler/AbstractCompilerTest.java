@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.TreeSet;
 
 /**
- * @version $Id$
+ *
  */
 public abstract class AbstractCompilerTest
     extends ArtifactTestCase
@@ -77,7 +77,7 @@ public abstract class AbstractCompilerTest
         File file = getLocalArtifactPath( "commons-lang", "commons-lang", "2.0", "jar" );
 
         assertTrue( "test prerequisite: commons-lang library must be available in local repository, expected "
-                    + file.getAbsolutePath(), file.canRead() );
+                        + file.getAbsolutePath(), file.canRead() );
 
         cp.add( file.getAbsolutePath() );
 
@@ -125,9 +125,7 @@ public abstract class AbstractCompilerTest
                 System.err.println( "----" );
             }
 
-            assertEquals( "Wrong number of compilation errors.",
-                          expectedErrors(),
-                          numCompilerErrors );
+            assertEquals( "Wrong number of compilation errors.", expectedErrors(), numCompilerErrors );
         }
 
         if ( expectedWarnings() != numCompilerWarnings )
@@ -146,9 +144,7 @@ public abstract class AbstractCompilerTest
                 System.err.println( "----" );
             }
 
-            assertEquals( "Wrong number of compilation warnings.",
-                          expectedWarnings(),
-                          numCompilerWarnings );
+            assertEquals( "Wrong number of compilation warnings.", expectedWarnings(), numCompilerWarnings );
         }
 
         assertEquals( new TreeSet<String>( normalizePaths( expectedOutputFiles() ) ), files );
@@ -159,8 +155,8 @@ public abstract class AbstractCompilerTest
     {
         String sourceDir = getBasedir() + "/src/test-input/src/main";
 
-        @SuppressWarnings( "unchecked" )
-        List<String> filenames = FileUtils.getFileNames( new File( sourceDir ), "**/*.java", null, false, true );
+        @SuppressWarnings( "unchecked" ) List<String> filenames =
+            FileUtils.getFileNames( new File( sourceDir ), "**/*.java", null, false, true );
         Collections.sort( filenames );
 
         List<CompilerConfiguration> compilerConfigurations = new ArrayList<CompilerConfiguration>();
@@ -235,9 +231,8 @@ public abstract class AbstractCompilerTest
     {
         VersionRange versionRange = VersionRange.createFromVersion( version );
 
-        Artifact artifact =
-            new DefaultArtifact( groupId, artifactId, versionRange, Artifact.SCOPE_COMPILE, type, null,
-                                 new DefaultArtifactHandler( type ) );
+        Artifact artifact = new DefaultArtifact( groupId, artifactId, versionRange, Artifact.SCOPE_COMPILE, type, null,
+                                                 new DefaultArtifactHandler( type ) );
 
         return getLocalArtifactPath( artifact );
     }

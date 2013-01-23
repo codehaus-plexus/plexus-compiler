@@ -46,7 +46,6 @@ package org.codehaus.plexus.compiler;
  * processor (whether interpreted or compiled).
  *
  * @author <a href="mailto:stefano@apache.org">Stefano Mazzocchi</a>
- * @version $Id$
  * @since 2.0
  */
 public class CompilerMessage
@@ -90,7 +89,6 @@ public class CompilerMessage
     /**
      * Constructs a compiler message.
      *
-     * @deprecated        Use {@link #CompilerMessage(String,Kind,int,int,int,int,String)} instead
      * @param file        The name of the file containing the offending program text
      * @param error       <code>true</code> if this is a error message, or <code>false</code> if it
      *                    is a warning message
@@ -99,6 +97,7 @@ public class CompilerMessage
      * @param endline     The end line number of the offending program text
      * @param endcolumn   The end column number of the offending program text
      * @param message     The actual message text produced by the language processor
+     * @deprecated Use {@link #CompilerMessage(String, Kind, int, int, int, int, String)} instead
      */
     @Deprecated
     public CompilerMessage( String file, boolean error, int startline, int startcolumn, int endline, int endcolumn,
@@ -139,8 +138,8 @@ public class CompilerMessage
     /**
      * The warning message constructor.
      *
-     * @deprecated    Use {@link #CompilerMessage(String,Kind)} instead
      * @param message The actual message text produced by the language processor
+     * @deprecated Use {@link #CompilerMessage(String, Kind)} instead
      */
     @Deprecated
     public CompilerMessage( String message )
@@ -152,10 +151,10 @@ public class CompilerMessage
     /**
      * Constructs a compiler message.
      *
-     * @deprecated    Use {@link #CompilerMessage(String,Kind)} instead
      * @param message The actual message text produced by the language processor
      * @param error   <code>true</code> if this is a error message, or <code>false</code> if it
      *                is a warning message
+     * @deprecated Use {@link #CompilerMessage(String, Kind)} instead
      */
     @Deprecated
     public CompilerMessage( String message, boolean error )
@@ -166,7 +165,7 @@ public class CompilerMessage
 
     /**
      * Constructs a compiler message.
-     * 
+     *
      * @param message The actual message text produced by the language processor
      * @param kind    The kind of message
      * @since 2.0

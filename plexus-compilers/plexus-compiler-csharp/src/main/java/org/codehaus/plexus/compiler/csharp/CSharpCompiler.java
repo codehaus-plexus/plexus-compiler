@@ -52,7 +52,6 @@ import java.util.Set;
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  * @author <a href="mailto:matthew.pocock@ncl.ac.uk">Matthew Pocock</a>
  * @author <a href="mailto:chris.stevenson@gmail.com">Chris Stevenson</a>
- * @version $Id$
  * @plexus.component role="org.codehaus.plexus.compiler.Compiler"
  * role-hint="csharp"
  */
@@ -395,7 +394,7 @@ Options can be of the form -option or /option
         return name.replace( File.separatorChar, '.' );
     }
 
-    @SuppressWarnings ( "deprecation" )
+    @SuppressWarnings( "deprecation" )
     private List<CompilerMessage> compileOutOfProcess( File workingDirectory, File target, String executable,
                                                        String[] args )
         throws CompilerException

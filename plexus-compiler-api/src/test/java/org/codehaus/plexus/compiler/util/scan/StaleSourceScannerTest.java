@@ -27,12 +27,11 @@ import org.codehaus.plexus.compiler.util.scan.mapping.SuffixMapping;
 /**
  * @author jdcasey
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
- * @version $Id$
  */
 public class StaleSourceScannerTest
     extends AbstractSourceInclusionScannerTest
 {
-    
+
     protected void setUp()
         throws Exception
     {

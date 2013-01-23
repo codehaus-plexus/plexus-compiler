@@ -23,7 +23,6 @@ import java.util.Set;
 
 /**
  * @author jdcasey
- * @version $Id$
  */
 public final class SuffixMapping
     implements SourceMapping

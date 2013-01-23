@@ -26,7 +26,6 @@ package org.codehaus.plexus.compiler.manager;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
- * @version $Id$
  */
 public class NoSuchCompilerException
     extends Exception

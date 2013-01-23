@@ -26,7 +26,6 @@ package org.codehaus.plexus.compiler;
 
 /**
  * @author <a href="mailto:andrew@eisenberg.as">Andrew Eisenberg</a>
- * @version $Id$
  */
 public class CompilerNotImplementedException
     extends CompilerException

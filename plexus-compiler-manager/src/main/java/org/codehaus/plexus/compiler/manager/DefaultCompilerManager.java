@@ -30,10 +30,8 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import java.util.Map;
 
 /**
- * @plexus.component
- *
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
- * @version $Id$
+ * @plexus.component
  */
 public class DefaultCompilerManager
     extends AbstractLogEnabled

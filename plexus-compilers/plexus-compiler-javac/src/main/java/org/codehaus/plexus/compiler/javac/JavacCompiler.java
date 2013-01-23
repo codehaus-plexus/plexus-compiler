@@ -80,7 +80,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author <a href="mailto:matthew.pocock@ncl.ac.uk">Matthew Pocock</a>
  * @author <a href="mailto:joerg.wassmer@web.de">J&ouml;rg Wa&szlig;mer</a>
  * @author Others
- * @version $Id$
  * @plexus.component role="org.codehaus.plexus.compiler.Compiler"
  * role-hint="javac"
  */

@@ -26,7 +26,6 @@ import java.util.Set;
 
 /**
  * @author jdcasey
- * @version $Id$
  */
 public class StaleSourceScanner
     extends AbstractSourceInclusionScanner
@@ -92,8 +91,8 @@ public class StaleSourceScanner
                 // mappers must tell us to look for them.
                 for ( File targetFile : targetFiles )
                 {
-                    if ( !targetFile.exists()
-                        || ( targetFile.lastModified() + lastUpdatedWithinMsecs < sourceFile.lastModified() ) )
+                    if ( !targetFile.exists() || ( targetFile.lastModified() + lastUpdatedWithinMsecs
+                        < sourceFile.lastModified() ) )
                     {
                         matchingSources.add( sourceFile );
                         break staleSourceFileTesting;

@@ -27,7 +27,6 @@ import java.util.Set;
 
 /**
  * @author jdcasey
- * @version $Id$
  */
 public abstract class AbstractSourceInclusionScanner
     implements SourceInclusionScanner

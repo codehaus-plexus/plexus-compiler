@@ -9,7 +9,6 @@ import org.codehaus.plexus.compiler.AbstractCompilerTest;
 
 /**
  * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>
- * @version $Id$
  */
 public class AspectJCompilerTest
     extends AbstractCompilerTest
@@ -31,7 +30,7 @@ public class AspectJCompilerTest
 
     protected Collection<String> expectedOutputFiles()
     {
-        return Arrays.asList( new String[] { "org/codehaus/foo/ExternalDeps.class", "org/codehaus/foo/Person.class" } );
+        return Arrays.asList( new String[]{ "org/codehaus/foo/ExternalDeps.class", "org/codehaus/foo/Person.class" } );
     }
 
     protected List<String> getClasspath()
