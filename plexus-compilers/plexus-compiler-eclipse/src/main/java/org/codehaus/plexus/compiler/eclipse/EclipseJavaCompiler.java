@@ -269,9 +269,9 @@ public class EclipseJavaCompiler
 
     }
 
-    private CompilerMessage handleWarning( IProblem warning )
+    private CompilerMessage handleWarning( String fileName, IProblem warning )
     {
-        return new CompilerMessage( new String( warning.getOriginatingFileName() ), CompilerMessage.Kind.WARNING,
+        return new CompilerMessage( fileName, CompilerMessage.Kind.WARNING,
                                     warning.getSourceLineNumber(), warning.getSourceStart(),
                                     warning.getSourceLineNumber(), warning.getSourceEnd(), warning.getMessage() );
     }
@@ -359,6 +359,11 @@ public class EclipseJavaCompiler
             }
 
             return fileName.toCharArray();
+        }
+
+        String getAbsolutePath()
+        {
+            return sourceFile;
         }
 
         public char[] getContents()
@@ -583,11 +588,11 @@ public class EclipseJavaCompiler
 
                 for ( IProblem problem : problems )
                 {
-                    String name = new String( problem.getOriginatingFileName() );
+                    String name = getFileName(result.getCompilationUnit(), problem.getOriginatingFileName());
 
                     if ( problem.isWarning() )
                     {
-                        errors.add( handleWarning( problem ) );
+                        errors.add( handleWarning( name, problem ) );
                     }
                     else
                     {
@@ -644,6 +649,17 @@ public class EclipseJavaCompiler
                         IOUtil.close( fout );
                     }
                 }
+            }
+        }
+
+        private String getFileName( ICompilationUnit compilationUnit, char[] originalFileName ) {
+            if ( compilationUnit instanceof CompilationUnit )
+            {
+                return ((CompilationUnit)compilationUnit).getAbsolutePath();
+            }
+            else
+            {
+                return String.valueOf(originalFileName);
             }
         }
     }
