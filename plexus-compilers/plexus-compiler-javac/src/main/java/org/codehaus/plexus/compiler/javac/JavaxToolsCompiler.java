@@ -89,8 +89,7 @@ public class JavaxToolsCompiler
         }
     }
 
-    static CompilerResult compileInProcess( String[] args, final CompilerConfiguration config,
-                                                 String[] sourceFiles )
+    static CompilerResult compileInProcess( String[] args, final CompilerConfiguration config, String[] sourceFiles )
         throws CompilerException
     {
         JavaCompiler compiler = getJavaCompiler( config );
@@ -98,10 +97,9 @@ public class JavaxToolsCompiler
         {
             if ( compiler == null )
             {
-                CompilerMessage message =
-                                new CompilerMessage( "No compiler is provided in this environment. "
-                                                     + "Perhaps you are running on a JRE rather than a JDK?",
-                                                     CompilerMessage.Kind.ERROR );
+                CompilerMessage message = new CompilerMessage( "No compiler is provided in this environment. "
+                                                                   + "Perhaps you are running on a JRE rather than a JDK?",
+                                                               CompilerMessage.Kind.ERROR );
                 return new CompilerResult( false, Collections.singletonList( message ) );
             }
             final String sourceEncoding = config.getSourceEncoding();
@@ -112,17 +110,18 @@ public class JavaxToolsCompiler
 
             final Iterable<? extends JavaFileObject> fileObjects =
                 standardFileManager.getJavaFileObjectsFromStrings( Arrays.asList( sourceFiles ) );
+
+             /*(Writer out,
+             JavaFileManager fileManager,
+             DiagnosticListener<? super JavaFileObject> diagnosticListener,
+             Iterable<String> options,
+             Iterable<String> classes,
+             Iterable<? extends JavaFileObject> compilationUnits)*/
+
+            List<String> arguments = Arrays.asList( args );
+
             final JavaCompiler.CompilationTask task =
-
-                                         /*(Writer out,
-                                         JavaFileManager fileManager,
-                                         DiagnosticListener<? super JavaFileObject> diagnosticListener,
-                                         Iterable<String> options,
-                                         Iterable<String> classes,
-                                         Iterable<? extends JavaFileObject> compilationUnits)*/
-
-
-                compiler.getTask( null, standardFileManager, collector, Arrays.asList( args ), null, fileObjects );
+                compiler.getTask( null, standardFileManager, collector, arguments, null, fileObjects );
             final Boolean result = task.call();
             final ArrayList<CompilerMessage> compilerMsgs = new ArrayList<CompilerMessage>();
             for ( Diagnostic<? extends JavaFileObject> diagnostic : collector.getDiagnostics() )
@@ -176,15 +175,15 @@ public class JavaxToolsCompiler
                 }
                 compilerMsgs.add(
                     new CompilerMessage( longFileName, kind, lineNumber, columnNumber, lineNumber, columnNumber,
-                                       formattedMessage ) );
+                                         formattedMessage ) );
             }
             if ( result != Boolean.TRUE && compilerMsgs.isEmpty() )
             {
                 compilerMsgs.add(
                     new CompilerMessage( "An unknown compilation problem occurred", CompilerMessage.Kind.ERROR ) );
             }
-            
-            return new CompilerResult( result, compilerMsgs);
+
+            return new CompilerResult( result, compilerMsgs );
         }
         catch ( Exception e )
         {

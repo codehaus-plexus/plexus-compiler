@@ -60,6 +60,21 @@ public abstract class AbstractJavacCompilerTest
 
     protected int expectedErrors()
     {
+
+        // javac output changed for misspelled modifiers starting in 1.6...they now generate 2 errors per occurrence, not one.
+        if ( "1.5".compareTo( getJavaVersion() ) < 0 )
+        {
+            return 4;
+        }
+        else
+        {
+            return 3;
+        }
+    }
+
+    protected String getJavaVersion()
+    {
+
         String javaVersion = System.getProperty( "java.version" );
         String realJavaVersion = javaVersion;
 
@@ -80,15 +95,7 @@ public abstract class AbstractJavacCompilerTest
                                 + "\ncomparison: \"1.5\".compareTo( \"" + javaVersion + "\" ) == " + ( "1.5".compareTo(
             javaVersion ) ) + "\n" );
 
-        // javac output changed for misspelled modifiers starting in 1.6...they now generate 2 errors per occurrence, not one.
-        if ( "1.5".compareTo( javaVersion ) < 0 )
-        {
-            return 4;
-        }
-        else
-        {
-            return 3;
-        }
+        return javaVersion;
     }
 
     protected int expectedWarnings()

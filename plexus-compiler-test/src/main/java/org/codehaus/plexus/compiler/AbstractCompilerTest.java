@@ -178,12 +178,17 @@ public abstract class AbstractCompilerTest
 
             compilerConfig.setOutputLocation( getBasedir() + "/target/" + getRoleHint() + "/classes-" + index );
 
+            FileUtils.deleteDirectory( compilerConfig.getOutputLocation() );
+
             compilerConfig.addInclude( filename );
 
             compilerConfig.setForceJavacCompilerUse( this.forceJavacCompilerUse );
 
-            compilerConfigurations.add( compilerConfig );
+            //compilerConfig.setTargetVersion( "1.5" );
 
+            //compilerConfig.setSourceVersion( "1.5" );
+
+            compilerConfigurations.add( compilerConfig );
 
         }
 

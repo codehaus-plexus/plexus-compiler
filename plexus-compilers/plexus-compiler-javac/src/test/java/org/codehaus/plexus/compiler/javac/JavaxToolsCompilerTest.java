@@ -25,4 +25,17 @@ public class JavaxToolsCompilerTest
     extends AbstractJavacCompilerTest
 {
     // no op default is to javax.tools if available
+
+    protected int expectedWarnings()
+    {
+        // with 1.7 some warning with bootstrap class path not set in conjunction with -source 1.3
+        if ( "1.6".compareTo( getJavaVersion() ) < 0 )
+        {
+            return 9;
+        }
+        else
+        {
+            return 2;
+        }
+    }
 }
