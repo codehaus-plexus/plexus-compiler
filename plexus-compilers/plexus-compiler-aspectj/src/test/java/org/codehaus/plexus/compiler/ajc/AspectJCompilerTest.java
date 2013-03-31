@@ -38,7 +38,8 @@ public class AspectJCompilerTest
     {
         List<String> cp = super.getClasspath();
 
-        File localArtifactPath = getLocalArtifactPath( "org.aspectj", "aspectjrt", "1.6.0", "jar" );
+        File localArtifactPath =
+            getLocalArtifactPath( "org.aspectj", "aspectjrt", System.getProperty( "aspectj.version" ), "jar" );
         cp.add( localArtifactPath.getAbsolutePath() );
 
         return cp;
