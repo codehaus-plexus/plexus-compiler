@@ -13,16 +13,20 @@
   <name>Plexus AspectJ Compiler</name>
   <description>AspectJ Compiler support for Plexus Compiler component.</description>
 
+  <properties>
+    <aspectj.version>1.7.1</aspectj.version>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.aspectj</groupId>
       <artifactId>aspectjrt</artifactId>
-      <version>1.7.1</version>
+      <version>${aspectj.version}</version>
     </dependency>
     <dependency>
       <groupId>org.aspectj</groupId>
       <artifactId>aspectjtools</artifactId>
-      <version>1.7.1</version>
+      <version>${aspectj.version}</version>
     </dependency>
   </dependencies>
 </project>

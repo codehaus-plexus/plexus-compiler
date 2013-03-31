@@ -111,7 +111,7 @@ public abstract class AbstractCompilerTest
 
         if ( expectedErrors() != numCompilerErrors )
         {
-            System.err.println( numCompilerErrors + " error(s) found:" );
+            System.out.println( numCompilerErrors + " error(s) found:" );
             for ( CompilerMessage error : messages )
             {
                 if ( !error.isError() )
@@ -119,10 +119,10 @@ public abstract class AbstractCompilerTest
                     continue;
                 }
 
-                System.err.println( "----" );
-                System.err.println( error.getFile() );
-                System.err.println( error.getMessage() );
-                System.err.println( "----" );
+                System.out.println( "----" );
+                System.out.println( error.getFile() );
+                System.out.println( error.getMessage() );
+                System.out.println( "----" );
             }
 
             assertEquals( "Wrong number of compilation errors.", expectedErrors(), numCompilerErrors );
@@ -130,7 +130,7 @@ public abstract class AbstractCompilerTest
 
         if ( expectedWarnings() != numCompilerWarnings )
         {
-            System.err.println( numCompilerWarnings + " warning(s) found:" );
+            System.out.println( numCompilerWarnings + " warning(s) found:" );
             for ( CompilerMessage error : messages )
             {
                 if ( error.isError() )
@@ -138,10 +138,10 @@ public abstract class AbstractCompilerTest
                     continue;
                 }
 
-                System.err.println( "----" );
-                System.err.println( error.getFile() );
-                System.err.println( error.getMessage() );
-                System.err.println( "----" );
+                System.out.println( "----" );
+                System.out.println( error.getFile() );
+                System.out.println( error.getMessage() );
+                System.out.println( "----" );
             }
 
             assertEquals( "Wrong number of compilation warnings.", expectedWarnings(), numCompilerWarnings );
