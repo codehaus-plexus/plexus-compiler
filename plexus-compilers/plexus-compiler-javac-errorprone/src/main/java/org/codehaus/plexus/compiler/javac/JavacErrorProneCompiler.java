@@ -73,14 +73,16 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @plexus.component role="org.codehaus.plexus.compiler.Compiler"
  * role-hint="javac-with-errorprone"
  */
-public class JavacErrorProneCompiler extends AbstractCompiler
+public class JavacErrorProneCompiler
+    extends AbstractCompiler
 {
-  private static final Object LOCK = new Object();
+    private static final Object LOCK = new Object();
 
     private static final String JAVAC_CLASSNAME = "com.google.errorprone.ErrorProneCompiler";
-  public static final String ERROR_PRONE_PARENT_CLASS = "com.sun.tools.javac.main.Main";
 
-  private static volatile Class<?> JAVAC_CLASS;
+    public static final String ERROR_PRONE_PARENT_CLASS = "com.sun.tools.javac.main.Main";
+
+    private static volatile Class<?> JAVAC_CLASS;
 
     private List<Class<?>> javaccClasses = new CopyOnWriteArrayList<Class<?>>();
 
@@ -127,8 +129,7 @@ public class JavacErrorProneCompiler extends AbstractCompiler
 
         if ( config.isFork() )
         {
-            throw new UnsupportedOperationException(
-                "Cannot compile out-of-process with error-prone enabled.");
+            throw new UnsupportedOperationException( "Cannot compile out-of-process with error-prone enabled." );
         }
         else
         {
@@ -140,7 +141,7 @@ public class JavacErrorProneCompiler extends AbstractCompiler
         return result;
     }
 
-  public String[] createCommandLine( CompilerConfiguration config )
+    public String[] createCommandLine( CompilerConfiguration config )
         throws CompilerException
     {
         return buildCompilerArguments( config, getSourceFiles( config ) );
@@ -365,7 +366,7 @@ public class JavacErrorProneCompiler extends AbstractCompiler
         return isPreJava14( config );
     }
 
-  /**
+    /**
      * Compile the java sources in the current JVM, without calling an external executable,
      * using <code>com.sun.tools.javac.Main</code> class
      *
@@ -373,6 +374,7 @@ public class JavacErrorProneCompiler extends AbstractCompiler
      * @param config compiler configuration
      * @return a CompilerResult object encapsulating the result of the compilation and any compiler messages
      * @throws org.codehaus.plexus.compiler.CompilerException
+     *
      */
     CompilerResult compileInProcess( String[] args, CompilerConfiguration config )
         throws CompilerException
@@ -383,7 +385,7 @@ public class JavacErrorProneCompiler extends AbstractCompiler
         thread.setContextClassLoader( javacClass.getClassLoader() );
         try
         {
-          return compileWithErrorProne( javacClass, args );
+            return compileWithErrorProne( javacClass, args );
         }
         finally
         {
@@ -392,63 +394,74 @@ public class JavacErrorProneCompiler extends AbstractCompiler
         }
     }
 
-  private static CompilerResult compileWithErrorProne(Class<?> errorProneCompilerClass, String[] args)
-      throws CompilerException {
-    // TODO(alexeagle): perhaps error-prone can conform to the 1.6 JavaCompiler API.
-    // Then we could use the JavaxToolsCompiler approach instead, which would reuse more code.
+    private static CompilerResult compileWithErrorProne( Class<?> errorProneCompilerClass, String[] args )
+        throws CompilerException
+    {
+        // TODO(alexeagle): perhaps error-prone can conform to the 1.6 JavaCompiler API.
+        // Then we could use the JavaxToolsCompiler approach instead, which would reuse more code.
 
-    try {
-      Method compile = errorProneCompilerClass
-          .getMethod("compile", new Class[]{ DiagnosticListener.class, String[].class });
-      return getCompilerResult(compile, args);
-    } catch (NoSuchMethodException e) {
-      throw new CompilerException("Couldn't find error-prone compile method", e);
-    } catch (IllegalAccessException e) {
-      throw new CompilerException("", e);
-    } catch (InvocationTargetException e) {
-      throw new CompilerException("", e);
+        try
+        {
+            Method compile =
+                errorProneCompilerClass.getMethod( "compile", new Class[]{ DiagnosticListener.class, String[].class } );
+            return getCompilerResult( compile, args );
+        }
+        catch ( NoSuchMethodException e )
+        {
+            throw new CompilerException( "Couldn't find error-prone compile method", e );
+        }
+        catch ( IllegalAccessException e )
+        {
+            throw new CompilerException( "", e );
+        }
+        catch ( InvocationTargetException e )
+        {
+            throw new CompilerException( "", e );
+        }
+
     }
 
-  }
+    private static CompilerResult getCompilerResult( Method compile, String[] args )
+        throws InvocationTargetException, IllegalAccessException
+    {
 
-  private static CompilerResult getCompilerResult(Method compile, String[] args)
-      throws InvocationTargetException, IllegalAccessException {
+        final List<CompilerMessage> messages = new ArrayList<CompilerMessage>();
+        DiagnosticListener<? super JavaFileObject> listener = new DiagnosticListener<JavaFileObject>()
+        {
+            public void report( Diagnostic<? extends JavaFileObject> diagnostic )
+            {
+                messages.add(
+                    new CompilerMessage( diagnostic.getSource().getName(), convertKind( diagnostic.getKind() ),
+                                         (int) diagnostic.getLineNumber(), (int) diagnostic.getColumnNumber(), -1, -1,
+                                         // end pos line:column is hard to calculate
+                                         diagnostic.getMessage( Locale.getDefault() ) ) );
+            }
+        };
+        int result = (Integer) compile.invoke( null, new Object[]{ listener, args } );
 
-    final List<CompilerMessage> messages = new ArrayList<CompilerMessage>();
-    DiagnosticListener<? super JavaFileObject> listener = new DiagnosticListener<JavaFileObject>() {
-      public void report(Diagnostic<? extends JavaFileObject> diagnostic) {
-        messages.add(new CompilerMessage(
-            diagnostic.getSource().getName(),
-            convertKind(diagnostic.getKind()),
-            (int)diagnostic.getLineNumber(),
-            (int)diagnostic.getColumnNumber(),
-            -1, -1, // end pos line:column is hard to calculate
-            diagnostic.getMessage(Locale.getDefault())));
-      }
-    };
-    int result = (Integer)compile.invoke(null, new Object[] {listener, args});
-
-    return new CompilerResult(result == 0, messages);
-  }
-
-  private static CompilerMessage.Kind convertKind(Diagnostic.Kind kind) {
-    switch(kind) {
-      case ERROR:
-        return CompilerMessage.Kind.ERROR;
-      case MANDATORY_WARNING:
-        return CompilerMessage.Kind.MANDATORY_WARNING;
-      case NOTE:
-        return CompilerMessage.Kind.NOTE;
-      case WARNING:
-        return CompilerMessage.Kind.WARNING;
-      case OTHER:
-        return CompilerMessage.Kind.OTHER;
-      default:
-        return CompilerMessage.Kind.OTHER;
+        return new CompilerResult( result == 0, messages );
     }
-  }
 
-  private void releaseJavaccClass( Class<?> javaccClass, CompilerConfiguration compilerConfiguration )
+    private static CompilerMessage.Kind convertKind( Diagnostic.Kind kind )
+    {
+        switch ( kind )
+        {
+            case ERROR:
+                return CompilerMessage.Kind.ERROR;
+            case MANDATORY_WARNING:
+                return CompilerMessage.Kind.MANDATORY_WARNING;
+            case NOTE:
+                return CompilerMessage.Kind.NOTE;
+            case WARNING:
+                return CompilerMessage.Kind.WARNING;
+            case OTHER:
+                return CompilerMessage.Kind.OTHER;
+            default:
+                return CompilerMessage.Kind.OTHER;
+        }
+    }
+
+    private void releaseJavaccClass( Class<?> javaccClass, CompilerConfiguration compilerConfiguration )
     {
         if ( compilerConfiguration.getCompilerReuseStrategy()
             == CompilerConfiguration.CompilerReuseStrategy.ReuseCreated )
@@ -462,13 +475,14 @@ public class JavacErrorProneCompiler extends AbstractCompiler
      * Find the main class of JavaC. Return the same class for subsequent calls.
      *
      * @return the non-null class.
-     * @throws org.codehaus.plexus.compiler.CompilerException if the class has not been found.
+     * @throws org.codehaus.plexus.compiler.CompilerException
+     *          if the class has not been found.
      */
     private Class<?> getJavacClass( CompilerConfiguration compilerConfiguration )
         throws CompilerException
     {
         Class<?> c = null;
-      switch ( compilerConfiguration.getCompilerReuseStrategy() )
+        switch ( compilerConfiguration.getCompilerReuseStrategy() )
         {
             case AlwaysNew:
                 return createJavacClass();
@@ -511,17 +525,17 @@ public class JavacErrorProneCompiler extends AbstractCompiler
     private Class<?> createJavacClass()
         throws CompilerException
     {
-      try
+        try
         {
             // Classloader subtlety: if we try to load the errorprone class, but its parent class
             // isn't on the classpath, we get a ClassNotFoundException from the wrong classloader
             // that doesn't match the catch block.
             // look whether error-prone's parent class is on Maven's classpath
-            return JavacErrorProneCompiler.class.getClassLoader().loadClass(ERROR_PRONE_PARENT_CLASS);
+            return JavacErrorProneCompiler.class.getClassLoader().loadClass( ERROR_PRONE_PARENT_CLASS );
         }
         catch ( ClassNotFoundException ex )
         {
-            System.err.println("Could not find javac in JavacCompiler classloader, falling back");
+            System.err.println( "Could not find javac in JavacCompiler classloader, falling back" );
             // ok
         }
 
@@ -533,23 +547,22 @@ public class JavacErrorProneCompiler extends AbstractCompiler
 
         try
         {
-          // Combined classloader with no parent/child relationship, so classes in our classloader
-          // can reference classes in tools.jar
-          URL[] originalUrls = ((URLClassLoader) JavacErrorProneCompiler.class.getClassLoader()).getURLs();
-          URL[] urls = new URL[originalUrls.length + 1];
-          urls[0] = toolsJar.toURI().toURL();
-          System.arraycopy(originalUrls, 0, urls, 1, originalUrls.length);
-          ClassLoader javacClassLoader = new URLClassLoader(urls);
+            // Combined classloader with no parent/child relationship, so classes in our classloader
+            // can reference classes in tools.jar
+            URL[] originalUrls = ( (URLClassLoader) JavacErrorProneCompiler.class.getClassLoader() ).getURLs();
+            URL[] urls = new URL[originalUrls.length + 1];
+            urls[0] = toolsJar.toURI().toURL();
+            System.arraycopy( originalUrls, 0, urls, 1, originalUrls.length );
+            ClassLoader javacClassLoader = new URLClassLoader( urls );
 
-
-          final Thread thread = Thread.currentThread();
-          final ClassLoader contextClassLoader = thread.getContextClassLoader();
-          thread.setContextClassLoader(javacClassLoader);
+            final Thread thread = Thread.currentThread();
+            final ClassLoader contextClassLoader = thread.getContextClassLoader();
+            thread.setContextClassLoader( javacClassLoader );
             try
             {
                 //return Class.forName( JavacCompiler.JAVAC_CLASSNAME, true, javacClassLoader );\
-                javacClassLoader.loadClass(ERROR_PRONE_PARENT_CLASS);
-                return javacClassLoader.loadClass(JAVAC_CLASSNAME);
+                javacClassLoader.loadClass( ERROR_PRONE_PARENT_CLASS );
+                return javacClassLoader.loadClass( JAVAC_CLASSNAME );
             }
             finally
             {
@@ -564,11 +577,12 @@ public class JavacErrorProneCompiler extends AbstractCompiler
         }
         catch ( ClassNotFoundException ex )
         {
-            if (ex.getMessage().contains(JAVAC_CLASSNAME)) {
-              throw new CompilerException("Unable to locate the error-prone library on the classpath." + EOL
-                                             + "Make sure you have the error_prone_core library included as "
-                                             + "a dependency in the <plugin><dependencies> for the "
-                                             + "maven-compiler-plugin.", ex);
+            if ( ex.getMessage().contains( JAVAC_CLASSNAME ) )
+            {
+                throw new CompilerException( "Unable to locate the error-prone library on the classpath." + EOL
+                                                 + "Make sure you have the error_prone_core library included as "
+                                                 + "a dependency in the <plugin><dependencies> for the "
+                                                 + "maven-compiler-plugin.", ex );
             }
             throw new CompilerException( "Unable to locate the Javac Compiler in:" + EOL + "  " + toolsJar + EOL
                                              + "Please ensure you are using JDK 1.4 or above and" + EOL
