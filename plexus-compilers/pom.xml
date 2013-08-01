@@ -19,6 +19,7 @@
     <module>plexus-compiler-eclipse</module>
     <module>plexus-compiler-jikes</module>
     <module>plexus-compiler-javac</module>
+    <module>plexus-compiler-javac-errorprone</module>
   </modules>
 
   <dependencies>
