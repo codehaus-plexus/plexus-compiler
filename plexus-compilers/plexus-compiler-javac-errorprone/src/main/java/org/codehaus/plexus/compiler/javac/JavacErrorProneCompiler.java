@@ -531,6 +531,15 @@ public class JavacErrorProneCompiler
     {
         try
         {
+            return JavacErrorProneCompiler.class.getClassLoader().loadClass( JAVAC_CLASSNAME );
+        }
+        catch ( ClassNotFoundException ex )
+        {
+            System.err.println( "Could not find javac in JavacCompiler classloader, falling back" );
+            // ok
+        }
+        try
+        {
             // Classloader subtlety: if we try to load the errorprone class, but its parent class
             // isn't on the classpath, we get a ClassNotFoundException from the wrong classloader
             // that doesn't match the catch block.
