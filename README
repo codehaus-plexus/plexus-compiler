@@ -1,0 +1,6 @@
+until we get a release of error-prone
+you must build locally error-prone 1.0-SNAPSHOT
+git clone https://code.google.com/p/error-prone/
+cd error-prone
+mvn clean install
+
