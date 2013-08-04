@@ -534,13 +534,18 @@ public class JavacCompiler
         thread.setContextClassLoader( javacClass.getClassLoader() );
         try
         {
-            return compileInProcess0( javacClass, args );
+            return compileInProcessWithProperClassloader(javacClass, args);
         }
         finally
         {
             releaseJavaccClass( javacClass, config );
             thread.setContextClassLoader( contextClassLoader );
         }
+    }
+
+    CompilerResult compileInProcessWithProperClassloader( Class<?> javacClass, String[] args )
+        throws CompilerException {
+      return compileInProcess0(javacClass, args);
     }
 
     /**
@@ -1001,8 +1006,13 @@ public class JavacCompiler
 
         try
         {
-            final ClassLoader javacClassLoader =
-                new URLClassLoader( new URL[]{ toolsJar.toURI().toURL() }, JavacCompiler.class.getClassLoader() );
+            // Combined classloader with no parent/child relationship, so classes in our classloader
+            // can reference classes in tools.jar
+            URL[] originalUrls = ((URLClassLoader) JavacCompiler.class.getClassLoader()).getURLs();
+            URL[] urls = new URL[originalUrls.length + 1];
+            urls[0] = toolsJar.toURI().toURL();
+            System.arraycopy(originalUrls, 0, urls, 1, originalUrls.length);
+            ClassLoader javacClassLoader = new URLClassLoader(urls);
 
             final Thread thread = Thread.currentThread();
             final ClassLoader contextClassLoader = thread.getContextClassLoader();

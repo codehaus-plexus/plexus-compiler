@@ -126,25 +126,7 @@ public class JavaxToolsCompiler
             final ArrayList<CompilerMessage> compilerMsgs = new ArrayList<CompilerMessage>();
             for ( Diagnostic<? extends JavaFileObject> diagnostic : collector.getDiagnostics() )
             {
-                CompilerMessage.Kind kind;
-                switch ( diagnostic.getKind() )
-                {
-                    case ERROR:
-                        kind = CompilerMessage.Kind.ERROR;
-                        break;
-                    case WARNING:
-                        kind = CompilerMessage.Kind.WARNING;
-                        break;
-                    case MANDATORY_WARNING:
-                        kind = CompilerMessage.Kind.MANDATORY_WARNING;
-                        break;
-                    case NOTE:
-                        kind = CompilerMessage.Kind.NOTE;
-                        break;
-                    default:
-                        kind = CompilerMessage.Kind.OTHER;
-                        break;
-                }
+                CompilerMessage.Kind kind = convertKind(diagnostic);
                 String baseMessage = diagnostic.getMessage( null );
                 if ( baseMessage == null )
                 {
@@ -194,5 +176,28 @@ public class JavaxToolsCompiler
             releaseJavaCompiler( compiler, config );
 
         }
+    }
+
+    static CompilerMessage.Kind convertKind(Diagnostic<? extends JavaFileObject> diagnostic) {
+        CompilerMessage.Kind kind;
+        switch ( diagnostic.getKind() )
+        {
+            case ERROR:
+                kind = CompilerMessage.Kind.ERROR;
+                break;
+            case WARNING:
+                kind = CompilerMessage.Kind.WARNING;
+                break;
+            case MANDATORY_WARNING:
+                kind = CompilerMessage.Kind.MANDATORY_WARNING;
+                break;
+            case NOTE:
+                kind = CompilerMessage.Kind.NOTE;
+                break;
+            default:
+                kind = CompilerMessage.Kind.OTHER;
+                break;
+        }
+        return kind;
     }
 }
