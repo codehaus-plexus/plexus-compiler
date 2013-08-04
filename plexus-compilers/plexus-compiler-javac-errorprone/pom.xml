@@ -26,11 +26,13 @@
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-compiler-javac</artifactId>
+      <!-- fixme: olamy: I'm not able to omit the version here, maven gives me errors. -->
       <version>2.3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.google.errorprone</groupId>
       <artifactId>error_prone_core</artifactId>
+      <!-- TODO(alexeagle): use the error-prone release version when possible -->
       <!-- users can choose a more recent version in their <plugin><dependencies> -->
       <version>1.0-SNAPSHOT</version>
     </dependency>
