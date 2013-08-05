@@ -29,6 +29,5 @@ public class JavacCompilerTest
     {
         super.setUp();
         setForceJavacCompilerUse( true );
-
     }
 }

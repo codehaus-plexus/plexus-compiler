@@ -72,32 +72,6 @@ public abstract class AbstractJavacCompilerTest
         }
     }
 
-    protected String getJavaVersion()
-    {
-
-        String javaVersion = System.getProperty( "java.version" );
-        String realJavaVersion = javaVersion;
-
-        int dotIdx = javaVersion.indexOf( "." );
-        if ( dotIdx > -1 )
-        {
-            int lastDot = dotIdx;
-
-            // find the next dot, so we can trim up to this point.
-            dotIdx = javaVersion.indexOf( ".", lastDot + 1 );
-            if ( dotIdx > lastDot )
-            {
-                javaVersion = javaVersion.substring( 0, dotIdx );
-            }
-        }
-
-        System.out.println( "java.version is: " + realJavaVersion + "\ntrimmed java version is: " + javaVersion
-                                + "\ncomparison: \"1.5\".compareTo( \"" + javaVersion + "\" ) == " + ( "1.5".compareTo(
-            javaVersion ) ) + "\n" );
-
-        return javaVersion;
-    }
-
     protected int expectedWarnings()
     {
         return 2;
