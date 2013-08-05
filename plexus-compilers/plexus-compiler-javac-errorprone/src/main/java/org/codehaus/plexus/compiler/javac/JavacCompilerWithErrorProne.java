@@ -48,7 +48,6 @@ public class JavacCompilerWithErrorProne extends JavacCompiler {
   @Override
   CompilerResult compileInProcessWithProperClassloader(Class<?> javacClass, String[] args)
       throws CompilerException {
-    System.out.println("made it to error-prone compilation");
     // TODO(alexeagle): perhaps error-prone can conform to the 1.6 JavaCompiler API.
     // Then we could use the JavaxToolsCompiler approach instead, which would reuse more code.
 
