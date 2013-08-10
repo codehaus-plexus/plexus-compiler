@@ -32,22 +32,37 @@
       <groupId>com.google.errorprone</groupId>
       <artifactId>error_prone_core</artifactId>
       <version>1.0-SNAPSHOT</version>
-      <!--
+
       <exclusions>
         <exclusion>
           <groupId>openjdk</groupId>
           <artifactId>tools</artifactId>
         </exclusion>
       </exclusions>
-      -->
+
     </dependency>
-    <dependency>
-      <groupId>openjdk</groupId>
-      <artifactId>tools</artifactId>
-      <version>1.6</version>
-      <scope>system</scope>
-      <systemPath>${java.home}/../lib/tools.jar</systemPath>
-    </dependency>
+
   </dependencies>
+
+
+
+  <profiles>
+    <profile>
+      <id>tools.jar</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>openjdk</groupId>
+          <artifactId>tools</artifactId>
+          <version>1.6</version>
+          <scope>system</scope>
+          <systemPath>${java.home}/../lib/tools.jar</systemPath>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
+
   
 </project>
