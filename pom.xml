@@ -80,6 +80,14 @@
           <artifactId>maven-surefire-plugin</artifactId>
           <version>2.15</version>
         </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-release-plugin</artifactId>
+          <version>2.4.1</version>
+          <configuration>
+            <releaseProfiles>plexus-release,tools.jar</releaseProfiles>
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
