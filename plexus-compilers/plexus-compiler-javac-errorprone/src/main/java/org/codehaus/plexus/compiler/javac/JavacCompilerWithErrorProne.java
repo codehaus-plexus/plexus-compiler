@@ -37,37 +37,42 @@ import java.util.Locale;
  * @plexus.component role="org.codehaus.plexus.compiler.Compiler"
  * role-hint="javac-with-errorprone"
  */
-public class JavacCompilerWithErrorProne extends JavacCompiler {
+public class JavacCompilerWithErrorProne
+    extends JavacCompiler
+{
 
-  @Override
-  CompilerResult compileOutOfProcess(CompilerConfiguration config, String executable, String[] args)
-      throws CompilerException {
-    throw new UnsupportedOperationException("Cannot compile out-of-process with error-prone");
-  }
+    @Override
+    CompilerResult compileOutOfProcess( CompilerConfiguration config, String executable, String[] args )
+        throws CompilerException
+    {
+        throw new UnsupportedOperationException( "Cannot compile out-of-process with error-prone" );
+    }
 
-  @Override
-  CompilerResult compileInProcessWithProperClassloader(Class<?> javacClass, String[] args)
-      throws CompilerException {
+    @Override
+    CompilerResult compileInProcessWithProperClassloader( Class<?> javacClass, String[] args )
+        throws CompilerException
+    {
     // TODO(alexeagle): perhaps error-prone can conform to the 1.6 JavaCompiler API.
     // Then we could use the JavaxToolsCompiler approach instead, which would reuse more code.
 
-    final List<CompilerMessage> messages = new ArrayList<CompilerMessage>();
-    DiagnosticListener<? super JavaFileObject> listener = new DiagnosticListener<JavaFileObject>() {
-      public void report(Diagnostic<? extends JavaFileObject> diagnostic) {
-        messages.add(new CompilerMessage(
-            diagnostic.getSource().getName(),
-            JavaxToolsCompiler.convertKind(diagnostic),
-            (int)diagnostic.getLineNumber(),
-            (int)diagnostic.getColumnNumber(),
-            -1, -1, // end pos line:column is hard to calculate
-            diagnostic.getMessage(Locale.getDefault())));
-      }
+        final List<CompilerMessage> messages = new ArrayList<CompilerMessage>();
+        DiagnosticListener<? super JavaFileObject> listener = new DiagnosticListener<JavaFileObject>()
+        {
+            public void report( Diagnostic<? extends JavaFileObject> diagnostic )
+            {
+                messages.add(
+                    new CompilerMessage( diagnostic.getSource().getName(),
+                                         JavaxToolsCompiler.convertKind( diagnostic ),
+                                         (int) diagnostic.getLineNumber(),
+                                         (int) diagnostic.getColumnNumber(),
+                                         -1,
+                                         -1,
+                                         // end pos line:column is hard to calculate
+                                         diagnostic.getMessage( Locale.getDefault() ) ) );
+            }
     };
-    int result = new ErrorProneCompiler.Builder()
-        .listenToDiagnostics(listener)
-        .build()
-        .compile(args);
+        int result = new ErrorProneCompiler.Builder().listenToDiagnostics( listener ).build().compile( args );
 
-    return new CompilerResult(result == 0, messages);
-  }
+        return new CompilerResult( result == 0, messages );
+    }
 }
