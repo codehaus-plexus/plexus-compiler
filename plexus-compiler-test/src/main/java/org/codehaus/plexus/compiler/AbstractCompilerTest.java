@@ -229,7 +229,7 @@ public abstract class AbstractCompilerTest
 
     protected Collection<String> expectedOutputFiles()
     {
-        return Collections.<String>emptyList();
+        return Collections.emptyList();
     }
 
     protected File getLocalArtifactPath( String groupId, String artifactId, String version, String type )

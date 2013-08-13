@@ -60,15 +60,17 @@ public class JavacCompilerWithErrorProne
         {
             public void report( Diagnostic<? extends JavaFileObject> diagnostic )
             {
-                messages.add(
-                    new CompilerMessage( diagnostic.getSource().getName(),
+                CompilerMessage compilerMessage =
+                    new CompilerMessage( diagnostic.getSource() == null ? null : diagnostic.getSource().getName(),
                                          JavaxToolsCompiler.convertKind( diagnostic ),
                                          (int) diagnostic.getLineNumber(),
                                          (int) diagnostic.getColumnNumber(),
                                          -1,
                                          -1,
                                          // end pos line:column is hard to calculate
-                                         diagnostic.getMessage( Locale.getDefault() ) ) );
+                                         diagnostic.getMessage( Locale.getDefault() ) );
+
+                messages.add( compilerMessage );
             }
     };
         int result = new ErrorProneCompiler.Builder().listenToDiagnostics( listener ).build().compile( args );
