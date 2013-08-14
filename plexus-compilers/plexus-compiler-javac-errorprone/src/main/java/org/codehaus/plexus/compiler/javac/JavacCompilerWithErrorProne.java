@@ -72,7 +72,7 @@ public class JavacCompilerWithErrorProne
 
                 messages.add( compilerMessage );
             }
-    };
+        };
         int result = new ErrorProneCompiler.Builder().listenToDiagnostics( listener ).build().compile( args );
 
         return new CompilerResult( result == 0, messages );
