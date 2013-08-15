@@ -17,7 +17,6 @@
 package org.codehaus.plexus.compiler.javac;
 
 
-import com.google.errorprone.ErrorProneCompiler;
 import org.codehaus.classworlds.ClassRealm;
 import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.classworlds.DuplicateRealmException;
