@@ -532,6 +532,7 @@ public class JavacCompiler
         final Thread thread = Thread.currentThread();
         final ClassLoader contextClassLoader = thread.getContextClassLoader();
         thread.setContextClassLoader( javacClass.getClassLoader() );
+        getLogger().debug( "ttcl changed run compileInProcessWithProperClassloader" );
         try
         {
             return compileInProcessWithProperClassloader(javacClass, args);
@@ -984,7 +985,7 @@ public class JavacCompiler
     /**
      * Helper method for create Javac class
      */
-    private Class<?> createJavacClass()
+    protected Class<?> createJavacClass()
         throws CompilerException
     {
         try
