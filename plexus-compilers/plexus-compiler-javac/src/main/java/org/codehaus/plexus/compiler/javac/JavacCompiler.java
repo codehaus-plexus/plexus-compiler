@@ -429,7 +429,7 @@ public class JavacCompiler
      * @return a CompilerResult object encapsulating the result of the compilation and any compiler messages
      * @throws CompilerException
      */
-    CompilerResult compileOutOfProcess( CompilerConfiguration config, String executable, String[] args )
+    protected CompilerResult compileOutOfProcess( CompilerConfiguration config, String executable, String[] args )
         throws CompilerException
     {
         Commandline cli = new Commandline();
@@ -544,7 +544,7 @@ public class JavacCompiler
         }
     }
 
-    CompilerResult compileInProcessWithProperClassloader( Class<?> javacClass, String[] args )
+    protected CompilerResult compileInProcessWithProperClassloader( Class<?> javacClass, String[] args )
         throws CompilerException {
       return compileInProcess0(javacClass, args);
     }

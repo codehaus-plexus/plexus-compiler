@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.codehaus.plexus.compiler.javac;
+package org.codehaus.plexus.compiler.javac.errorprone;
 
 
 import org.codehaus.classworlds.ClassRealm;
@@ -25,6 +25,8 @@ import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerException;
 import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.compiler.CompilerResult;
+import org.codehaus.plexus.compiler.javac.JavacCompiler;
+import org.codehaus.plexus.compiler.javac.JavaxToolsCompiler;
 
 import javax.tools.Diagnostic;
 import javax.tools.DiagnosticListener;
@@ -57,7 +59,7 @@ public class JavacCompilerWithErrorProne
     private static final String REALM_ID = "error-prone";
 
     @Override
-    CompilerResult compileOutOfProcess( CompilerConfiguration config, String executable, String[] args )
+    protected CompilerResult compileOutOfProcess( CompilerConfiguration config, String executable, String[] args )
         throws CompilerException
     {
         throw new UnsupportedOperationException( "Cannot compile out-of-process with error-prone" );
@@ -127,7 +129,7 @@ public class JavacCompilerWithErrorProne
     }
 
     @Override
-    CompilerResult compileInProcessWithProperClassloader( Class<?> javacClass, String[] args )
+    protected CompilerResult compileInProcessWithProperClassloader( Class<?> javacClass, String[] args )
         throws CompilerException
     {
 

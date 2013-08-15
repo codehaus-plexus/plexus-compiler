@@ -178,7 +178,7 @@ public class JavaxToolsCompiler
         }
     }
 
-    static CompilerMessage.Kind convertKind(Diagnostic<? extends JavaFileObject> diagnostic) {
+    public static CompilerMessage.Kind convertKind(Diagnostic<? extends JavaFileObject> diagnostic) {
         CompilerMessage.Kind kind;
         switch ( diagnostic.getKind() )
         {
