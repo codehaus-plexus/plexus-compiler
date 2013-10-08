@@ -165,7 +165,7 @@ public abstract class AbstractCompiler
         if ( excludes != null && !excludes.isEmpty() )
         {
             String[] exclStrs = excludes.toArray( new String[excludes.size()] );
-            scanner.setIncludes( exclStrs );
+            scanner.setExcludes( exclStrs );
         }
 
         scanner.scan();
@@ -174,9 +174,9 @@ public abstract class AbstractCompiler
 
         Set<String> sources = new HashSet<String>();
 
-        for ( int j = 0; j < sourceDirectorySources.length; j++ )
+        for ( String sourceDirectorySource : sourceDirectorySources )
         {
-            File f = new File( sourceLocation, sourceDirectorySources[j] );
+            File f = new File( sourceLocation, sourceDirectorySource );
 
             sources.add( f.getPath() );
         }
@@ -213,7 +213,7 @@ public abstract class AbstractCompiler
         }
         else
         {
-            result = (String[]) sources.toArray( new String[sources.size()] );
+            result = sources.toArray( new String[sources.size()] );
         }
 
         return result;
