@@ -133,9 +133,12 @@ public class EclipseJavaCompiler
 
         if ( !config.isShowWarnings() )
         {
-            // TODO: Implement. I'm not sure what value to pass - trygve
-//            settings.put( CompilerOptions.OPTION_SuppressWarnings,  );
-            settings.put( CompilerOptions.OPTION_SuppressWarnings, CompilerOptions.ENABLED );
+            Map opts = new CompilerOptions().getMap();
+            for (Object optKey : opts.keySet()) {
+                if (opts.get(optKey).equals(CompilerOptions.WARNING)) {
+                    settings.put((String) optKey, CompilerOptions.IGNORE);
+                }
+            }
         }
 
         String sourceVersion = decodeVersion( config.getSourceVersion() );
