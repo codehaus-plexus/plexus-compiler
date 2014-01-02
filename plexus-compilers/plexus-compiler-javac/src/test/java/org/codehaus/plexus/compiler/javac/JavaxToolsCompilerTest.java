@@ -28,9 +28,13 @@ public class JavaxToolsCompilerTest
 
     protected int expectedWarnings()
     {
-        // with 1.7 some warning with bootstrap class path not set in conjunction with -source 1.3
-        if ( "1.6".compareTo( getJavaVersion() ) < 0 )
+        if (getJavaVersion().contains("1.8")){
+            // lots of new warnings about obsoletions for future releases
+            return 30;
+        }
+        else if ( "1.6".compareTo( getJavaVersion() ) < 0 )
         {
+            // with 1.7 some warning with bootstrap class path not set in conjunction with -source 1.3
             return 9;
         }
         else
