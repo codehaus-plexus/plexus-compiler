@@ -177,8 +177,10 @@ public class JavacCompilerWithErrorProne
             Method build = javacClass.getMethod( "build" );
             Object compiler = build.invoke( builderInstance );
             Method compile = compiler.getClass().getMethod( "compile", new Class[]{ String[].class } );
-            int result = (Integer) compile.invoke( compiler, new Object[]{ args } );
-            return new CompilerResult( result == 0, messages );
+            Object resultObj = compile.invoke( compiler, new Object[]{ args } );
+            boolean success =  (resultObj instanceof  Integer) ? ((Integer)resultObj) == 0
+                    : isJdk8OK(resultObj);
+            return new CompilerResult( success, messages );
         }
         catch ( InvocationTargetException e )
         {
@@ -208,6 +210,18 @@ public class JavacCompilerWithErrorProne
         finally
         {
             Thread.currentThread().setContextClassLoader( original );
+        }
+    }
+
+    private boolean isJdk8OK(Object resultObj) throws CompilerException {
+        try {
+            return (Boolean) resultObj.getClass().getMethod("isOK").invoke(resultObj);
+        } catch (IllegalAccessException e) {
+            throw new CompilerException(e.getMessage(), e);
+        } catch (InvocationTargetException e) {
+            throw new CompilerException(e.getMessage(), e);
+        } catch (NoSuchMethodException e) {
+            throw new CompilerException(e.getMessage(), e);
         }
     }
 }
