@@ -50,10 +50,14 @@ package org.codehaus.plexus.compiler;
  */
 public class CompilerMessage
 {
+    private static final String JDK_6_NOTE_PREFIX = "note: ";
+
+    private static final String JDK_6_WARNING_PREFIX = "warning: ";
+
     /**
      * The kind of message.
      */
-    private Kind kind;
+    private final Kind kind;
 
     /**
      * The start line number of the offending program text
@@ -83,7 +87,7 @@ public class CompilerMessage
     /**
      * The actual message text produced by the language processor
      */
-    private String message;
+    private final String message;
 
 
     /**
@@ -100,8 +104,8 @@ public class CompilerMessage
      * @deprecated Use {@link #CompilerMessage(String, Kind, int, int, int, int, String)} instead
      */
     @Deprecated
-    public CompilerMessage( String file, boolean error, int startline, int startcolumn, int endline, int endcolumn,
-                            String message )
+    public CompilerMessage( final String file, final boolean error, final int startline, final int startcolumn, final int endline, final int endcolumn,
+                            final String message )
     {
         this.file = file;
         this.kind = error ? Kind.ERROR : Kind.WARNING;
@@ -109,7 +113,8 @@ public class CompilerMessage
         this.startcolumn = startcolumn;
         this.endline = endline;
         this.endcolumn = endcolumn;
-        this.message = message;
+
+        this.message = cleanupMessage( message );
     }
 
     /**
@@ -123,8 +128,8 @@ public class CompilerMessage
      * @param endcolumn   The end column number of the offending program text
      * @param message     The actual message text produced by the language processor
      */
-    public CompilerMessage( String file, Kind kind, int startline, int startcolumn, int endline, int endcolumn,
-                            String message )
+    public CompilerMessage( final String file, final Kind kind, final int startline, final int startcolumn, final int endline, final int endcolumn,
+                            final String message )
     {
         this.file = file;
         this.kind = kind;
@@ -132,7 +137,7 @@ public class CompilerMessage
         this.startcolumn = startcolumn;
         this.endline = endline;
         this.endcolumn = endcolumn;
-        this.message = message;
+        this.message = cleanupMessage( message );
     }
 
     /**
@@ -142,10 +147,10 @@ public class CompilerMessage
      * @deprecated Use {@link #CompilerMessage(String, Kind)} instead
      */
     @Deprecated
-    public CompilerMessage( String message )
+    public CompilerMessage( final String message )
     {
-        this.message = message;
         this.kind = Kind.WARNING;
+        this.message = cleanupMessage( message );
     }
 
     /**
@@ -157,10 +162,10 @@ public class CompilerMessage
      * @deprecated Use {@link #CompilerMessage(String, Kind)} instead
      */
     @Deprecated
-    public CompilerMessage( String message, boolean error )
+    public CompilerMessage( final String message, final boolean error )
     {
-        this.message = message;
         this.kind = error ? Kind.ERROR : Kind.WARNING;
+        this.message = cleanupMessage( message );
     }
 
     /**
@@ -170,10 +175,10 @@ public class CompilerMessage
      * @param kind    The kind of message
      * @since 2.0
      */
-    public CompilerMessage( String message, Kind kind )
+    public CompilerMessage( final String message, final Kind kind )
     {
-        this.message = message;
         this.kind = kind;
+        this.message = cleanupMessage( message );
     }
 
     /**
@@ -263,6 +268,7 @@ public class CompilerMessage
         return kind;
     }
 
+    @Override
     public String toString()
     {
         if ( file != null )
@@ -287,6 +293,22 @@ public class CompilerMessage
         {
             return message;
         }
+    }
+
+    private String cleanupMessage( String msg )
+    {
+        if ( kind == Kind.NOTE && msg.toLowerCase()
+                                     .startsWith( JDK_6_NOTE_PREFIX ) )
+        {
+            msg = msg.substring( JDK_6_NOTE_PREFIX.length() );
+        }
+        else if ( ( kind == Kind.WARNING || kind == Kind.MANDATORY_WARNING ) && msg.toLowerCase()
+                                                                                   .startsWith( JDK_6_WARNING_PREFIX ) )
+        {
+            msg = msg.substring( JDK_6_WARNING_PREFIX.length() );
+        }
+
+        return msg;
     }
 
     /**
@@ -319,7 +341,7 @@ public class CompilerMessage
 
         private String type;
 
-        private Kind( String type )
+        private Kind( final String type )
         {
             this.type = type;
         }
