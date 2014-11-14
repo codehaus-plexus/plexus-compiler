@@ -239,12 +239,17 @@ public class EclipseJavaCompiler
     }
 
     //The compiler mojo adds a dash to all keys which does not make sense for the eclipse compiler
-    private Map<String, String> cleanKeyNames(Map<String, String> customCompilerArgumentsAsMap) {
+    Map<String, String> cleanKeyNames(Map<String, String> customCompilerArgumentsAsMap) {
         LinkedHashMap<String, String> cleanedMap = new LinkedHashMap<String, String>();
-        for (Iterator<String> iterator = customCompilerArgumentsAsMap.keySet().iterator(); iterator.hasNext(); ) {
-            String key = iterator.next();
-            cleanedMap.put(key.substring(1),customCompilerArgumentsAsMap.get(key));
+
+        for (Map.Entry<String, String> entry : customCompilerArgumentsAsMap.entrySet()) {
+            String key = entry.getKey();
+            if(key.startsWith("-")){
+                key=key.substring(1);
+            }
+            cleanedMap.put(key,entry.getValue());
         }
+
         return cleanedMap;
     }
 
