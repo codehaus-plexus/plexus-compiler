@@ -65,6 +65,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -182,11 +183,10 @@ public class EclipseJavaCompiler
         settings.put( CompilerOptions.OPTION_SourceFileAttribute, CompilerOptions.GENERATE );
 
         // compiler-specific extra options override anything else in the config object...
-        Map<String, String> extras = config.getCustomCompilerArguments();
-        if ( extras != null && !extras.isEmpty() )
-        {
-            settings.putAll( extras );
-        }
+        Map<String, String> extras = cleanKeyNames( config.getCustomCompilerArgumentsAsMap());
+
+        settings.putAll( extras );
+
 
         if ( settings.containsKey( "-properties" ) )
         {
@@ -241,6 +241,21 @@ public class EclipseJavaCompiler
         }
 
         return compilerResult;
+    }
+
+    //The compiler mojo adds a dash to all keys which does not make sense for the eclipse compiler
+    Map<String, String> cleanKeyNames(Map<String, String> customCompilerArgumentsAsMap) {
+        LinkedHashMap<String, String> cleanedMap = new LinkedHashMap<String, String>();
+
+        for (Map.Entry<String, String> entry : customCompilerArgumentsAsMap.entrySet()) {
+            String key = entry.getKey();
+            if(key.startsWith("-")){
+                key=key.substring(1);
+            }
+            cleanedMap.put(key,entry.getValue());
+        }
+
+        return cleanedMap;
     }
 
     public String[] createCommandLine( CompilerConfiguration config )
@@ -317,6 +332,9 @@ public class EclipseJavaCompiler
         else if ( "1.7".equals( versionSpec ) )
         {
             return CompilerOptions.VERSION_1_7;
+        }else if ( "1.8".equals( versionSpec ) )
+        {
+            return CompilerOptions.VERSION_1_8;
         }
         else
         {

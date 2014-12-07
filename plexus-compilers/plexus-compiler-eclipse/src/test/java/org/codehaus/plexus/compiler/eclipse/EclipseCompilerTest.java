@@ -26,8 +26,10 @@ package org.codehaus.plexus.compiler.eclipse;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 
-import org.codehaus.plexus.compiler.AbstractCompilerTest;
+import org.codehaus.plexus.compiler.*;
+import org.codehaus.plexus.compiler.Compiler;
 
 /**
  * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>
@@ -64,6 +66,45 @@ public class EclipseCompilerTest
     {
         return Arrays.asList( new String[]{ "org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ExternalDeps.class",
             "org/codehaus/foo/Person.class", "org/codehaus/foo/ReservedWord.class" } );
+    }
+
+    //The test is fairly meaningless as we can not validate anything
+    public void testCustomArgument() throws Exception{
+
+        org.codehaus.plexus.compiler.Compiler compiler = (Compiler) lookup( Compiler.ROLE, getRoleHint() );
+
+        CompilerConfiguration compilerConfig = createMinimalCompilerConfig();
+
+        compilerConfig.addCompilerCustomArgument("-key","value");
+
+        compiler.performCompile(compilerConfig);
+    }
+
+
+
+    public void testCustomArgumentCleanup(){
+
+        EclipseJavaCompiler compiler = new EclipseJavaCompiler();
+
+        CompilerConfiguration compilerConfig = createMinimalCompilerConfig();
+
+        compilerConfig.addCompilerCustomArgument("-key","value");
+        compilerConfig.addCompilerCustomArgument("cleanKey","value");
+
+        Map<String, String> cleaned = compiler.cleanKeyNames(compilerConfig.getCustomCompilerArgumentsAsMap());
+
+        assertTrue("Key should have been cleaned", cleaned.containsKey("key"));
+
+        assertFalse("Key should have been cleaned", cleaned.containsKey("-key"));
+
+        assertTrue("This key should not have been cleaned does not start with dash", cleaned.containsKey("cleanKey"));
+
+    }
+
+    private CompilerConfiguration createMinimalCompilerConfig() {
+        CompilerConfiguration compilerConfig = new CompilerConfiguration();
+        compilerConfig.setOutputLocation( getBasedir() + "/target/" + getRoleHint() + "/classes-CustomArgument"  );
+        return compilerConfig;
     }
 
 }
