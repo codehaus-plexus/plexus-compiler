@@ -183,10 +183,9 @@ public class EclipseJavaCompiler
         settings.put( CompilerOptions.OPTION_SourceFileAttribute, CompilerOptions.GENERATE );
 
         // compiler-specific extra options override anything else in the config object...
-        Map<String, String> extras = cleanKeyNames( config.getCustomCompilerArgumentsAsMap());
+        Map<String, String> extras = cleanKeyNames( config.getCustomCompilerArgumentsAsMap() );
 
         settings.putAll( extras );
-
 
         if ( settings.containsKey( "-properties" ) )
         {
@@ -203,7 +202,7 @@ public class EclipseJavaCompiler
         for ( String sourceRoot : config.getSourceLocations() )
         {
             // annotations directory does not always exist and the below scanner fails on non existing directories
-            File potentialSourceDirectory= new File( sourceRoot );
+            File potentialSourceDirectory = new File( sourceRoot );
             if ( potentialSourceDirectory.exists() )
             {
                 Set<String> sources = getSourceFilesForSourceRoot( config, sourceRoot );
@@ -243,16 +242,19 @@ public class EclipseJavaCompiler
         return compilerResult;
     }
 
-    //The compiler mojo adds a dash to all keys which does not make sense for the eclipse compiler
-    Map<String, String> cleanKeyNames(Map<String, String> customCompilerArgumentsAsMap) {
+    // The compiler mojo adds a dash to all keys which does not make sense for the eclipse compiler
+    Map<String, String> cleanKeyNames( Map<String, String> customCompilerArgumentsAsMap )
+    {
         LinkedHashMap<String, String> cleanedMap = new LinkedHashMap<String, String>();
 
-        for (Map.Entry<String, String> entry : customCompilerArgumentsAsMap.entrySet()) {
+        for ( Map.Entry<String, String> entry : customCompilerArgumentsAsMap.entrySet() )
+        {
             String key = entry.getKey();
-            if(key.startsWith("-")){
-                key=key.substring(1);
+            if ( key.startsWith( "-" ) )
+            {
+                key = key.substring( 1 );
             }
-            cleanedMap.put(key,entry.getValue());
+            cleanedMap.put( key, entry.getValue() );
         }
 
         return cleanedMap;
@@ -332,7 +334,8 @@ public class EclipseJavaCompiler
         else if ( "1.7".equals( versionSpec ) )
         {
             return CompilerOptions.VERSION_1_7;
-        }else if ( "1.8".equals( versionSpec ) )
+        }
+        else if ( "1.8".equals( versionSpec ) )
         {
             return CompilerOptions.VERSION_1_8;
         }
@@ -614,7 +617,7 @@ public class EclipseJavaCompiler
 
                 for ( IProblem problem : problems )
                 {
-                    String name = getFileName(result.getCompilationUnit(), problem.getOriginatingFileName());
+                    String name = getFileName( result.getCompilationUnit(), problem.getOriginatingFileName() );
 
                     if ( problem.isWarning() )
                     {
@@ -678,14 +681,15 @@ public class EclipseJavaCompiler
             }
         }
 
-        private String getFileName( ICompilationUnit compilationUnit, char[] originalFileName ) {
+        private String getFileName( ICompilationUnit compilationUnit, char[] originalFileName )
+        {
             if ( compilationUnit instanceof CompilationUnit )
             {
-                return ((CompilationUnit)compilationUnit).getAbsolutePath();
+                return ( (CompilationUnit) compilationUnit ).getAbsolutePath();
             }
             else
             {
-                return String.valueOf(originalFileName);
+                return String.valueOf( originalFileName );
             }
         }
     }
