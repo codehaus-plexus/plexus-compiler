@@ -202,14 +202,19 @@ public class EclipseJavaCompiler
 
         for ( String sourceRoot : config.getSourceLocations() )
         {
-            Set<String> sources = getSourceFilesForSourceRoot( config, sourceRoot );
-
-            for ( String source : sources )
+            // annotations directory does not always exist and the below scanner fails on non existing directories
+            File potentialSourceDirectory= new File( sourceRoot );
+            if ( potentialSourceDirectory.exists() )
             {
-                CompilationUnit unit = new CompilationUnit( source, makeClassName( source, sourceRoot ), errors,
-                                                            config.getSourceEncoding() );
+                Set<String> sources = getSourceFilesForSourceRoot( config, sourceRoot );
 
-                compilationUnits.add( unit );
+                for ( String source : sources )
+                {
+                    CompilationUnit unit = new CompilationUnit( source, makeClassName( source, sourceRoot ), errors,
+                                                                config.getSourceEncoding() );
+
+                    compilationUnits.add( unit );
+                }
             }
         }
 
