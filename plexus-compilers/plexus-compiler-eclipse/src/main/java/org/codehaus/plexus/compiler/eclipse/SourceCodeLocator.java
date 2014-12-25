@@ -24,6 +24,7 @@ package org.codehaus.plexus.compiler.eclipse;
  * SOFTWARE.
  */
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -67,14 +68,20 @@ public class SourceCodeLocator
 
     private File findInRoots( String s )
     {
-        for ( String root : sourceRoots )
+        try
         {
-            File f = new File( root, s );
-
-            if ( f.exists() )
+            for ( String root : sourceRoots )
             {
-                return f;
+                File f = new File( root, s );
+
+                if ( f.exists() && f.getName().equals( f.getCanonicalFile().getName() ) )
+                {
+                    return f;
+                }
             }
+        } catch ( IOException e )
+        {
+            // Ignore
         }
 
         return null;
