@@ -154,11 +154,7 @@ public class EclipseJavaCompiler
         if ( targetVersion != null )
         {
             settings.put( CompilerOptions.OPTION_TargetPlatform, targetVersion );
-
-            if ( config.isOptimize() )
-            {
-                settings.put( CompilerOptions.OPTION_Compliance, targetVersion );
-            }
+            settings.put( CompilerOptions.OPTION_Compliance, targetVersion );
         }
 
         if ( StringUtils.isNotEmpty( config.getSourceEncoding() ) )
