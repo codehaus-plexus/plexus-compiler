@@ -16,29 +16,24 @@
 
 package org.codehaus.plexus.compiler.javac.errorprone;
 
-
-import org.codehaus.classworlds.ClassRealm;
-import org.codehaus.classworlds.ClassWorld;
-import org.codehaus.classworlds.DuplicateRealmException;
-import org.codehaus.classworlds.NoSuchRealmException;
+import com.google.errorprone.ErrorProneCompiler;
+import org.codehaus.plexus.compiler.AbstractCompiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerException;
 import org.codehaus.plexus.compiler.CompilerMessage;
+import org.codehaus.plexus.compiler.CompilerOutputStyle;
 import org.codehaus.plexus.compiler.CompilerResult;
 import org.codehaus.plexus.compiler.javac.JavacCompiler;
-import org.codehaus.plexus.compiler.javac.JavaxToolsCompiler;
 
 import javax.tools.Diagnostic;
 import javax.tools.DiagnosticListener;
 import javax.tools.JavaFileObject;
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -50,178 +45,166 @@ import java.util.Locale;
  * @plexus.component role="org.codehaus.plexus.compiler.Compiler"
  * role-hint="javac-with-errorprone"
  */
-public class JavacCompilerWithErrorProne
-    extends JavacCompiler
+public class JavacCompilerWithErrorProne extends AbstractCompiler
 {
-
-    private ClassWorld classWorld = new ClassWorld();
-
-    private static final String REALM_ID = "error-prone";
-
-    @Override
-    protected CompilerResult compileOutOfProcess( CompilerConfiguration config, String executable, String[] args )
-        throws CompilerException
+    public JavacCompilerWithErrorProne()
     {
-        throw new UnsupportedOperationException( "Cannot compile out-of-process with error-prone" );
+        super( CompilerOutputStyle.ONE_OUTPUT_FILE_PER_INPUT_FILE, ".java", ".class", null );
     }
 
-    protected ClassLoader getErrorProneCompilerClassLoader()
-        throws MalformedURLException, NoSuchRealmException
+    public String[] createCommandLine( CompilerConfiguration config ) throws CompilerException
     {
+        return new String[0];
+    }
+
+    @Override
+    public CompilerResult performCompile( CompilerConfiguration config ) throws CompilerException
+    {
+        File destinationDir = new File( config.getOutputLocation() );
+
+        if ( !destinationDir.exists() )
+        {
+            destinationDir.mkdirs();
+        }
+
+        String[] sourceFiles = getSourceFiles( config );
+
+        if ( ( sourceFiles == null ) || ( sourceFiles.length == 0 ) )
+        {
+            return new CompilerResult();
+        }
+
+        if ( ( getLogger() != null ) && getLogger().isInfoEnabled() )
+        {
+            getLogger().info( "Compiling " + sourceFiles.length + " "
+                              + "source file" + ( sourceFiles.length == 1 ? "" : "s" ) + " to " +
+                              destinationDir.getAbsolutePath() );
+        }
+
+        String[] args = JavacCompiler.buildCompilerArguments( config, sourceFiles );
 
         try
         {
-            final String javaHome = System.getProperty( "java.home" );
-            final File toolsJar = new File( javaHome, "../lib/tools.jar" );
+            return (CompilerResult) getInvoker().invoke( null, new Object[] {args} );
+        }
+        catch ( Exception e )
+        {
+            throw new CompilerException( e.getMessage(), e );
+        }
+    }
 
-            ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+    private static class NonDelegatingClassLoader extends URLClassLoader
+    {
+        ClassLoader original;
 
-            getLogger().debug( "javaHome:" + javaHome );
+        public NonDelegatingClassLoader( URL[] urls, ClassLoader original )
+            throws MalformedURLException
+        {
+            super( urls, null );
+            this.original = original;
+        }
 
-            getLogger().debug( "toolsJar:" + toolsJar.getPath() );
-            URL[] originalUrls = ( (URLClassLoader) tccl ).getURLs();
-            URL[] urls = new URL[originalUrls.length + 1];
-            urls[0] = toolsJar.toURI().toURL();
-            System.arraycopy( originalUrls, 0, urls, 1, originalUrls.length );
-
-            ClassRealm urlClassLoader = classWorld.newRealm( REALM_ID );
-            for ( URL url : urls )
+        @Override
+        public Class<?> loadClass( String name, boolean complete ) throws ClassNotFoundException
+        {
+            if ( name.contentEquals( CompilerResult.class.getName() ) )
             {
-                urlClassLoader.addConstituent( url );
+                return original.loadClass( name );
             }
 
-            getLogger().debug( "urls:" + Arrays.asList( urls ) );
-            return urlClassLoader.getClassLoader();
-        }
-        catch ( DuplicateRealmException e )
-        {
-            if ( REALM_ID.equals( e.getId() ) )
+            try
             {
-                return classWorld.getRealm( REALM_ID ).getClassLoader();
-            }
-            // should not happen ...
-            throw new NoSuchRealmException( classWorld, REALM_ID );
-        }
-
-
-    }
-
-    @Override
-    protected Class<?> createJavacClass()
-        throws CompilerException
-    {
-        try
-        {
-            return getErrorProneCompilerClassLoader().loadClass( "com.google.errorprone.ErrorProneCompiler$Builder" );
-        }
-        catch ( ClassNotFoundException e )
-        {
-            throw new CompilerException( e.getMessage(), e );
-        }
-        catch ( MalformedURLException e )
-        {
-            throw new CompilerException( e.getMessage(), e );
-        }
-        catch ( NoSuchRealmException e )
-        {
-            throw new CompilerException( e.getMessage(), e );
-        }
-    }
-
-    @Override
-    protected CompilerResult compileInProcessWithProperClassloader( Class<?> javacClass, String[] args )
-        throws CompilerException
-    {
-
-        ClassLoader original = Thread.currentThread().getContextClassLoader();
-
-        try
-        {
-
-            // TODO(alexeagle): perhaps error-prone can conform to the 1.6 JavaCompiler API.
-            // Then we could use the JavaxToolsCompiler approach instead, which would reuse more code.
-            // olamy: except we have a bunch of issues with classloader hierarchy
-
-            final List<CompilerMessage> messages = new ArrayList<CompilerMessage>();
-            DiagnosticListener<? super JavaFileObject> listener = new DiagnosticListener<JavaFileObject>()
-            {
-                public void report( Diagnostic<? extends JavaFileObject> diagnostic )
+                synchronized ( getClassLoadingLock( name ) )
                 {
-                    CompilerMessage compilerMessage =
-                        new CompilerMessage( diagnostic.getSource() == null ? null : diagnostic.getSource().getName(),
-                                             JavaxToolsCompiler.convertKind( diagnostic ),
-                                             (int) diagnostic.getLineNumber(), (int) diagnostic.getColumnNumber(), -1,
-                                             -1,// end pos line:column is hard to calculate
-                                             diagnostic.getMessage( Locale.getDefault() ) );
-
-                    messages.add( compilerMessage );
+                    Class c = findLoadedClass( name );
+                    if ( c != null )
+                    {
+                        return c;
+                    }
+                    return findClass( name );
                 }
-            };
-            /*
-            int result = new com.google.errorprone.ErrorProneCompiler.Builder().listenToDiagnostics( listener ).build().compile( args );
-
-            return new CompilerResult( result == 0, messages );
-            */
-
-            // here we need to use the new classloader containing tools.jar and use reflection with classworld class loader
-            // whereas default jdk classloader will try to load com.sun.* classes from the plugin classloader!!
-
-            Thread.currentThread().setContextClassLoader( getErrorProneCompilerClassLoader() );
-
-            Object builderInstance = javacClass.newInstance();
-
-            Method listenToDiagnostics = javacClass.getMethod( "listenToDiagnostics", DiagnosticListener.class );
-
-            builderInstance = listenToDiagnostics.invoke( builderInstance, listener );
-
-            Method build = javacClass.getMethod( "build" );
-            Object compiler = build.invoke( builderInstance );
-            Method compile = compiler.getClass().getMethod( "compile", new Class[]{ String[].class } );
-            Object resultObj = compile.invoke( compiler, new Object[]{ args } );
-            boolean success =  (resultObj instanceof  Integer) ? ((Integer)resultObj) == 0
-                    : isJdk8OK(resultObj);
-            return new CompilerResult( success, messages );
-        }
-        catch ( InvocationTargetException e )
-        {
-            throw new CompilerException( e.getMessage(), e );
-        }
-        catch ( NoSuchMethodException e )
-        {
-            throw new CompilerException( e.getMessage(), e );
-        }
-        catch ( InstantiationException e )
-        {
-            throw new CompilerException( e.getMessage(), e );
-        }
-        catch ( IllegalAccessException e )
-        {
-            throw new CompilerException( e.getMessage(), e );
-        }
-        catch ( MalformedURLException e )
-        {
-            throw new CompilerException( e.getMessage(), e );
-        }
-        catch ( NoSuchRealmException e )
-        {
-            throw new CompilerException( e.getMessage(), e );
-        }
-
-        finally
-        {
-            Thread.currentThread().setContextClassLoader( original );
+            }
+            catch ( ClassNotFoundException e )
+            {
+                return super.loadClass( name, complete );
+            }
         }
     }
 
-    private boolean isJdk8OK(Object resultObj) throws CompilerException {
-        try {
-            return (Boolean) resultObj.getClass().getMethod("isOK").invoke(resultObj);
-        } catch (IllegalAccessException e) {
-            throw new CompilerException(e.getMessage(), e);
-        } catch (InvocationTargetException e) {
-            throw new CompilerException(e.getMessage(), e);
-        } catch (NoSuchMethodException e) {
-            throw new CompilerException(e.getMessage(), e);
+    private Method invokerMethod;
+
+    private Method getInvoker() throws CompilerException
+    {
+        if ( invokerMethod == null )
+        {
+            ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+            URL[] urls = ( (URLClassLoader) contextClassLoader ).getURLs();
+            ClassLoader loader;
+            try
+            {
+                loader = new NonDelegatingClassLoader( urls, contextClassLoader );
+                Class<?> clazz = Class.forName( CompilerInvoker.class.getName(), true, loader );
+                invokerMethod = clazz.getMethod( "compile", String[].class );
+            }
+            catch ( Exception e )
+            {
+                throw new CompilerException( e.getMessage(), e );
+            }
+        }
+        return invokerMethod;
+    }
+
+    /**
+     * A wrapper for all of the error-prone specific classes. Loading this class with a
+     * non-delegating classloader ensures that error-prone's javac loads javax.tools.* classes from
+     * javac.jar instead of from the bootclasspath.
+     */
+    public static class CompilerInvoker
+    {
+        private static class MessageListener implements DiagnosticListener<JavaFileObject>
+        {
+            private final List<CompilerMessage> messages;
+
+            MessageListener( List<CompilerMessage> messages ) { this.messages = messages; }
+
+            public static CompilerMessage.Kind convertKind(
+                Diagnostic<? extends JavaFileObject> diagnostic )
+            {
+                switch ( diagnostic.getKind() )
+                {
+                    case ERROR:
+                        return CompilerMessage.Kind.ERROR;
+                    case WARNING:
+                        return CompilerMessage.Kind.WARNING;
+                    case MANDATORY_WARNING:
+                        return CompilerMessage.Kind.MANDATORY_WARNING;
+                    case NOTE:
+                        return CompilerMessage.Kind.NOTE;
+                    default:
+                        return CompilerMessage.Kind.OTHER;
+                }
+            }
+
+            public void report( Diagnostic<? extends JavaFileObject> diagnostic )
+            {
+                CompilerMessage compilerMessage = new CompilerMessage(
+                    diagnostic.getSource() == null ? null : diagnostic.getSource().getName(),
+                    convertKind( diagnostic ), (int) diagnostic.getLineNumber(),
+                    (int) diagnostic.getColumnNumber(), -1,
+                    -1, // end pos line:column is hard to calculate
+                    diagnostic.getMessage( Locale.getDefault() ) );
+                messages.add( compilerMessage );
+            }
+        }
+
+        public static CompilerResult compile( String[] args )
+        {
+            List<CompilerMessage> messages = new ArrayList<CompilerMessage>();
+            ErrorProneCompiler compiler =
+                new ErrorProneCompiler.Builder()
+                    .listenToDiagnostics( new MessageListener( messages ) )
+                    .build();
+            return new CompilerResult( compiler.compile( args ).isOK(), messages );
         }
     }
 }

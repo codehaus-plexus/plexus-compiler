@@ -13,9 +13,7 @@
   <name>Plexus Javac+error-prone Component</name>
   <description>Javac Compiler support for Plexus Compiler component,
     with error-prone static analysis checks enabled.
-    See http://error-prone.googlecode.com
-    (Note: this component should be merged into plexus-compiler-javac
-    when it is matured.)
+    See http://errorprone.info
   </description>
 
   <dependencies>
@@ -31,17 +29,10 @@
     <dependency>
       <groupId>com.google.errorprone</groupId>
       <artifactId>error_prone_core</artifactId>
-      <version>1.1.2</version>
-      <exclusions>
-        <exclusion>
-          <groupId>openjdk</groupId>
-          <artifactId>tools</artifactId>
-        </exclusion>
-      </exclusions>
-
+      <version>2.0</version>
     </dependency>
-
   </dependencies>
+
   <build>
     <plugins>
       <plugin>
@@ -57,26 +48,5 @@
       </plugin>
     </plugins>
   </build>
-  <!--
-  <profiles>
-    <profile>
-      <id>tools.jar</id>
-      <activation>
-        <file>
-          <exists>${java.home}/../lib/tools.jar</exists>
-        </file>
-      </activation>
-      <dependencies>
-        <dependency>
-          <groupId>openjdk</groupId>
-          <artifactId>tools</artifactId>
-          <version>1.6</version>
-          <scope>system</scope>
-          <systemPath>${java.home}/../lib/tools.jar</systemPath>
-        </dependency>
-      </dependencies>
-    </profile>
-  </profiles>
-  -->
 
 </project>
