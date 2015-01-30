@@ -24,9 +24,9 @@
   </modules>
   
   <scm>
-    <connection>scm:git:git@github.com:sonatype/plexus-compiler.git</connection>
-    <developerConnection>scm:git:git@github.com:sonatype/plexus-compiler.git</developerConnection>
-    <url>http://github.com/sonatype/plexus-compiler</url>
+    <connection>scm:git:git@github.com:codehaus-plexus/plexus-compiler.git</connection>
+    <developerConnection>scm:git:git@github.com:codehaus-plexus/plexus-compiler.git</developerConnection>
+    <url>http://github.com/codehaus-plexus/plexus-compiler</url>
     <tag>plexus-compiler-2.4</tag>
   </scm>
   <issueManagement>
