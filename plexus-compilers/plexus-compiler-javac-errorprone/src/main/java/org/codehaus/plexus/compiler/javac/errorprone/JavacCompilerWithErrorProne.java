@@ -42,23 +42,25 @@ import java.util.Locale;
  * entry point into Javac.
  *
  * @author <a href="mailto:alexeagle@google.com">Alex Eagle</a>
- * @plexus.component role="org.codehaus.plexus.compiler.Compiler"
- * role-hint="javac-with-errorprone"
+ * @plexus.component role="org.codehaus.plexus.compiler.Compiler" role-hint="javac-with-errorprone"
  */
-public class JavacCompilerWithErrorProne extends AbstractCompiler
+public class JavacCompilerWithErrorProne
+    extends AbstractCompiler
 {
     public JavacCompilerWithErrorProne()
     {
         super( CompilerOutputStyle.ONE_OUTPUT_FILE_PER_INPUT_FILE, ".java", ".class", null );
     }
 
-    public String[] createCommandLine( CompilerConfiguration config ) throws CompilerException
+    public String[] createCommandLine( CompilerConfiguration config )
+        throws CompilerException
     {
         return new String[0];
     }
 
     @Override
-    public CompilerResult performCompile( CompilerConfiguration config ) throws CompilerException
+    public CompilerResult performCompile( CompilerConfiguration config )
+        throws CompilerException
     {
         File destinationDir = new File( config.getOutputLocation() );
 
@@ -76,16 +78,17 @@ public class JavacCompilerWithErrorProne extends AbstractCompiler
 
         if ( ( getLogger() != null ) && getLogger().isInfoEnabled() )
         {
-            getLogger().info( "Compiling " + sourceFiles.length + " "
-                              + "source file" + ( sourceFiles.length == 1 ? "" : "s" ) + " to " +
-                              destinationDir.getAbsolutePath() );
+            getLogger().info( "Compiling " + sourceFiles.length + " " //
+                                  + "source file" //
+                                  + ( sourceFiles.length == 1 ? "" : "s" ) //
+                                  + " to " + destinationDir.getAbsolutePath() );
         }
 
         String[] args = JavacCompiler.buildCompilerArguments( config, sourceFiles );
 
         try
         {
-            return (CompilerResult) getInvoker().invoke( null, new Object[] {args} );
+            return (CompilerResult) getInvoker().invoke( null, new Object[]{ args } );
         }
         catch ( Exception e )
         {
@@ -93,7 +96,8 @@ public class JavacCompilerWithErrorProne extends AbstractCompiler
         }
     }
 
-    private static class NonDelegatingClassLoader extends URLClassLoader
+    private static class NonDelegatingClassLoader
+        extends URLClassLoader
     {
         ClassLoader original;
 
@@ -105,7 +109,8 @@ public class JavacCompilerWithErrorProne extends AbstractCompiler
         }
 
         @Override
-        public Class<?> loadClass( String name, boolean complete ) throws ClassNotFoundException
+        public Class<?> loadClass( String name, boolean complete )
+            throws ClassNotFoundException
         {
             if ( name.contentEquals( CompilerResult.class.getName() ) )
             {
@@ -133,7 +138,8 @@ public class JavacCompilerWithErrorProne extends AbstractCompiler
 
     private Method invokerMethod;
 
-    private Method getInvoker() throws CompilerException
+    private Method getInvoker()
+        throws CompilerException
     {
         if ( invokerMethod == null )
         {
@@ -161,14 +167,17 @@ public class JavacCompilerWithErrorProne extends AbstractCompiler
      */
     public static class CompilerInvoker
     {
-        private static class MessageListener implements DiagnosticListener<JavaFileObject>
+        private static class MessageListener
+            implements DiagnosticListener<JavaFileObject>
         {
             private final List<CompilerMessage> messages;
 
-            MessageListener( List<CompilerMessage> messages ) { this.messages = messages; }
+            MessageListener( List<CompilerMessage> messages )
+            {
+                this.messages = messages;
+            }
 
-            public static CompilerMessage.Kind convertKind(
-                Diagnostic<? extends JavaFileObject> diagnostic )
+            public static CompilerMessage.Kind convertKind( Diagnostic<? extends JavaFileObject> diagnostic )
             {
                 switch ( diagnostic.getKind() )
                 {
@@ -187,12 +196,15 @@ public class JavacCompilerWithErrorProne extends AbstractCompiler
 
             public void report( Diagnostic<? extends JavaFileObject> diagnostic )
             {
-                CompilerMessage compilerMessage = new CompilerMessage(
-                    diagnostic.getSource() == null ? null : diagnostic.getSource().getName(),
-                    convertKind( diagnostic ), (int) diagnostic.getLineNumber(),
-                    (int) diagnostic.getColumnNumber(), -1,
-                    -1, // end pos line:column is hard to calculate
-                    diagnostic.getMessage( Locale.getDefault() ) );
+                CompilerMessage compilerMessage =
+                    new CompilerMessage( diagnostic.getSource() == null ? null : diagnostic.getSource().getName(), //
+                                         convertKind( diagnostic ), //
+                                         (int) diagnostic.getLineNumber(), //
+                                         (int) diagnostic.getColumnNumber(), //
+                                         -1, //
+                                         -1,
+                                         // end pos line:column is hard to calculate
+                                         diagnostic.getMessage( Locale.getDefault() ) );
                 messages.add( compilerMessage );
             }
         }
@@ -200,9 +212,9 @@ public class JavacCompilerWithErrorProne extends AbstractCompiler
         public static CompilerResult compile( String[] args )
         {
             List<CompilerMessage> messages = new ArrayList<CompilerMessage>();
-            ErrorProneCompiler compiler =
-                new ErrorProneCompiler.Builder()
-                    .listenToDiagnostics( new MessageListener( messages ) )
+            ErrorProneCompiler compiler = //
+                new ErrorProneCompiler.Builder() //
+                    .listenToDiagnostics( new MessageListener( messages ) ) //
                     .build();
             return new CompilerResult( compiler.compile( args ).isOK(), messages );
         }
