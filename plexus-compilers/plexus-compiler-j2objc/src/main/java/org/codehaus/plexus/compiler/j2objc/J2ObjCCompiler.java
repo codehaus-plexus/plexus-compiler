@@ -25,7 +25,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -36,11 +35,11 @@ import org.codehaus.plexus.compiler.AbstractCompiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerException;
 import org.codehaus.plexus.compiler.CompilerMessage;
+import org.codehaus.plexus.compiler.CompilerMessage.Kind;
 import org.codehaus.plexus.compiler.CompilerOutputStyle;
 import org.codehaus.plexus.compiler.CompilerResult;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
@@ -60,8 +59,6 @@ public class J2ObjCCompiler
     extends AbstractCompiler
 {
     private static final String ARGUMENTS_FILE_NAME = "j2objc-arguments";
-
-    private static final String[] DEFAULT_INCLUDES = { "**/**" };
 
     private static void err(String s) {
     	System.err.println(s);
@@ -83,12 +80,6 @@ public class J2ObjCCompiler
         throws CompilerException
     {
         return false;
-    }
-
-    public String getOutputFile( CompilerConfiguration configuration )
-        throws CompilerException
-    {
-        return configuration.getOutputFileName() + "." + getTypeExtension( configuration );
     }
 
     public CompilerResult performCompile( CompilerConfiguration config )
@@ -156,15 +147,6 @@ public class J2ObjCCompiler
  j2objc --help
 Usage: j2objc <options> <source files>
 Common options:
--sourcepath <path>           Specify where to find input source files.
--classpath <path>            Specify where to find user class files.
--d <directory>               Specify where to place generated Objective-C files.
--encoding <encoding>         Specify character encoding used by source files.
--g                           Generate Java source debugging support.
--q, --quiet                  Do not print status messages.
--v, --verbose                Output messages about what the translator is doing.
--Werror                      Make all warnings into errors.
--h, --help                   Print this message.
 
 Other options:
 --batch-translate-max=<n>    The maximum number of source files that are translated.
@@ -226,16 +208,17 @@ Other options:
         //
         // ----------------------------------------------------------------------
 
-        for ( String element : config.getClasspathEntries() )
-        {
-            File f = new File( element );
-
-            if ( !f.isFile() )
+        if ( !config.getClasspathEntries().isEmpty() ) {
+            List<String> classpath = new ArrayList<String>();
+            for ( String element : config.getClasspathEntries() )
             {
-                continue;
+                File f = new File( element );
+                classpath.add(f.getAbsolutePath());
+                
+                classpath.add( element );
             }
-
-            args.add( element );
+            args.add("-classpath");
+            args.add(StringUtils.join(classpath.toArray(), File.pathSeparator));
         }
 
 /*
@@ -248,167 +231,42 @@ Other options:
 
  */
         Map<String, String> compilerArguments = config.getCustomCompilerArgumentsAsMap();
+/*
+-sourcepath <path>           Specify where to find input source files.
+-classpath <path>            Specify where to find user class files.
+-d <directory>               Specify where to place generated Objective-C files.
+-encoding <encoding>         Specify character encoding used by source files.
+-g                           Generate Java source debugging support.
+-q, --quiet                  Do not print status messages.
+-v, --verbose                Output messages about what the translator is doing.
+-Werror                      Make all warnings into errors.
+-h, --help                   Print this message.
         
+ */
         for ( String k : compilerArguments.keySet() ) {
         	System.out.println( k + "=" + compilerArguments.get( k ) );
+        	if ( "Xbootclasspath".equals(k)) {
+        		args.add("-Xbootclasspath:" + compilerArguments.get(k));
+        	} else {
+            	args.add(k);
+            	String v = compilerArguments.get(k);
+            	if ( v != null ) {
+            		args.add(v);
+            	}        		
+        	}
         }
-        if ( compilerArguments.containsKey("-use-arc") ) {
-        	
-        }
-        String mainClass = compilerArguments.get( "-main" );
-
-        if ( !StringUtils.isEmpty( mainClass ) )
-        {
-            args.add( "/main:" + mainClass );
-        }
-
-        // ----------------------------------------------------------------------
-        // Xml Doc output
-        // ----------------------------------------------------------------------
-
-        String doc = compilerArguments.get( "-doc" );
-
-        if ( !StringUtils.isEmpty( doc ) )
-        {
-            args.add( "/doc:" + new File( config.getOutputLocation(),
-                                          config.getOutputFileName() + ".xml" ).getAbsolutePath() );
-        }
-
-        // ----------------------------------------------------------------------
-        // Xml Doc output
-        // ----------------------------------------------------------------------
-
-        String nowarn = compilerArguments.get( "-nowarn" );
-
-        if ( !StringUtils.isEmpty( nowarn ) )
-        {
-            args.add( "/nowarn:" + nowarn );
-        }
-
-        // ----------------------------------------------------------------------
-        // Out - Override output name, this is required for generating the unit test dll
-        // ----------------------------------------------------------------------
-
-        String out = compilerArguments.get( "-out" );
-        /*
-        if ( !StringUtils.isEmpty( out ) )
-        {
-            args.add( "/out:" + new File( config.getOutputLocation(), out ).getAbsolutePath() );
-        }
-        else
-        {
-            args.add( "/out:" + new File( config.getOutputLocation(), getOutputFile( config ) ).getAbsolutePath() );
-        }*/
-
-        // ----------------------------------------------------------------------
-        // Resource File - compile in a resource file into the assembly being created
-        // ----------------------------------------------------------------------
-        String resourcefile = compilerArguments.get( "-resourcefile" );
-
-        if ( !StringUtils.isEmpty( resourcefile ) )
-        {
-            String resourceTarget = (String) compilerArguments.get( "-resourcetarget" );
-            args.add( "/res:" + new File( resourcefile ).getAbsolutePath() + "," + resourceTarget );
-        }
-
-        // ----------------------------------------------------------------------
-        // Target - type of assembly to produce, lib,exe,winexe etc... 
-        // ----------------------------------------------------------------------
-
-        String target = compilerArguments.get( "-target" );
-        /*
-        if ( StringUtils.isEmpty( target ) )
-        {
-            args.add( "/target:library" );
-        }
-        else
-        {
-            args.add( "/target:" + target );
-        }*/
-
-        // ----------------------------------------------------------------------
-        // remove MS logo from output (not applicable for mono)
-        // ----------------------------------------------------------------------
-        String nologo = compilerArguments.get( "-nologo" );
-
-        if ( !StringUtils.isEmpty( nologo ) )
-        {
-            args.add( "/nologo" );
-        }
-
-        // ----------------------------------------------------------------------
-        // add any resource files
-        // ----------------------------------------------------------------------
-        this.addResourceArgs( config, args );
 
         // ----------------------------------------------------------------------
         // add source files
         // ----------------------------------------------------------------------
+        //List<String> sources = new ArrayList<String>();
         for ( String sourceFile : sourceFiles )
         {
+        	//sources.add(sourceFile)
             args.add( sourceFile );
         }
                
         return args.toArray( new String[args.size()] );
-    }
-
-    private void addResourceArgs( CompilerConfiguration config, List<String> args )
-    {
-        File filteredResourceDir = this.findResourceDir( config );
-        if ( ( filteredResourceDir != null ) && filteredResourceDir.exists() )
-        {
-            DirectoryScanner scanner = new DirectoryScanner();
-            scanner.setBasedir( filteredResourceDir );
-            scanner.setIncludes( DEFAULT_INCLUDES );
-            scanner.addDefaultExcludes();
-            scanner.scan();
-
-            List<String> includedFiles = Arrays.asList( scanner.getIncludedFiles() );
-            for ( String name : includedFiles )
-            {
-                File filteredResource = new File( filteredResourceDir, name );
-                String assemblyResourceName = this.convertNameToAssemblyResourceName( name );
-                String argLine = "/resource:\"" + filteredResource + "\",\"" + assemblyResourceName + "\"";
-                if ( config.isDebug() )
-                {
-                    System.out.println( "adding resource arg line:" + argLine );
-                }
-                args.add( argLine );
-
-            }
-        }
-    }
-
-    private File findResourceDir( CompilerConfiguration config )
-    {
-        if ( config.isDebug() )
-        {
-            System.out.println( "Looking for resourcesDir" );
-        }
-        Map<String, String> compilerArguments = config.getCustomCompilerArguments();
-        String tempResourcesDirAsString = (String) compilerArguments.get( "-resourceDir" );
-        File filteredResourceDir = null;
-        if ( tempResourcesDirAsString != null )
-        {
-            filteredResourceDir = new File( tempResourcesDirAsString );
-            if ( config.isDebug() )
-            {
-                System.out.println( "Found resourceDir at: " + filteredResourceDir.toString() );
-            }
-        }
-        else
-        {
-            if ( config.isDebug() )
-            {
-                System.out.println( "No resourceDir was available." );
-            }
-        }
-        return filteredResourceDir;
-    }
-
-    private String convertNameToAssemblyResourceName( String name )
-    {
-        return name.replace( File.separatorChar, '.' );
     }
 
     @SuppressWarnings( "deprecation" )
@@ -486,7 +344,7 @@ Other options:
             // TODO: exception?
             messages.add( new CompilerMessage(
                 "Failure executing the compiler, but could not parse the error:" + EOL + stringWriter.toString(),
-                true ) );
+                Kind.ERROR ) );
         }
 
         return messages;
@@ -512,36 +370,6 @@ Other options:
         }
 
         return messages;
-    }
-
-    private String getType( Map<String, String> compilerArguments )
-    {
-        String type = compilerArguments.get( "-target" );
-
-        if ( StringUtils.isEmpty( type ) )
-        {
-            return "library";
-        }
-
-        return type;
-    }
-
-    private String getTypeExtension( CompilerConfiguration configuration )
-        throws CompilerException
-    {
-        String type = getType( configuration.getCustomCompilerArguments() );
-
-        if ( "exe".equals( type ) || "winexe".equals( type ) )
-        {
-            return "exe";
-        }
-
-        if ( "library".equals( type ) || "module".equals( type ) )
-        {
-            return "dll";
-        }
-
-        throw new CompilerException( "Unrecognized type '" + type + "'." );
     }
 
     // added for debug purposes.... 

@@ -20,6 +20,7 @@
     <module>plexus-compiler-jikes</module>
     <module>plexus-compiler-javac</module>
     <module>plexus-compiler-javac-errorprone</module>
+    <module>plexus-compiler-j2objc</module>
   </modules>
 
   <dependencies>
