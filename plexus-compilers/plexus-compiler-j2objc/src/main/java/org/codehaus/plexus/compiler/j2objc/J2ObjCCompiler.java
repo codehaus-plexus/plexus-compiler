@@ -25,8 +25,8 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,10 +48,11 @@ import org.codehaus.plexus.util.cli.StreamConsumer;
 import org.codehaus.plexus.util.cli.WriterStreamConsumer;
 
 /**
- * A loosy derivation of the CSharpCompiler to compile J2ObjC.
+ * A plexus compiler which use J2ObjC .
+ * It is derived from the CSharpCompiler to compile with J2ObjC.
  * 
  * @author <a href="mailto:ludovic.maitre@effervens.com">Ludovic Ma&icirc;tre</a>
- * @see CsharpCompiler
+ * @see CSharpCompiler
  * @plexus.component role="org.codehaus.plexus.compiler.Compiler"
  * role-hint="j2objc"
  */
@@ -60,9 +61,114 @@ public class J2ObjCCompiler
 {
     private static final String ARGUMENTS_FILE_NAME = "j2objc-arguments";
 
-    private static void err(String s) {
-    	System.err.println(s);
-    }
+    private static final String X_BOOTCLASSPATH = "Xbootclasspath";
+
+    /**
+     *    -J<flag>                     Pass Java <flag>, such as -Xmx1G, to the system runtime.
+     */
+    private static final String J_FLAG = "J";
+    
+    /**
+     * --batch-translate-max=<n>    The maximum number of source files that are translated.
+                                  together. Batching speeds up translation, but
+                                  requires more memory.
+     */
+    private static final String BATCH_SIZE = "batch-translate-max";
+
+    /**
+    -pluginpath <path>           Specify where to find plugin class files.
+    -pluginoptions <options>     Comma separated key=value pairs passed to all plugins.
+    -t            Print time spent in translation steps.
+    -Xbootclasspath:<path>       Boot path used by translation (not the tool itself).
+    -Xno-jsni-warnings           Warn if JSNI (GWT) native code delimiters are used
+                                   instead of OCNI delimiters.
+    -sourcepath <path>           Specify where to find input source files.
+    -classpath <path>            Specify where to find user class files.
+    -d <directory>               Specify where to place generated Objective-C files.
+    -encoding <encoding>         Specify character encoding used by source files.
+    -g                           Generate Java source debugging support.
+    -q			                  Do not print status messages.
+    -v          	      Output messages about what the translator is doing.
+    -Werror                      Make all warnings into errors.
+    -h                   Print this message.
+    -use-arc                     Generate Objective-C code to support Automatic
+                                   Reference Counting (ARC).
+    -use-reference-counting      Generate Objective-C code to support iOS manual
+                                   reference counting (default).
+    -x <language>                Specify what language to output.  Possible values
+                                   are objective-c (default) and objective-c++.                              
+     */    
+    private static final List<String> ONE_DASH_ARGS = Arrays.asList( new String[] {
+    		"-pluginpath",
+    		"-pluginoptions",
+    		"-t",
+    		"-Xno-jsni-warnings",
+    		"-sourcepath",
+    		"-classpath",
+    		"-d",
+    		"-encoding",
+    		"-g",
+    		"-q",
+    		"-v",
+    		"-Werror",
+    		"-h",
+    		"-use-arc",
+    		"-use-reference-counting",
+    		"-x"    		
+    });
+
+    /**
+   --build-closure              Translate dependent classes if out-of-date.
+   --dead-code-report <file>    Specify a ProGuard usage report for dead code elimination.
+   --doc-comments               Translate Javadoc comments into Xcode-compatible comments.
+   --no-extract-unsequenced     Don't rewrite expressions that would produce unsequenced
+                                  modification errors.
+   --generate-deprecated        Generate deprecated attributes for deprecated methods,
+                                  classes and interfaces.
+   --mapping <file>             Add a method mapping file.
+   --no-class-methods           Don't emit class methods for static Java methods.
+                                  (static methods are always converted to functions)
+   --no-final-methods-functions Disable generating functions for final methods.
+   --no-hide-private-members    Includes private fields and methods in header file.
+   --no-package-directories     Generate output files to specified directory, without
+                                  creating package sub-directories.
+   --prefix <package=prefix>    Substitute a specified prefix for a package name.
+   --prefixes <file>            Specify a properties file with prefix definitions.
+   --preserve-full-paths        Generates output files with the same relative paths as 
+                                  the input files.
+   --strip-gwt-incompatible     Removes methods that are marked with a GwtIncompatible
+                                  annotation, unless its value is known to be compatible.
+   --strip-reflection           Do not generate metadata needed for Java reflection.
+   --segmented-headers          Generates headers with guards around each declared type.
+                                  Useful for breaking import cycles.
+   --timing-info            Print time spent in translation steps.
+   --quiet                  Do not print status messages.
+   --verbose                Output messages about what the translator is doing.
+   --help                   Print this message.
+   */    
+    private static final List<String> TWO_DASH_ARGS = Arrays.asList( new String[] {
+    	"--build-closure",
+    	"--dead-code-report",
+    	"--doc-comments",
+    	"--no-extract-unsequenced",
+    	"--generate-deprecated",
+    	"--mapping",
+    	"--no-class-methods",
+    	"--no-final-methods-functions",
+    	"--no-hide-private-members",
+    	"--no-package-directories",
+    	"--prefix",
+    	"--prefixes",
+    	"--preserve-full-paths",
+    	"--strip-gwt-incompatible",
+    	"--strip-reflection",
+    	"--segmented-headers",
+    	"--timing-info",
+    	"--quiet",
+    	"--verbose",
+    	"--help"    	
+    } );
+    
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
@@ -86,7 +192,6 @@ public class J2ObjCCompiler
         throws CompilerException
     {
         File destinationDir = new File( config.getOutputLocation() );
-        err("Dest:" + destinationDir.getAbsolutePath() );
         if ( !destinationDir.exists() )
         {
             destinationDir.mkdirs();
@@ -124,7 +229,7 @@ public class J2ObjCCompiler
 
     public String[] createCommandLine( CompilerConfiguration config )
         throws CompilerException
-    {
+    {    	
         return buildCompilerArguments( config, J2ObjCCompiler.getSourceFiles( config ) );
     }
 
@@ -143,54 +248,19 @@ public class J2ObjCCompiler
 
         return "j2objc";
     }
-/*
- j2objc --help
-Usage: j2objc <options> <source files>
-Common options:
-
-Other options:
---batch-translate-max=<n>    The maximum number of source files that are translated.
-                               together. Batching speeds up translation, but
-                               requires more memory.
---build-closure              Translate dependent classes if out-of-date.
---dead-code-report <file>    Specify a ProGuard usage report for dead code elimination.
---doc-comments               Translate Javadoc comments into Xcode-compatible comments.
---no-extract-unsequenced     Don't rewrite expressions that would produce unsequenced
-                               modification errors.
---generate-deprecated        Generate deprecated attributes for deprecated methods,
-                               classes and interfaces.
--J<flag>                     Pass Java <flag>, such as -Xmx1G, to the system runtime.
---mapping <file>             Add a method mapping file.
---no-class-methods           Don't emit class methods for static Java methods.
-                               (static methods are always converted to functions)
---no-final-methods-functions Disable generating functions for final methods.
---no-hide-private-members    Includes private fields and methods in header file.
---no-package-directories     Generate output files to specified directory, without
-                               creating package sub-directories.
--pluginpath <path>           Specify where to find plugin class files.
--pluginoptions <options>     Comma separated key=value pairs passed to all plugins.
---prefix <package=prefix>    Substitute a specified prefix for a package name.
---prefixes <file>            Specify a properties file with prefix definitions.
---preserve-full-paths        Generates output files with the same relative paths as 
-                               the input files.
---strip-gwt-incompatible     Removes methods that are marked with a GwtIncompatible
-                               annotation, unless its value is known to be compatible.
---strip-reflection           Do not generate metadata needed for Java reflection.
---segmented-headers          Generates headers with guards around each declared type.
-                               Useful for breaking import cycles.
--t, --timing-info            Print time spent in translation steps.
--Xbootclasspath:<path>       Boot path used by translation (not the tool itself).
--Xno-jsni-warnings           Warn if JSNI (GWT) native code delimiters are used
-                               instead of OCNI delimiters.
- */
 
     private String[] buildCompilerArguments( CompilerConfiguration config, String[] sourceFiles )
         throws CompilerException
     {
+    	/*
+    	j2objc --help
+    	Usage: j2objc <options> <source files>
+    	*/    	
         List<String> args = new ArrayList<String>();
+        Map<String, String> compilerArguments = config.getCustomCompilerArgumentsAsMap();
 
         // Verbose
-        if ( config.isDebug() )
+        if ( config.isVerbose() )
         {
             args.add( "-v" );
         }
@@ -221,35 +291,23 @@ Other options:
             args.add(StringUtils.join(classpath.toArray(), File.pathSeparator));
         }
 
-/*
--use-arc                     Generate Objective-C code to support Automatic
-                               Reference Counting (ARC).
--use-reference-counting      Generate Objective-C code to support iOS manual
-                               reference counting (default).
--x <language>                Specify what language to output.  Possible values
-                               are objective-c (default) and objective-c++.
-
- */
-        Map<String, String> compilerArguments = config.getCustomCompilerArgumentsAsMap();
-/*
--sourcepath <path>           Specify where to find input source files.
--classpath <path>            Specify where to find user class files.
--d <directory>               Specify where to place generated Objective-C files.
--encoding <encoding>         Specify character encoding used by source files.
--g                           Generate Java source debugging support.
--q, --quiet                  Do not print status messages.
--v, --verbose                Output messages about what the translator is doing.
--Werror                      Make all warnings into errors.
--h, --help                   Print this message.
-        
- */
         for ( String k : compilerArguments.keySet() ) {
         	System.out.println( k + "=" + compilerArguments.get( k ) );
-        	if ( "Xbootclasspath".equals(k)) {
-        		args.add("-Xbootclasspath:" + compilerArguments.get(k));
+        	String v = compilerArguments.get(k);
+        	if ( J_FLAG.equals(k)) {
+        		args.add(J_FLAG+v);
+        	} else if ( X_BOOTCLASSPATH.equals(k)) {
+        		args.add(X_BOOTCLASSPATH+":" + v);
+        	} else if (BATCH_SIZE.equals(k)) {
+        		args.add("-" + BATCH_SIZE +"=" + v);
         	} else {
-            	args.add(k);
-            	String v = compilerArguments.get(k);
+        		if ( TWO_DASH_ARGS.contains( k ) ) {
+                	args.add("-" + k);        			
+        		} else if (ONE_DASH_ARGS.contains(k)) {
+        			args.add(k);
+        		} else {
+        			throw new IllegalArgumentException("The argument " + k + " isnt't a flag recognized by J2ObjC.");
+        		}
             	if ( v != null ) {
             		args.add(v);
             	}        		
@@ -269,7 +327,6 @@ Other options:
         return args.toArray( new String[args.size()] );
     }
 
-    @SuppressWarnings( "deprecation" )
     private List<CompilerMessage> compileOutOfProcess( File workingDirectory, File target, String executable,
                                                        String[] args )
         throws CompilerException
@@ -377,8 +434,6 @@ Other options:
     {
         Set<String> sources = new HashSet<String>();
 
-        //Set sourceFiles = null;
-        //was:
         Set<File> sourceFiles = config.getSourceFiles();
 
         if ( sourceFiles != null && !sourceFiles.isEmpty() )
@@ -392,7 +447,11 @@ Other options:
         {
             for ( String sourceLocation : config.getSourceLocations() )
             {
-                sources.addAll( getSourceFilesForSourceRoot( config, sourceLocation ) );
+                // annotations directory does not always exist and the below scanner fails on non existing directories
+                File potentialSourceDirectory = new File( sourceLocation );
+                if ( potentialSourceDirectory.exists() ) {
+                	sources.addAll( getSourceFilesForSourceRoot( config, sourceLocation ) );
+                }
             }
         }
 
@@ -410,26 +469,8 @@ Other options:
         return result;
     }
 
-    /**
-     * This method is just here to maintain the public api. This is now handled in the parse
-     * compiler output function.
-     *
-     * @author Chris Stevenson
-     * @deprecated
-     */
-    public static CompilerMessage parseLine( String line )
-    {
-        return DefaultJ2ObjCCompilerParser.parseLine( line );
-    }
-
     protected static Set<String> getSourceFilesForSourceRoot( CompilerConfiguration config, String sourceLocation )
     {
-    	if ( new File( sourceLocation ).exists() == false ) {
-        	System.out.println("Source didn't exist:"+sourceLocation);
-        	return new LinkedHashSet<String>();
-    	} else {
-        	System.out.println("Source:"+sourceLocation);    		
-    	}
         DirectoryScanner scanner = new DirectoryScanner();
         
         scanner.setBasedir( sourceLocation );
