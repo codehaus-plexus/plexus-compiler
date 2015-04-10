@@ -11,7 +11,7 @@ import org.codehaus.plexus.util.StringUtils;
 public class DefaultJ2ObjCCompilerParser
 {
 
-    private static String ERROR_PREFIX = "error ";
+    private static String ERROR_PREFIX = "error: ";
 
     private static String CONVERT_PREFIX = "translating ";
     
@@ -67,7 +67,7 @@ Unknown output: Translated 2 methods as functions
     {
 
         String file = null;
-        boolean error = true;
+        boolean error = false;
         int startline = -1;
         int startcolumn = -1;
         int endline = -1;
@@ -77,6 +77,7 @@ Unknown output: Translated 2 methods as functions
         if ( line.startsWith( ERROR_PREFIX ) )
         {
             message = line.substring( ERROR_PREFIX.length() );
+            error = true;
         }
         else if ( line.startsWith( CONVERT_PREFIX ) )
         {
