@@ -54,7 +54,7 @@ public class J2ObjCCompilerTest
 		cc.setSourceLocations(Arrays.asList(new String[]{
 				"src/test/resources"
 		}));
-		cc.setExecutable("/Users/lmaitre/apps/j2objc/j2objc");
+		//cc.setExecutable("/Users/lmaitre/apps/j2objc/j2objc");
 		cc.setWorkingDirectory(new File("."));
 		cc.setFork(true);
 		cc.setCustomCompilerArgumentsAsMap(customCompilerArguments);
