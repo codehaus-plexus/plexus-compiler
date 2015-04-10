@@ -292,7 +292,7 @@ public class J2ObjCCompiler
         }
 
         for ( String k : compilerArguments.keySet() ) {
-        	System.out.println( k + "=" + compilerArguments.get( k ) );
+        	//System.out.println( k + "=" + compilerArguments.get( k ) );
         	String v = compilerArguments.get(k);
         	if ( J_FLAG.equals(k)) {
         		args.add(J_FLAG+v);
