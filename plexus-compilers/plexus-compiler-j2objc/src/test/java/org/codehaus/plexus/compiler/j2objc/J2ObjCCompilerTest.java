@@ -36,11 +36,19 @@ import java.io.StringReader;
 import java.util.List;
 
 /**
- * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
+ * @author lmaitre
  */
 public class J2ObjCCompilerTest
     extends TestCase
 {
+	public void testParser() throws IOException {
+		
+	}
+	
+	public void testJ2ObjCCompiler() throws IOException {
+		J2ObjCCompiler comp = new J2ObjCCompiler();
+		//comp.
+	}
 	/*
     public void testParser()
         throws IOException

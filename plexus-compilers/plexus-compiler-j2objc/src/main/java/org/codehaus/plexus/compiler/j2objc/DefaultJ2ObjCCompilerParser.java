@@ -5,31 +5,29 @@ import org.codehaus.plexus.compiler.CompilerMessage.Kind;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
- * Handles output from both mono with only the line number
- * <p/>
- * ex error = "/home/trygvis/dev/com.myrealbox/trunk/mcs/nunit20/core/./TestRunnerThread.cs(29) error CS0246: Cannot find type 'NameValueCollection'"
- * <p/>
- * and errors from mono & csc on windows which has column num also
- * <p/>
- * ex error = "src\\test\\csharp\\Hierarchy\\Logger.cs(98,4): warning CS0618: 'NUnit.Framework.Assertion' is obsolete: 'Use Assert class instead'";
- *
- * @author <a href="mailto:gdodinet@karmicsoft.com">Gilles Dodinet</a>
- * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
- * @author <a href="mailto:matthew.pocock@ncl.ac.uk">Matthew Pocock</a>
- * @author <a href="mailto:chris.stevenson@gmail.com">Chris Stevenson</a>
+ * Handle the output of J2ObjC
+ * @author lmaitre
  */
 public class DefaultJ2ObjCCompilerParser
 {
 
     private static String ERROR_PREFIX = "error ";
 
-    private static String COMPILATION_PREFIX = "Compilation ";
+    private static String CONVERT_PREFIX = "translating ";
+    
+    private static String TRANSLATION_PREFIX = "Translated ";
 
     private static String MAGIC_LINE_MARKER = ".cs(";
 
     private static String MAGIC_LINE_MARKER_2 = ")";
 
-
+/**
+Unknown output: translating /Users/lmaitre/Workspaces/IOSSamples/maven-quickstart-j2objc/src/main/java/de/test/App.java
+Unknown output: Translated 1 file: 0 errors, 0 warnings
+Unknown output: Translated 2 methods as functions
+ * @param line
+ * @return
+ */
     public static CompilerMessage parseLine( String line )
     {
         CompilerMessage ce = null;
@@ -80,11 +78,12 @@ public class DefaultJ2ObjCCompilerParser
         {
             message = line.substring( ERROR_PREFIX.length() );
         }
-        else if ( line.startsWith( COMPILATION_PREFIX ) )
+        else if ( line.startsWith( CONVERT_PREFIX ) )
         {
-            // ignore
-
-            return null;
+        	message = line;
+        } else if ( line.startsWith( TRANSLATION_PREFIX ) )
+        {
+        	message = line;
         }
         else if ( line.indexOf( MAGIC_LINE_MARKER ) != -1 )
         {
@@ -129,11 +128,11 @@ public class DefaultJ2ObjCCompilerParser
         if ( line.startsWith( ERROR_PREFIX ) )
         {
             message = line.substring( ERROR_PREFIX.length() );
-        }
+        }/*
         else if ( line.startsWith( COMPILATION_PREFIX ) )
         {
             return null;
-        }
+        }*/
         else if ( line.indexOf( MAGIC_LINE_MARKER ) != -1 )
         {
             int i = line.indexOf( MAGIC_LINE_MARKER );
