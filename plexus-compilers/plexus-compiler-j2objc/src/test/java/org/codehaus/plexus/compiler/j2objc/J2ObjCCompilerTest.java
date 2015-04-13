@@ -47,22 +47,20 @@ public class J2ObjCCompilerTest
 	public void testJ2ObjCCompiler() throws IOException {
 		J2ObjCCompiler comp = new J2ObjCCompiler();
 		Map<String,String> customCompilerArguments = new HashMap<String,String>();
-//			<use-arc/>
 		customCompilerArguments.put("-use-arc", null);
 		customCompilerArguments.put("-sourcepath", "src/test/resources");
 		CompilerConfiguration cc = new CompilerConfiguration();
+		cc.setOutputLocation("target/generated/objective-c");
 		cc.setSourceLocations(Arrays.asList(new String[]{
 				"src/test/resources"
 		}));
-		cc.setExecutable("/Users/lmaitre/apps/j2objc/j2objc");
 		cc.setWorkingDirectory(new File("."));
 		cc.setFork(true);
 		cc.setCustomCompilerArgumentsAsMap(customCompilerArguments);
-		cc.setOutputLocation("target");
 		try {
 			comp.performCompile(cc);
-			Assert.assertTrue(new File("target/de/test/App.h").exists());
-			Assert.assertTrue(new File("target/de/test/App.m").exists());
+			Assert.assertTrue(new File("target/generated/objective-c/de/test/App.h").exists());
+			Assert.assertTrue(new File("target/generated/objective-c/de/test/App.m").exists());
 		} catch ( CompilerException ce ) {
 			fail("An exception has occured: " + ce.getMessage());
 		}
