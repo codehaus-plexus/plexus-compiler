@@ -547,6 +547,14 @@ Options can be of the form -option or /option
         {
             for ( String sourceLocation : config.getSourceLocations() )
             {
+                if (!new File(sourceLocation).exists())
+                {
+                    if ( config.isDebug() )
+                    {
+                        System.out.println( "Ignoring not found sourceLocation at: " + sourceLocation );
+                    }
+                    continue;
+                }
                 sources.addAll( getSourceFilesForSourceRoot( config, sourceLocation ) );
             }
         }
