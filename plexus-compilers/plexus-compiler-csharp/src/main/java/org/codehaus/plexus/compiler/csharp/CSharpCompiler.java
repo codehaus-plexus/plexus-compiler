@@ -40,6 +40,7 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -58,6 +59,10 @@ import java.util.Set;
 public class CSharpCompiler
     extends AbstractCompiler
 {
+    private static final String JAR_SUFFIX = ".jar";
+    private static final String DLL_SUFFIX = ".dll";
+    private static final String NET_SUFFIX = ".net";
+    
     private static final String ARGUMENTS_FILE_NAME = "csharp-arguments";
 
     private static final String[] DEFAULT_INCLUDES = { "**/**" };
@@ -228,8 +233,34 @@ Options can be of the form -option or /option
             {
                 continue;
             }
-
-            args.add( "/reference:\"" + element + "\"" );
+            
+            if (element.endsWith(JAR_SUFFIX)) {
+                try 
+                {
+                    File dllDir = new File(element + NET_SUFFIX);
+                    if (!dllDir.exists())
+                    {
+                        dllDir.mkdir();
+                    }
+                    JarUtil.extract(dllDir, new File(element));
+                    for (String tmpfile : dllDir.list()) 
+                    {
+                        if ( tmpfile.endsWith(DLL_SUFFIX) )
+                        {
+                            String dll = Paths.get(dllDir.getAbsolutePath(), tmpfile).toString();
+                            args.add( "/reference:\"" + dll + "\"" );
+                        }
+                    }
+                }
+                catch ( IOException e )
+                {
+                    throw new CompilerException( e.toString(), e );
+                }
+            }
+            else
+            {
+                args.add( "/reference:\"" + element + "\"" );
+            }
         }
 
         // ----------------------------------------------------------------------
