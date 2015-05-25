@@ -44,6 +44,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -66,6 +67,8 @@ public class CSharpCompiler
     private static final String ARGUMENTS_FILE_NAME = "csharp-arguments";
 
     private static final String[] DEFAULT_INCLUDES = { "**/**" };
+    
+    private Map<String, String> compilerArguments;
 
     // ----------------------------------------------------------------------
     //
@@ -141,6 +144,40 @@ public class CSharpCompiler
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
+
+    private Map<String, String> getCompilerArguments( CompilerConfiguration config )
+    {
+        if (compilerArguments != null)
+        {
+            return compilerArguments;
+        }
+        
+        compilerArguments = config.getCustomCompilerArgumentsAsMap();
+        
+        Iterator<String> i = compilerArguments.keySet().iterator();
+        
+        while ( i.hasNext() ) 
+        {
+            String orig = i.next();
+            String v = compilerArguments.get( orig );
+            if ( orig.contains( ":" ) && v == null ) 
+            {
+                String[] arr = orig.split( ":" );
+                i.remove();
+                String k = arr[0];
+                v = arr[1];
+                compilerArguments.put( k, v );
+                if ( config.isDebug() )
+                {
+                    System.out.println( "transforming argument from " + orig + " to " + k + " = [" + v + "]" );
+                }
+            }
+        }
+        
+        config.setCustomCompilerArgumentsAsMap( compilerArguments );
+        
+        return compilerArguments;
+    }
 
     private String findExecutable( CompilerConfiguration config )
     {
@@ -267,7 +304,7 @@ Options can be of the form -option or /option
         // Main class
         // ----------------------------------------------------------------------
 
-        Map<String, String> compilerArguments = config.getCustomCompilerArguments();
+        Map<String, String> compilerArguments = getCompilerArguments( config );
 
         String mainClass = compilerArguments.get( "-main" );
 
@@ -399,7 +436,9 @@ Options can be of the form -option or /option
         {
             System.out.println( "Looking for resourcesDir" );
         }
-        Map<String, String> compilerArguments = config.getCustomCompilerArguments();
+        
+        Map<String, String> compilerArguments = getCompilerArguments( config );
+        
         String tempResourcesDirAsString = (String) compilerArguments.get( "-resourceDir" );
         File filteredResourceDir = null;
         if ( tempResourcesDirAsString != null )
