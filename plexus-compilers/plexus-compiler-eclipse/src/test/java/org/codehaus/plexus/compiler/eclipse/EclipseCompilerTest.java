@@ -101,6 +101,26 @@ public class EclipseCompilerTest
 
     }
 
+    public void testInitializeWarningsForPropertiesArgument()
+        throws Exception
+    {
+        org.codehaus.plexus.compiler.Compiler compiler = (Compiler) lookup( Compiler.ROLE, getRoleHint() );
+
+        CompilerConfiguration compilerConfig = createMinimalCompilerConfig();
+
+        compilerConfig.addCompilerCustomArgument( "-properties", "file_does_not_exist" );
+
+        try
+        {
+            compiler.performCompile( compilerConfig );
+            fail( "looking up the properties file should have thrown an exception" );
+        }
+        catch ( IllegalArgumentException e )
+        {
+            assertEquals( "Properties file not exist", e.getMessage() );
+        }
+    }
+
     private CompilerConfiguration createMinimalCompilerConfig()
     {
         CompilerConfiguration compilerConfig = new CompilerConfiguration();
