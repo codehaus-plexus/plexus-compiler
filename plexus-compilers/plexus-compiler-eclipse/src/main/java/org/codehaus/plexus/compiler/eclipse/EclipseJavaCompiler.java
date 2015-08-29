@@ -183,10 +183,10 @@ public class EclipseJavaCompiler
 
         settings.putAll( extras );
 
-        if ( settings.containsKey( "-properties" ) )
+        if ( settings.containsKey( "properties" ) )
         {
-            initializeWarnings( settings.get( "-properties" ), settings );
-            settings.remove( "-properties" );
+            initializeWarnings( settings.get( "properties" ), settings );
+            settings.remove( "properties" );
         }
 
         IProblemFactory problemFactory = new DefaultProblemFactory( Locale.getDefault() );
