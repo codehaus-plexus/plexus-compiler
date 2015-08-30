@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pmd version="4.3" timestamp="2015-08-30T22:11:19.981">
+<file name="F:\github-workspace\plexus-compiler\plexus-compilers\plexus-compiler-javac\src\main\java\org\codehaus\plexus\compiler\javac\IsolatedClassLoader.java">
+<violation beginline="40" endline="43" begincolumn="12" endcolumn="5" rule="UselessOverridingMethod" ruleset="Basic Rules" package="org.codehaus.plexus.compiler.javac" class="IsolatedClassLoader" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UselessOverridingMethod" priority="3">
+Overriding method merely calls super
+</violation>
+</file>
+<file name="F:\github-workspace\plexus-compiler\plexus-compilers\plexus-compiler-javac\src\main\java\org\codehaus\plexus\compiler\javac\JavacCompiler.java">
+<violation beginline="636" endline="638" begincolumn="17" endcolumn="17" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.codehaus.plexus.compiler.javac" class="JavacCompiler" method="parseModernStream" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+</pmd>

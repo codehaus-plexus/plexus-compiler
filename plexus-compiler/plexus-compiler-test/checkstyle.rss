@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<rss version="0.91">
+  <channel>
+    <title>Plexus Compiler Test Harness - Checkstyle report</title>
+    <link>http://plexus.codehaus.org/plexus-compiler/plexus-compiler-test/</link>
+    <description>Plexus Compiler Test Harness - Checkstyle report</description>
+    <language>en-us</language>
+    <copyright>&#169;2001 - 2015 Codehaus</copyright>
+    <item>
+      <title>File: 2,
+             Errors: 20,
+             Warnings: 18,
+             Infos: 0
+      </title>
+            <link>http://plexus.codehaus.org/plexus-compiler/plexus-compiler-test//checkstyle.html</link>
+      <description>
+        <p>Click <a href="http://plexus.codehaus.org/plexus-compiler/plexus-compiler-test//checkstyle.html">here</a> for the full Checkstyle report.</p>
+
+        <table summary="Files" boder="1">
+          <thead>
+            <tr>
+              <th>Files</th>
+              <th style="width:30px;"><abbr title="Info">I</abbr></th>
+              <th style="width:30px;"><abbr title="Warning">W</abbr></th>
+              <th style="width:30px;"><abbr title="Error">E</abbr></th>
+            </tr>
+          </thead>
+          <tbody>
+                          <tr>
+                <td>
+                  <a href="http://plexus.codehaus.org/plexus-compiler/plexus-compiler-test//checkstyle.html#org.codehaus.plexus.compiler.AbstractCompilerTest.java">org/codehaus/plexus/compiler/AbstractCompilerTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  12
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://plexus.codehaus.org/plexus-compiler/plexus-compiler-test//checkstyle.html#org.codehaus.plexus.compiler.AbstractCompilerTckTest.java">org/codehaus/plexus/compiler/AbstractCompilerTckTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  6
+                </td>
+                <td>
+                  19
+                </td>
+              </tr>
+                      </tbody>
+        </table>
+        
+      </description>
+    </item>
+  </channel>
+</rss>
+
