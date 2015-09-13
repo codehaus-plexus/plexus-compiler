@@ -26,7 +26,8 @@
   <scm>
     <connection>scm:git:git@github.com:codehaus-plexus/plexus-compiler.git</connection>
     <developerConnection>scm:git:git@github.com:codehaus-plexus/plexus-compiler.git</developerConnection>
-    <url>http://github.com/codehaus-plexus/plexus-compiler</url>
+    <url>http://github.com/codehaus-plexus/plexus-compiler/tree/${project.scm.tag}/</url>
+    <tag>master</tag>
   </scm>
   <issueManagement>
     <system>github</system>
