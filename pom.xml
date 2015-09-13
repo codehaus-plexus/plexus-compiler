@@ -27,11 +27,10 @@
     <connection>scm:git:git@github.com:codehaus-plexus/plexus-compiler.git</connection>
     <developerConnection>scm:git:git@github.com:codehaus-plexus/plexus-compiler.git</developerConnection>
     <url>http://github.com/codehaus-plexus/plexus-compiler</url>
-    <tag>plexus-compiler-2.4</tag>
   </scm>
   <issueManagement>
-    <system>jira</system>
-    <url>http://jira.codehaus.org/browse/PLXCOMP/component/12541</url>
+    <system>github</system>
+    <url>https://github.com/codehaus-plexus/plexus-compiler/issues</url>
   </issueManagement>
 
   <dependencyManagement>
