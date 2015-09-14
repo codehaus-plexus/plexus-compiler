@@ -46,7 +46,7 @@ public class JavaxToolsCompiler
     /**
      * is that thread safe ???
      */
-    static final JavaCompiler COMPILER = ToolProvider.getSystemJavaCompiler();
+    static final JavaCompiler COMPILER = getSystemJavaCompiler();
 
     private static List<JavaCompiler> JAVA_COMPILERS = new CopyOnWriteArrayList<JavaCompiler>();
 
@@ -55,7 +55,7 @@ public class JavaxToolsCompiler
         switch ( compilerConfiguration.getCompilerReuseStrategy() )
         {
             case AlwaysNew:
-                return ToolProvider.getSystemJavaCompiler();
+                return getSystemJavaCompiler();
             case ReuseCreated:
                 JavaCompiler javaCompiler;
                 synchronized ( JAVA_COMPILERS )
@@ -67,13 +67,29 @@ public class JavaxToolsCompiler
                         return javaCompiler;
                     }
                 }
-                javaCompiler = ToolProvider.getSystemJavaCompiler();
+                javaCompiler = getSystemJavaCompiler();
                 return javaCompiler;
             case ReuseSame:
             default:
                 return COMPILER;
         }
 
+    }
+
+    private static JavaCompiler getSystemJavaCompiler()
+    {
+        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        try
+        {
+            // set to system classloader for duration of lookup
+            Thread.currentThread().setContextClassLoader( null );
+
+            return ToolProvider.getSystemJavaCompiler();
+        }
+        finally
+        {
+            Thread.currentThread().setContextClassLoader( tccl );
+        }
     }
 
     static void releaseJavaCompiler( JavaCompiler javaCompiler, CompilerConfiguration compilerConfiguration )
