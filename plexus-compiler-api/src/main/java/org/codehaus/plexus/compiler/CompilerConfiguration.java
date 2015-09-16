@@ -90,6 +90,8 @@ public class CompilerConfiguration
 
     private boolean verbose = false;
 
+    private boolean warningsAreErrors = false;
+
     /**
      * A build temporary directory, eg target/.
      * <p/>
@@ -360,8 +362,8 @@ public class CompilerConfiguration
         {
             this.customCompilerArguments = customCompilerArguments;
         }
-    }    
-    
+    }
+
     public Map<String, String> getCustomCompilerArgumentsAsMap()
     {
         return new LinkedHashMap<String, String>( customCompilerArguments );
@@ -467,6 +469,16 @@ public class CompilerConfiguration
     public void setCompilerVersion( String compilerVersion )
     {
         this.compilerVersion = compilerVersion;
+    }
+
+    public boolean isWarningsAreErrors()
+    {
+        return warningsAreErrors;
+    }
+
+    public void setWarningsAreErrors( boolean warningsAreErrors )
+    {
+        this.warningsAreErrors = warningsAreErrors;
     }
 
     public boolean isVerbose()

@@ -25,7 +25,6 @@ package org.codehaus.plexus.compiler.javac;
  */
 
 import org.codehaus.plexus.compiler.AbstractCompilerTest;
-import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
@@ -54,18 +53,21 @@ public class JavacErrorProneCompilerTest
     {
         return "javac-with-errorprone";
     }
-    protected int expectedWarnings()
+
+    @Override
+    protected int expectedWarnings( boolean warningsAreErrors )
     {
         return 10;
     }
 
     @Override
-    protected int expectedErrors()
+    protected int expectedErrors( boolean warningsAreErrors )
     {
         return 4;
     }
 
-    protected Collection<String> expectedOutputFiles()
+    @Override
+    protected Collection<String> expectedOutputFiles( boolean warningsAreErrors )
     {
         return Arrays.asList( new String[]{ "org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ExternalDeps.class",
             "org/codehaus/foo/Person.class", "org/codehaus/foo/ReservedWord.class" } );

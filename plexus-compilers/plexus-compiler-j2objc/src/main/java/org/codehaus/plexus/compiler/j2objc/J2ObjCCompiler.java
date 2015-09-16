@@ -189,6 +189,11 @@ public class J2ObjCCompiler extends AbstractCompiler {
 			args.add("-v");
 		}
 
+		// warningsAreErrors
+		if (config.isWarningsAreErrors()) {
+			args.add("-Werror");
+		}
+
 		// Destination/output directory
 		args.add("-d");
 		args.add(config.getOutputLocation());

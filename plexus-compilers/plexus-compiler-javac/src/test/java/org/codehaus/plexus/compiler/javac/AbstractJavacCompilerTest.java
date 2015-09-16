@@ -32,6 +32,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,8 +59,16 @@ public abstract class AbstractJavacCompilerTest
         return "javac";
     }
 
-    protected int expectedErrors()
+    @Override
+    protected final int expectedErrors( boolean warningsAreErrors )
     {
+        int errors = 0;
+
+        // Werror is supported in JDK 1.7 and above
+        if ( warningsAreErrors  && "1.6".compareTo( getJavaVersion() ) < 0 )
+        {
+            return 7; // All classes have a bootstrap path error.
+        }
 
         // javac output changed for misspelled modifiers starting in 1.6...they now generate 2 errors per occurrence, not one.
         if ( "1.5".compareTo( getJavaVersion() ) < 0 )
@@ -72,15 +81,34 @@ public abstract class AbstractJavacCompilerTest
         }
     }
 
-    protected int expectedWarnings()
+    @Override
+    protected final int expectedWarnings( boolean warningsAreErrors )
     {
-        return 2;
+        if (getJavaVersion().contains("1.8")) {
+            // lots of new warnings about obsoletions for future releases
+            return warningsAreErrors ? 28 : 30;
+        }
+        else if ( "1.6".compareTo( getJavaVersion() ) < 0 )
+        {
+            // with 1.7 some warning with bootstrap class path not set in conjunction with -source 1.3
+            return warningsAreErrors ? 7 : 9;
+        }
+        else
+        {
+            return 2;
+        }
     }
 
-    protected Collection<String> expectedOutputFiles()
+    @Override
+    protected final Collection<String> expectedOutputFiles( boolean warningsAreErrors )
     {
-        return Arrays.asList( new String[]{ "org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ExternalDeps.class",
-            "org/codehaus/foo/Person.class", "org/codehaus/foo/ReservedWord.class" } );
+        if ( ! ( warningsAreErrors  && "1.6".compareTo( getJavaVersion() ) < 0 ) )
+        {
+            return Arrays.asList ( "org/codehaus/foo/ExternalDeps.class", "org/codehaus/foo/Person.class",
+                "org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ReservedWord.class" );
+        }
+
+        return Collections.emptyList();
     }
 
     public void internalTest( CompilerConfiguration compilerConfiguration, List<String> expectedArguments )
@@ -191,7 +219,6 @@ public abstract class AbstractJavacCompilerTest
 
         internalTest( compilerConfiguration, expectedArguments );
     }
-    
 
     /* This test fails on Java 1.4. The multiple parameters of the same source file cause an error, as it is interpreted as a DuplicateClass
      * Setting the size of the array to 3 is fine, but does not exactly test what it is supposed to - disabling the test for now

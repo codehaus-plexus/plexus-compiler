@@ -28,7 +28,8 @@ public class AspectJCompilerTest
         return 1;
     }
 
-    protected Collection<String> expectedOutputFiles()
+    @Override
+    protected Collection<String> expectedOutputFiles( boolean warningsAreErrors )
     {
         return Arrays.asList( new String[]{ "org/codehaus/foo/ExternalDeps.class", "org/codehaus/foo/Person.class" } );
     }

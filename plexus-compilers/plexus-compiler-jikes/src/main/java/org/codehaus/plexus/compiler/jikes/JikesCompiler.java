@@ -253,6 +253,11 @@ public class JikesCompiler
             args.add( "-verbose" );
         }
 
+        if (config.isWarningsAreErrors() )
+        {
+            args.add( "+Z" );
+        }
+
         if ( config.isDebug() )
         {
             args.add( "-g:lines" );
