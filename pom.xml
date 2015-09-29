@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.codehaus.plexus</groupId>
     <artifactId>plexus-components</artifactId>
-    <version>1.3.1</version>
+    <version>4.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>plexus-compiler</artifactId>
@@ -24,8 +24,8 @@
   </modules>
   
   <scm>
-    <connection>scm:git:git@github.com:codehaus-plexus/plexus-compiler.git</connection>
-    <developerConnection>scm:git:git@github.com:codehaus-plexus/plexus-compiler.git</developerConnection>
+    <connection>${scm.url}</connection>
+    <developerConnection>${scm.url}</developerConnection>
     <url>http://github.com/codehaus-plexus/plexus-compiler/tree/${project.scm.tag}/</url>
     <tag>master</tag>
   </scm>
@@ -33,6 +33,16 @@
     <system>github</system>
     <url>https://github.com/codehaus-plexus/plexus-compiler/issues</url>
   </issueManagement>
+  <distributionManagement>
+    <site>
+      <id>github:gh-pages</id>
+      <url>${scm.url}</url>
+    </site>
+  </distributionManagement>
+
+  <properties>
+    <scm.url>scm:git:git@github.com:codehaus-plexus/plexus-compiler.git</scm.url>
+  </properties>
 
   <dependencyManagement>
     <dependencies>
@@ -45,11 +55,6 @@
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-compiler-test</artifactId>
         <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-utils</artifactId>
-        <version>3.0.22</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -72,23 +77,7 @@
       <plugins>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.3</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.18.1</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-site-plugin</artifactId>
-          <version>3.4</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-release-plugin</artifactId>
-          <version>2.5.1</version>
           <configuration>
             <releaseProfiles>plexus-release,tools.jar</releaseProfiles>
           </configuration>
@@ -97,9 +86,15 @@
     </pluginManagement>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <configuration>
+          <topSiteURL>${scm.url}</topSiteURL>
+        </configuration>
+      </plugin>
+      <plugin>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
-        <version>1.6</version>
         <executions>
           <execution>
             <goals>
@@ -109,26 +104,11 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-gpg-plugin</artifactId>
-        <version>1.6</version>
-      </plugin>
     </plugins>
   </build>
 
   <reporting>
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>2.8.1</version>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>findbugs-maven-plugin</artifactId>
-        <version>3.0.2</version>
-      </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>cobertura-maven-plugin</artifactId>
