@@ -74,6 +74,7 @@ import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.jar.JarFile;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
@@ -191,6 +192,20 @@ public class JavacCompiler
         }
     }
 
+    protected static boolean isJava19()
+    {
+        try
+        {
+            Thread.currentThread().getContextClassLoader().loadClass( "java.lang.ModuleClassLoader" );
+            return true;
+        }
+        catch ( Exception e )
+        {
+            System.out.println( e.getMessage() );
+            return false;
+        }
+    }
+
     public String[] createCommandLine( CompilerConfiguration config )
         throws CompilerException
     {
@@ -218,9 +233,70 @@ public class JavacCompiler
         List<String> classpathEntries = config.getClasspathEntries();
         if ( classpathEntries != null && !classpathEntries.isEmpty() )
         {
-            args.add( "-classpath" );
+            if( isJava19() )
+            {
+                // Jigsaw-ea divides modules over cp and mp
+                // On cp the module-info is ignored
+                // Hopefully it is not the buildtool who has to verify if a jar is a module
+                // This is here to start testing with jigsaw
+                List<String> classicEntries = new ArrayList<String>();
+                List<String> moduleEntries = new ArrayList<String>();
+                
+                for ( String entry: classpathEntries )
+                {
+                    JarFile jarFile = null;
+                    try 
+                    {
+                        jarFile = new JarFile( entry, false );
+                        if ( jarFile.getEntry( "module-info.class" ) != null )
+                        {
+                            moduleEntries.add( entry );
+                        }
+                        else
+                        {
+                            classicEntries.add( entry );
+                        }
+                    }
+                    catch ( IOException e )
+                    {
+                        classicEntries.add( entry );
+                    }
+                    finally
+                    {
+                        try
+                        {
+                            if ( jarFile != null )
+                            {
+                                jarFile.close();
+                            }
+                        }
+                        catch ( IOException e )
+                        {
+                            // noop
+                        }
+                    }
+                }
+                
+                if ( !classicEntries.isEmpty() )
+                {
+                    args.add( "-classpath" );
 
-            args.add( getPathString( classpathEntries ) );
+                    args.add( getPathString( classicEntries ) );
+                }
+                
+                if( !moduleEntries.isEmpty() )
+                {
+                    args.add( "-modulepath" );
+
+                    args.add( getPathString( moduleEntries ) );
+                }
+            }
+            else
+            {
+                args.add( "-classpath" );
+
+                args.add( getPathString( classpathEntries ) );
+            }
         }
 
         List<String> sourceLocations = config.getSourceLocations();
