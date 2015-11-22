@@ -41,19 +41,6 @@ package org.codehaus.plexus.compiler.javac;
  *  limitations under the License.
  */
 
-import org.codehaus.plexus.compiler.AbstractCompiler;
-import org.codehaus.plexus.compiler.CompilerConfiguration;
-import org.codehaus.plexus.compiler.CompilerException;
-import org.codehaus.plexus.compiler.CompilerMessage;
-import org.codehaus.plexus.compiler.CompilerOutputStyle;
-import org.codehaus.plexus.compiler.CompilerResult;
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.Os;
-import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.cli.CommandLineException;
-import org.codehaus.plexus.util.cli.CommandLineUtils;
-import org.codehaus.plexus.util.cli.Commandline;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
@@ -68,6 +55,8 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -75,6 +64,19 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.jar.JarFile;
+
+import org.codehaus.plexus.compiler.AbstractCompiler;
+import org.codehaus.plexus.compiler.CompilerConfiguration;
+import org.codehaus.plexus.compiler.CompilerException;
+import org.codehaus.plexus.compiler.CompilerMessage;
+import org.codehaus.plexus.compiler.CompilerOutputStyle;
+import org.codehaus.plexus.compiler.CompilerResult;
+import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.Os;
+import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.cli.CommandLineException;
+import org.codehaus.plexus.util.cli.CommandLineUtils;
+import org.codehaus.plexus.util.cli.Commandline;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
@@ -235,22 +237,60 @@ public class JavacCompiler
         {
             if( isJava19() )
             {
+                boolean hasModuleDescriptor = false;
+                
+                List<String> sourceLocations = config.getSourceLocations();
+                
+                for ( String sourceLocation : sourceLocations )
+                {
+                    // for now oldschool, probably need to switch to JDK9 implementation with Path
+                    if ( new File( sourceLocation, "module-info.java" ).exists() )
+                    {
+                        hasModuleDescriptor = true;
+                        break;
+                    }
+                }
+                
                 // Jigsaw-ea divides modules over cp and mp
                 // On cp the module-info is ignored
                 // Hopefully it is not the buildtool who has to verify if a jar is a module
                 // This is here to start testing with jigsaw
                 List<String> classicEntries = new ArrayList<String>();
-                List<String> moduleEntries = new ArrayList<String>();
+                Collection<String> moduleEntries = new LinkedHashSet<String>();
                 
+                final File modDirectory = new File( config.getBuildDirectory(), "lib" );
+                
+                if ( modDirectory.exists() )
+                {
+                    try
+                    {
+                        // brute force, better sync or not copy modules at all
+                        FileUtils.cleanDirectory( modDirectory );
+                    }
+                    catch ( IOException e )
+                    {
+                        // noop
+                    }
+                }
+                else
+                {
+                    modDirectory.mkdirs();
+                }
+
                 for ( String entry: classpathEntries )
                 {
+                    File entryFile = new File( entry );
                     JarFile jarFile = null;
                     try 
                     {
-                        jarFile = new JarFile( entry, false );
-                        if ( jarFile.getEntry( "module-info.class" ) != null )
+                        
+                        jarFile = new JarFile( entryFile, false );
+                        
+                        if ( hasModuleDescriptor || jarFile.getEntry( "module-info.class" ) != null )
                         {
-                            moduleEntries.add( entry );
+                            FileUtils.copyFileToDirectory( entryFile, modDirectory );
+                            
+                            moduleEntries.add( modDirectory.getPath() );
                         }
                         else
                         {
@@ -288,7 +328,7 @@ public class JavacCompiler
                 {
                     args.add( "-modulepath" );
 
-                    args.add( getPathString( moduleEntries ) );
+                    args.add( getPathString( new ArrayList<String>( moduleEntries ) ) );
                 }
             }
             else
