@@ -251,6 +251,52 @@ public class JavacCompiler
                     }
                 }
                 
+                if ( !hasModuleDescriptor )
+                {
+                    for ( String entry: classpathEntries )
+                    {
+                        File entryFile = new File( entry );
+                        
+                        if ( entryFile.isDirectory() )
+                        {
+                            // noop
+                        }
+                        else
+                        {
+                            JarFile jarFile = null;
+                            try 
+                            {
+                                
+                                jarFile = new JarFile( entryFile, false );
+                                
+                                if ( jarFile.getEntry( "module-info.class" ) != null )
+                                {
+                                    hasModuleDescriptor = true;
+                                    break;
+                                }
+                            }
+                            catch ( IOException e )
+                            {
+                                // noop
+                            }
+                            finally
+                            {
+                                try
+                                {
+                                    if ( jarFile != null )
+                                    {
+                                        jarFile.close();
+                                    }
+                                }
+                                catch ( IOException e )
+                                {
+                                    // noop
+                                }
+                            }
+                        }
+                    }
+                }
+                
                 // Jigsaw-ea divides modules over cp and mp
                 // On cp the module-info is ignored
                 // Hopefully it is not the buildtool who has to verify if a jar is a module
@@ -280,39 +326,22 @@ public class JavacCompiler
                 for ( String entry: classpathEntries )
                 {
                     File entryFile = new File( entry );
-                    JarFile jarFile = null;
-                    try 
+                    
+                    if ( entryFile.isDirectory() || !hasModuleDescriptor )
                     {
-                        
-                        jarFile = new JarFile( entryFile, false );
-                        
-                        if ( hasModuleDescriptor || jarFile.getEntry( "module-info.class" ) != null )
+                        classicEntries.add( entry );
+                    }
+                    else
+                    {
+                        try 
                         {
                             FileUtils.copyFileToDirectory( entryFile, modDirectory );
                             
                             moduleEntries.add( modDirectory.getPath() );
                         }
-                        else
-                        {
-                            classicEntries.add( entry );
-                        }
-                    }
-                    catch ( IOException e )
-                    {
-                        classicEntries.add( entry );
-                    }
-                    finally
-                    {
-                        try
-                        {
-                            if ( jarFile != null )
-                            {
-                                jarFile.close();
-                            }
-                        }
                         catch ( IOException e )
                         {
-                            // noop
+                            classicEntries.add( entry );
                         }
                     }
                 }
