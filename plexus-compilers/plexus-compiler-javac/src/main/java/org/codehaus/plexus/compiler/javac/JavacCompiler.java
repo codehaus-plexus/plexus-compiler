@@ -198,12 +198,11 @@ public class JavacCompiler
     {
         try
         {
-            Thread.currentThread().getContextClassLoader().loadClass( "java.lang.ModuleClassLoader" );
+            Thread.currentThread().getContextClassLoader().loadClass( "java.lang.module.ModuleFinder" );
             return true;
         }
         catch ( Exception e )
         {
-            System.out.println( e.getMessage() );
             return false;
         }
     }
@@ -257,9 +256,10 @@ public class JavacCompiler
                     {
                         File entryFile = new File( entry );
                         
-                        if ( entryFile.isDirectory() )
+                        if ( entryFile.isDirectory() && new File( entryFile, "module-info.class" ).exists() )
                         {
-                            // noop
+                            hasModuleDescriptor = true;
+                            break;
                         }
                         else
                         {
