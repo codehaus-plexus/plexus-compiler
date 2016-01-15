@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pmd version="4.2.5" timestamp="2016-01-15T23:50:03.908">
+<file name="C:\data\workspace-stuff\apache\plexus\plexus-compiler\target\checkout\plexus-compilers\plexus-compiler-eclipse\src\main\java\org\codehaus\plexus\compiler\eclipse\EclipseJavaCompiler.java">
+<violation beginline="720" endline="723" begincolumn="17" endcolumn="17" rule="EmptyCatchBlock" ruleset="Basic Rules" package="org.codehaus.plexus.compiler.eclipse" class="EclipseJavaCompiler" method="initializeWarnings" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyCatchBlock" priority="3">
+Avoid empty catch blocks
+</violation>
+</file>
+</pmd>
