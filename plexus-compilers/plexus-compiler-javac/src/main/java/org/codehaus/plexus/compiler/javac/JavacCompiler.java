@@ -117,6 +117,7 @@ public class JavacCompiler
     // Compiler Implementation
     // ----------------------------------------------------------------------
 
+    @Override
     public CompilerResult performCompile( CompilerConfiguration config )
         throws CompilerException
     {
@@ -412,6 +413,11 @@ public class JavacCompiler
                     buffer.append( procs[i] );
                 }
                 args.add( buffer.toString() );
+            }
+            if ( config.getProcessorPathEntries() != null && !config.getProcessorPathEntries().isEmpty() ) {
+                args.add( "-processorpath" );
+
+                args.add( getPathString( config.getProcessorPathEntries() ) );
             }
         }
 

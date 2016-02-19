@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.codehaus.plexus.compiler.CompilerConfiguration.CompilerReuseStrategy;
+
 /**
  * @author jdcasey
  */
@@ -117,6 +119,12 @@ public class CompilerConfiguration
      * -processor parameters in jdk 1.6+
      */
     private String[] annotationProcessors;
+
+    /**
+     * -processorpath parameter in jdk 1.6+. If specified, annotation processors are only searched in the processor
+     * path. Otherwise they are searched in the classpath.
+     */
+    private List<String> processorPathEntries;
 
     /**
      * default value {@link CompilerReuseStrategy.ReuseCreated}
@@ -341,6 +349,7 @@ public class CompilerConfiguration
      * @deprecated will be removed in 2.X use #getCustomCompilerArgumentsAsMap
      * @return
      */
+    @Deprecated
     public LinkedHashMap<String, String> getCustomCompilerArguments()
     {
         return new LinkedHashMap<String, String>( customCompilerArguments );
@@ -350,6 +359,7 @@ public class CompilerConfiguration
      * @deprecated will be removed in 2.X use #setCustomCompilerArgumentsAsMap
      * @param customCompilerArguments
      */
+    @Deprecated
     public void setCustomCompilerArguments( LinkedHashMap<String, String> customCompilerArguments )
     {
         if ( customCompilerArguments == null )
@@ -360,8 +370,8 @@ public class CompilerConfiguration
         {
             this.customCompilerArguments = customCompilerArguments;
         }
-    }    
-    
+    }
+
     public Map<String, String> getCustomCompilerArgumentsAsMap()
     {
         return new LinkedHashMap<String, String>( customCompilerArguments );
@@ -507,6 +517,40 @@ public class CompilerConfiguration
     public String[] getAnnotationProcessors()
     {
         return annotationProcessors;
+    }
+
+    /**
+     * -processorpath parameter in jdk 1.6+. If specified, annotation processors are only searched in the processor
+     * path. Otherwise they are searched in the classpath.
+     *
+     * @param entry processor path entry to add
+     */
+    public void addProcessorPathEntry(String entry) {
+        if ( processorPathEntries == null ) {
+            processorPathEntries = new LinkedList<String>();
+        }
+
+        processorPathEntries.add( entry );
+    }
+
+    /**
+     * -processorpath parameter in jdk 1.6+. If specified, annotation processors are only searched in the processor
+     * path. Otherwise they are searched in the classpath.
+     *
+     * @return the processorPathEntries
+     */
+    public List<String> getProcessorPathEntries() {
+        return processorPathEntries;
+    }
+
+    /**
+     * -processorpath parameter in jdk 1.6+. If specified, annotation processors are only searched in the processor
+     * path. Otherwise they are searched in the classpath.
+     *
+     * @param processorPathEntries the processorPathEntries to set
+     */
+    public void setProcessorPathEntries(List<String> processorPathEntries) {
+        this.processorPathEntries = processorPathEntries;
     }
 
     public CompilerReuseStrategy getCompilerReuseStrategy()
