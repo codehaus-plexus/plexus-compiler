@@ -33,8 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.codehaus.plexus.compiler.CompilerConfiguration.CompilerReuseStrategy;
-
 /**
  * @author jdcasey
  */
@@ -43,6 +41,8 @@ public class CompilerConfiguration
     private String outputLocation;
 
     private List<String> classpathEntries = new LinkedList<String>();
+
+    private List<String> modulepathEntries = new LinkedList<String>();
 
     // ----------------------------------------------------------------------
     // Source Files
@@ -177,6 +177,32 @@ public class CompilerConfiguration
     public List<String> getClasspathEntries()
     {
         return Collections.unmodifiableList( classpathEntries );
+    }
+
+    // ----------------------------------------------------------------------
+    // Module path
+    // ----------------------------------------------------------------------
+
+    public void addModulepathEntry( String modulepathEntry )
+    {
+        modulepathEntries.add( modulepathEntry );
+    }
+
+    public void setModulepathEntries( List<String> modulepathEntries )
+    {
+        if ( modulepathEntries == null )
+        {
+            this.modulepathEntries = Collections.emptyList();
+        }
+        else
+        {
+            this.modulepathEntries = new LinkedList<String>( modulepathEntries );
+        }
+    }
+
+    public List<String> getModulepathEntries()
+    {
+        return Collections.unmodifiableList( modulepathEntries );
     }
 
     // ----------------------------------------------------------------------

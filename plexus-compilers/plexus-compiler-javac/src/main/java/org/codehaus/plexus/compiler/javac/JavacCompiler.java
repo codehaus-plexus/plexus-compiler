@@ -195,19 +195,6 @@ public class JavacCompiler
         }
     }
 
-    protected static boolean isJava19()
-    {
-        try
-        {
-            Thread.currentThread().getContextClassLoader().loadClass( "java.lang.module.ModuleFinder" );
-            return true;
-        }
-        catch ( Exception e )
-        {
-            return false;
-        }
-    }
-
     public String[] createCommandLine( CompilerConfiguration config )
         throws CompilerException
     {
@@ -235,138 +222,17 @@ public class JavacCompiler
         List<String> classpathEntries = config.getClasspathEntries();
         if ( classpathEntries != null && !classpathEntries.isEmpty() )
         {
-            if( isJava19() )
-            {
-                boolean hasModuleDescriptor = false;
-                
-                List<String> sourceLocations = config.getSourceLocations();
-                
-                for ( String sourceLocation : sourceLocations )
-                {
-                    // for now oldschool, probably need to switch to JDK9 implementation with Path
-                    if ( new File( sourceLocation, "module-info.java" ).exists() )
-                    {
-                        hasModuleDescriptor = true;
-                        break;
-                    }
-                }
-                
-                if ( !hasModuleDescriptor )
-                {
-                    for ( String entry: classpathEntries )
-                    {
-                        File entryFile = new File( entry );
-                        
-                        if ( entryFile.isDirectory() && new File( entryFile, "module-info.class" ).exists() )
-                        {
-                            hasModuleDescriptor = true;
-                            break;
-                        }
-                        else
-                        {
-                            JarFile jarFile = null;
-                            try 
-                            {
-                                
-                                jarFile = new JarFile( entryFile, false );
-                                
-                                if ( jarFile.getEntry( "module-info.class" ) != null )
-                                {
-                                    hasModuleDescriptor = true;
-                                    break;
-                                }
-                            }
-                            catch ( IOException e )
-                            {
-                                // noop
-                            }
-                            finally
-                            {
-                                try
-                                {
-                                    if ( jarFile != null )
-                                    {
-                                        jarFile.close();
-                                    }
-                                }
-                                catch ( IOException e )
-                                {
-                                    // noop
-                                }
-                            }
-                        }
-                    }
-                }
-                
-                // Jigsaw-ea divides modules over cp and mp
-                // On cp the module-info is ignored
-                // Hopefully it is not the buildtool who has to verify if a jar is a module
-                // This is here to start testing with jigsaw
-                List<String> classicEntries = new ArrayList<String>();
-                Collection<String> moduleEntries = new LinkedHashSet<String>();
-                
-                final File modDirectory = new File( config.getBuildDirectory(), "lib" );
-                
-                if ( modDirectory.exists() )
-                {
-                    try
-                    {
-                        // brute force, better sync or not copy modules at all
-                        FileUtils.cleanDirectory( modDirectory );
-                    }
-                    catch ( IOException e )
-                    {
-                        // noop
-                    }
-                }
-                else
-                {
-                    modDirectory.mkdirs();
-                }
+            args.add( "-classpath" );
 
-                for ( String entry: classpathEntries )
-                {
-                    File entryFile = new File( entry );
-                    
-                    if ( entryFile.isDirectory() || !hasModuleDescriptor )
-                    {
-                        classicEntries.add( entry );
-                    }
-                    else
-                    {
-                        try 
-                        {
-                            FileUtils.copyFileToDirectory( entryFile, modDirectory );
-                            
-                            moduleEntries.add( modDirectory.getPath() );
-                        }
-                        catch ( IOException e )
-                        {
-                            classicEntries.add( entry );
-                        }
-                    }
-                }
-                
-                if ( !classicEntries.isEmpty() )
-                {
-                    args.add( "-classpath" );
+            args.add( getPathString( classpathEntries ) );
+        }
+        
+        List<String> modulepathEntries = config.getModulepathEntries();
+        if ( modulepathEntries != null && !modulepathEntries.isEmpty() )
+        {
+            args.add( "-modulepath" );
 
-                    args.add( getPathString( classicEntries ) );
-                }
-                
-                if( !moduleEntries.isEmpty() )
-                {
-                    args.add( "-modulepath" );
-
-                    args.add( getPathString( new ArrayList<String>( moduleEntries ) ) );
-                }
-            }
-            else
-            {
-                args.add( "-classpath" );
-
-                args.add( getPathString( classpathEntries ) );
-            }
+            args.add( getPathString( modulepathEntries ) );
         }
 
         List<String> sourceLocations = config.getSourceLocations();
