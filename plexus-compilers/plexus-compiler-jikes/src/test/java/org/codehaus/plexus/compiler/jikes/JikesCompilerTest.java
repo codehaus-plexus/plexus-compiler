@@ -49,17 +49,20 @@ public class JikesCompilerTest
         setCompilerDeprecationWarnings( true );
     }
 
-    protected int expectedErrors()
+    @Override
+    protected int expectedErrors( boolean warningsAreErrors )
     {
         return 2;
     }
 
-    protected int expectedWarnings()
+    @Override
+    protected int expectedWarnings( boolean warningsAreErrors )
     {
         return 3;
     }
 
-    protected Collection<String> expectedOutputFiles()
+    @Override
+    protected Collection<String> expectedOutputFiles( boolean warningsAreErrors )
     {
         return Arrays.asList( new String[]{ "org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ExternalDeps.class",
             "org/codehaus/foo/Person.class", "org/codehaus/foo/ReservedWord.class",

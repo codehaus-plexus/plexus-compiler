@@ -88,10 +88,24 @@ public abstract class AbstractCompilerTest
     public void testCompilingSources()
         throws Exception
     {
+        performSourceCompilation( false );
+    }
+
+    @SuppressWarnings( "unchecked" )
+    public void testCompilingSourcesWithWarningsAreErrors()
+        throws Exception
+    {
+        performSourceCompilation( true );
+    }
+
+
+    private void performSourceCompilation(  boolean warningsAreErrors )
+        throws Exception
+    {
         List<CompilerMessage> messages = new ArrayList<CompilerMessage>();
         Collection<String> files = new TreeSet<String>();
 
-        for ( CompilerConfiguration compilerConfig : getCompilerConfigurations() )
+        for ( CompilerConfiguration compilerConfig : getCompilerConfigurations( warningsAreErrors ) )
         {
             File outputDir = new File( compilerConfig.getOutputLocation() );
 
@@ -109,7 +123,7 @@ public abstract class AbstractCompilerTest
 
         int numCompilerWarnings = messages.size() - numCompilerErrors;
 
-        if ( expectedErrors() != numCompilerErrors )
+        if ( expectedErrors( warningsAreErrors ) != numCompilerErrors )
         {
             System.out.println( numCompilerErrors + " error(s) found:" );
             for ( CompilerMessage error : messages )
@@ -125,10 +139,10 @@ public abstract class AbstractCompilerTest
                 System.out.println( "----" );
             }
 
-            assertEquals( "Wrong number of compilation errors.", expectedErrors(), numCompilerErrors );
+            assertEquals( "Wrong number of compilation errors.", expectedErrors( warningsAreErrors ), numCompilerErrors );
         }
 
-        if ( expectedWarnings() != numCompilerWarnings )
+        if ( expectedWarnings( warningsAreErrors ) != numCompilerWarnings )
         {
             System.out.println( numCompilerWarnings + " warning(s) found:" );
             for ( CompilerMessage error : messages )
@@ -144,13 +158,13 @@ public abstract class AbstractCompilerTest
                 System.out.println( "----" );
             }
 
-            assertEquals( "Wrong number of compilation warnings.", expectedWarnings(), numCompilerWarnings );
+            assertEquals( "Wrong number of compilation warnings.", expectedWarnings( warningsAreErrors ), numCompilerWarnings );
         }
 
-        assertEquals( new TreeSet<String>( normalizePaths( expectedOutputFiles() ) ), files );
+        assertEquals( new TreeSet<String>( normalizePaths( expectedOutputFiles( warningsAreErrors ) ) ), files );
     }
 
-    private List<CompilerConfiguration> getCompilerConfigurations()
+    private List<CompilerConfiguration> getCompilerConfigurations( boolean warningsAreErrors )
         throws Exception
     {
         String sourceDir = getBasedir() + "/src/test-input/src/main";
@@ -183,6 +197,8 @@ public abstract class AbstractCompilerTest
             compilerConfig.addInclude( filename );
 
             compilerConfig.setForceJavacCompilerUse( this.forceJavacCompilerUse );
+
+            compilerConfig.setWarningsAreErrors( warningsAreErrors );
 
             //compilerConfig.setTargetVersion( "1.5" );
 
@@ -217,17 +233,17 @@ public abstract class AbstractCompilerTest
         return count;
     }
 
-    protected int expectedErrors()
+    protected int expectedErrors( boolean warningsAreErrors )
     {
         return 1;
     }
 
-    protected int expectedWarnings()
+    protected int expectedWarnings( boolean warningsAreErrors )
     {
         return 0;
     }
 
-    protected Collection<String> expectedOutputFiles()
+    protected Collection<String> expectedOutputFiles( boolean warningsAreErrors )
     {
         return Collections.emptyList();
     }

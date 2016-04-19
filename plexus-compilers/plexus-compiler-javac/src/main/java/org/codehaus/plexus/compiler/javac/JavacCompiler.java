@@ -45,6 +45,7 @@ import org.codehaus.plexus.compiler.AbstractCompiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerException;
 import org.codehaus.plexus.compiler.CompilerMessage;
+import org.codehaus.plexus.compiler.CompilerMessage.Kind;
 import org.codehaus.plexus.compiler.CompilerOutputStyle;
 import org.codehaus.plexus.compiler.CompilerResult;
 import org.codehaus.plexus.util.FileUtils;
@@ -298,6 +299,11 @@ public class JavacCompiler
             args.add( "-verbose" );
         }
 
+        if ( config.isWarningsAreErrors() )
+        {
+            args.add( "-Werror" );
+        }
+
         if ( config.isShowDeprecation() )
         {
             args.add( "-deprecation" );
@@ -366,6 +372,10 @@ public class JavacCompiler
         return args.toArray( new String[args.size()] );
     }
 
+    private static final String [] PRE_JDK14 = new String [] { "1.3", "1.2", "1.1", "1.0" };
+    private static final String [] PRE_JDK16 = new String [] { "1.5", "1.4", "1.3", "1.2", "1.1", "1.0" };
+    private static final String [] PRE_JDK17 = new String [] { "1.6", "1.5", "1.4", "1.3", "1.2", "1.1", "1.0" };
+
     /**
      * Determine if the compiler is a version prior to 1.4.
      * This is needed as 1.3 and earlier did not support -source or -encoding parameters
@@ -373,16 +383,60 @@ public class JavacCompiler
      * @param config The compiler configuration to test.
      * @return true if the compiler configuration represents a Java 1.4 compiler or later, false otherwise
      */
-    private static boolean isPreJava14( CompilerConfiguration config )
+    static boolean isPreJava14( CompilerConfiguration config )
+    {
+        return checkJdk ( config, null, PRE_JDK14 );
+    }
+
+    private static boolean checkJdk( CompilerConfiguration config, String [] sourceVersionCheck, String [] compilerVersionCheck )
     {
         String v = config.getCompilerVersion();
 
         if ( v == null )
         {
-            return false;
+            if ( sourceVersionCheck == null )
+            {
+                return false;
+            }
+
+            //mkleint: i haven't completely understood the reason for the
+            //compiler version parameter, checking source as well, as most projects will have this one set, not the compiler
+            String s = config.getSourceVersion();
+            if ( s == null )
+            {
+                //now return true, as the 1.6 version is not the default - 1.4 is.
+                return true;
+            }
+
+            return versionCheck(s, sourceVersionCheck);
         }
 
-        return v.startsWith( "1.3" ) || v.startsWith( "1.2" ) || v.startsWith( "1.1" ) || v.startsWith( "1.0" );
+        return versionCheck(v, compilerVersionCheck);
+    }
+
+    private static boolean versionCheck( String v, String [] versionStrings )
+    {
+        for ( String s : versionStrings )
+        {
+            if ( ! v.startsWith( s ) )
+            {
+                continue;
+            }
+
+            if ( v.length() == s.length() )
+            {
+                return true;
+            }
+
+            // Return true if both strings are the same length or the first character in the
+            // checked string is not a number. This ensures that 1.10 does not match for 1.1.
+            // Otherwise, Java 10 will be a problem.
+            if ( ! Character.isDigit( v.charAt( s.length() ) ) )
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -392,28 +446,22 @@ public class JavacCompiler
      * @param config The compiler configuration to test.
      * @return true if the compiler configuration represents a Java 1.6 compiler or later, false otherwise
      */
-    private static boolean isPreJava16( CompilerConfiguration config )
+    static boolean isPreJava16( CompilerConfiguration config )
     {
-        String v = config.getCompilerVersion();
-
-        if ( v == null )
-        {
-            //mkleint: i haven't completely understood the reason for the
-            //compiler version parameter, checking source as well, as most projects will have this one set, not the compiler
-            String s = config.getSourceVersion();
-            if ( s == null )
-            {
-                //now return true, as the 1.6 version is not the default - 1.4 is.
-                return true;
-            }
-            return s.startsWith( "1.5" ) || s.startsWith( "1.4" ) || s.startsWith( "1.3" ) || s.startsWith( "1.2" )
-                || s.startsWith( "1.1" ) || s.startsWith( "1.0" );
-        }
-
-        return v.startsWith( "1.5" ) || v.startsWith( "1.4" ) || v.startsWith( "1.3" ) || v.startsWith( "1.2" )
-            || v.startsWith( "1.1" ) || v.startsWith( "1.0" );
+        return checkJdk ( config, PRE_JDK16, PRE_JDK16 );
     }
 
+    /**
+     * Determine if the compiler is a version prior to 1.7.
+     * This is needed for the warningAreErrors setting.
+     *
+     * @param config The compiler configuration to test.
+     * @return true if the compiler configuration represents a Java 1.7 compiler or later, false otherwise
+     */
+    static boolean isPreJava17( CompilerConfiguration config )
+    {
+        return checkJdk ( config, PRE_JDK17, PRE_JDK17);
+    }
 
     private static boolean suppressSource( CompilerConfiguration config )
     {
@@ -636,7 +684,11 @@ public class JavacCompiler
                 // TODO: there should be a better way to parse these
                 if ( ( buffer.length() == 0 ) && line.startsWith( "error: " ) )
                 {
-                    errors.add( new CompilerMessage( line, true ) );
+                    errors.add( new CompilerMessage( line, Kind.ERROR ) );
+                }
+                else if ( ( buffer.length() == 0 ) && line.startsWith( "warning: " ) )
+                {
+                    errors.add( new CompilerMessage( line, Kind.WARNING ) );
                 }
                 else if ( ( buffer.length() == 0 ) && isNote( line ) )
                 {

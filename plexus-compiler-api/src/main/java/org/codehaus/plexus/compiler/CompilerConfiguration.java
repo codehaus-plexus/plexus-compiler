@@ -92,6 +92,8 @@ public class CompilerConfiguration
 
     private boolean verbose = false;
 
+    private boolean warningsAreErrors = false;
+
     /**
      * A build temporary directory, eg target/.
      * <p/>
@@ -477,6 +479,16 @@ public class CompilerConfiguration
     public void setCompilerVersion( String compilerVersion )
     {
         this.compilerVersion = compilerVersion;
+    }
+
+    public boolean isWarningsAreErrors()
+    {
+        return warningsAreErrors;
+    }
+
+    public void setWarningsAreErrors( boolean warningsAreErrors )
+    {
+        this.warningsAreErrors = warningsAreErrors;
     }
 
     public boolean isVerbose()
