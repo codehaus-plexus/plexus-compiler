@@ -41,6 +41,7 @@ import org.eclipse.jdt.internal.compiler.DefaultErrorHandlingPolicies;
 import org.eclipse.jdt.internal.compiler.ICompilerRequestor;
 import org.eclipse.jdt.internal.compiler.IErrorHandlingPolicy;
 import org.eclipse.jdt.internal.compiler.IProblemFactory;
+import org.eclipse.jdt.internal.compiler.batch.FileSystem;
 import org.eclipse.jdt.internal.compiler.classfmt.ClassFileReader;
 import org.eclipse.jdt.internal.compiler.classfmt.ClassFormatException;
 import org.eclipse.jdt.internal.compiler.env.ICompilationUnit;
@@ -60,6 +61,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -70,6 +72,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.function.Predicate;
 
 /**
  * @plexus.component role="org.codehaus.plexus.compiler.Compiler" role-hint="eclipse"
@@ -91,31 +94,28 @@ public class EclipseJavaCompiler
     {
         List<CompilerMessage> errors = new LinkedList<CompilerMessage>();
 
-        List<String> classpathEntries = config.getClasspathEntries();
+        File outFile = new File(config.getOutputLocation());
 
-        URL[] urls = new URL[1 + classpathEntries.size()];
+        if(!outFile.isDirectory() && !outFile.mkdirs()) {
+            throw new CompilerException( "Error creating output directory: " + outFile.getAbsolutePath());
+        }
 
-        int i = 0;
+        List<String> cpe = new ArrayList<String>();
+        cpe.addAll(Arrays.asList(System.getProperty("sun.boot.class.path").split(":")));
+        cpe.addAll(config.getSourceLocations());
+        cpe.addAll(config.getClasspathEntries());
 
-        try
-        {
-            urls[i++] = new File( config.getOutputLocation() ).toURL();
-
-            for ( String entry : classpathEntries )
-            {
-                urls[i++] = new File( entry ).toURL();
+        cpe.removeIf(new Predicate<String>() {
+            @Override public boolean test(String e) {
+                File file = new File(e);
+                return !file.exists();
             }
-        }
-        catch ( MalformedURLException e )
-        {
-            throw new CompilerException( "Error while converting the classpath entries to URLs.", e );
-        }
+        });
 
-        ClassLoader classLoader = new URLClassLoader( urls );
-
-        SourceCodeLocator sourceCodeLocator = new SourceCodeLocator( config.getSourceLocations() );
-
-        INameEnvironment env = new EclipseCompilerINameEnvironment( sourceCodeLocator, classLoader, errors );
+        INameEnvironment env = new FileSystem(
+            cpe.toArray(new String[cpe.size()]),
+            getSourceFiles(config),
+            config.getSourceEncoding());
 
         IErrorHandlingPolicy policy = DefaultErrorHandlingPolicies.proceedWithAllProblems();
 
@@ -442,151 +442,6 @@ public class EclipseJavaCompiler
         public boolean ignoreOptionalProblems()
         {
             return false;
-        }
-    }
-
-    private class EclipseCompilerINameEnvironment
-        implements INameEnvironment
-    {
-        private SourceCodeLocator sourceCodeLocator;
-
-        private ClassLoader classLoader;
-
-        private List<CompilerMessage> errors;
-
-        public EclipseCompilerINameEnvironment( SourceCodeLocator sourceCodeLocator, ClassLoader classLoader,
-                                                List<CompilerMessage> errors )
-        {
-            this.sourceCodeLocator = sourceCodeLocator;
-            this.classLoader = classLoader;
-            this.errors = errors;
-        }
-
-        public NameEnvironmentAnswer findType( char[][] compoundTypeName )
-        {
-            String result = "";
-
-            String sep = "";
-
-            for ( int i = 0; i < compoundTypeName.length; i++ )
-            {
-                result += sep;
-                result += new String( compoundTypeName[i] );
-                sep = ".";
-            }
-
-            return findType( result );
-        }
-
-        public NameEnvironmentAnswer findType( char[] typeName, char[][] packageName )
-        {
-            String result = "";
-
-            String sep = "";
-
-            for ( int i = 0; i < packageName.length; i++ )
-            {
-                result += sep;
-                result += new String( packageName[i] );
-                sep = ".";
-            }
-
-            result += sep;
-            result += new String( typeName );
-            return findType( result );
-        }
-
-        private NameEnvironmentAnswer findType( String className )
-        {
-            try
-            {
-                File f = sourceCodeLocator.findSourceCodeForClass( className );
-
-                if ( f != null )
-                {
-                    ICompilationUnit compilationUnit = new CompilationUnit( f.getAbsolutePath(), className, errors );
-
-                    return new NameEnvironmentAnswer( compilationUnit, null );
-                }
-
-                String resourceName = className.replace( '.', '/' ) + ".class";
-
-                InputStream is = classLoader.getResourceAsStream( resourceName );
-
-                if ( is == null )
-                {
-                    return null;
-                }
-
-                byte[] classBytes = IOUtil.toByteArray( is );
-
-                char[] fileName = className.toCharArray();
-
-                ClassFileReader classFileReader = new ClassFileReader( classBytes, fileName, true );
-
-                return new NameEnvironmentAnswer( classFileReader, null );
-            }
-            catch ( IOException e )
-            {
-                errors.add( handleError( className, -1, -1, e.getMessage() ) );
-
-                return null;
-            }
-            catch ( ClassFormatException e )
-            {
-                errors.add( handleError( className, -1, -1, e.getMessage() ) );
-
-                return null;
-            }
-        }
-
-        private boolean isPackage( String result )
-        {
-            if ( sourceCodeLocator.findSourceCodeForClass( result ) != null )
-            {
-                return false;
-            }
-
-            String resourceName = "/" + result.replace( '.', '/' ) + ".class";
-
-            InputStream is = classLoader.getResourceAsStream( resourceName );
-
-            return is == null;
-        }
-
-        public boolean isPackage( char[][] parentPackageName, char[] packageName )
-        {
-            String result = "";
-
-            String sep = "";
-
-            if ( parentPackageName != null )
-            {
-                for ( int i = 0; i < parentPackageName.length; i++ )
-                {
-                    result += sep;
-                    result += new String( parentPackageName[i] );
-                    sep = ".";
-                }
-            }
-
-            if ( Character.isUpperCase( packageName[0] ) )
-            {
-                return false;
-            }
-
-            String str = new String( packageName );
-
-            result += sep;
-
-            result += str;
-
-            return isPackage( result );
-        }
-
-        public void cleanup()
-        {
-            // nothing to do
         }
     }
 
