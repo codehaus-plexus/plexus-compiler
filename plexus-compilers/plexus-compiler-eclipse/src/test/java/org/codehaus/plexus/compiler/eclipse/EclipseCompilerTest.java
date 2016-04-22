@@ -67,7 +67,7 @@ public class EclipseCompilerTest
     {
         return Arrays.asList( new String[] { "org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ExternalDeps.class",
                                              "org/codehaus/foo/Person.class", "org/codehaus/foo/ReservedWord.class",
-                                             "org/codehaus/foo/Import.class", "org/codehaus/bar/Baz.class" } );
+                                             "org/codehaus/foo/Import.class", "org/codehaus/BAR/Baz.class" } );
     }
 
     // The test is fairly meaningless as we can not validate anything

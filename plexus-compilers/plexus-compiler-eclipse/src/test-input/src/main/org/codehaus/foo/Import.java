@@ -1,6 +1,6 @@
 package org.codehaus.foo;
 
-import org.codehaus.bar.Baz;
+import org.codehaus.BAR.Baz;
 
 public class Import
 {
