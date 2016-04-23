@@ -27,6 +27,7 @@ package org.codehaus.plexus.compiler.javac;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -620,9 +621,15 @@ public class ErrorMessageParserTest
             + CRLF +
             "[total 654ms]" + CRLF +
             "4 warnings" + CRLF;
-        List<CompilerMessage> compilerErrors =
+        List<CompilerMessage> compilerMessages =
             JavacCompiler.parseModernStream( 0, new BufferedReader( new StringReader( errors ) ) );
-        assertEquals( "count", 3, compilerErrors.size() );
+        assertEquals( "count", 107, compilerMessages.size() );
+        List<CompilerMessage> compilerErrors = new ArrayList<CompilerMessage>( 3 );
+        for ( CompilerMessage message : compilerMessages ) {
+            if ( message.getKind() != CompilerMessage.Kind.OTHER ) {
+                compilerErrors.add( message );
+            }
+        }
         CompilerMessage error1 = compilerErrors.get( 0 );
         assertEquals( "file",
                       "C:\\commander\\pre\\ec\\ec-http\\src\\main\\java\\com\\electriccloud\\http\\HttpUtil.java",
