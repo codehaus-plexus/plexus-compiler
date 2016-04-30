@@ -1,5 +1,7 @@
 package org.codehaus.plexus.compiler.javac;
 
+import org.apache.commons.lang.ArrayUtils;
+
 /**
  * The MIT License
  *
@@ -192,6 +194,24 @@ public abstract class AbstractJavacCompilerTest
         internalTest( compilerConfiguration, expectedArguments );
     }
     
+    public void testReleaseVersion()
+    {
+        List<String> expectedArguments = new ArrayList<String>();
+
+        CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
+
+        // outputLocation
+        compilerConfiguration.setOutputLocation( "/output" );
+        expectedArguments.add( "-d" );
+        expectedArguments.add( new File( "/output" ).getAbsolutePath() );
+
+        // releaseVersion
+        compilerConfiguration.setReleaseVersion( "6" );
+        expectedArguments.add( "-release" );
+        expectedArguments.add( "6" );
+        
+        internalTest( compilerConfiguration, expectedArguments );
+    }
 
     /* This test fails on Java 1.4. The multiple parameters of the same source file cause an error, as it is interpreted as a DuplicateClass
      * Setting the size of the array to 3 is fine, but does not exactly test what it is supposed to - disabling the test for now

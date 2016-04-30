@@ -71,6 +71,11 @@ public class CompilerConfiguration
     private String sourceVersion;
 
     private String targetVersion;
+    
+    /**
+     * value of -release parameter in java 9+
+     */
+    private String releaseVersion;
 
     private String sourceEncoding;
 
@@ -355,6 +360,14 @@ public class CompilerConfiguration
     {
         this.targetVersion = targetVersion;
     }
+    
+    public String getReleaseVersion() {
+		return releaseVersion;
+	}
+    
+    public void setReleaseVersion(String releaseVersion) {
+		this.releaseVersion = releaseVersion;
+	}
 
     public String getSourceEncoding()
     {

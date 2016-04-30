@@ -322,30 +322,39 @@ public class JavacCompiler
             args.add( "-nowarn" );
         }
 
-        // TODO: this could be much improved
-        if ( StringUtils.isEmpty( config.getTargetVersion() ) )
+        if ( !StringUtils.isEmpty( config.getReleaseVersion() ) )
         {
-            // Required, or it defaults to the target of your JDK (eg 1.5)
-            args.add( "-target" );
-            args.add( "1.1" );
+            args.add( "-release" );
+            args.add( config.getReleaseVersion() );
         }
         else
         {
-            args.add( "-target" );
-            args.add( config.getTargetVersion() );
+            // TODO: this could be much improved
+            if ( StringUtils.isEmpty( config.getTargetVersion() ) )
+            {
+                // Required, or it defaults to the target of your JDK (eg 1.5)
+                args.add( "-target" );
+                args.add( "1.1" );
+            }
+            else
+            {
+                args.add( "-target" );
+                args.add( config.getTargetVersion() );
+            }
+
+            if ( !suppressSource( config ) && StringUtils.isEmpty( config.getSourceVersion() ) )
+            {
+                // If omitted, later JDKs complain about a 1.1 target
+                args.add( "-source" );
+                args.add( "1.3" );
+            }
+            else if ( !suppressSource( config ) )
+            {
+                args.add( "-source" );
+                args.add( config.getSourceVersion() );
+            }            
         }
 
-        if ( !suppressSource( config ) && StringUtils.isEmpty( config.getSourceVersion() ) )
-        {
-            // If omitted, later JDKs complain about a 1.1 target
-            args.add( "-source" );
-            args.add( "1.3" );
-        }
-        else if ( !suppressSource( config ) )
-        {
-            args.add( "-source" );
-            args.add( config.getSourceVersion() );
-        }
 
         if ( !suppressEncoding( config ) && !StringUtils.isEmpty( config.getSourceEncoding() ) )
         {
