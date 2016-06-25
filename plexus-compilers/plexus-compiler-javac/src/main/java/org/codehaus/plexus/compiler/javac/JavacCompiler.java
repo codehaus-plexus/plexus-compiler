@@ -645,7 +645,9 @@ public class JavacCompiler
             if ( line == null )
             {
                 // javac output not detected by other parsing
-                if ( buffer.length() > 0 && buffer.toString().startsWith( "javac:" ) )
+                // maybe better to ignore only the summary an mark the rest as error
+                if ( buffer.length() > 0 && ( buffer.toString().startsWith( "javac:" )
+                    || buffer.toString().startsWith( "An exception has occurred in the compiler" ) ) )
                 {
                     errors.add( new CompilerMessage( buffer.toString(), CompilerMessage.Kind.ERROR ) );
                 }

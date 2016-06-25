@@ -761,4 +761,18 @@ public class ErrorMessageParserTest
         assertEquals( 3, message2.getEndLine() );
     }
     
+    public void testBugParade() throws Exception
+    {
+        String out = "An exception has occurred in the compiler (1.7.0_80). "
+            + "Please file a bug at the Java Developer Connection (http://java.sun.com/webapps/bugreport)  after checking the Bug Parade for duplicates. "
+            + "Include your program and the following diagnostic in your report.  Thank you." + EOL + 
+            "com.sun.tools.javac.code.Symbol$CompletionFailure: class file for java.util.Optional not found";
+        
+        List<CompilerMessage> compilerErrors = JavacCompiler.parseModernStream( 4, new BufferedReader( new StringReader( out ) ));
+
+        assertNotNull( compilerErrors );
+        
+        assertEquals( 1, compilerErrors.size() );
+    }
+    
 }
