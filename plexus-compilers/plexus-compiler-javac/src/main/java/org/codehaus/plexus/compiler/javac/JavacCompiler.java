@@ -93,6 +93,9 @@ public class JavacCompiler
     // see compiler.note.note in compiler.properties of javac sources
     private static final String[] NOTE_PREFIXES = { "Note: ", "\u6ce8: ", "\u6ce8\u610f\uff1a " };
 
+    // see compiler.misc.verbose in compiler.properties of javac sources
+    private static final String[] MISC_PREFIXES = { "[" };
+
     private static final Object LOCK = new Object();
 
     private static final String JAVAC_CLASSNAME = "com.sun.tools.javac.Main";
@@ -497,8 +500,6 @@ public class JavacCompiler
 
         CommandLineUtils.StringStreamConsumer out = new CommandLineUtils.StringStreamConsumer();
 
-        CommandLineUtils.StringStreamConsumer err = new CommandLineUtils.StringStreamConsumer();
-
         int returnCode;
 
         List<CompilerMessage> messages;
@@ -527,9 +528,9 @@ public class JavacCompiler
 
         try
         {
-            returnCode = CommandLineUtils.executeCommandLine( cli, out, err );
+            returnCode = CommandLineUtils.executeCommandLine( cli, out, out );
 
-            messages = parseModernStream( returnCode, new BufferedReader( new StringReader( err.getOutput() ) ) );
+            messages = parseModernStream( returnCode, new BufferedReader( new StringReader( out.getOutput() ) ) );
         }
         catch ( CommandLineException e )
         {
@@ -672,6 +673,11 @@ public class JavacCompiler
             {
                 // skip, JDK 1.5 telling us deprecated APIs are used but -Xlint:deprecation isn't set
             }
+            else if ( ( buffer.length() == 0 ) && isMisc( line ) )
+            {
+                // verbose output was set
+                errors.add( new CompilerMessage( line, CompilerMessage.Kind.OTHER ) );
+            }
             else
             {
                 buffer.append( line );
@@ -685,12 +691,22 @@ public class JavacCompiler
             }
         }
     }
+    
+    private static boolean isMisc( String line )
+    {
+        return startsWithPrefix( line, MISC_PREFIXES );
+    }
 
     private static boolean isNote( String line )
     {
-        for ( int i = 0; i < NOTE_PREFIXES.length; i++ )
+        return startsWithPrefix( line, NOTE_PREFIXES );
+    }
+    
+    private static boolean startsWithPrefix( String line, String[] prefixes )
+    {
+        for ( int i = 0; i < prefixes.length; i++ )
         {
-            if ( line.startsWith( NOTE_PREFIXES[i] ) )
+            if ( line.startsWith( prefixes[i] ) )
             {
                 return true;
             }
