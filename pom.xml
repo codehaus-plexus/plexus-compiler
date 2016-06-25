@@ -80,6 +80,7 @@
           <artifactId>maven-release-plugin</artifactId>
           <configuration>
             <releaseProfiles>plexus-release,tools.jar</releaseProfiles>
+            <autoVersionSubmodules>true</autoVersionSubmodules>
           </configuration>
         </plugin>
         <plugin>
