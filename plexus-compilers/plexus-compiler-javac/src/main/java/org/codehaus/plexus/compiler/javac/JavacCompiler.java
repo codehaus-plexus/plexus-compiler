@@ -55,15 +55,12 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.jar.JarFile;
 
 import org.codehaus.plexus.compiler.AbstractCompiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
@@ -320,6 +317,11 @@ public class JavacCompiler
         if ( !config.isShowWarnings() )
         {
             args.add( "-nowarn" );
+        }
+        
+        if ( config.isFailOnWarning() )
+        {
+            args.add( "-Werror" );
         }
 
         if ( !StringUtils.isEmpty( config.getReleaseVersion() ) )

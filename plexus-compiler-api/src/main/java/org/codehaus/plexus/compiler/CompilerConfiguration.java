@@ -65,6 +65,11 @@ public class CompilerConfiguration
     private String debugLevel;
 
     private boolean showWarnings = true;
+    
+    /**
+     * -Werror argument as supported since Java 1.7
+     */
+    private boolean failOnWarning;
 
     private boolean showDeprecation;
 
@@ -340,6 +345,16 @@ public class CompilerConfiguration
     {
         this.showDeprecation = showDeprecation;
     }
+    
+    public boolean isFailOnWarning()
+    {
+        return failOnWarning;
+    }
+    
+    public void setFailOnWarning( boolean failOnWarnings )
+    {
+        this.failOnWarning = failOnWarnings;
+    }
 
     public String getSourceVersion()
     {
@@ -361,13 +376,15 @@ public class CompilerConfiguration
         this.targetVersion = targetVersion;
     }
     
-    public String getReleaseVersion() {
-		return releaseVersion;
-	}
-    
-    public void setReleaseVersion(String releaseVersion) {
-		this.releaseVersion = releaseVersion;
-	}
+    public String getReleaseVersion()
+    {
+        return releaseVersion;
+    }
+
+    public void setReleaseVersion( String releaseVersion )
+    {
+        this.releaseVersion = releaseVersion;
+    }
 
     public String getSourceEncoding()
     {

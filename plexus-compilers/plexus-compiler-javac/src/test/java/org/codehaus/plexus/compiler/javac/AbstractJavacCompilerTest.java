@@ -1,7 +1,5 @@
 package org.codehaus.plexus.compiler.javac;
 
-import org.apache.commons.lang.ArrayUtils;
-
 /**
  * The MIT License
  *
@@ -209,6 +207,30 @@ public abstract class AbstractJavacCompilerTest
         compilerConfiguration.setReleaseVersion( "6" );
         expectedArguments.add( "-release" );
         expectedArguments.add( "6" );
+        
+        internalTest( compilerConfiguration, expectedArguments );
+    }
+
+    public void testFailOnWarning()
+    {
+        List<String> expectedArguments = new ArrayList<String>();
+
+        CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
+
+        // outputLocation
+        compilerConfiguration.setOutputLocation( "/output" );
+        expectedArguments.add( "-d" );
+        expectedArguments.add( new File( "/output" ).getAbsolutePath() );
+
+        // failOnWarning
+        compilerConfiguration.setFailOnWarning( true );
+        expectedArguments.add( "-Werror" );
+        
+        // default source + target
+        expectedArguments.add( "-target" );
+        expectedArguments.add( "1.1" );
+        expectedArguments.add( "-source" );
+        expectedArguments.add( "1.3" );
         
         internalTest( compilerConfiguration, expectedArguments );
     }

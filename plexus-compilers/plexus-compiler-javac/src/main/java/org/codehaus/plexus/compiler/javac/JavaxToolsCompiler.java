@@ -46,6 +46,7 @@ public class JavaxToolsCompiler
     /**
      * is that thread safe ???
      */
+    @SuppressWarnings( "restriction" )
     static final JavaCompiler COMPILER = ToolProvider.getSystemJavaCompiler();
 
     private static List<JavaCompiler> JAVA_COMPILERS = new CopyOnWriteArrayList<JavaCompiler>();
