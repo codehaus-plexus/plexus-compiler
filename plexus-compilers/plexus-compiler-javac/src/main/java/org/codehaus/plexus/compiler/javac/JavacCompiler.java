@@ -633,48 +633,56 @@ public class JavacCompiler
 
         String line;
 
-        StringBuilder buffer;
+        StringBuilder buffer = new StringBuilder();
+        
+        boolean hasPointer = false;
 
         while ( true )
         {
-            // cleanup the buffer
-            buffer = new StringBuilder(); // this is quicker than clearing it
-
-            // most errors terminate with the '^' char
-            do
+            line = input.readLine();
+            
+            if ( line == null )
             {
-                line = input.readLine();
-
-                if ( line == null )
+                // javac output not detected by other parsing
+                if ( buffer.length() > 0 && buffer.toString().startsWith( "javac:" ) )
                 {
-                    // javac output not detected by other parsing
-                    if ( buffer.length() > 0 && buffer.toString().startsWith( "javac:" ) )
-                    {
-                        errors.add( new CompilerMessage( buffer.toString(), CompilerMessage.Kind.ERROR ) );
-                    }
-                    return errors;
+                    errors.add( new CompilerMessage( buffer.toString(), CompilerMessage.Kind.ERROR ) );
                 }
-
-                // TODO: there should be a better way to parse these
-                if ( ( buffer.length() == 0 ) && line.startsWith( "error: " ) )
-                {
-                    errors.add( new CompilerMessage( line, true ) );
-                }
-                else if ( ( buffer.length() == 0 ) && isNote( line ) )
-                {
-                    // skip, JDK 1.5 telling us deprecated APIs are used but -Xlint:deprecation isn't set
-                }
-                else
-                {
-                    buffer.append( line );
-
-                    buffer.append( EOL );
-                }
+                return errors;
             }
-            while ( !line.endsWith( "^" ) );
 
-            // add the error bean
-            errors.add( parseModernError( exitCode, buffer.toString() ) );
+            // new error block?
+            if ( !line.startsWith( " " ) && hasPointer )
+            {
+                // add the error bean
+                errors.add( parseModernError( exitCode, buffer.toString() ) );
+                
+                // reset for next error block
+                buffer = new StringBuilder(); // this is quicker than clearing it
+                
+                hasPointer = false;
+            }
+
+            // TODO: there should be a better way to parse these
+            if ( ( buffer.length() == 0 ) && line.startsWith( "error: " ) )
+            {
+                errors.add( new CompilerMessage( line, true ) );
+            }
+            else if ( ( buffer.length() == 0 ) && isNote( line ) )
+            {
+                // skip, JDK 1.5 telling us deprecated APIs are used but -Xlint:deprecation isn't set
+            }
+            else
+            {
+                buffer.append( line );
+
+                buffer.append( EOL );
+            }
+            
+            if ( line.endsWith( "^" ) )
+            {
+                hasPointer = true;
+            }
         }
     }
 
@@ -780,33 +788,35 @@ public class JavacCompiler
             msgBuffer.append( EOL );
 
             String context = tokens.nextToken( EOL );
-
-            String pointer = tokens.nextToken( EOL );
-
-            if ( tokens.hasMoreTokens() )
+            
+            String pointer = null;
+            
+            do
             {
-                msgBuffer.append( context );    // 'symbol' line
+                String msgLine = tokens.nextToken( EOL );
 
-                msgBuffer.append( EOL );
-
-                msgBuffer.append( pointer );    // 'location' line
-
-                msgBuffer.append( EOL );
-
-                context = tokens.nextToken( EOL );
-
-                try
+                if ( pointer != null )
                 {
-                    pointer = tokens.nextToken( EOL );
+                    msgBuffer.append( msgLine );
+
+                    msgBuffer.append( EOL );
                 }
-                catch ( NoSuchElementException e )
+                else if ( msgLine.endsWith( "^" ) )
                 {
-                    pointer = context;
-
-                    context = null;
+                    pointer = msgLine;
                 }
+                else
+                {
+                    msgBuffer.append( context );
 
+                    msgBuffer.append( EOL );
+
+                    context = msgLine;
+                }
             }
+            while ( tokens.hasMoreTokens() );
+
+            msgBuffer.append( EOL );
 
             String message = msgBuffer.toString();
 

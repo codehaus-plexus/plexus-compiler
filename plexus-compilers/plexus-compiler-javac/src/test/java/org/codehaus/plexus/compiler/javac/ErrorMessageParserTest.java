@@ -652,4 +652,106 @@ public class ErrorMessageParserTest
         assertEquals( "column", 16, error3.getStartColumn() );
     }
 
+    public void testJava6Error() throws Exception
+    {
+        String out = "Error.java:3: cannot find symbol" + EOL + 
+            "symbol  : class Properties" + EOL + 
+            "location: class Error" + EOL + 
+            "                Properties p = new Properties();" + EOL + 
+            "                ^" + EOL + 
+            "Error.java:3: cannot find symbol" + EOL + 
+            "symbol  : class Properties" + EOL + 
+            "location: class Error" + EOL + 
+            "                Properties p = new Properties();" + EOL + 
+            "                                   ^" + EOL + 
+            "2 errors";
+
+        List<CompilerMessage> compilerErrors = JavacCompiler.parseModernStream( 1, new BufferedReader( new StringReader( out ) ));
+
+        assertNotNull( compilerErrors );
+
+        CompilerMessage message1 = compilerErrors.get( 0 );
+
+        assertTrue( message1.isError() );
+
+        assertEquals( "cannot find symbol" + EOL + 
+                      "symbol  : class Properties" + EOL + 
+                      "location: class Error", message1.getMessage() );
+
+        assertEquals( 16, message1.getStartColumn() );
+
+        assertEquals( 26, message1.getEndColumn() );
+
+        assertEquals( 3, message1.getStartLine() );
+
+        assertEquals( 3, message1.getEndLine() );
+        
+        CompilerMessage message2 = compilerErrors.get( 1 );
+
+        assertTrue( message2.isError() );
+
+        assertEquals( "cannot find symbol" + EOL + 
+                      "symbol  : class Properties" + EOL + 
+                      "location: class Error", message2.getMessage() );
+
+        assertEquals( 35, message2.getStartColumn() );
+
+        assertEquals( 48, message2.getEndColumn() );
+
+        assertEquals( 3, message2.getStartLine() );
+
+        assertEquals( 3, message2.getEndLine() );
+    }
+    
+    public void testJava7Error() throws Exception
+    {
+        String out = "Error.java:3: error: cannot find symbol" + EOL + 
+                        "                Properties p = new Properties();" + EOL + 
+                        "                ^" + EOL + 
+                        "  symbol:   class Properties" + EOL + 
+                        "  location: class Error" + EOL + 
+                        "Error.java:3: error: cannot find symbol" + EOL + 
+                        "                Properties p = new Properties();" + EOL + 
+                        "                                   ^" + EOL + 
+                        "  symbol:   class Properties" + EOL + 
+                        "  location: class Error" + EOL + 
+                        "2 errors";
+        
+        List<CompilerMessage> compilerErrors = JavacCompiler.parseModernStream( 1, new BufferedReader( new StringReader( out ) ));
+        
+        assertNotNull( compilerErrors );
+        
+        CompilerMessage message1 = compilerErrors.get( 0 );
+        
+        assertTrue( message1.isError() );
+        
+        assertEquals( "error: cannot find symbol" + EOL + 
+                      "  symbol:   class Properties" + EOL + 
+                      "  location: class Error", message1.getMessage() );
+        
+        assertEquals( 16, message1.getStartColumn() );
+        
+        assertEquals( 26, message1.getEndColumn() );
+        
+        assertEquals( 3, message1.getStartLine() );
+        
+        assertEquals( 3, message1.getEndLine() );
+        
+        CompilerMessage message2 = compilerErrors.get( 1 );
+        
+        assertTrue( message2.isError() );
+        
+        assertEquals( "error: cannot find symbol" + EOL + 
+                      "  symbol:   class Properties" + EOL + 
+                      "  location: class Error", message2.getMessage() );
+        
+        assertEquals( 35, message2.getStartColumn() );
+        
+        assertEquals( 48, message2.getEndColumn() );
+        
+        assertEquals( 3, message2.getStartLine() );
+        
+        assertEquals( 3, message2.getEndLine() );
+    }
+    
 }
