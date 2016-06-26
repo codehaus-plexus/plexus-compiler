@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<pmd version="4.2.5" timestamp="2016-01-15T23:50:53.641">
-<file name="C:\data\workspace-stuff\apache\plexus\plexus-compiler\target\checkout\plexus-compilers\plexus-compiler-j2objc\src\main\java\org\codehaus\plexus\compiler\j2objc\J2ObjCCompiler.java">
-<violation beginline="245" endline="288" begincolumn="17" endcolumn="9" rule="UnusedFormalParameter" ruleset="Unused Code Rules" package="org.codehaus.plexus.compiler.j2objc" class="J2ObjCCompiler" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedFormalParameter" priority="3">
-Avoid unused method parameters such as 'target'.
-</violation>
-</file>
-</pmd>
