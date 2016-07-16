@@ -206,7 +206,7 @@ public abstract class AbstractJavacCompilerTest
         // failOnWarning
         compilerConfiguration.setModulepathEntries( Arrays.asList( "/repo/a/b/1.0/b-1.0.jar",
                                                                    "/repo/c/d/1.0/d-1.0.jar" ) );
-        expectedArguments.add( "-module-path" );
+        expectedArguments.add( "--module-path" );
         expectedArguments.add( "/repo/a/b/1.0/b-1.0.jar" + File.pathSeparator + 
                                "/repo/c/d/1.0/d-1.0.jar" + File.pathSeparator );
 

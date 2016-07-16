@@ -230,7 +230,7 @@ public class JavacCompiler
         List<String> modulepathEntries = config.getModulepathEntries();
         if ( modulepathEntries != null && !modulepathEntries.isEmpty() )
         {
-            args.add( "-module-path" );
+            args.add( "--module-path" );
 
             args.add( getPathString( modulepathEntries ) );
         }
