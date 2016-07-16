@@ -191,7 +191,34 @@ public abstract class AbstractJavacCompilerTest
 
         internalTest( compilerConfiguration, expectedArguments );
     }
-    
+
+    public void testModulePath() throws Exception
+    {
+        List<String> expectedArguments = new ArrayList<String>();
+
+        CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
+
+        // outputLocation
+        compilerConfiguration.setOutputLocation( "/output" );
+        expectedArguments.add( "-d" );
+        expectedArguments.add( new File( "/output" ).getAbsolutePath() );
+
+        // failOnWarning
+        compilerConfiguration.setModulepathEntries( Arrays.asList( "/repo/a/b/1.0/b-1.0.jar",
+                                                                   "/repo/c/d/1.0/d-1.0.jar" ) );
+        expectedArguments.add( "-module-path" );
+        expectedArguments.add( "/repo/a/b/1.0/b-1.0.jar" + File.pathSeparator + 
+                               "/repo/c/d/1.0/d-1.0.jar" + File.pathSeparator );
+
+        // default source + target
+        expectedArguments.add( "-target" );
+        expectedArguments.add( "1.1" );
+        expectedArguments.add( "-source" );
+        expectedArguments.add( "1.3" );
+
+        internalTest( compilerConfiguration, expectedArguments );
+    }
+
     public void testReleaseVersion()
     {
         List<String> expectedArguments = new ArrayList<String>();
