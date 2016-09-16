@@ -232,7 +232,7 @@ public abstract class AbstractJavacCompilerTest
 
         // releaseVersion
         compilerConfiguration.setReleaseVersion( "6" );
-        expectedArguments.add( "-release" );
+        expectedArguments.add( "--release" );
         expectedArguments.add( "6" );
         
         internalTest( compilerConfiguration, expectedArguments );

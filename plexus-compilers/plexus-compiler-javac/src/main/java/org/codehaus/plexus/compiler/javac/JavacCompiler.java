@@ -329,7 +329,7 @@ public class JavacCompiler
 
         if ( !StringUtils.isEmpty( config.getReleaseVersion() ) )
         {
-            args.add( "-release" );
+            args.add( "--release" );
             args.add( config.getReleaseVersion() );
         }
         else
