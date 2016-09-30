@@ -112,7 +112,10 @@ public class JavacCompilerWithErrorProne
         public Class<?> loadClass( String name, boolean complete )
             throws ClassNotFoundException
         {
-            if ( name.contentEquals( CompilerResult.class.getName() ) )
+            // Classes loaded inside CompilerInvoker that need to reach back to the caller
+            if ( name.contentEquals( CompilerResult.class.getName() )
+                || name.contentEquals( CompilerMessage.class.getName() )
+                || name.contentEquals( CompilerMessage.Kind.class.getName() ) )
             {
                 return original.loadClass( name );
             }
@@ -216,7 +219,7 @@ public class JavacCompilerWithErrorProne
                 new ErrorProneCompiler.Builder() //
                     .listenToDiagnostics( new MessageListener( messages ) ) //
                     .build();
-            return new CompilerResult( compiler.compile( args ).isOK(), messages );
+            return new CompilerResult( compiler.run( args ).isOK(), messages );
         }
     }
 }
