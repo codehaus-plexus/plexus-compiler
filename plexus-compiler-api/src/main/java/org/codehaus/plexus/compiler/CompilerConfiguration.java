@@ -25,6 +25,9 @@ package org.codehaus.plexus.compiler;
  */
 
 import java.io.File;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -84,7 +87,7 @@ public class CompilerConfiguration
 
     private String sourceEncoding;
 
-    private Map<String, String> customCompilerArguments = new LinkedHashMap<String, String>();
+    private Collection<Map.Entry<String,String>> customCompilerArguments = new ArrayList<Map.Entry<String,String>>();
 
     private boolean fork;
 
@@ -398,7 +401,7 @@ public class CompilerConfiguration
 
     public void addCompilerCustomArgument( String customArgument, String value )
     {
-        customCompilerArguments.put( customArgument, value );
+        customCompilerArguments.add( new AbstractMap.SimpleImmutableEntry<String, String>( customArgument, value ) );
     }
 
     /**
@@ -408,7 +411,12 @@ public class CompilerConfiguration
     @Deprecated
     public LinkedHashMap<String, String> getCustomCompilerArguments()
     {
-        return new LinkedHashMap<String, String>( customCompilerArguments );
+        LinkedHashMap<String, String> arguments = new LinkedHashMap<String, String>( customCompilerArguments.size() );
+        for ( Map.Entry<String, String> entry : customCompilerArguments )
+        {
+            arguments.put( entry.getKey(), entry.getValue() );
+        }
+        return arguments;
     }
 
     /**
@@ -420,29 +428,50 @@ public class CompilerConfiguration
     {
         if ( customCompilerArguments == null )
         {
-            this.customCompilerArguments = new LinkedHashMap<String, String>();
+            this.customCompilerArguments = new ArrayList<Map.Entry<String,String>>();
         }
         else
         {
-            this.customCompilerArguments = customCompilerArguments;
+            this.customCompilerArguments = customCompilerArguments.entrySet();
         }
     }
 
+    /**
+     * Get all unique argument keys and their value. In case of duplicate keys, last one added wins.
+     * 
+     * @return
+     * @see CompilerConfiguration#getCustomCompilerArgumentsEntries()
+     */
     public Map<String, String> getCustomCompilerArgumentsAsMap()
     {
-        return new LinkedHashMap<String, String>( customCompilerArguments );
+        LinkedHashMap<String, String> arguments = new LinkedHashMap<String, String>( customCompilerArguments.size() );
+        for ( Map.Entry<String, String> entry : customCompilerArguments )
+        {
+            arguments.put( entry.getKey(), entry.getValue() );
+        }
+        return arguments;
     }
 
     public void setCustomCompilerArgumentsAsMap( Map<String, String> customCompilerArguments )
     {
         if ( customCompilerArguments == null )
         {
-            this.customCompilerArguments = new LinkedHashMap<String, String>();
+            this.customCompilerArguments = new ArrayList<Map.Entry<String,String>>();
         }
         else
         {
-            this.customCompilerArguments = customCompilerArguments;
+            this.customCompilerArguments = customCompilerArguments.entrySet();
         }
+    }
+    
+    /**
+     * In case argument keys are not unique, this will return all entries
+     * 
+     * @return
+     */
+    public Collection<Map.Entry<String,String>> getCustomCompilerArgumentsEntries()
+    {
+        return customCompilerArguments;
     }
 
     public boolean isFork()
