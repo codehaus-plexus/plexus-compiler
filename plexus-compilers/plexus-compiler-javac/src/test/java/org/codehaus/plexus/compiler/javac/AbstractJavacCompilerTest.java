@@ -262,6 +262,34 @@ public abstract class AbstractJavacCompilerTest
         internalTest( compilerConfiguration, expectedArguments );
     }
 
+    public void testMultipleAddExports()
+    {
+        List<String> expectedArguments = new ArrayList<String>();
+
+        CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
+
+        // outputLocation
+        compilerConfiguration.setOutputLocation( "/output" );
+        expectedArguments.add( "-d" );
+        expectedArguments.add( new File( "/output" ).getAbsolutePath() );
+
+        // default source + target
+        expectedArguments.add( "-target" );
+        expectedArguments.add( "1.1" );
+        expectedArguments.add( "-source" );
+        expectedArguments.add( "1.3" );
+
+        // add multiple --add-exports
+        compilerConfiguration.addCompilerCustomArgument( "--add-exports", "FROM-MOD/package1=OTHER-MOD" );
+        expectedArguments.add( "--add-exports" );
+        expectedArguments.add( "FROM-MOD/package1=OTHER-MOD" );
+        compilerConfiguration.addCompilerCustomArgument( "--add-exports", "FROM-MOD/package2=OTHER-MOD" );
+        expectedArguments.add( "--add-exports" );
+        expectedArguments.add( "FROM-MOD/package2=OTHER-MOD" );
+        
+        internalTest( compilerConfiguration, expectedArguments );
+    }
+
     /* This test fails on Java 1.4. The multiple parameters of the same source file cause an error, as it is interpreted as a DuplicateClass
      * Setting the size of the array to 3 is fine, but does not exactly test what it is supposed to - disabling the test for now
     public void testCommandLineTooLongWhenForking()

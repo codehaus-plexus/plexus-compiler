@@ -84,7 +84,6 @@ public abstract class AbstractCompilerTest
         return cp;
     }
 
-    @SuppressWarnings( "unchecked" )
     public void testCompilingSources()
         throws Exception
     {
@@ -155,7 +154,7 @@ public abstract class AbstractCompilerTest
     {
         String sourceDir = getBasedir() + "/src/test-input/src/main";
 
-        @SuppressWarnings( "unchecked" ) List<String> filenames =
+        List<String> filenames =
             FileUtils.getFileNames( new File( sourceDir ), "**/*.java", null, false, true );
         Collections.sort( filenames );
 

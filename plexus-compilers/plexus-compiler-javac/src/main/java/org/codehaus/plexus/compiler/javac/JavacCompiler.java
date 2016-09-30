@@ -367,7 +367,7 @@ public class JavacCompiler
             args.add( config.getSourceEncoding() );
         }
 
-        for ( Map.Entry<String, String> entry : config.getCustomCompilerArgumentsAsMap().entrySet() )
+        for ( Map.Entry<String, String> entry : config.getCustomCompilerArgumentsEntries() )
         {
             String key = entry.getKey();
 
