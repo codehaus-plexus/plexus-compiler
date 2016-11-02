@@ -426,14 +426,7 @@ public class CompilerConfiguration
     @Deprecated
     public void setCustomCompilerArguments( LinkedHashMap<String, String> customCompilerArguments )
     {
-        if ( customCompilerArguments == null )
-        {
-            this.customCompilerArguments = new ArrayList<Map.Entry<String,String>>();
-        }
-        else
-        {
-            this.customCompilerArguments = customCompilerArguments.entrySet();
-        }
+        setCustomCompilerArgumentsAsMap( customCompilerArguments );
     }
 
     /**
@@ -454,13 +447,10 @@ public class CompilerConfiguration
 
     public void setCustomCompilerArgumentsAsMap( Map<String, String> customCompilerArguments )
     {
-        if ( customCompilerArguments == null )
+        this.customCompilerArguments = new ArrayList<Map.Entry<String,String>>();
+        if ( customCompilerArguments != null )
         {
-            this.customCompilerArguments = new ArrayList<Map.Entry<String,String>>();
-        }
-        else
-        {
-            this.customCompilerArguments = customCompilerArguments.entrySet();
+            this.customCompilerArguments.addAll( customCompilerArguments.entrySet() );
         }
     }
     
