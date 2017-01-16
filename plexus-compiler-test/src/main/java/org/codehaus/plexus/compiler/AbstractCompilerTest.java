@@ -84,6 +84,11 @@ public abstract class AbstractCompilerTest
         return cp;
     }
 
+    protected void configureCompilerConfig( CompilerConfiguration compilerConfig )
+    {
+
+    }
+
     public void testCompilingSources()
         throws Exception
     {
@@ -182,6 +187,8 @@ public abstract class AbstractCompilerTest
             compilerConfig.addInclude( filename );
 
             compilerConfig.setForceJavacCompilerUse( this.forceJavacCompilerUse );
+
+            configureCompilerConfig( compilerConfig );
 
             //compilerConfig.setTargetVersion( "1.5" );
 
