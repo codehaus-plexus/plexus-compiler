@@ -85,6 +85,7 @@ public class EclipseJavaCompiler
     // ----------------------------------------------------------------------
     // Compiler Implementation
     // ----------------------------------------------------------------------
+    boolean errorsAsWarnings = false;
 
     public CompilerResult performCompile( CompilerConfiguration config )
         throws CompilerException
@@ -180,7 +181,12 @@ public class EclipseJavaCompiler
 
         // compiler-specific extra options override anything else in the config object...
         Map<String, String> extras = cleanKeyNames( config.getCustomCompilerArgumentsAsMap() );
-
+        if( extras.containsKey( "errorsAsWarnings" ) )
+        {
+        	extras.remove( "errorsAsWarnings" );
+        	this.errorsAsWarnings = true;
+        }
+        
         settings.putAll( extras );
 
         if ( settings.containsKey( "properties" ) )
@@ -621,8 +627,15 @@ public class EclipseJavaCompiler
                     }
                     else
                     {
-                        hasErrors = true;
-                        errors.add( handleError( name, problem.getSourceLineNumber(), -1, problem.getMessage() ) );
+                    	if( errorsAsWarnings )
+                    	{
+                    		errors.add( handleWarning( name, problem ) );
+                    	}
+                    	else
+                    	{
+                    		hasErrors = true;
+                    		errors.add( handleError( name, problem.getSourceLineNumber(), -1, problem.getMessage() ) );
+                    	}
                     }
                 }
             }
