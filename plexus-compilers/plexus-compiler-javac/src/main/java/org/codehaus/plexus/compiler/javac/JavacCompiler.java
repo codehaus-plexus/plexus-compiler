@@ -450,6 +450,11 @@ public class JavacCompiler
 
         if ( v == null )
         {
+            v = config.getSourceVersion();
+        }
+
+        if ( v == null )
+        {
             return true;
         }
 
