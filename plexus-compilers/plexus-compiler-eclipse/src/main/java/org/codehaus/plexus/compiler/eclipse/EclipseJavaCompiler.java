@@ -172,6 +172,11 @@ public class EclipseJavaCompiler
             settings.put( CompilerOptions.OPTION_ReportDeprecation, CompilerOptions.IGNORE );
         }
 
+        if ( config.isParameters() )
+        {
+            settings.put( CompilerOptions.OPTION_MethodParametersAttribute, CompilerOptions.GENERATE );
+        }
+
         // ----------------------------------------------------------------------
         // Set Eclipse-specific options
         // ----------------------------------------------------------------------

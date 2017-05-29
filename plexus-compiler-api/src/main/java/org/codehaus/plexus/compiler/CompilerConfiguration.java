@@ -105,6 +105,8 @@ public class CompilerConfiguration
 
     private boolean verbose = false;
 
+    private boolean parameters;
+
     /**
      * A build temporary directory, eg target/.
      * <p/>
@@ -564,7 +566,17 @@ public class CompilerConfiguration
         this.verbose = verbose;
     }
 
-    public void setProc( String proc )
+    public boolean isParameters()
+    {
+        return parameters;
+    }
+
+    public void setParameters(boolean parameters)
+    {
+        this.parameters = parameters;
+    }
+
+    public void setProc(String proc )
     {
         this.proc = proc;
     }
