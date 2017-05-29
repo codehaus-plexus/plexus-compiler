@@ -309,6 +309,11 @@ public class JavacCompiler
             args.add( "-verbose" );
         }
 
+        if ( !isPreJava18(config) && config.isParameters() )
+        {
+            args.add( "-parameters" );
+        }
+
         if ( config.isShowDeprecation() )
         {
             args.add( "-deprecation" );
@@ -437,6 +442,19 @@ public class JavacCompiler
 
         return v.startsWith( "1.5" ) || v.startsWith( "1.4" ) || v.startsWith( "1.3" ) || v.startsWith( "1.2" )
             || v.startsWith( "1.1" ) || v.startsWith( "1.0" );
+    }
+
+    private static boolean isPreJava18( CompilerConfiguration config )
+    {
+        String v = config.getCompilerVersion();
+
+        if ( v == null )
+        {
+            return true;
+        }
+
+        return v.startsWith( "1.7" ) || v.startsWith( "1.6" ) || v.startsWith( "1.5" ) || v.startsWith( "1.4" )
+                || v.startsWith( "1.3" ) || v.startsWith( "1.2" ) || v.startsWith( "1.1" ) || v.startsWith( "1.0" );
     }
 
 

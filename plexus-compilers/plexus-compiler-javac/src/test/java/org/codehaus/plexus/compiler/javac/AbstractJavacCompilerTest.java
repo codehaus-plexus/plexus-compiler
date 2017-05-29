@@ -104,7 +104,7 @@ public abstract class AbstractJavacCompilerTest
 
         compilerConfiguration.setCompilerVersion( "1.3" );
 
-        populateArguments( compilerConfiguration, expectedArguments, true, true );
+        populateArguments( compilerConfiguration, expectedArguments, true, true, false );
 
         internalTest( compilerConfiguration, expectedArguments );
     }
@@ -117,7 +117,7 @@ public abstract class AbstractJavacCompilerTest
 
         compilerConfiguration.setCompilerVersion( "1.4" );
 
-        populateArguments( compilerConfiguration, expectedArguments, false, false );
+        populateArguments( compilerConfiguration, expectedArguments, false, false, false );
 
         internalTest( compilerConfiguration, expectedArguments );
     }
@@ -130,7 +130,20 @@ public abstract class AbstractJavacCompilerTest
 
         compilerConfiguration.setCompilerVersion( "1.5" );
 
-        populateArguments( compilerConfiguration, expectedArguments, false, false );
+        populateArguments( compilerConfiguration, expectedArguments, false, false, false );
+
+        internalTest( compilerConfiguration, expectedArguments );
+    }
+
+    public void testBuildCompilerArgs18()
+    {
+        List<String> expectedArguments = new ArrayList<String>();
+
+        CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
+
+        compilerConfiguration.setCompilerVersion( "1.8" );
+
+        populateArguments( compilerConfiguration, expectedArguments, false, false, true );
 
         internalTest( compilerConfiguration, expectedArguments );
     }
@@ -141,7 +154,7 @@ public abstract class AbstractJavacCompilerTest
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
-        populateArguments( compilerConfiguration, expectedArguments, false, false );
+        populateArguments( compilerConfiguration, expectedArguments, false, false, false );
 
         internalTest( compilerConfiguration, expectedArguments );
     }
@@ -156,7 +169,7 @@ public abstract class AbstractJavacCompilerTest
 
         compilerConfiguration.setDebugLevel( "none" );
 
-        populateArguments( compilerConfiguration, expectedArguments, false, false );
+        populateArguments( compilerConfiguration, expectedArguments, false, false, false );
 
         internalTest( compilerConfiguration, expectedArguments );
     }
@@ -320,7 +333,7 @@ public abstract class AbstractJavacCompilerTest
     */
 
     private void populateArguments( CompilerConfiguration compilerConfiguration, List<String> expectedArguments,
-                                    boolean suppressSourceVersion, boolean suppressEncoding )
+                                    boolean suppressSourceVersion, boolean suppressEncoding, boolean parameters )
     {
         // outputLocation
 
@@ -371,6 +384,15 @@ public abstract class AbstractJavacCompilerTest
             expectedArguments.add( "-g" );
         }
 
+        // parameters
+
+        compilerConfiguration.setParameters( true );
+
+        if (parameters)
+        {
+            expectedArguments.add( "-parameters" );
+        }
+        
         // showDeprecation
 
         compilerConfiguration.setShowDeprecation( true );
