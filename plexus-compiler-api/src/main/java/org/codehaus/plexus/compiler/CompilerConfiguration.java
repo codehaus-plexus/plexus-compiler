@@ -105,6 +105,9 @@ public class CompilerConfiguration
 
     private boolean verbose = false;
 
+    /**
+     * @since 2.8.2
+     */
     private boolean parameters;
 
     /**
