@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.io.File;
+import java.io.IOException;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
@@ -71,9 +72,16 @@ public class SourceCodeLocator
         {
             File f = new File( root, s );
 
-            if ( f.exists() )
+            try
             {
-                return f;
+                if ( f.exists() && f.getName().equals( f.getCanonicalFile().getName() ) )
+                {
+                    return f;
+                }
+            } catch ( IOException e )
+            {
+                throw new RuntimeException(
+                    "Error while getting the canonical path of '" + f.getAbsolutePath() + "'.", e );
             }
         }
 
