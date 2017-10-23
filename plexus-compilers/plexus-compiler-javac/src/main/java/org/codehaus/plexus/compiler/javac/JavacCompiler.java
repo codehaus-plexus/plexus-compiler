@@ -332,7 +332,7 @@ public class JavacCompiler
             args.add( "-Werror" );
         }
 
-        if ( !StringUtils.isEmpty( config.getReleaseVersion() ) )
+        if ( supportsReleaseFlag() && !StringUtils.isEmpty( config.getReleaseVersion() ) )
         {
             args.add( "--release" );
             args.add( config.getReleaseVersion() );
@@ -460,6 +460,11 @@ public class JavacCompiler
 
         return v.startsWith( "1.7" ) || v.startsWith( "1.6" ) || v.startsWith( "1.5" ) || v.startsWith( "1.4" )
                 || v.startsWith( "1.3" ) || v.startsWith( "1.2" ) || v.startsWith( "1.1" ) || v.startsWith( "1.0" );
+    }
+
+    private static boolean supportsReleaseFlag()
+    {
+        return !System.getProperty("java.version").startsWith("1.");
     }
 
 
