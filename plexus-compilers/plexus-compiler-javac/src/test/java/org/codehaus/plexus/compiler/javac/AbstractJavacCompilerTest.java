@@ -245,8 +245,16 @@ public abstract class AbstractJavacCompilerTest
 
         // releaseVersion
         compilerConfiguration.setReleaseVersion( "6" );
-        expectedArguments.add( "--release" );
-        expectedArguments.add( "6" );
+
+        if ( !System.getProperty( "java.version" ).startsWith( "1." ) ) {
+            expectedArguments.add( "--release" );
+            expectedArguments.add( "6" );
+        } else {
+            expectedArguments.add( "-target" );
+            expectedArguments.add( "1.1" );
+            expectedArguments.add( "-source" );
+            expectedArguments.add( "1.3" );
+        }
         
         internalTest( compilerConfiguration, expectedArguments );
     }
