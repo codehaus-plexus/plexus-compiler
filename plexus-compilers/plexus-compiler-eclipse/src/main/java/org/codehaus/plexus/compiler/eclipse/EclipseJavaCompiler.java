@@ -191,7 +191,7 @@ public class EclipseJavaCompiler
         	extras.remove( "errorsAsWarnings" );
         	this.errorsAsWarnings = true;
         }
-        
+
         settings.putAll( extras );
 
         if ( settings.containsKey( "properties" ) )
@@ -345,6 +345,10 @@ public class EclipseJavaCompiler
         else if ( "1.8".equals( versionSpec ) )
         {
             return CompilerOptions.VERSION_1_8;
+        }
+        else if ( "9".equals( versionSpec ) )
+        {
+        	return CompilerOptions.VERSION_9;
         }
         else
         {
