@@ -22,7 +22,7 @@
     <module>plexus-compilers</module>
     <module>plexus-compiler-test</module>
   </modules>
-  
+
   <scm>
     <connection>${scm.url}</connection>
     <developerConnection>${scm.url}</developerConnection>
@@ -42,6 +42,7 @@
 
   <properties>
     <scm.url>scm:git:git@github.com:codehaus-plexus/plexus-compiler.git</scm.url>
+    <javaVersion>7</javaVersion>
   </properties>
 
   <dependencyManagement>
