@@ -669,11 +669,24 @@ public class JavacCompiler
             {
                 // javac output not detected by other parsing
                 // maybe better to ignore only the summary an mark the rest as error
-                if ( buffer.length() > 0 && ( buffer.toString().startsWith( "javac:" )
-                    || buffer.toString().startsWith( "An exception has occurred in the compiler" ) ) )
+                if (buffer.length() > 0 && buffer.toString().startsWith("javac:"))
                 {
                     errors.add( new CompilerMessage( buffer.toString(), CompilerMessage.Kind.ERROR ) );
                 }
+                return errors;
+            }
+
+            // A compiler error occurred, treat everything that follows as part of the error.
+            if (line.startsWith( "An exception has occurred in the compiler") ) {
+                buffer = new StringBuilder();
+
+                while (line != null) {
+                    buffer.append(line);
+                    buffer.append(EOL);
+                    line = input.readLine();
+                }
+
+                errors.add( new CompilerMessage( buffer.toString(), CompilerMessage.Kind.ERROR ) );
                 return errors;
             }
 
@@ -692,7 +705,11 @@ public class JavacCompiler
             // TODO: there should be a better way to parse these
             if ( ( buffer.length() == 0 ) && line.startsWith( "error: " ) )
             {
-                errors.add( new CompilerMessage( line, true ) );
+                errors.add( new CompilerMessage( line, CompilerMessage.Kind.ERROR ) );
+            }
+            else if ( ( buffer.length() == 0 ) && line.startsWith( "warning: " ) )
+            {
+                errors.add( new CompilerMessage( line, CompilerMessage.Kind.WARNING ) );
             }
             else if ( ( buffer.length() == 0 ) && isNote( line ) )
             {

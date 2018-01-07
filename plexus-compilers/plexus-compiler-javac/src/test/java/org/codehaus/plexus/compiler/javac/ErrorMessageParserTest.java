@@ -623,14 +623,17 @@ public class ErrorMessageParserTest
             "4 warnings" + CRLF;
         List<CompilerMessage> compilerMessages =
             JavacCompiler.parseModernStream( 0, new BufferedReader( new StringReader( errors ) ) );
-        assertEquals( "count", 107, compilerMessages.size() );
+        assertEquals( "count", 187, compilerMessages.size() );
         List<CompilerMessage> compilerErrors = new ArrayList<CompilerMessage>( 3 );
         for ( CompilerMessage message : compilerMessages ) {
             if ( message.getKind() != CompilerMessage.Kind.OTHER ) {
                 compilerErrors.add( message );
             }
         }
-        CompilerMessage error1 = compilerErrors.get( 0 );
+
+        assertEquivalent(new CompilerMessage("[options] bootstrap class path not set in conjunction with -source " +
+              "1.6", CompilerMessage.Kind.WARNING), compilerErrors.get(0));
+        CompilerMessage error1 = compilerErrors.get( 1 );
         assertEquals( "file",
                       "C:\\commander\\pre\\ec\\ec-http\\src\\main\\java\\com\\electriccloud\\http\\HttpUtil.java",
                       error1.getFile() );
@@ -639,7 +642,7 @@ public class ErrorMessageParserTest
                       error1.getMessage() );
         assertEquals( "line", 31, error1.getStartLine() );
         assertEquals( "column", 38, error1.getStartColumn() );
-        CompilerMessage error2 = compilerErrors.get( 1 );
+        CompilerMessage error2 = compilerErrors.get( 2 );
         assertEquals( "file",
                       "C:\\commander\\pre\\ec\\ec-http\\src\\main\\java\\com\\electriccloud\\http\\HttpUtil.java",
                       error2.getFile() );
@@ -648,7 +651,7 @@ public class ErrorMessageParserTest
                       error2.getMessage() );
         assertEquals( "line", 151, error2.getStartLine() );
         assertEquals( "column", 8, error2.getStartColumn() );
-        CompilerMessage error3 = compilerErrors.get( 2 );
+        CompilerMessage error3 = compilerErrors.get( 3 );
         assertEquals( "file",
                       "C:\\commander\\pre\\ec\\ec-http\\src\\main\\java\\com\\electriccloud\\http\\HttpUtil.java",
                       error3.getFile() );
@@ -681,7 +684,7 @@ public class ErrorMessageParserTest
 
         assertTrue( message1.isError() );
 
-        assertEquals( "cannot find symbol" + EOL + 
+        assertEquals( "cannot find symbol" + EOL +
                       "symbol  : class Properties" + EOL + 
                       "location: class Error", message1.getMessage() );
 
@@ -697,7 +700,7 @@ public class ErrorMessageParserTest
 
         assertTrue( message2.isError() );
 
-        assertEquals( "cannot find symbol" + EOL + 
+        assertEquals( "cannot find symbol" + EOL +
                       "symbol  : class Properties" + EOL + 
                       "location: class Error", message2.getMessage() );
 
@@ -732,7 +735,7 @@ public class ErrorMessageParserTest
         
         assertTrue( message1.isError() );
         
-        assertEquals( "error: cannot find symbol" + EOL + 
+        assertEquals( "error: cannot find symbol" + EOL +
                       "  symbol:   class Properties" + EOL + 
                       "  location: class Error", message1.getMessage() );
         
@@ -748,7 +751,7 @@ public class ErrorMessageParserTest
         
         assertTrue( message2.isError() );
         
-        assertEquals( "error: cannot find symbol" + EOL + 
+        assertEquals( "error: cannot find symbol" + EOL +
                       "  symbol:   class Properties" + EOL + 
                       "  location: class Error", message2.getMessage() );
         
@@ -774,5 +777,130 @@ public class ErrorMessageParserTest
         
         assertEquals( 1, compilerErrors.size() );
     }
-    
+
+    public final void testNonAnchoredWarning() throws IOException {
+        final String error =
+              "warning: [options] bootstrap class path not set in conjunction with -source 1.6" + EOL +
+                    "1 warning" + EOL;
+
+        final List<CompilerMessage> compilerErrors = JavacCompiler.parseModernStream(0, new BufferedReader(new
+              StringReader(
+              error)));
+
+        assertNotNull(compilerErrors);
+        assertEquals(1, compilerErrors.size());
+        assertEquivalent(
+              new CompilerMessage(
+                    "[options] bootstrap class path not set in conjunction with -source 1.6", CompilerMessage.Kind.WARNING),
+              compilerErrors.get(0));
+    }
+
+    public final void testAnchoredWarning() throws IOException {
+        final String error =
+              "C:\\repo\\src\\it\\includes-output-when-compiler-forked\\src\\main" +
+                    "\\java\\MyClass.java:23: warning: [divzero] division by zero" + EOL +
+                    "      System.out.println(1/0);" + EOL +
+                    "                           ^" + EOL +
+                    "1 warnings" + EOL;
+
+        final List<CompilerMessage> compilerErrors =
+              JavacCompiler.parseModernStream(0, new BufferedReader(new StringReader(error)));
+
+        assertNotNull(compilerErrors);
+        assertEquals(1, compilerErrors.size());
+        assertEquivalent(
+              new CompilerMessage("C:\\repo\\src\\it\\includes-output-when-compiler-forked\\src\\main\\java\\MyClass" +
+                    ".java", CompilerMessage.Kind.WARNING, 23, 27, 23, 30, "[divzero] division by zero"),
+              compilerErrors.get(0));
+    }
+
+    public final void testMixedWarnings() throws IOException {
+        final String error =
+              "warning: [options] bootstrap class path not set in conjunction with -source 1.6" + EOL +
+                    "C:\\repo\\src\\it\\includes-output-when-compiler-forked\\src\\main\\java" +
+                    "\\MyClass.java:23: warning: [divzero] division by zero" + EOL +
+                    "      System.out.println(1/0);" + EOL +
+                    "                           ^" + EOL +
+                    "2 warnings";
+
+        final List<CompilerMessage> compilerErrors =
+              JavacCompiler.parseModernStream(0, new BufferedReader(new StringReader(error)));
+
+        assertNotNull(compilerErrors);
+        assertEquals(2, compilerErrors.size());
+        assertEquivalent(
+              new CompilerMessage(
+                    "[options] bootstrap class path not set in conjunction with -source 1.6", CompilerMessage.Kind.WARNING),
+              compilerErrors.get(0));
+        assertEquivalent(
+              new CompilerMessage("C:\\repo\\src\\it\\includes-output-when-compiler-forked\\src\\main\\java\\MyClass" +
+                    ".java", CompilerMessage.Kind.WARNING, 23, 27, 23, 30, "[divzero] division by zero"),
+              compilerErrors.get(1));
+    }
+
+    public final void testIssue37() throws IOException {
+        final String error =
+              "warning: [path] bad path element \"d:\\maven_repo\\.m2\\repository\\org\\ow2\\asm\\asm-xml\\5.0.3\\asm-5.0.3.jar\": no such file or directory" + EOL +
+                    "warning: [path] bad path element \"d:\\maven_repo\\.m2\\repository\\org\\ow2\\asm\\asm-xml\\5.0.3\\asm-util-5.0.3.jar\": no such file or directory" + EOL +
+                    "warning: [options] bootstrap class path not set in conjunction with -source 1.7" + EOL +
+                    "3 warnings" + EOL +
+                    "An exception has occurred in the compiler (9). Please file a bug against the Java compiler via the Java bug reporting page (http://bugreport.java.com) after checking the Bug Database (http://bugs.java.com) for duplicates. Include your program and the following diagnostic in your report. Thank you." + EOL +
+                    "java.lang.NullPointerException" + EOL +
+                    "\tat jdk.zipfs/jdk.nio.zipfs.JarFileSystem.getVersionMap(JarFileSystem.java:137)" + EOL +
+                    "\tat jdk.zipfs/jdk.nio.zipfs.JarFileSystem.createVersionedLinks(JarFileSystem.java:112)" + EOL +
+                    "\tat jdk.zipfs/jdk.nio.zipfs.JarFileSystem.<init>(JarFileSystem.java:85)" + EOL +
+                    "\tat jdk.zipfs/jdk.nio.zipfs.ZipFileSystemProvider.newFileSystem(ZipFileSystemProvider.java:134)" + EOL +
+                    "\tat jdk.compiler/com.sun.tools.javac.file.JavacFileManager$ArchiveContainer.<init>(JavacFileManager.java:517)" + EOL +
+                    "\tat jdk.compiler/com.sun.tools.javac.file.JavacFileManager.getContainer(JavacFileManager.java:319)" + EOL +
+                    "\tat jdk.compiler/com.sun.tools.javac.file.JavacFileManager.list(JavacFileManager.java:715)" + EOL +
+                    "\tat jdk.compiler/com.sun.tools.javac.code.ClassFinder.list(ClassFinder.java:722)" + EOL +
+                    "\tat jdk.compiler/com.sun.tools.javac.code.ClassFinder.scanUserPaths(ClassFinder.java:655)" + EOL +
+                    "\tat jdk.compiler/com.sun.tools.javac.code.ClassFinder.fillIn(ClassFinder.java:526)" + EOL +
+                    "\tat jdk.compiler/com.sun.tools.javac.code.ClassFinder.complete(ClassFinder.java:293)" + EOL +
+                    "\tat jdk.compiler/com.sun.tools.javac.code.Symbol.complete(Symbol.java:633)" + EOL +
+                    "\tat jdk.compiler/com.sun.tools.javac.code.Symbol$PackageSymbol.members(Symbol.java:1120)" + EOL +
+                    "\tat jdk.compiler/com.sun.tools.javac.code.Symtab.listPackageModules(Symtab.java:810)" + EOL +
+                    "\tat jdk.compiler/com.sun.tools.javac.comp.Enter.visitTopLevel(Enter.java:344)" + EOL +
+                    "\tat jdk.compiler/com.sun.tools.javac.tree.JCTree$JCCompilationUnit.accept(JCTree.java:529)" + EOL +
+                    "\tat jdk.compiler/com.sun.tools.javac.comp.Enter.classEnter(Enter.java:285)" + EOL +
+                    "\tat jdk.compiler/com.sun.tools.javac.comp.Enter.classEnter(Enter.java:300)" + EOL +
+                    "\tat jdk.compiler/com.sun.tools.javac.comp.Enter.complete(Enter.java:570)" + EOL +
+                    "\tat jdk.compiler/com.sun.tools.javac.comp.Enter.main(Enter.java:554)" + EOL +
+                    "\tat jdk.compiler/com.sun.tools.javac.main.JavaCompiler.enterTrees(JavaCompiler.java:1052)" + EOL +
+                    "\tat jdk.compiler/com.sun.tools.javac.main.JavaCompiler.compile(JavaCompiler.java:923)" + EOL +
+                    "\tat jdk.compiler/com.sun.tools.javac.main.Main.compile(Main.java:302)" + EOL +
+                    "\tat jdk.compiler/com.sun.tools.javac.main.Main.compile(Main.java:162)" + EOL +
+                    "\tat jdk.compiler/com.sun.tools.javac.Main.compile(Main.java:57)" + EOL +
+                    "\tat jdk.compiler/com.sun.tools.javac.Main.main(Main.java:43)";
+
+        final List<CompilerMessage> compilerErrors =
+              JavacCompiler.parseModernStream(0, new BufferedReader(new StringReader(error)));
+
+        assertNotNull( compilerErrors );
+        assertEquals(4, compilerErrors.size());
+
+        assertEquivalent(new CompilerMessage("[path] bad path element \"d:\\maven_repo\\" +
+              ".m2\\repository\\org\\ow2\\asm\\asm-xml\\5.0.3\\asm-5.0.3.jar\": no such file or directory",
+              CompilerMessage.Kind.WARNING), compilerErrors.get(0));
+        assertEquivalent(new CompilerMessage("warning: [path] bad path element \"d:\\maven_repo\\.m2\\repository\\org\\ow2\\asm\\asm-xml\\5.0.3\\asm-util-5.0.3.jar\": no such file or directory",
+              CompilerMessage.Kind.WARNING), compilerErrors.get(1));
+        assertEquivalent(new CompilerMessage("[options] bootstrap class path not set in conjunction with -source 1.7",
+              CompilerMessage.Kind.WARNING), compilerErrors.get(2));
+
+        final CompilerMessage finalMessage = compilerErrors.get(3);
+        assertEquals(CompilerMessage.Kind.ERROR, finalMessage.getKind());
+        assertTrue("Starts correctly", finalMessage.getMessage().startsWith("An exception has occurred in the compiler"));
+        assertTrue("continues through end of output", finalMessage.getMessage().endsWith("\tat jdk.compiler/com.sun" +
+              ".tools.javac.Main.main(Main.java:43)" + EOL));
+    }
+
+    private static void assertEquivalent(CompilerMessage expected, CompilerMessage actual){
+        assertEquals("Message did not match", expected.getMessage(), actual.getMessage());
+        assertEquals("Kind did not match", expected.getKind(), actual.getKind());
+        assertEquals("File did not match", expected.getFile(), actual.getFile());
+        assertEquals( "Start line did not match", expected.getStartLine(), actual.getStartLine());
+        assertEquals( "Start column did not match", expected.getStartColumn(), actual.getStartColumn());
+        assertEquals("End line did not match", expected.getEndLine(), actual.getEndLine());
+        assertEquals("End column did not match", expected.getEndColumn(), actual.getEndColumn());
+    }
 }
