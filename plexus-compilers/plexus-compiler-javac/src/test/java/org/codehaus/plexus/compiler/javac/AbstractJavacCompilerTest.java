@@ -74,6 +74,17 @@ public abstract class AbstractJavacCompilerTest
 
     protected int expectedWarnings()
     {
+        if (getJavaVersion().contains("1.8")){
+            // lots of new warnings about obsoletions for future releases
+            return 30;
+        }
+
+        if ( "1.6".compareTo( getJavaVersion() ) < 0 )
+        {
+            // with 1.7 some warning with bootstrap class path not set in conjunction with -source 1.3
+            return 9;
+        }
+
         return 2;
     }
 
