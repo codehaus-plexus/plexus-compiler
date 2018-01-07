@@ -748,11 +748,9 @@ public class JavacCompiler
      */
     static CompilerMessage parseModernError( int exitCode, String error )
     {
-        StringTokenizer tokens = new StringTokenizer( error, ":" );
+        final StringTokenizer tokens = new StringTokenizer( error, ":" );
 
         boolean isError = exitCode != 0;
-
-        StringBuilder msgBuffer;
 
         try
         {
@@ -762,7 +760,7 @@ public class JavacCompiler
 
             boolean tokenIsAnInteger;
 
-            String file = null;
+            StringBuilder file = null;
 
             String currentToken = null;
 
@@ -772,11 +770,11 @@ public class JavacCompiler
                 {
                     if ( file == null )
                     {
-                        file = currentToken;
+                        file = new StringBuilder(currentToken);
                     }
                     else
                     {
-                        file = file + ':' + currentToken;
+                        file.append(':').append(currentToken);
                     }
                 }
 
@@ -797,23 +795,23 @@ public class JavacCompiler
             }
             while ( !tokenIsAnInteger );
 
-            String lineIndicator = currentToken;
+            final String lineIndicator = currentToken;
 
-            int startOfFileName = file.lastIndexOf( ']' );
+            final int startOfFileName = file.toString().lastIndexOf( ']' );
 
             if ( startOfFileName > -1 )
             {
-                file = file.substring( startOfFileName + 1 + EOL.length() );
+                file = new StringBuilder(file.substring(startOfFileName + 1 + EOL.length()));
             }
 
-            int line = Integer.parseInt( lineIndicator );
+            final int line = Integer.parseInt( lineIndicator );
 
-            msgBuffer = new StringBuilder();
+            final StringBuilder msgBuffer = new StringBuilder();
 
             String msg = tokens.nextToken( EOL ).substring( 2 );
 
             // Remove the 'warning: ' prefix
-            String warnPrefix = getWarnPrefix( msg );
+            final String warnPrefix = getWarnPrefix( msg );
             if ( warnPrefix != null )
             {
                 isError = false;
@@ -834,7 +832,7 @@ public class JavacCompiler
             
             do
             {
-                String msgLine = tokens.nextToken( EOL );
+                final String msgLine = tokens.nextToken( EOL );
 
                 if ( pointer != null )
                 {
@@ -859,18 +857,18 @@ public class JavacCompiler
 
             msgBuffer.append( EOL );
 
-            String message = msgBuffer.toString();
+            final String message = msgBuffer.toString();
 
-            int startcolumn = pointer.indexOf( "^" );
+            final int startcolumn = pointer.indexOf( "^" );
 
-            int endcolumn = context == null ? startcolumn : context.indexOf( " ", startcolumn );
+            int endcolumn = (context == null) ? startcolumn : context.indexOf(" ", startcolumn);
 
             if ( endcolumn == -1 )
             {
                 endcolumn = context.length();
             }
 
-            return new CompilerMessage( file, isError, line, startcolumn, line, endcolumn, message.trim() );
+            return new CompilerMessage(file.toString(), isError, line, startcolumn, line, endcolumn, message.trim() );
         }
         catch ( NoSuchElementException e )
         {
