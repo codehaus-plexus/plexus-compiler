@@ -243,6 +243,31 @@ public abstract class AbstractJavacCompilerTest
         internalTest( compilerConfiguration, expectedArguments );
     }
 
+    public void testModuleVersion()
+    {
+        List<String> expectedArguments = new ArrayList<String>();
+
+        CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
+
+        // outputLocation
+        compilerConfiguration.setOutputLocation( "/output" );
+        expectedArguments.add( "-d" );
+        expectedArguments.add( new File( "/output" ).getAbsolutePath() );
+
+        // default source + target
+        expectedArguments.add( "-target" );
+        expectedArguments.add( "1.1" );
+        expectedArguments.add( "-source" );
+        expectedArguments.add( "1.3" );
+
+        // module version
+        compilerConfiguration.setModuleVersion( "1.2.0-SNAPSHOT" );
+        expectedArguments.add( "--module-version" );
+        expectedArguments.add( "1.2.0-SNAPSHOT" );
+
+        internalTest( compilerConfiguration, expectedArguments );
+    }
+
     public void testReleaseVersion()
     {
         List<String> expectedArguments = new ArrayList<String>();

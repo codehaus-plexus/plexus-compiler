@@ -87,6 +87,11 @@ public class CompilerConfiguration
 
     private String sourceEncoding;
 
+    /**
+     * value of --module-version parameter in java 9+
+     */
+    private String moduleVersion;
+
     private Collection<Map.Entry<String,String>> customCompilerArguments = new ArrayList<Map.Entry<String,String>>();
 
     private boolean fork;
@@ -402,6 +407,16 @@ public class CompilerConfiguration
     public void setSourceEncoding( String sourceEncoding )
     {
         this.sourceEncoding = sourceEncoding;
+    }
+
+    public String getModuleVersion()
+    {
+        return moduleVersion;
+    }
+
+    public void setModuleVersion( String moduleVersion )
+    {
+        this.moduleVersion = moduleVersion;
     }
 
     public void addCompilerCustomArgument( String customArgument, String value )
