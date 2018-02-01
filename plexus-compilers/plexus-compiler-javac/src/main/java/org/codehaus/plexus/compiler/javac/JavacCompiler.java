@@ -372,6 +372,12 @@ public class JavacCompiler
             args.add( config.getSourceEncoding() );
         }
 
+        if ( !StringUtils.isEmpty( config.getModuleVersion() ) )
+        {
+            args.add( "--module-version" );
+            args.add( config.getModuleVersion() );
+        }
+
         for ( Map.Entry<String, String> entry : config.getCustomCompilerArgumentsEntries() )
         {
             String key = entry.getKey();
