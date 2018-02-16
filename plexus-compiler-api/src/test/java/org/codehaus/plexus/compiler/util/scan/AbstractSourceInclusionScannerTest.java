@@ -19,7 +19,6 @@ package org.codehaus.plexus.compiler.util.scan;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Set;
 
@@ -72,7 +71,6 @@ public abstract class AbstractSourceInclusionScannerTest
     // ----------------------------------------------------------------------
 
     protected File getTestBaseDir()
-        throws URISyntaxException
     {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         URL markerResource = cl.getResource( TESTFILE_DEST_MARKER_FILE );
@@ -81,7 +79,7 @@ public abstract class AbstractSourceInclusionScannerTest
 
         if ( markerResource != null )
         {
-            File marker = new File( markerResource.toURI() );
+            File marker = new File( markerResource.getPath() );
 
             basedir = marker.getParentFile().getAbsoluteFile();
         }
