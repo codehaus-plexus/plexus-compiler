@@ -47,7 +47,7 @@ public final class SuffixMapping
 
     public Set<File> getTargetFiles( File targetDir, String source )
     {
-        Set<File> targetFiles = new HashSet<File>();
+        Set<File> targetFiles = new HashSet<>();
 
         if ( source.endsWith( sourceSuffix ) )
         {

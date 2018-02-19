@@ -75,7 +75,7 @@ public class StaleSourceScanner
 
         String[] potentialIncludes = scanForSources( sourceDir, sourceIncludes, sourceExcludes );
 
-        Set<File> matchingSources = new HashSet<File>();
+        Set<File> matchingSources = new HashSet<>();
 
         for ( String path : potentialIncludes )
         {

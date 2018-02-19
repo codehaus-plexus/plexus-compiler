@@ -42,7 +42,7 @@ public abstract class AbstractCompiler
     extends AbstractLogEnabled
     implements Compiler
 {
-    protected static final String EOL = System.getProperty( "line.separator" );
+    protected static final String EOL = System.lineSeparator();
 
     protected static final String PS = System.getProperty( "path.separator" );
 
@@ -172,7 +172,7 @@ public abstract class AbstractCompiler
 
         String[] sourceDirectorySources = scanner.getIncludedFiles();
 
-        Set<String> sources = new HashSet<String>();
+        Set<String> sources = new HashSet<>();
 
         for ( String sourceDirectorySource : sourceDirectorySources )
         {
@@ -186,7 +186,7 @@ public abstract class AbstractCompiler
 
     protected static String[] getSourceFiles( CompilerConfiguration config )
     {
-        Set<String> sources = new HashSet<String>();
+        Set<String> sources = new HashSet<>();
 
         Set<File> sourceFiles = config.getSourceFiles();
 

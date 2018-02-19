@@ -37,7 +37,7 @@ import java.util.List;
 public abstract class AbstractCompilerTckTest
     extends PlexusTestCase
 {
-    private static final String EOL = System.getProperty( "line.separator" );
+    private static final String EOL = System.lineSeparator();
 
     private String roleHint;
 

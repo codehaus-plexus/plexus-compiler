@@ -74,7 +74,7 @@ public class CompilerResult
     {
         if ( compilerMessages == null )
         {
-            this.compilerMessages = new ArrayList<CompilerMessage>();
+            this.compilerMessages = new ArrayList<>();
         }
         return compilerMessages;
     }

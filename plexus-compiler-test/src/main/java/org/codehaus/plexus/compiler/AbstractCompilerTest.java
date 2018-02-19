@@ -74,7 +74,7 @@ public abstract class AbstractCompilerTest
     protected List<String> getClasspath()
         throws Exception
     {
-        List<String> cp = new ArrayList<String>();
+        List<String> cp = new ArrayList<>();
 
         File file = getLocalArtifactPath( "commons-lang", "commons-lang", "2.0", "jar" );
 
@@ -94,8 +94,8 @@ public abstract class AbstractCompilerTest
     public void testCompilingSources()
         throws Exception
     {
-        List<CompilerMessage> messages = new ArrayList<CompilerMessage>();
-        Collection<String> files = new TreeSet<String>();
+        List<CompilerMessage> messages = new ArrayList<>();
+        Collection<String> files = new TreeSet<>();
 
         for ( CompilerConfiguration compilerConfig : getCompilerConfigurations() )
         {
@@ -153,7 +153,7 @@ public abstract class AbstractCompilerTest
             assertEquals( "Wrong number of compilation warnings.", expectedWarnings(), numCompilerWarnings );
         }
 
-        assertEquals( new TreeSet<String>( normalizePaths( expectedOutputFiles() ) ), files );
+        assertEquals( new TreeSet<>( normalizePaths( expectedOutputFiles() ) ), files );
     }
 
     private List<CompilerConfiguration> getCompilerConfigurations()
@@ -165,7 +165,7 @@ public abstract class AbstractCompilerTest
             FileUtils.getFileNames( new File( sourceDir ), "**/*.java", null, false, true );
         Collections.sort( filenames );
 
-        List<CompilerConfiguration> compilerConfigurations = new ArrayList<CompilerConfiguration>();
+        List<CompilerConfiguration> compilerConfigurations = new ArrayList<>();
 
         int index = 0;
         for ( Iterator<String> it = filenames.iterator(); it.hasNext(); index++ )

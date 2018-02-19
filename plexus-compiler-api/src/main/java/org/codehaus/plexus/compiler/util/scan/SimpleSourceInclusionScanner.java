@@ -61,7 +61,7 @@ public class SimpleSourceInclusionScanner
 
         String[] potentialSources = scanForSources( sourceDir, sourceIncludes, sourceExcludes );
 
-        Set<File> matchingSources = new HashSet<File>( potentialSources != null ? potentialSources.length : 0 );
+        Set<File> matchingSources = new HashSet<>( potentialSources != null ? potentialSources.length : 0 );
 
         if ( potentialSources != null )
         {

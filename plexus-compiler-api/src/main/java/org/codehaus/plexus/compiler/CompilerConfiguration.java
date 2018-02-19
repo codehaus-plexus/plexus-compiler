@@ -43,21 +43,21 @@ public class CompilerConfiguration
 {
     private String outputLocation;
 
-    private List<String> classpathEntries = new LinkedList<String>();
+    private List<String> classpathEntries = new LinkedList<>();
 
-    private List<String> modulepathEntries = new LinkedList<String>();
+    private List<String> modulepathEntries = new LinkedList<>();
 
     // ----------------------------------------------------------------------
     // Source Files
     // ----------------------------------------------------------------------
 
-    private Set<File> sourceFiles = new HashSet<File>();
+    private Set<File> sourceFiles = new HashSet<>();
 
-    private List<String> sourceLocations = new LinkedList<String>();
+    private List<String> sourceLocations = new LinkedList<>();
 
-    private Set<String> includes = new HashSet<String>();
+    private Set<String> includes = new HashSet<>();
 
-    private Set<String> excludes = new HashSet<String>();
+    private Set<String> excludes = new HashSet<>();
 
     // ----------------------------------------------------------------------
     // Compiler Settings
@@ -92,7 +92,7 @@ public class CompilerConfiguration
      */
     private String moduleVersion;
 
-    private Collection<Map.Entry<String,String>> customCompilerArguments = new ArrayList<Map.Entry<String,String>>();
+    private Collection<Map.Entry<String,String>> customCompilerArguments = new ArrayList<>();
 
     private boolean fork;
 
@@ -150,7 +150,7 @@ public class CompilerConfiguration
     private List<String> processorPathEntries;
 
     /**
-     * default value {@link CompilerReuseStrategy.ReuseCreated}
+     * default value {@link CompilerReuseStrategy#ReuseCreated}
      *
      * @since 1.9
      */
@@ -193,7 +193,7 @@ public class CompilerConfiguration
         }
         else
         {
-            this.classpathEntries = new LinkedList<String>( classpathEntries );
+            this.classpathEntries = new LinkedList<>( classpathEntries );
         }
     }
 
@@ -219,7 +219,7 @@ public class CompilerConfiguration
         }
         else
         {
-            this.modulepathEntries = new LinkedList<String>( modulepathEntries );
+            this.modulepathEntries = new LinkedList<>( modulepathEntries );
         }
     }
 
@@ -240,7 +240,7 @@ public class CompilerConfiguration
         }
         else
         {
-            this.sourceFiles = new HashSet<File>( sourceFiles );
+            this.sourceFiles = new HashSet<>( sourceFiles );
         }
     }
 
@@ -262,7 +262,7 @@ public class CompilerConfiguration
         }
         else
         {
-            this.sourceLocations = new LinkedList<String>( sourceLocations );
+            this.sourceLocations = new LinkedList<>( sourceLocations );
         }
     }
 
@@ -284,7 +284,7 @@ public class CompilerConfiguration
         }
         else
         {
-            this.includes = new HashSet<String>( includes );
+            this.includes = new HashSet<>( includes );
         }
     }
 
@@ -306,7 +306,7 @@ public class CompilerConfiguration
         }
         else
         {
-            this.excludes = new HashSet<String>( excludes );
+            this.excludes = new HashSet<>( excludes );
         }
     }
 
@@ -421,7 +421,7 @@ public class CompilerConfiguration
 
     public void addCompilerCustomArgument( String customArgument, String value )
     {
-        customCompilerArguments.add( new AbstractMap.SimpleImmutableEntry<String, String>( customArgument, value ) );
+        customCompilerArguments.add( new AbstractMap.SimpleImmutableEntry<>( customArgument, value ) );
     }
 
     /**
@@ -431,7 +431,7 @@ public class CompilerConfiguration
     @Deprecated
     public LinkedHashMap<String, String> getCustomCompilerArguments()
     {
-        LinkedHashMap<String, String> arguments = new LinkedHashMap<String, String>( customCompilerArguments.size() );
+        LinkedHashMap<String, String> arguments = new LinkedHashMap<>( customCompilerArguments.size() );
         for ( Map.Entry<String, String> entry : customCompilerArguments )
         {
             arguments.put( entry.getKey(), entry.getValue() );
@@ -457,7 +457,7 @@ public class CompilerConfiguration
      */
     public Map<String, String> getCustomCompilerArgumentsAsMap()
     {
-        LinkedHashMap<String, String> arguments = new LinkedHashMap<String, String>( customCompilerArguments.size() );
+        LinkedHashMap<String, String> arguments = new LinkedHashMap<>( customCompilerArguments.size() );
         for ( Map.Entry<String, String> entry : customCompilerArguments )
         {
             arguments.put( entry.getKey(), entry.getValue() );
@@ -467,7 +467,7 @@ public class CompilerConfiguration
 
     public void setCustomCompilerArgumentsAsMap( Map<String, String> customCompilerArguments )
     {
-        this.customCompilerArguments = new ArrayList<Map.Entry<String,String>>();
+        this.customCompilerArguments = new ArrayList<>();
         if ( customCompilerArguments != null )
         {
             this.customCompilerArguments.addAll( customCompilerArguments.entrySet() );
@@ -632,7 +632,7 @@ public class CompilerConfiguration
      */
     public void addProcessorPathEntry(String entry) {
         if ( processorPathEntries == null ) {
-            processorPathEntries = new LinkedList<String>();
+            processorPathEntries = new LinkedList<>();
         }
 
         processorPathEntries.add( entry );
