@@ -88,7 +88,8 @@ public class JavacCompilerWithErrorProne
 
         try
         {
-            return (CompilerResult) getInvoker().invoke( null, new Object[]{ args } );
+            CompilerResult compilerResult = (CompilerResult) getInvoker().invoke( null, new Object[]{ args } );
+            return compilerResult;
         }
         catch ( Exception e )
         {
@@ -214,9 +215,9 @@ public class JavacCompilerWithErrorProne
 
         public static CompilerResult compile( String[] args )
         {
-            List<CompilerMessage> messages = new ArrayList<CompilerMessage>();
+            List<CompilerMessage> messages = new ArrayList<>();
             ErrorProneCompiler compiler = //
-                new ErrorProneCompiler.Builder() //
+                ErrorProneCompiler.builder() //
                     .listenToDiagnostics( new MessageListener( messages ) ) //
                     .build();
             return new CompilerResult( compiler.run( args ).isOK(), messages );
