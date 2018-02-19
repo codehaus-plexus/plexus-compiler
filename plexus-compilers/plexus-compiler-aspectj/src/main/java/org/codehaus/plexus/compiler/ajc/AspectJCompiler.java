@@ -1,5 +1,6 @@
 package org.codehaus.plexus.compiler.ajc;
 
+import org.aspectj.ajdt.ajc.BuildArgParser;
 import org.aspectj.ajdt.internal.core.builder.AjBuildConfig;
 import org.aspectj.ajdt.internal.core.builder.AjBuildManager;
 import org.aspectj.bridge.AbortException;
@@ -7,6 +8,7 @@ import org.aspectj.bridge.IMessage;
 import org.aspectj.bridge.ISourceLocation;
 import org.aspectj.bridge.MessageHandler;
 import org.aspectj.org.eclipse.jdt.internal.compiler.classfmt.ClassFileConstants;
+import org.aspectj.tools.ajc.Main;
 import org.codehaus.plexus.compiler.AbstractCompiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerException;
@@ -260,10 +262,18 @@ public class AspectJCompiler
         return new CompilerResult().compilerMessages( compileInProcess( buildConfig ) );
     }
 
+    private static class AspectJMessagePrinter extends Main.MessagePrinter
+    {
+        public AspectJMessagePrinter( boolean verbose )
+        {
+            super( verbose );
+        }
+    }
+
     private AjBuildConfig buildCompilerConfig( CompilerConfiguration config )
         throws CompilerException
     {
-        AjBuildConfig buildConfig = new AjBuildConfig();
+        AjBuildConfig buildConfig = new AjBuildConfig(new BuildArgParser(new AspectJMessagePrinter(config.isVerbose())));
         buildConfig.setIncrementalMode( false );
 
         String[] files = getSourceFiles( config );
@@ -493,7 +503,15 @@ public class AspectJCompiler
     private void setSourceVersion( AjBuildConfig buildConfig, String sourceVersion )
         throws CompilerException
     {
-        if ( "1.7".equals( sourceVersion ) )
+        if ( "1.9".equals( sourceVersion ) )
+        {
+            buildConfig.getOptions().sourceLevel = ClassFileConstants.JDK1_9;
+        }
+        else if ( "1.8".equals( sourceVersion ) )
+        {
+            buildConfig.getOptions().sourceLevel = ClassFileConstants.JDK1_8;
+        }
+        else if ( "1.7".equals( sourceVersion ) )
         {
             buildConfig.getOptions().sourceLevel = ClassFileConstants.JDK1_7;
         }
