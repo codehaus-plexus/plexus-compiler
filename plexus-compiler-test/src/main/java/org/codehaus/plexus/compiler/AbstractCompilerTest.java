@@ -31,7 +31,9 @@ import org.apache.maven.artifact.test.ArtifactTestCase;
 import org.apache.maven.artifact.versioning.VersionRange;
 
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.StringUtils;
 
+import javax.print.DocFlavor;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -129,7 +131,7 @@ public abstract class AbstractCompilerTest
                 System.out.println( "----" );
             }
 
-            assertEquals( "Wrong number of compilation errors.", expectedErrors(), numCompilerErrors );
+            assertEquals( "Wrong number of compilation errors: " + messages, expectedErrors(), numCompilerErrors );
         }
 
         if ( expectedWarnings() != numCompilerWarnings )
@@ -190,9 +192,17 @@ public abstract class AbstractCompilerTest
 
             configureCompilerConfig( compilerConfig );
 
-            //compilerConfig.setTargetVersion( "1.5" );
+            String target = getTargetVersion();
+            if( StringUtils.isNotEmpty( target) )
+            {
+                compilerConfig.setTargetVersion( target );
+            }
 
-            //compilerConfig.setSourceVersion( "1.5" );
+            String source = getSourceVersion();
+            if( StringUtils.isNotEmpty( source) )
+            {
+                compilerConfig.setSourceVersion( source );
+            }
 
             compilerConfigurations.add( compilerConfig );
 
@@ -200,6 +210,17 @@ public abstract class AbstractCompilerTest
 
         return compilerConfigurations;
     }
+
+    public String getTargetVersion()
+    {
+        return null;
+    }
+
+    public String getSourceVersion()
+    {
+        return null;
+    }
+
 
     private List<String> normalizePaths( Collection<String> relativePaths )
     {

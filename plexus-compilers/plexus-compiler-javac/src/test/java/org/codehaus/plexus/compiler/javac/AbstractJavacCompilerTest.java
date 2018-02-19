@@ -61,6 +61,11 @@ public abstract class AbstractJavacCompilerTest
     protected int expectedErrors()
     {
 
+        if (getJavaVersion().contains("9.0")){
+            // lots of new warnings about obsoletions for future releases
+            return 5;
+        }
+
         // javac output changed for misspelled modifiers starting in 1.6...they now generate 2 errors per occurrence, not one.
         if ( "1.5".compareTo( getJavaVersion() ) < 0 )
         {
@@ -74,6 +79,12 @@ public abstract class AbstractJavacCompilerTest
 
     protected int expectedWarnings()
     {
+        if (getJavaVersion().contains("9.0")){
+            // lots of new warnings about obsoletions for future releases
+            return 8;
+        }
+
+
         if (getJavaVersion().contains("1.8")){
             // lots of new warnings about obsoletions for future releases
             return 30;
@@ -88,8 +99,30 @@ public abstract class AbstractJavacCompilerTest
         return 2;
     }
 
+    @Override
+    public String getTargetVersion()
+    {
+        if (getJavaVersion().contains("9.0")){
+            return "1.7";
+        }
+        return super.getTargetVersion();
+    }
+
+    @Override
+    public String getSourceVersion()
+    {
+        if (getJavaVersion().contains("9.0")){
+            return "1.7";
+        }
+        return super.getTargetVersion();
+    }
+
     protected Collection<String> expectedOutputFiles()
     {
+        if (getJavaVersion().contains("9.0")){
+            return Arrays.asList( new String[]{ "org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ExternalDeps.class",
+                "org/codehaus/foo/Person.class"} );
+        }
         return Arrays.asList( new String[]{ "org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ExternalDeps.class",
             "org/codehaus/foo/Person.class", "org/codehaus/foo/ReservedWord.class" } );
     }
