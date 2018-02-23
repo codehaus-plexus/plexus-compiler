@@ -631,161 +631,289 @@
 <a class="jxr_linenumber" name="L623" href="#L623">623</a>             <span class="jxr_string">"4 warnings"</span> + CRLF;
 <a class="jxr_linenumber" name="L624" href="#L624">624</a>         List&lt;CompilerMessage&gt; compilerMessages =
 <a class="jxr_linenumber" name="L625" href="#L625">625</a>             JavacCompiler.parseModernStream( 0, <strong class="jxr_keyword">new</strong> BufferedReader( <strong class="jxr_keyword">new</strong> StringReader( errors ) ) );
-<a class="jxr_linenumber" name="L626" href="#L626">626</a>         assertEquals( <span class="jxr_string">"count"</span>, 107, compilerMessages.size() );
+<a class="jxr_linenumber" name="L626" href="#L626">626</a>         assertEquals( <span class="jxr_string">"count"</span>, 187, compilerMessages.size() );
 <a class="jxr_linenumber" name="L627" href="#L627">627</a>         List&lt;CompilerMessage&gt; compilerErrors = <strong class="jxr_keyword">new</strong> ArrayList&lt;CompilerMessage&gt;( 3 );
 <a class="jxr_linenumber" name="L628" href="#L628">628</a>         <strong class="jxr_keyword">for</strong> ( CompilerMessage message : compilerMessages ) {
 <a class="jxr_linenumber" name="L629" href="#L629">629</a>             <strong class="jxr_keyword">if</strong> ( message.getKind() != CompilerMessage.Kind.OTHER ) {
 <a class="jxr_linenumber" name="L630" href="#L630">630</a>                 compilerErrors.add( message );
 <a class="jxr_linenumber" name="L631" href="#L631">631</a>             }
 <a class="jxr_linenumber" name="L632" href="#L632">632</a>         }
-<a class="jxr_linenumber" name="L633" href="#L633">633</a>         CompilerMessage error1 = compilerErrors.get( 0 );
-<a class="jxr_linenumber" name="L634" href="#L634">634</a>         assertEquals( <span class="jxr_string">"file"</span>,
-<a class="jxr_linenumber" name="L635" href="#L635">635</a>                       <span class="jxr_string">"C:&#92;&#92;commander&#92;&#92;pre&#92;&#92;ec&#92;&#92;ec-http&#92;&#92;src&#92;&#92;main&#92;&#92;java&#92;&#92;com&#92;&#92;electriccloud&#92;&#92;http&#92;&#92;HttpUtil.java"</span>,
-<a class="jxr_linenumber" name="L636" href="#L636">636</a>                       error1.getFile() );
-<a class="jxr_linenumber" name="L637" href="#L637">637</a>         assertEquals( <span class="jxr_string">"message"</span>,
-<a class="jxr_linenumber" name="L638" href="#L638">638</a>                       <span class="jxr_string">"[deprecation] ThreadSafeClientConnManager in org.apache.http.impl.conn.tsccm has been deprecated"</span>,
-<a class="jxr_linenumber" name="L639" href="#L639">639</a>                       error1.getMessage() );
-<a class="jxr_linenumber" name="L640" href="#L640">640</a>         assertEquals( <span class="jxr_string">"line"</span>, 31, error1.getStartLine() );
-<a class="jxr_linenumber" name="L641" href="#L641">641</a>         assertEquals( <span class="jxr_string">"column"</span>, 38, error1.getStartColumn() );
-<a class="jxr_linenumber" name="L642" href="#L642">642</a>         CompilerMessage error2 = compilerErrors.get( 1 );
-<a class="jxr_linenumber" name="L643" href="#L643">643</a>         assertEquals( <span class="jxr_string">"file"</span>,
-<a class="jxr_linenumber" name="L644" href="#L644">644</a>                       <span class="jxr_string">"C:&#92;&#92;commander&#92;&#92;pre&#92;&#92;ec&#92;&#92;ec-http&#92;&#92;src&#92;&#92;main&#92;&#92;java&#92;&#92;com&#92;&#92;electriccloud&#92;&#92;http&#92;&#92;HttpUtil.java"</span>,
-<a class="jxr_linenumber" name="L645" href="#L645">645</a>                       error2.getFile() );
-<a class="jxr_linenumber" name="L646" href="#L646">646</a>         assertEquals( <span class="jxr_string">"message"</span>,
-<a class="jxr_linenumber" name="L647" href="#L647">647</a>                       <span class="jxr_string">"[deprecation] ThreadSafeClientConnManager in org.apache.http.impl.conn.tsccm has been deprecated"</span>,
-<a class="jxr_linenumber" name="L648" href="#L648">648</a>                       error2.getMessage() );
-<a class="jxr_linenumber" name="L649" href="#L649">649</a>         assertEquals( <span class="jxr_string">"line"</span>, 151, error2.getStartLine() );
-<a class="jxr_linenumber" name="L650" href="#L650">650</a>         assertEquals( <span class="jxr_string">"column"</span>, 8, error2.getStartColumn() );
-<a class="jxr_linenumber" name="L651" href="#L651">651</a>         CompilerMessage error3 = compilerErrors.get( 2 );
-<a class="jxr_linenumber" name="L652" href="#L652">652</a>         assertEquals( <span class="jxr_string">"file"</span>,
-<a class="jxr_linenumber" name="L653" href="#L653">653</a>                       <span class="jxr_string">"C:&#92;&#92;commander&#92;&#92;pre&#92;&#92;ec&#92;&#92;ec-http&#92;&#92;src&#92;&#92;main&#92;&#92;java&#92;&#92;com&#92;&#92;electriccloud&#92;&#92;http&#92;&#92;HttpUtil.java"</span>,
-<a class="jxr_linenumber" name="L654" href="#L654">654</a>                       error3.getFile() );
-<a class="jxr_linenumber" name="L655" href="#L655">655</a>         assertEquals( <span class="jxr_string">"message"</span>,
-<a class="jxr_linenumber" name="L656" href="#L656">656</a>                       <span class="jxr_string">"[deprecation] ThreadSafeClientConnManager in org.apache.http.impl.conn.tsccm has been deprecated"</span>,
-<a class="jxr_linenumber" name="L657" href="#L657">657</a>                       error3.getMessage() );
-<a class="jxr_linenumber" name="L658" href="#L658">658</a>         assertEquals( <span class="jxr_string">"line"</span>, 152, error3.getStartLine() );
-<a class="jxr_linenumber" name="L659" href="#L659">659</a>         assertEquals( <span class="jxr_string">"column"</span>, 16, error3.getStartColumn() );
-<a class="jxr_linenumber" name="L660" href="#L660">660</a>     }
-<a class="jxr_linenumber" name="L661" href="#L661">661</a> 
-<a class="jxr_linenumber" name="L662" href="#L662">662</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testJava6Error() <strong class="jxr_keyword">throws</strong> Exception
-<a class="jxr_linenumber" name="L663" href="#L663">663</a>     {
-<a class="jxr_linenumber" name="L664" href="#L664">664</a>         String out = <span class="jxr_string">"Error.java:3: cannot find symbol"</span> + EOL + 
-<a class="jxr_linenumber" name="L665" href="#L665">665</a>             <span class="jxr_string">"symbol  : class Properties"</span> + EOL + 
-<a class="jxr_linenumber" name="L666" href="#L666">666</a>             <span class="jxr_string">"location: class Error"</span> + EOL + 
-<a class="jxr_linenumber" name="L667" href="#L667">667</a>             <span class="jxr_string">"                Properties p = new Properties();"</span> + EOL + 
-<a class="jxr_linenumber" name="L668" href="#L668">668</a>             <span class="jxr_string">"                ^"</span> + EOL + 
-<a class="jxr_linenumber" name="L669" href="#L669">669</a>             <span class="jxr_string">"Error.java:3: cannot find symbol"</span> + EOL + 
-<a class="jxr_linenumber" name="L670" href="#L670">670</a>             <span class="jxr_string">"symbol  : class Properties"</span> + EOL + 
-<a class="jxr_linenumber" name="L671" href="#L671">671</a>             <span class="jxr_string">"location: class Error"</span> + EOL + 
-<a class="jxr_linenumber" name="L672" href="#L672">672</a>             <span class="jxr_string">"                Properties p = new Properties();"</span> + EOL + 
-<a class="jxr_linenumber" name="L673" href="#L673">673</a>             <span class="jxr_string">"                                   ^"</span> + EOL + 
-<a class="jxr_linenumber" name="L674" href="#L674">674</a>             <span class="jxr_string">"2 errors"</span>;
-<a class="jxr_linenumber" name="L675" href="#L675">675</a> 
-<a class="jxr_linenumber" name="L676" href="#L676">676</a>         List&lt;CompilerMessage&gt; compilerErrors = JavacCompiler.parseModernStream( 1, <strong class="jxr_keyword">new</strong> BufferedReader( <strong class="jxr_keyword">new</strong> StringReader( out ) ));
-<a class="jxr_linenumber" name="L677" href="#L677">677</a> 
-<a class="jxr_linenumber" name="L678" href="#L678">678</a>         assertNotNull( compilerErrors );
-<a class="jxr_linenumber" name="L679" href="#L679">679</a> 
-<a class="jxr_linenumber" name="L680" href="#L680">680</a>         CompilerMessage message1 = compilerErrors.get( 0 );
-<a class="jxr_linenumber" name="L681" href="#L681">681</a> 
-<a class="jxr_linenumber" name="L682" href="#L682">682</a>         assertTrue( message1.isError() );
-<a class="jxr_linenumber" name="L683" href="#L683">683</a> 
-<a class="jxr_linenumber" name="L684" href="#L684">684</a>         assertEquals( <span class="jxr_string">"cannot find symbol"</span> + EOL + 
-<a class="jxr_linenumber" name="L685" href="#L685">685</a>                       <span class="jxr_string">"symbol  : class Properties"</span> + EOL + 
-<a class="jxr_linenumber" name="L686" href="#L686">686</a>                       <span class="jxr_string">"location: class Error"</span>, message1.getMessage() );
-<a class="jxr_linenumber" name="L687" href="#L687">687</a> 
-<a class="jxr_linenumber" name="L688" href="#L688">688</a>         assertEquals( 16, message1.getStartColumn() );
-<a class="jxr_linenumber" name="L689" href="#L689">689</a> 
-<a class="jxr_linenumber" name="L690" href="#L690">690</a>         assertEquals( 26, message1.getEndColumn() );
-<a class="jxr_linenumber" name="L691" href="#L691">691</a> 
-<a class="jxr_linenumber" name="L692" href="#L692">692</a>         assertEquals( 3, message1.getStartLine() );
-<a class="jxr_linenumber" name="L693" href="#L693">693</a> 
-<a class="jxr_linenumber" name="L694" href="#L694">694</a>         assertEquals( 3, message1.getEndLine() );
-<a class="jxr_linenumber" name="L695" href="#L695">695</a>         
-<a class="jxr_linenumber" name="L696" href="#L696">696</a>         CompilerMessage message2 = compilerErrors.get( 1 );
-<a class="jxr_linenumber" name="L697" href="#L697">697</a> 
-<a class="jxr_linenumber" name="L698" href="#L698">698</a>         assertTrue( message2.isError() );
-<a class="jxr_linenumber" name="L699" href="#L699">699</a> 
-<a class="jxr_linenumber" name="L700" href="#L700">700</a>         assertEquals( <span class="jxr_string">"cannot find symbol"</span> + EOL + 
-<a class="jxr_linenumber" name="L701" href="#L701">701</a>                       <span class="jxr_string">"symbol  : class Properties"</span> + EOL + 
-<a class="jxr_linenumber" name="L702" href="#L702">702</a>                       <span class="jxr_string">"location: class Error"</span>, message2.getMessage() );
-<a class="jxr_linenumber" name="L703" href="#L703">703</a> 
-<a class="jxr_linenumber" name="L704" href="#L704">704</a>         assertEquals( 35, message2.getStartColumn() );
-<a class="jxr_linenumber" name="L705" href="#L705">705</a> 
-<a class="jxr_linenumber" name="L706" href="#L706">706</a>         assertEquals( 48, message2.getEndColumn() );
-<a class="jxr_linenumber" name="L707" href="#L707">707</a> 
-<a class="jxr_linenumber" name="L708" href="#L708">708</a>         assertEquals( 3, message2.getStartLine() );
-<a class="jxr_linenumber" name="L709" href="#L709">709</a> 
-<a class="jxr_linenumber" name="L710" href="#L710">710</a>         assertEquals( 3, message2.getEndLine() );
-<a class="jxr_linenumber" name="L711" href="#L711">711</a>     }
-<a class="jxr_linenumber" name="L712" href="#L712">712</a>     
-<a class="jxr_linenumber" name="L713" href="#L713">713</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testJava7Error() <strong class="jxr_keyword">throws</strong> Exception
-<a class="jxr_linenumber" name="L714" href="#L714">714</a>     {
-<a class="jxr_linenumber" name="L715" href="#L715">715</a>         String out = <span class="jxr_string">"Error.java:3: error: cannot find symbol"</span> + EOL + 
-<a class="jxr_linenumber" name="L716" href="#L716">716</a>                         <span class="jxr_string">"                Properties p = new Properties();"</span> + EOL + 
-<a class="jxr_linenumber" name="L717" href="#L717">717</a>                         <span class="jxr_string">"                ^"</span> + EOL + 
-<a class="jxr_linenumber" name="L718" href="#L718">718</a>                         <span class="jxr_string">"  symbol:   class Properties"</span> + EOL + 
-<a class="jxr_linenumber" name="L719" href="#L719">719</a>                         <span class="jxr_string">"  location: class Error"</span> + EOL + 
-<a class="jxr_linenumber" name="L720" href="#L720">720</a>                         <span class="jxr_string">"Error.java:3: error: cannot find symbol"</span> + EOL + 
-<a class="jxr_linenumber" name="L721" href="#L721">721</a>                         <span class="jxr_string">"                Properties p = new Properties();"</span> + EOL + 
-<a class="jxr_linenumber" name="L722" href="#L722">722</a>                         <span class="jxr_string">"                                   ^"</span> + EOL + 
-<a class="jxr_linenumber" name="L723" href="#L723">723</a>                         <span class="jxr_string">"  symbol:   class Properties"</span> + EOL + 
-<a class="jxr_linenumber" name="L724" href="#L724">724</a>                         <span class="jxr_string">"  location: class Error"</span> + EOL + 
-<a class="jxr_linenumber" name="L725" href="#L725">725</a>                         <span class="jxr_string">"2 errors"</span>;
-<a class="jxr_linenumber" name="L726" href="#L726">726</a>         
-<a class="jxr_linenumber" name="L727" href="#L727">727</a>         List&lt;CompilerMessage&gt; compilerErrors = JavacCompiler.parseModernStream( 1, <strong class="jxr_keyword">new</strong> BufferedReader( <strong class="jxr_keyword">new</strong> StringReader( out ) ));
-<a class="jxr_linenumber" name="L728" href="#L728">728</a>         
-<a class="jxr_linenumber" name="L729" href="#L729">729</a>         assertNotNull( compilerErrors );
-<a class="jxr_linenumber" name="L730" href="#L730">730</a>         
-<a class="jxr_linenumber" name="L731" href="#L731">731</a>         CompilerMessage message1 = compilerErrors.get( 0 );
-<a class="jxr_linenumber" name="L732" href="#L732">732</a>         
-<a class="jxr_linenumber" name="L733" href="#L733">733</a>         assertTrue( message1.isError() );
-<a class="jxr_linenumber" name="L734" href="#L734">734</a>         
-<a class="jxr_linenumber" name="L735" href="#L735">735</a>         assertEquals( <span class="jxr_string">"error: cannot find symbol"</span> + EOL + 
-<a class="jxr_linenumber" name="L736" href="#L736">736</a>                       <span class="jxr_string">"  symbol:   class Properties"</span> + EOL + 
-<a class="jxr_linenumber" name="L737" href="#L737">737</a>                       <span class="jxr_string">"  location: class Error"</span>, message1.getMessage() );
-<a class="jxr_linenumber" name="L738" href="#L738">738</a>         
-<a class="jxr_linenumber" name="L739" href="#L739">739</a>         assertEquals( 16, message1.getStartColumn() );
-<a class="jxr_linenumber" name="L740" href="#L740">740</a>         
-<a class="jxr_linenumber" name="L741" href="#L741">741</a>         assertEquals( 26, message1.getEndColumn() );
-<a class="jxr_linenumber" name="L742" href="#L742">742</a>         
-<a class="jxr_linenumber" name="L743" href="#L743">743</a>         assertEquals( 3, message1.getStartLine() );
-<a class="jxr_linenumber" name="L744" href="#L744">744</a>         
-<a class="jxr_linenumber" name="L745" href="#L745">745</a>         assertEquals( 3, message1.getEndLine() );
-<a class="jxr_linenumber" name="L746" href="#L746">746</a>         
-<a class="jxr_linenumber" name="L747" href="#L747">747</a>         CompilerMessage message2 = compilerErrors.get( 1 );
-<a class="jxr_linenumber" name="L748" href="#L748">748</a>         
-<a class="jxr_linenumber" name="L749" href="#L749">749</a>         assertTrue( message2.isError() );
-<a class="jxr_linenumber" name="L750" href="#L750">750</a>         
-<a class="jxr_linenumber" name="L751" href="#L751">751</a>         assertEquals( <span class="jxr_string">"error: cannot find symbol"</span> + EOL + 
-<a class="jxr_linenumber" name="L752" href="#L752">752</a>                       <span class="jxr_string">"  symbol:   class Properties"</span> + EOL + 
-<a class="jxr_linenumber" name="L753" href="#L753">753</a>                       <span class="jxr_string">"  location: class Error"</span>, message2.getMessage() );
-<a class="jxr_linenumber" name="L754" href="#L754">754</a>         
-<a class="jxr_linenumber" name="L755" href="#L755">755</a>         assertEquals( 35, message2.getStartColumn() );
-<a class="jxr_linenumber" name="L756" href="#L756">756</a>         
-<a class="jxr_linenumber" name="L757" href="#L757">757</a>         assertEquals( 48, message2.getEndColumn() );
-<a class="jxr_linenumber" name="L758" href="#L758">758</a>         
-<a class="jxr_linenumber" name="L759" href="#L759">759</a>         assertEquals( 3, message2.getStartLine() );
-<a class="jxr_linenumber" name="L760" href="#L760">760</a>         
-<a class="jxr_linenumber" name="L761" href="#L761">761</a>         assertEquals( 3, message2.getEndLine() );
-<a class="jxr_linenumber" name="L762" href="#L762">762</a>     }
-<a class="jxr_linenumber" name="L763" href="#L763">763</a>     
-<a class="jxr_linenumber" name="L764" href="#L764">764</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testBugParade() <strong class="jxr_keyword">throws</strong> Exception
-<a class="jxr_linenumber" name="L765" href="#L765">765</a>     {
-<a class="jxr_linenumber" name="L766" href="#L766">766</a>         String out = <span class="jxr_string">"An exception has occurred in the compiler (1.7.0_80). "</span>
-<a class="jxr_linenumber" name="L767" href="#L767">767</a>             + <span class="jxr_string">"Please file a bug at the Java Developer Connection (http://java.sun.com/webapps/bugreport)  after checking the Bug Parade for duplicates. "</span>
-<a class="jxr_linenumber" name="L768" href="#L768">768</a>             + <span class="jxr_string">"Include your program and the following diagnostic in your report.  Thank you."</span> + EOL + 
-<a class="jxr_linenumber" name="L769" href="#L769">769</a>             <span class="jxr_string">"com.sun.tools.javac.code.Symbol$CompletionFailure: class file for java.util.Optional not found"</span>;
-<a class="jxr_linenumber" name="L770" href="#L770">770</a>         
-<a class="jxr_linenumber" name="L771" href="#L771">771</a>         List&lt;CompilerMessage&gt; compilerErrors = JavacCompiler.parseModernStream( 4, <strong class="jxr_keyword">new</strong> BufferedReader( <strong class="jxr_keyword">new</strong> StringReader( out ) ));
-<a class="jxr_linenumber" name="L772" href="#L772">772</a> 
-<a class="jxr_linenumber" name="L773" href="#L773">773</a>         assertNotNull( compilerErrors );
-<a class="jxr_linenumber" name="L774" href="#L774">774</a>         
-<a class="jxr_linenumber" name="L775" href="#L775">775</a>         assertEquals( 1, compilerErrors.size() );
-<a class="jxr_linenumber" name="L776" href="#L776">776</a>     }
-<a class="jxr_linenumber" name="L777" href="#L777">777</a>     
-<a class="jxr_linenumber" name="L778" href="#L778">778</a> }
+<a class="jxr_linenumber" name="L633" href="#L633">633</a> 
+<a class="jxr_linenumber" name="L634" href="#L634">634</a>         assertEquivalent(<strong class="jxr_keyword">new</strong> CompilerMessage(<span class="jxr_string">"[options] bootstrap class path not set in conjunction with -source "</span> +
+<a class="jxr_linenumber" name="L635" href="#L635">635</a>               <span class="jxr_string">"1.6"</span>, CompilerMessage.Kind.WARNING), compilerErrors.get(0));
+<a class="jxr_linenumber" name="L636" href="#L636">636</a>         CompilerMessage error1 = compilerErrors.get( 1 );
+<a class="jxr_linenumber" name="L637" href="#L637">637</a>         assertEquals( <span class="jxr_string">"file"</span>,
+<a class="jxr_linenumber" name="L638" href="#L638">638</a>                       <span class="jxr_string">"C:&#92;&#92;commander&#92;&#92;pre&#92;&#92;ec&#92;&#92;ec-http&#92;&#92;src&#92;&#92;main&#92;&#92;java&#92;&#92;com&#92;&#92;electriccloud&#92;&#92;http&#92;&#92;HttpUtil.java"</span>,
+<a class="jxr_linenumber" name="L639" href="#L639">639</a>                       error1.getFile() );
+<a class="jxr_linenumber" name="L640" href="#L640">640</a>         assertEquals( <span class="jxr_string">"message"</span>,
+<a class="jxr_linenumber" name="L641" href="#L641">641</a>                       <span class="jxr_string">"[deprecation] ThreadSafeClientConnManager in org.apache.http.impl.conn.tsccm has been deprecated"</span>,
+<a class="jxr_linenumber" name="L642" href="#L642">642</a>                       error1.getMessage() );
+<a class="jxr_linenumber" name="L643" href="#L643">643</a>         assertEquals( <span class="jxr_string">"line"</span>, 31, error1.getStartLine() );
+<a class="jxr_linenumber" name="L644" href="#L644">644</a>         assertEquals( <span class="jxr_string">"column"</span>, 38, error1.getStartColumn() );
+<a class="jxr_linenumber" name="L645" href="#L645">645</a>         CompilerMessage error2 = compilerErrors.get( 2 );
+<a class="jxr_linenumber" name="L646" href="#L646">646</a>         assertEquals( <span class="jxr_string">"file"</span>,
+<a class="jxr_linenumber" name="L647" href="#L647">647</a>                       <span class="jxr_string">"C:&#92;&#92;commander&#92;&#92;pre&#92;&#92;ec&#92;&#92;ec-http&#92;&#92;src&#92;&#92;main&#92;&#92;java&#92;&#92;com&#92;&#92;electriccloud&#92;&#92;http&#92;&#92;HttpUtil.java"</span>,
+<a class="jxr_linenumber" name="L648" href="#L648">648</a>                       error2.getFile() );
+<a class="jxr_linenumber" name="L649" href="#L649">649</a>         assertEquals( <span class="jxr_string">"message"</span>,
+<a class="jxr_linenumber" name="L650" href="#L650">650</a>                       <span class="jxr_string">"[deprecation] ThreadSafeClientConnManager in org.apache.http.impl.conn.tsccm has been deprecated"</span>,
+<a class="jxr_linenumber" name="L651" href="#L651">651</a>                       error2.getMessage() );
+<a class="jxr_linenumber" name="L652" href="#L652">652</a>         assertEquals( <span class="jxr_string">"line"</span>, 151, error2.getStartLine() );
+<a class="jxr_linenumber" name="L653" href="#L653">653</a>         assertEquals( <span class="jxr_string">"column"</span>, 8, error2.getStartColumn() );
+<a class="jxr_linenumber" name="L654" href="#L654">654</a>         CompilerMessage error3 = compilerErrors.get( 3 );
+<a class="jxr_linenumber" name="L655" href="#L655">655</a>         assertEquals( <span class="jxr_string">"file"</span>,
+<a class="jxr_linenumber" name="L656" href="#L656">656</a>                       <span class="jxr_string">"C:&#92;&#92;commander&#92;&#92;pre&#92;&#92;ec&#92;&#92;ec-http&#92;&#92;src&#92;&#92;main&#92;&#92;java&#92;&#92;com&#92;&#92;electriccloud&#92;&#92;http&#92;&#92;HttpUtil.java"</span>,
+<a class="jxr_linenumber" name="L657" href="#L657">657</a>                       error3.getFile() );
+<a class="jxr_linenumber" name="L658" href="#L658">658</a>         assertEquals( <span class="jxr_string">"message"</span>,
+<a class="jxr_linenumber" name="L659" href="#L659">659</a>                       <span class="jxr_string">"[deprecation] ThreadSafeClientConnManager in org.apache.http.impl.conn.tsccm has been deprecated"</span>,
+<a class="jxr_linenumber" name="L660" href="#L660">660</a>                       error3.getMessage() );
+<a class="jxr_linenumber" name="L661" href="#L661">661</a>         assertEquals( <span class="jxr_string">"line"</span>, 152, error3.getStartLine() );
+<a class="jxr_linenumber" name="L662" href="#L662">662</a>         assertEquals( <span class="jxr_string">"column"</span>, 16, error3.getStartColumn() );
+<a class="jxr_linenumber" name="L663" href="#L663">663</a>     }
+<a class="jxr_linenumber" name="L664" href="#L664">664</a> 
+<a class="jxr_linenumber" name="L665" href="#L665">665</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testJava6Error() <strong class="jxr_keyword">throws</strong> Exception
+<a class="jxr_linenumber" name="L666" href="#L666">666</a>     {
+<a class="jxr_linenumber" name="L667" href="#L667">667</a>         String out = <span class="jxr_string">"Error.java:3: cannot find symbol"</span> + EOL + 
+<a class="jxr_linenumber" name="L668" href="#L668">668</a>             <span class="jxr_string">"symbol  : class Properties"</span> + EOL + 
+<a class="jxr_linenumber" name="L669" href="#L669">669</a>             <span class="jxr_string">"location: class Error"</span> + EOL + 
+<a class="jxr_linenumber" name="L670" href="#L670">670</a>             <span class="jxr_string">"                Properties p = new Properties();"</span> + EOL + 
+<a class="jxr_linenumber" name="L671" href="#L671">671</a>             <span class="jxr_string">"                ^"</span> + EOL + 
+<a class="jxr_linenumber" name="L672" href="#L672">672</a>             <span class="jxr_string">"Error.java:3: cannot find symbol"</span> + EOL + 
+<a class="jxr_linenumber" name="L673" href="#L673">673</a>             <span class="jxr_string">"symbol  : class Properties"</span> + EOL + 
+<a class="jxr_linenumber" name="L674" href="#L674">674</a>             <span class="jxr_string">"location: class Error"</span> + EOL + 
+<a class="jxr_linenumber" name="L675" href="#L675">675</a>             <span class="jxr_string">"                Properties p = new Properties();"</span> + EOL + 
+<a class="jxr_linenumber" name="L676" href="#L676">676</a>             <span class="jxr_string">"                                   ^"</span> + EOL + 
+<a class="jxr_linenumber" name="L677" href="#L677">677</a>             <span class="jxr_string">"2 errors"</span>;
+<a class="jxr_linenumber" name="L678" href="#L678">678</a> 
+<a class="jxr_linenumber" name="L679" href="#L679">679</a>         List&lt;CompilerMessage&gt; compilerErrors = JavacCompiler.parseModernStream( 1, <strong class="jxr_keyword">new</strong> BufferedReader( <strong class="jxr_keyword">new</strong> StringReader( out ) ));
+<a class="jxr_linenumber" name="L680" href="#L680">680</a> 
+<a class="jxr_linenumber" name="L681" href="#L681">681</a>         assertNotNull( compilerErrors );
+<a class="jxr_linenumber" name="L682" href="#L682">682</a> 
+<a class="jxr_linenumber" name="L683" href="#L683">683</a>         CompilerMessage message1 = compilerErrors.get( 0 );
+<a class="jxr_linenumber" name="L684" href="#L684">684</a> 
+<a class="jxr_linenumber" name="L685" href="#L685">685</a>         assertTrue( message1.isError() );
+<a class="jxr_linenumber" name="L686" href="#L686">686</a> 
+<a class="jxr_linenumber" name="L687" href="#L687">687</a>         assertEquals( <span class="jxr_string">"cannot find symbol"</span> + EOL +
+<a class="jxr_linenumber" name="L688" href="#L688">688</a>                       <span class="jxr_string">"symbol  : class Properties"</span> + EOL + 
+<a class="jxr_linenumber" name="L689" href="#L689">689</a>                       <span class="jxr_string">"location: class Error"</span>, message1.getMessage() );
+<a class="jxr_linenumber" name="L690" href="#L690">690</a> 
+<a class="jxr_linenumber" name="L691" href="#L691">691</a>         assertEquals( 16, message1.getStartColumn() );
+<a class="jxr_linenumber" name="L692" href="#L692">692</a> 
+<a class="jxr_linenumber" name="L693" href="#L693">693</a>         assertEquals( 26, message1.getEndColumn() );
+<a class="jxr_linenumber" name="L694" href="#L694">694</a> 
+<a class="jxr_linenumber" name="L695" href="#L695">695</a>         assertEquals( 3, message1.getStartLine() );
+<a class="jxr_linenumber" name="L696" href="#L696">696</a> 
+<a class="jxr_linenumber" name="L697" href="#L697">697</a>         assertEquals( 3, message1.getEndLine() );
+<a class="jxr_linenumber" name="L698" href="#L698">698</a>         
+<a class="jxr_linenumber" name="L699" href="#L699">699</a>         CompilerMessage message2 = compilerErrors.get( 1 );
+<a class="jxr_linenumber" name="L700" href="#L700">700</a> 
+<a class="jxr_linenumber" name="L701" href="#L701">701</a>         assertTrue( message2.isError() );
+<a class="jxr_linenumber" name="L702" href="#L702">702</a> 
+<a class="jxr_linenumber" name="L703" href="#L703">703</a>         assertEquals( <span class="jxr_string">"cannot find symbol"</span> + EOL +
+<a class="jxr_linenumber" name="L704" href="#L704">704</a>                       <span class="jxr_string">"symbol  : class Properties"</span> + EOL + 
+<a class="jxr_linenumber" name="L705" href="#L705">705</a>                       <span class="jxr_string">"location: class Error"</span>, message2.getMessage() );
+<a class="jxr_linenumber" name="L706" href="#L706">706</a> 
+<a class="jxr_linenumber" name="L707" href="#L707">707</a>         assertEquals( 35, message2.getStartColumn() );
+<a class="jxr_linenumber" name="L708" href="#L708">708</a> 
+<a class="jxr_linenumber" name="L709" href="#L709">709</a>         assertEquals( 48, message2.getEndColumn() );
+<a class="jxr_linenumber" name="L710" href="#L710">710</a> 
+<a class="jxr_linenumber" name="L711" href="#L711">711</a>         assertEquals( 3, message2.getStartLine() );
+<a class="jxr_linenumber" name="L712" href="#L712">712</a> 
+<a class="jxr_linenumber" name="L713" href="#L713">713</a>         assertEquals( 3, message2.getEndLine() );
+<a class="jxr_linenumber" name="L714" href="#L714">714</a>     }
+<a class="jxr_linenumber" name="L715" href="#L715">715</a>     
+<a class="jxr_linenumber" name="L716" href="#L716">716</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testJava7Error() <strong class="jxr_keyword">throws</strong> Exception
+<a class="jxr_linenumber" name="L717" href="#L717">717</a>     {
+<a class="jxr_linenumber" name="L718" href="#L718">718</a>         String out = <span class="jxr_string">"Error.java:3: error: cannot find symbol"</span> + EOL + 
+<a class="jxr_linenumber" name="L719" href="#L719">719</a>                         <span class="jxr_string">"                Properties p = new Properties();"</span> + EOL + 
+<a class="jxr_linenumber" name="L720" href="#L720">720</a>                         <span class="jxr_string">"                ^"</span> + EOL + 
+<a class="jxr_linenumber" name="L721" href="#L721">721</a>                         <span class="jxr_string">"  symbol:   class Properties"</span> + EOL + 
+<a class="jxr_linenumber" name="L722" href="#L722">722</a>                         <span class="jxr_string">"  location: class Error"</span> + EOL + 
+<a class="jxr_linenumber" name="L723" href="#L723">723</a>                         <span class="jxr_string">"Error.java:3: error: cannot find symbol"</span> + EOL + 
+<a class="jxr_linenumber" name="L724" href="#L724">724</a>                         <span class="jxr_string">"                Properties p = new Properties();"</span> + EOL + 
+<a class="jxr_linenumber" name="L725" href="#L725">725</a>                         <span class="jxr_string">"                                   ^"</span> + EOL + 
+<a class="jxr_linenumber" name="L726" href="#L726">726</a>                         <span class="jxr_string">"  symbol:   class Properties"</span> + EOL + 
+<a class="jxr_linenumber" name="L727" href="#L727">727</a>                         <span class="jxr_string">"  location: class Error"</span> + EOL + 
+<a class="jxr_linenumber" name="L728" href="#L728">728</a>                         <span class="jxr_string">"2 errors"</span>;
+<a class="jxr_linenumber" name="L729" href="#L729">729</a>         
+<a class="jxr_linenumber" name="L730" href="#L730">730</a>         List&lt;CompilerMessage&gt; compilerErrors = JavacCompiler.parseModernStream( 1, <strong class="jxr_keyword">new</strong> BufferedReader( <strong class="jxr_keyword">new</strong> StringReader( out ) ));
+<a class="jxr_linenumber" name="L731" href="#L731">731</a>         
+<a class="jxr_linenumber" name="L732" href="#L732">732</a>         assertNotNull( compilerErrors );
+<a class="jxr_linenumber" name="L733" href="#L733">733</a>         
+<a class="jxr_linenumber" name="L734" href="#L734">734</a>         CompilerMessage message1 = compilerErrors.get( 0 );
+<a class="jxr_linenumber" name="L735" href="#L735">735</a>         
+<a class="jxr_linenumber" name="L736" href="#L736">736</a>         assertTrue( message1.isError() );
+<a class="jxr_linenumber" name="L737" href="#L737">737</a>         
+<a class="jxr_linenumber" name="L738" href="#L738">738</a>         assertEquals( <span class="jxr_string">"error: cannot find symbol"</span> + EOL +
+<a class="jxr_linenumber" name="L739" href="#L739">739</a>                       <span class="jxr_string">"  symbol:   class Properties"</span> + EOL + 
+<a class="jxr_linenumber" name="L740" href="#L740">740</a>                       <span class="jxr_string">"  location: class Error"</span>, message1.getMessage() );
+<a class="jxr_linenumber" name="L741" href="#L741">741</a>         
+<a class="jxr_linenumber" name="L742" href="#L742">742</a>         assertEquals( 16, message1.getStartColumn() );
+<a class="jxr_linenumber" name="L743" href="#L743">743</a>         
+<a class="jxr_linenumber" name="L744" href="#L744">744</a>         assertEquals( 26, message1.getEndColumn() );
+<a class="jxr_linenumber" name="L745" href="#L745">745</a>         
+<a class="jxr_linenumber" name="L746" href="#L746">746</a>         assertEquals( 3, message1.getStartLine() );
+<a class="jxr_linenumber" name="L747" href="#L747">747</a>         
+<a class="jxr_linenumber" name="L748" href="#L748">748</a>         assertEquals( 3, message1.getEndLine() );
+<a class="jxr_linenumber" name="L749" href="#L749">749</a>         
+<a class="jxr_linenumber" name="L750" href="#L750">750</a>         CompilerMessage message2 = compilerErrors.get( 1 );
+<a class="jxr_linenumber" name="L751" href="#L751">751</a>         
+<a class="jxr_linenumber" name="L752" href="#L752">752</a>         assertTrue( message2.isError() );
+<a class="jxr_linenumber" name="L753" href="#L753">753</a>         
+<a class="jxr_linenumber" name="L754" href="#L754">754</a>         assertEquals( <span class="jxr_string">"error: cannot find symbol"</span> + EOL +
+<a class="jxr_linenumber" name="L755" href="#L755">755</a>                       <span class="jxr_string">"  symbol:   class Properties"</span> + EOL + 
+<a class="jxr_linenumber" name="L756" href="#L756">756</a>                       <span class="jxr_string">"  location: class Error"</span>, message2.getMessage() );
+<a class="jxr_linenumber" name="L757" href="#L757">757</a>         
+<a class="jxr_linenumber" name="L758" href="#L758">758</a>         assertEquals( 35, message2.getStartColumn() );
+<a class="jxr_linenumber" name="L759" href="#L759">759</a>         
+<a class="jxr_linenumber" name="L760" href="#L760">760</a>         assertEquals( 48, message2.getEndColumn() );
+<a class="jxr_linenumber" name="L761" href="#L761">761</a>         
+<a class="jxr_linenumber" name="L762" href="#L762">762</a>         assertEquals( 3, message2.getStartLine() );
+<a class="jxr_linenumber" name="L763" href="#L763">763</a>         
+<a class="jxr_linenumber" name="L764" href="#L764">764</a>         assertEquals( 3, message2.getEndLine() );
+<a class="jxr_linenumber" name="L765" href="#L765">765</a>     }
+<a class="jxr_linenumber" name="L766" href="#L766">766</a>     
+<a class="jxr_linenumber" name="L767" href="#L767">767</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testBugParade() <strong class="jxr_keyword">throws</strong> Exception
+<a class="jxr_linenumber" name="L768" href="#L768">768</a>     {
+<a class="jxr_linenumber" name="L769" href="#L769">769</a>         String out = <span class="jxr_string">"An exception has occurred in the compiler (1.7.0_80). "</span>
+<a class="jxr_linenumber" name="L770" href="#L770">770</a>             + <span class="jxr_string">"Please file a bug at the Java Developer Connection (http://java.sun.com/webapps/bugreport)  after checking the Bug Parade for duplicates. "</span>
+<a class="jxr_linenumber" name="L771" href="#L771">771</a>             + <span class="jxr_string">"Include your program and the following diagnostic in your report.  Thank you."</span> + EOL + 
+<a class="jxr_linenumber" name="L772" href="#L772">772</a>             <span class="jxr_string">"com.sun.tools.javac.code.Symbol$CompletionFailure: class file for java.util.Optional not found"</span>;
+<a class="jxr_linenumber" name="L773" href="#L773">773</a>         
+<a class="jxr_linenumber" name="L774" href="#L774">774</a>         List&lt;CompilerMessage&gt; compilerErrors = JavacCompiler.parseModernStream( 4, <strong class="jxr_keyword">new</strong> BufferedReader( <strong class="jxr_keyword">new</strong> StringReader( out ) ));
+<a class="jxr_linenumber" name="L775" href="#L775">775</a> 
+<a class="jxr_linenumber" name="L776" href="#L776">776</a>         assertNotNull( compilerErrors );
+<a class="jxr_linenumber" name="L777" href="#L777">777</a>         
+<a class="jxr_linenumber" name="L778" href="#L778">778</a>         assertEquals( 1, compilerErrors.size() );
+<a class="jxr_linenumber" name="L779" href="#L779">779</a>     }
+<a class="jxr_linenumber" name="L780" href="#L780">780</a> 
+<a class="jxr_linenumber" name="L781" href="#L781">781</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">void</strong> testNonAnchoredWarning() <strong class="jxr_keyword">throws</strong> IOException {
+<a class="jxr_linenumber" name="L782" href="#L782">782</a>         <strong class="jxr_keyword">final</strong> String error =
+<a class="jxr_linenumber" name="L783" href="#L783">783</a>               <span class="jxr_string">"warning: [options] bootstrap class path not set in conjunction with -source 1.6"</span> + EOL +
+<a class="jxr_linenumber" name="L784" href="#L784">784</a>                     <span class="jxr_string">"1 warning"</span> + EOL;
+<a class="jxr_linenumber" name="L785" href="#L785">785</a> 
+<a class="jxr_linenumber" name="L786" href="#L786">786</a>         <strong class="jxr_keyword">final</strong> List&lt;CompilerMessage&gt; compilerErrors = JavacCompiler.parseModernStream(0, <strong class="jxr_keyword">new</strong> BufferedReader(<strong class="jxr_keyword">new</strong>
+<a class="jxr_linenumber" name="L787" href="#L787">787</a>               StringReader(
+<a class="jxr_linenumber" name="L788" href="#L788">788</a>               error)));
+<a class="jxr_linenumber" name="L789" href="#L789">789</a> 
+<a class="jxr_linenumber" name="L790" href="#L790">790</a>         assertNotNull(compilerErrors);
+<a class="jxr_linenumber" name="L791" href="#L791">791</a>         assertEquals(1, compilerErrors.size());
+<a class="jxr_linenumber" name="L792" href="#L792">792</a>         assertEquivalent(
+<a class="jxr_linenumber" name="L793" href="#L793">793</a>               <strong class="jxr_keyword">new</strong> CompilerMessage(
+<a class="jxr_linenumber" name="L794" href="#L794">794</a>                     <span class="jxr_string">"[options] bootstrap class path not set in conjunction with -source 1.6"</span>, CompilerMessage.Kind.WARNING),
+<a class="jxr_linenumber" name="L795" href="#L795">795</a>               compilerErrors.get(0));
+<a class="jxr_linenumber" name="L796" href="#L796">796</a>     }
+<a class="jxr_linenumber" name="L797" href="#L797">797</a> 
+<a class="jxr_linenumber" name="L798" href="#L798">798</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">void</strong> testAnchoredWarning() <strong class="jxr_keyword">throws</strong> IOException {
+<a class="jxr_linenumber" name="L799" href="#L799">799</a>         <strong class="jxr_keyword">final</strong> String error =
+<a class="jxr_linenumber" name="L800" href="#L800">800</a>               <span class="jxr_string">"C:&#92;&#92;repo&#92;&#92;src&#92;&#92;it&#92;&#92;includes-output-when-compiler-forked&#92;&#92;src&#92;&#92;main"</span> +
+<a class="jxr_linenumber" name="L801" href="#L801">801</a>                     <span class="jxr_string">"&#92;&#92;java&#92;&#92;MyClass.java:23: warning: [divzero] division by zero"</span> + EOL +
+<a class="jxr_linenumber" name="L802" href="#L802">802</a>                     <span class="jxr_string">"      System.out.println(1/0);"</span> + EOL +
+<a class="jxr_linenumber" name="L803" href="#L803">803</a>                     <span class="jxr_string">"                           ^"</span> + EOL +
+<a class="jxr_linenumber" name="L804" href="#L804">804</a>                     <span class="jxr_string">"1 warnings"</span> + EOL;
+<a class="jxr_linenumber" name="L805" href="#L805">805</a> 
+<a class="jxr_linenumber" name="L806" href="#L806">806</a>         <strong class="jxr_keyword">final</strong> List&lt;CompilerMessage&gt; compilerErrors =
+<a class="jxr_linenumber" name="L807" href="#L807">807</a>               JavacCompiler.parseModernStream(0, <strong class="jxr_keyword">new</strong> BufferedReader(<strong class="jxr_keyword">new</strong> StringReader(error)));
+<a class="jxr_linenumber" name="L808" href="#L808">808</a> 
+<a class="jxr_linenumber" name="L809" href="#L809">809</a>         assertNotNull(compilerErrors);
+<a class="jxr_linenumber" name="L810" href="#L810">810</a>         assertEquals(1, compilerErrors.size());
+<a class="jxr_linenumber" name="L811" href="#L811">811</a>         assertEquivalent(
+<a class="jxr_linenumber" name="L812" href="#L812">812</a>               <strong class="jxr_keyword">new</strong> CompilerMessage(<span class="jxr_string">"C:&#92;&#92;repo&#92;&#92;src&#92;&#92;it&#92;&#92;includes-output-when-compiler-forked&#92;&#92;src&#92;&#92;main&#92;&#92;java&#92;&#92;MyClass"</span> +
+<a class="jxr_linenumber" name="L813" href="#L813">813</a>                     <span class="jxr_string">".java"</span>, CompilerMessage.Kind.WARNING, 23, 27, 23, 30, <span class="jxr_string">"[divzero] division by zero"</span>),
+<a class="jxr_linenumber" name="L814" href="#L814">814</a>               compilerErrors.get(0));
+<a class="jxr_linenumber" name="L815" href="#L815">815</a>     }
+<a class="jxr_linenumber" name="L816" href="#L816">816</a> 
+<a class="jxr_linenumber" name="L817" href="#L817">817</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">void</strong> testMixedWarnings() <strong class="jxr_keyword">throws</strong> IOException {
+<a class="jxr_linenumber" name="L818" href="#L818">818</a>         <strong class="jxr_keyword">final</strong> String error =
+<a class="jxr_linenumber" name="L819" href="#L819">819</a>               <span class="jxr_string">"warning: [options] bootstrap class path not set in conjunction with -source 1.6"</span> + EOL +
+<a class="jxr_linenumber" name="L820" href="#L820">820</a>                     <span class="jxr_string">"C:&#92;&#92;repo&#92;&#92;src&#92;&#92;it&#92;&#92;includes-output-when-compiler-forked&#92;&#92;src&#92;&#92;main&#92;&#92;java"</span> +
+<a class="jxr_linenumber" name="L821" href="#L821">821</a>                     <span class="jxr_string">"&#92;&#92;MyClass.java:23: warning: [divzero] division by zero"</span> + EOL +
+<a class="jxr_linenumber" name="L822" href="#L822">822</a>                     <span class="jxr_string">"      System.out.println(1/0);"</span> + EOL +
+<a class="jxr_linenumber" name="L823" href="#L823">823</a>                     <span class="jxr_string">"                           ^"</span> + EOL +
+<a class="jxr_linenumber" name="L824" href="#L824">824</a>                     <span class="jxr_string">"2 warnings"</span>;
+<a class="jxr_linenumber" name="L825" href="#L825">825</a> 
+<a class="jxr_linenumber" name="L826" href="#L826">826</a>         <strong class="jxr_keyword">final</strong> List&lt;CompilerMessage&gt; compilerErrors =
+<a class="jxr_linenumber" name="L827" href="#L827">827</a>               JavacCompiler.parseModernStream(0, <strong class="jxr_keyword">new</strong> BufferedReader(<strong class="jxr_keyword">new</strong> StringReader(error)));
+<a class="jxr_linenumber" name="L828" href="#L828">828</a> 
+<a class="jxr_linenumber" name="L829" href="#L829">829</a>         assertNotNull(compilerErrors);
+<a class="jxr_linenumber" name="L830" href="#L830">830</a>         assertEquals(2, compilerErrors.size());
+<a class="jxr_linenumber" name="L831" href="#L831">831</a>         assertEquivalent(
+<a class="jxr_linenumber" name="L832" href="#L832">832</a>               <strong class="jxr_keyword">new</strong> CompilerMessage(
+<a class="jxr_linenumber" name="L833" href="#L833">833</a>                     <span class="jxr_string">"[options] bootstrap class path not set in conjunction with -source 1.6"</span>, CompilerMessage.Kind.WARNING),
+<a class="jxr_linenumber" name="L834" href="#L834">834</a>               compilerErrors.get(0));
+<a class="jxr_linenumber" name="L835" href="#L835">835</a>         assertEquivalent(
+<a class="jxr_linenumber" name="L836" href="#L836">836</a>               <strong class="jxr_keyword">new</strong> CompilerMessage(<span class="jxr_string">"C:&#92;&#92;repo&#92;&#92;src&#92;&#92;it&#92;&#92;includes-output-when-compiler-forked&#92;&#92;src&#92;&#92;main&#92;&#92;java&#92;&#92;MyClass"</span> +
+<a class="jxr_linenumber" name="L837" href="#L837">837</a>                     <span class="jxr_string">".java"</span>, CompilerMessage.Kind.WARNING, 23, 27, 23, 30, <span class="jxr_string">"[divzero] division by zero"</span>),
+<a class="jxr_linenumber" name="L838" href="#L838">838</a>               compilerErrors.get(1));
+<a class="jxr_linenumber" name="L839" href="#L839">839</a>     }
+<a class="jxr_linenumber" name="L840" href="#L840">840</a> 
+<a class="jxr_linenumber" name="L841" href="#L841">841</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">void</strong> testIssue37() <strong class="jxr_keyword">throws</strong> IOException {
+<a class="jxr_linenumber" name="L842" href="#L842">842</a>         <strong class="jxr_keyword">final</strong> String error =
+<a class="jxr_linenumber" name="L843" href="#L843">843</a>               <span class="jxr_string">"warning: [path] bad path element \&quot;d:&#92;&#92;maven_repo&#92;&#92;.m2&#92;&#92;repository&#92;&#92;org&#92;&#92;ow2&#92;&#92;asm&#92;&#92;asm-xml&#92;&#92;5.0.3&#92;&#92;asm-5.0.3.jar\&quot;: no such file or directory"</span> + EOL +
+<a class="jxr_linenumber" name="L844" href="#L844">844</a>                     <span class="jxr_string">"warning: [path] bad path element \&quot;d:&#92;&#92;maven_repo&#92;&#92;.m2&#92;&#92;repository&#92;&#92;org&#92;&#92;ow2&#92;&#92;asm&#92;&#92;asm-xml&#92;&#92;5.0.3&#92;&#92;asm-util-5.0.3.jar\&quot;: no such file or directory"</span> + EOL +
+<a class="jxr_linenumber" name="L845" href="#L845">845</a>                     <span class="jxr_string">"warning: [options] bootstrap class path not set in conjunction with -source 1.7"</span> + EOL +
+<a class="jxr_linenumber" name="L846" href="#L846">846</a>                     <span class="jxr_string">"3 warnings"</span> + EOL +
+<a class="jxr_linenumber" name="L847" href="#L847">847</a>                     <span class="jxr_string">"An exception has occurred in the compiler (9). Please file a bug against the Java compiler via the Java bug reporting page (http://bugreport.java.com) after checking the Bug Database (http://bugs.java.com) for duplicates. Include your program and the following diagnostic in your report. Thank you."</span> + EOL +
+<a class="jxr_linenumber" name="L848" href="#L848">848</a>                     <span class="jxr_string">"java.lang.NullPointerException"</span> + EOL +
+<a class="jxr_linenumber" name="L849" href="#L849">849</a>                     <span class="jxr_string">"\tat jdk.zipfs/jdk.nio.zipfs.JarFileSystem.getVersionMap(JarFileSystem.java:137)"</span> + EOL +
+<a class="jxr_linenumber" name="L850" href="#L850">850</a>                     <span class="jxr_string">"\tat jdk.zipfs/jdk.nio.zipfs.JarFileSystem.createVersionedLinks(JarFileSystem.java:112)"</span> + EOL +
+<a class="jxr_linenumber" name="L851" href="#L851">851</a>                     <span class="jxr_string">"\tat jdk.zipfs/jdk.nio.zipfs.JarFileSystem.&lt;init&gt;(JarFileSystem.java:85)"</span> + EOL +
+<a class="jxr_linenumber" name="L852" href="#L852">852</a>                     <span class="jxr_string">"\tat jdk.zipfs/jdk.nio.zipfs.ZipFileSystemProvider.newFileSystem(ZipFileSystemProvider.java:134)"</span> + EOL +
+<a class="jxr_linenumber" name="L853" href="#L853">853</a>                     <span class="jxr_string">"\tat jdk.compiler/com.sun.tools.javac.file.JavacFileManager$ArchiveContainer.&lt;init&gt;(JavacFileManager.java:517)"</span> + EOL +
+<a class="jxr_linenumber" name="L854" href="#L854">854</a>                     <span class="jxr_string">"\tat jdk.compiler/com.sun.tools.javac.file.JavacFileManager.getContainer(JavacFileManager.java:319)"</span> + EOL +
+<a class="jxr_linenumber" name="L855" href="#L855">855</a>                     <span class="jxr_string">"\tat jdk.compiler/com.sun.tools.javac.file.JavacFileManager.list(JavacFileManager.java:715)"</span> + EOL +
+<a class="jxr_linenumber" name="L856" href="#L856">856</a>                     <span class="jxr_string">"\tat jdk.compiler/com.sun.tools.javac.code.ClassFinder.list(ClassFinder.java:722)"</span> + EOL +
+<a class="jxr_linenumber" name="L857" href="#L857">857</a>                     <span class="jxr_string">"\tat jdk.compiler/com.sun.tools.javac.code.ClassFinder.scanUserPaths(ClassFinder.java:655)"</span> + EOL +
+<a class="jxr_linenumber" name="L858" href="#L858">858</a>                     <span class="jxr_string">"\tat jdk.compiler/com.sun.tools.javac.code.ClassFinder.fillIn(ClassFinder.java:526)"</span> + EOL +
+<a class="jxr_linenumber" name="L859" href="#L859">859</a>                     <span class="jxr_string">"\tat jdk.compiler/com.sun.tools.javac.code.ClassFinder.complete(ClassFinder.java:293)"</span> + EOL +
+<a class="jxr_linenumber" name="L860" href="#L860">860</a>                     <span class="jxr_string">"\tat jdk.compiler/com.sun.tools.javac.code.Symbol.complete(Symbol.java:633)"</span> + EOL +
+<a class="jxr_linenumber" name="L861" href="#L861">861</a>                     <span class="jxr_string">"\tat jdk.compiler/com.sun.tools.javac.code.Symbol$PackageSymbol.members(Symbol.java:1120)"</span> + EOL +
+<a class="jxr_linenumber" name="L862" href="#L862">862</a>                     <span class="jxr_string">"\tat jdk.compiler/com.sun.tools.javac.code.Symtab.listPackageModules(Symtab.java:810)"</span> + EOL +
+<a class="jxr_linenumber" name="L863" href="#L863">863</a>                     <span class="jxr_string">"\tat jdk.compiler/com.sun.tools.javac.comp.Enter.visitTopLevel(Enter.java:344)"</span> + EOL +
+<a class="jxr_linenumber" name="L864" href="#L864">864</a>                     <span class="jxr_string">"\tat jdk.compiler/com.sun.tools.javac.tree.JCTree$JCCompilationUnit.accept(JCTree.java:529)"</span> + EOL +
+<a class="jxr_linenumber" name="L865" href="#L865">865</a>                     <span class="jxr_string">"\tat jdk.compiler/com.sun.tools.javac.comp.Enter.classEnter(Enter.java:285)"</span> + EOL +
+<a class="jxr_linenumber" name="L866" href="#L866">866</a>                     <span class="jxr_string">"\tat jdk.compiler/com.sun.tools.javac.comp.Enter.classEnter(Enter.java:300)"</span> + EOL +
+<a class="jxr_linenumber" name="L867" href="#L867">867</a>                     <span class="jxr_string">"\tat jdk.compiler/com.sun.tools.javac.comp.Enter.complete(Enter.java:570)"</span> + EOL +
+<a class="jxr_linenumber" name="L868" href="#L868">868</a>                     <span class="jxr_string">"\tat jdk.compiler/com.sun.tools.javac.comp.Enter.main(Enter.java:554)"</span> + EOL +
+<a class="jxr_linenumber" name="L869" href="#L869">869</a>                     <span class="jxr_string">"\tat jdk.compiler/com.sun.tools.javac.main.JavaCompiler.enterTrees(JavaCompiler.java:1052)"</span> + EOL +
+<a class="jxr_linenumber" name="L870" href="#L870">870</a>                     <span class="jxr_string">"\tat jdk.compiler/com.sun.tools.javac.main.JavaCompiler.compile(JavaCompiler.java:923)"</span> + EOL +
+<a class="jxr_linenumber" name="L871" href="#L871">871</a>                     <span class="jxr_string">"\tat jdk.compiler/com.sun.tools.javac.main.Main.compile(Main.java:302)"</span> + EOL +
+<a class="jxr_linenumber" name="L872" href="#L872">872</a>                     <span class="jxr_string">"\tat jdk.compiler/com.sun.tools.javac.main.Main.compile(Main.java:162)"</span> + EOL +
+<a class="jxr_linenumber" name="L873" href="#L873">873</a>                     <span class="jxr_string">"\tat jdk.compiler/com.sun.tools.javac.Main.compile(Main.java:57)"</span> + EOL +
+<a class="jxr_linenumber" name="L874" href="#L874">874</a>                     <span class="jxr_string">"\tat jdk.compiler/com.sun.tools.javac.Main.main(Main.java:43)"</span>;
+<a class="jxr_linenumber" name="L875" href="#L875">875</a> 
+<a class="jxr_linenumber" name="L876" href="#L876">876</a>         <strong class="jxr_keyword">final</strong> List&lt;CompilerMessage&gt; compilerErrors =
+<a class="jxr_linenumber" name="L877" href="#L877">877</a>               JavacCompiler.parseModernStream(0, <strong class="jxr_keyword">new</strong> BufferedReader(<strong class="jxr_keyword">new</strong> StringReader(error)));
+<a class="jxr_linenumber" name="L878" href="#L878">878</a> 
+<a class="jxr_linenumber" name="L879" href="#L879">879</a>         assertNotNull( compilerErrors );
+<a class="jxr_linenumber" name="L880" href="#L880">880</a>         assertEquals(4, compilerErrors.size());
+<a class="jxr_linenumber" name="L881" href="#L881">881</a> 
+<a class="jxr_linenumber" name="L882" href="#L882">882</a>         assertEquivalent(<strong class="jxr_keyword">new</strong> CompilerMessage(<span class="jxr_string">"[path] bad path element \&quot;d:&#92;&#92;maven_repo&#92;&#92;"</span> +
+<a class="jxr_linenumber" name="L883" href="#L883">883</a>               <span class="jxr_string">".m2&#92;&#92;repository&#92;&#92;org&#92;&#92;ow2&#92;&#92;asm&#92;&#92;asm-xml&#92;&#92;5.0.3&#92;&#92;asm-5.0.3.jar\&quot;: no such file or directory"</span>,
+<a class="jxr_linenumber" name="L884" href="#L884">884</a>               CompilerMessage.Kind.WARNING), compilerErrors.get(0));
+<a class="jxr_linenumber" name="L885" href="#L885">885</a>         assertEquivalent(<strong class="jxr_keyword">new</strong> CompilerMessage(<span class="jxr_string">"warning: [path] bad path element \&quot;d:&#92;&#92;maven_repo&#92;&#92;.m2&#92;&#92;repository&#92;&#92;org&#92;&#92;ow2&#92;&#92;asm&#92;&#92;asm-xml&#92;&#92;5.0.3&#92;&#92;asm-util-5.0.3.jar\&quot;: no such file or directory"</span>,
+<a class="jxr_linenumber" name="L886" href="#L886">886</a>               CompilerMessage.Kind.WARNING), compilerErrors.get(1));
+<a class="jxr_linenumber" name="L887" href="#L887">887</a>         assertEquivalent(<strong class="jxr_keyword">new</strong> CompilerMessage(<span class="jxr_string">"[options] bootstrap class path not set in conjunction with -source 1.7"</span>,
+<a class="jxr_linenumber" name="L888" href="#L888">888</a>               CompilerMessage.Kind.WARNING), compilerErrors.get(2));
+<a class="jxr_linenumber" name="L889" href="#L889">889</a> 
+<a class="jxr_linenumber" name="L890" href="#L890">890</a>         <strong class="jxr_keyword">final</strong> CompilerMessage finalMessage = compilerErrors.get(3);
+<a class="jxr_linenumber" name="L891" href="#L891">891</a>         assertEquals(CompilerMessage.Kind.ERROR, finalMessage.getKind());
+<a class="jxr_linenumber" name="L892" href="#L892">892</a>         assertTrue(<span class="jxr_string">"Starts correctly"</span>, finalMessage.getMessage().startsWith(<span class="jxr_string">"An exception has occurred in the compiler"</span>));
+<a class="jxr_linenumber" name="L893" href="#L893">893</a>         assertTrue(<span class="jxr_string">"continues through end of output"</span>, finalMessage.getMessage().endsWith(<span class="jxr_string">"\tat jdk.compiler/com.sun"</span> +
+<a class="jxr_linenumber" name="L894" href="#L894">894</a>               <span class="jxr_string">".tools.javac.Main.main(Main.java:43)"</span> + EOL));
+<a class="jxr_linenumber" name="L895" href="#L895">895</a>     }
+<a class="jxr_linenumber" name="L896" href="#L896">896</a> 
+<a class="jxr_linenumber" name="L897" href="#L897">897</a>     <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">void</strong> assertEquivalent(CompilerMessage expected, CompilerMessage actual){
+<a class="jxr_linenumber" name="L898" href="#L898">898</a>         assertEquals(<span class="jxr_string">"Message did not match"</span>, expected.getMessage(), actual.getMessage());
+<a class="jxr_linenumber" name="L899" href="#L899">899</a>         assertEquals(<span class="jxr_string">"Kind did not match"</span>, expected.getKind(), actual.getKind());
+<a class="jxr_linenumber" name="L900" href="#L900">900</a>         assertEquals(<span class="jxr_string">"File did not match"</span>, expected.getFile(), actual.getFile());
+<a class="jxr_linenumber" name="L901" href="#L901">901</a>         assertEquals( <span class="jxr_string">"Start line did not match"</span>, expected.getStartLine(), actual.getStartLine());
+<a class="jxr_linenumber" name="L902" href="#L902">902</a>         assertEquals( <span class="jxr_string">"Start column did not match"</span>, expected.getStartColumn(), actual.getStartColumn());
+<a class="jxr_linenumber" name="L903" href="#L903">903</a>         assertEquals(<span class="jxr_string">"End line did not match"</span>, expected.getEndLine(), actual.getEndLine());
+<a class="jxr_linenumber" name="L904" href="#L904">904</a>         assertEquals(<span class="jxr_string">"End column did not match"</span>, expected.getEndColumn(), actual.getEndColumn());
+<a class="jxr_linenumber" name="L905" href="#L905">905</a>     }
+<a class="jxr_linenumber" name="L906" href="#L906">906</a> }
 </pre>
 <hr/>
-<div id="footer">Copyright &#169; 2001&#x2013;2016 <a href="http://codehaus-plexus.github.io/">Codehaus Plexus</a>. All rights reserved.</div>
+<div id="footer">Copyright &#169; 2001&#x2013;2018 <a href="http://codehaus-plexus.github.io/">Codehaus Plexus</a>. All rights reserved.</div>
 </body>
 </html>

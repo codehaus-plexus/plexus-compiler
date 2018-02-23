@@ -23,11 +23,11 @@ under the License.
     <link>http://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compiler-api/</link>
     <description>Plexus Compiler Api - Checkstyle report</description>
     <language>en-us</language>
-    <copyright>&#169;2001 - 2016 Codehaus Plexus</copyright>
+    <copyright>&#169;2001 - 2018 Codehaus Plexus</copyright>
     <item>
       <title>File: 18,
-             Errors: 41,
-             Warnings: 135,
+             Errors: 46,
+             Warnings: 140,
              Infos: 5
       </title>
             <link>http://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compiler-api//checkstyle.html</link>
@@ -262,10 +262,10 @@ under the License.
                   0
                 </td>
                 <td>
-                  74
+                  79
                 </td>
                 <td>
-                  11
+                  16
                 </td>
               </tr>
                           <tr>

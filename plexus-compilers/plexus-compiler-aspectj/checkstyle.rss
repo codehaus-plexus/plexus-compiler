@@ -23,10 +23,10 @@ under the License.
     <link>http://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compilers/plexus-compiler-aspectj/</link>
     <description>Plexus AspectJ Compiler - Checkstyle report</description>
     <language>en-us</language>
-    <copyright>&#169;2001 - 2016 Codehaus Plexus</copyright>
+    <copyright>&#169;2001 - 2018 Codehaus Plexus</copyright>
     <item>
       <title>File: 2,
-             Errors: 2,
+             Errors: 9,
              Warnings: 22,
              Infos: 0
       </title>
@@ -55,7 +55,7 @@ under the License.
                   4
                 </td>
                 <td>
-                  1
+                  8
                 </td>
               </tr>
                           <tr>

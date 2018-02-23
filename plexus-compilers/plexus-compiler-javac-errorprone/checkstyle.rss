@@ -23,7 +23,7 @@ under the License.
     <link>http://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compilers/plexus-compiler-javac-errorprone/</link>
     <description>Plexus Javac+error-prone Component - Checkstyle report</description>
     <language>en-us</language>
-    <copyright>&#169;2001 - 2016 Codehaus Plexus</copyright>
+    <copyright>&#169;2001 - 2018 Codehaus Plexus</copyright>
     <item>
       <title>File: 1,
              Errors: 1,

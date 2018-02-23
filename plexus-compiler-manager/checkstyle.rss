@@ -23,7 +23,7 @@ under the License.
     <link>http://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compiler-manager/</link>
     <description>Plexus Compiler Manager - Checkstyle report</description>
     <language>en-us</language>
-    <copyright>&#169;2001 - 2016 Codehaus Plexus</copyright>
+    <copyright>&#169;2001 - 2018 Codehaus Plexus</copyright>
     <item>
       <title>File: 3,
              Errors: 3,

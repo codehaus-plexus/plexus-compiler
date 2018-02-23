@@ -23,11 +23,11 @@ under the License.
     <link>http://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compiler-test/</link>
     <description>Plexus Compiler Test Harness - Checkstyle report</description>
     <language>en-us</language>
-    <copyright>&#169;2001 - 2016 Codehaus Plexus</copyright>
+    <copyright>&#169;2001 - 2018 Codehaus Plexus</copyright>
     <item>
       <title>File: 2,
-             Errors: 20,
-             Warnings: 18,
+             Errors: 25,
+             Warnings: 21,
              Infos: 0
       </title>
             <link>http://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compiler-test//checkstyle.html</link>
@@ -52,10 +52,10 @@ under the License.
                   0
                 </td>
                 <td>
-                  12
+                  15
                 </td>
                 <td>
-                  1
+                  6
                 </td>
               </tr>
                           <tr>

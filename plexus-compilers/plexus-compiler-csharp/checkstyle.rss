@@ -23,11 +23,11 @@ under the License.
     <link>http://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compilers/plexus-compiler-csharp/</link>
     <description>Plexus C# Compiler - Checkstyle report</description>
     <language>en-us</language>
-    <copyright>&#169;2001 - 2016 Codehaus Plexus</copyright>
+    <copyright>&#169;2001 - 2018 Codehaus Plexus</copyright>
     <item>
       <title>File: 3,
-             Errors: 37,
-             Warnings: 12,
+             Errors: 39,
+             Warnings: 15,
              Infos: 0
       </title>
             <link>http://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compilers/plexus-compiler-csharp//checkstyle.html</link>
@@ -52,10 +52,10 @@ under the License.
                   0
                 </td>
                 <td>
-                  10
+                  13
                 </td>
                 <td>
-                  26
+                  28
                 </td>
               </tr>
                           <tr>

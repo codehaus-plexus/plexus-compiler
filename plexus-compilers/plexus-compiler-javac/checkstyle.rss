@@ -23,10 +23,10 @@ under the License.
     <link>http://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compilers/plexus-compiler-javac/</link>
     <description>Plexus Javac Component - Checkstyle report</description>
     <language>en-us</language>
-    <copyright>&#169;2001 - 2016 Codehaus Plexus</copyright>
+    <copyright>&#169;2001 - 2018 Codehaus Plexus</copyright>
     <item>
       <title>File: 3,
-             Errors: 30,
+             Errors: 61,
              Warnings: 13,
              Infos: 0
       </title>
@@ -69,7 +69,7 @@ under the License.
                   8
                 </td>
                 <td>
-                  20
+                  51
                 </td>
               </tr>
                           <tr>
