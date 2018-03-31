@@ -26,7 +26,7 @@ public class EcjResponseParser {
 	/**
 	 * Scan the specified response file for compilation messages.
 	 */
-	public List<CompilerMessage> parse(File xmltf, boolean warningsAsErrors) throws Exception {
+	public List<CompilerMessage> parse(File xmltf, boolean errorsAsWarnings) throws Exception {
 		//if(xmltf.length() < 80)
 		//	return;
 
@@ -39,14 +39,14 @@ public class EcjResponseParser {
 			while(xsr.hasNext()) {
 				int type = xsr.next();
 				if(type == XMLStreamConstants.START_ELEMENT && "source".equals(xsr.getLocalName())) {
-					decodeSourceElement(list, xsr, warningsAsErrors);
+					decodeSourceElement(list, xsr, errorsAsWarnings);
 				}
 			}
 		}
 		return list;
 	}
 
-	private void decodeSourceElement(List<CompilerMessage> list, XMLStreamReader xsr, boolean warningsAsErrors) throws Exception {
+	private void decodeSourceElement(List<CompilerMessage> list, XMLStreamReader xsr, boolean errorsAsWarnings) throws Exception {
 		String filename = xsr.getAttributeValue(null, "path");
 
 		//-- Got a file- call handler
@@ -55,7 +55,7 @@ public class EcjResponseParser {
 			int type = xsr.nextTag();
 			if(type == XMLStreamConstants.START_ELEMENT) {
 				if("problems".equals(xsr.getLocalName())) {
-					decodeProblems(list, path.toString(), xsr, warningsAsErrors);
+					decodeProblems(list, path.toString(), xsr, errorsAsWarnings);
 				} else
 					ignoreTillEnd(xsr);
 
@@ -68,12 +68,12 @@ public class EcjResponseParser {
 	/**
 	 * Locate "problem" nodes.
 	 */
-	private void decodeProblems(List<CompilerMessage> list, String sourcePath, XMLStreamReader xsr, boolean warningsAsErrors) throws Exception {
+	private void decodeProblems(List<CompilerMessage> list, String sourcePath, XMLStreamReader xsr, boolean errorsAsWarnings) throws Exception {
 		while(xsr.hasNext()) {
 			int type = xsr.nextTag();
 			if(type == XMLStreamConstants.START_ELEMENT) {
 				if("problem".equals(xsr.getLocalName())) {
-					decodeProblem(list, sourcePath, xsr, warningsAsErrors);
+					decodeProblem(list, sourcePath, xsr, errorsAsWarnings);
 				} else
 					ignoreTillEnd(xsr);
 
@@ -84,7 +84,7 @@ public class EcjResponseParser {
 	}
 
 
-	private void decodeProblem(List<CompilerMessage> list, String sourcePath, XMLStreamReader xsr, boolean warningsAsErrors) throws Exception {
+	private void decodeProblem(List<CompilerMessage> list, String sourcePath, XMLStreamReader xsr, boolean errorsAsWarnings) throws Exception {
 		String id = xsr.getAttributeValue(null, "optionKey");				// Key for the problem
 		int startline = getInt(xsr, "line");
 		int column = getInt(xsr, "charStart");
@@ -108,9 +108,9 @@ public class EcjResponseParser {
 
 		Kind msgtype;
 		if("warning".equalsIgnoreCase(sev))
-			msgtype = warningsAsErrors ? Kind.ERROR : Kind.WARNING;
+			msgtype = Kind.WARNING;
 		else if("error".equalsIgnoreCase(sev))
-			msgtype = Kind.ERROR;
+			msgtype = errorsAsWarnings ? Kind.WARNING : Kind.ERROR;
 		else if("info".equalsIgnoreCase(sev))
 			msgtype = Kind.NOTE;
 		else {
