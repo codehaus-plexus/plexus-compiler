@@ -34,6 +34,7 @@ import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.jdt.core.compiler.IProblem;
+import org.eclipse.jdt.core.compiler.batch.BatchCompiler;
 import org.eclipse.jdt.internal.compiler.ClassFile;
 import org.eclipse.jdt.internal.compiler.CompilationResult;
 import org.eclipse.jdt.internal.compiler.Compiler;
@@ -41,6 +42,8 @@ import org.eclipse.jdt.internal.compiler.DefaultErrorHandlingPolicies;
 import org.eclipse.jdt.internal.compiler.ICompilerRequestor;
 import org.eclipse.jdt.internal.compiler.IErrorHandlingPolicy;
 import org.eclipse.jdt.internal.compiler.IProblemFactory;
+import org.eclipse.jdt.internal.compiler.apt.dispatch.BatchAnnotationProcessorManager;
+import org.eclipse.jdt.internal.compiler.batch.CompilationUnit;
 import org.eclipse.jdt.internal.compiler.classfmt.ClassFileReader;
 import org.eclipse.jdt.internal.compiler.classfmt.ClassFormatException;
 import org.eclipse.jdt.internal.compiler.env.ICompilationUnit;
@@ -62,10 +65,10 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -231,6 +234,55 @@ public class EclipseJavaCompiler
         CompilerOptions options = new CompilerOptions( settings );
         Compiler compiler = new Compiler( env, policy, options, requestor, problemFactory );
 
+        // Annotation processors defined?
+        if ( !isPreJava16( config ) )
+        {
+            //now add jdk 1.6 annotation processing related parameters
+
+
+            String[] annotationProcessors = config.getAnnotationProcessors();
+            List<String> processorPathEntries = config.getProcessorPathEntries();
+            if((annotationProcessors != null && annotationProcessors.length > 0) || (processorPathEntries != null && processorPathEntries.size() > 0))
+            {
+                List<String> args = new ArrayList<>();
+                if (annotationProcessors != null && annotationProcessors.length > 0) {
+                    args.add("-processor");
+                    StringBuilder sb = new StringBuilder();
+                    for(String ap : annotationProcessors) {
+                        if(sb.length() > 0)
+                            sb.append(',');
+                        sb.append(ap);
+                    }
+                    args.add(sb.toString());
+                }
+
+                if(processorPathEntries != null && processorPathEntries.size() > 0) {
+                    args.add("-processorpath");
+                    args.add(getPathString(processorPathEntries));
+                }
+
+                File generatedSourcesDir = config.getGeneratedSourcesDirectory();
+                if ( generatedSourcesDir != null )
+                {
+                    generatedSourcesDir.mkdirs();
+
+                    //args.add( "-s" );
+                    //args.add( generatedSourcesDir.getAbsolutePath() );
+                }
+                if ( config.getProc() != null )
+                {
+                    args.add("-proc:" + config.getProc());
+                }
+
+                BatchAnnotationProcessorManager bapm = new BatchAnnotationProcessorManager();
+                bapm.configure(compiler, args.toArray(new String[args.size()]));
+                compiler.annotationProcessorManager = bapm;
+            }
+        }
+
+        BatchCompiler bc = BatchCompiler.
+
+
         ICompilationUnit[] units = compilationUnits.toArray( new ICompilationUnit[compilationUnits.size()] );
 
         compiler.compile( units );
@@ -247,6 +299,17 @@ public class EclipseJavaCompiler
         }
 
         return compilerResult;
+    }
+
+    private boolean isPreJava16(CompilerConfiguration config) {
+        String s = config.getSourceVersion();
+        if ( s == null )
+        {
+            //now return true, as the 1.6 version is not the default - 1.4 is.
+            return true;
+        }
+        return s.startsWith( "1.5" ) || s.startsWith( "1.4" ) || s.startsWith( "1.3" ) || s.startsWith( "1.2" )
+            || s.startsWith( "1.1" ) || s.startsWith( "1.0" );
     }
 
     // The compiler mojo adds a dash to all keys which does not make sense for the eclipse compiler
