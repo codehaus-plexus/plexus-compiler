@@ -62,6 +62,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -190,6 +191,17 @@ public class EclipseJavaCompiler
         	if(! propFile.exists() || ! propFile.isFile())
 				throw new IllegalArgumentException("Properties file " + propFile + " does not exist");
 		}
+
+		for(Entry<String, String> entry : extras.entrySet()) {
+			String opt = entry.getKey();
+			if(! opt.startsWith("-"))
+				opt = "-" + opt;					// This is beyond sad
+			args.add(opt);
+			String value = entry.getValue();
+			if(null != value && ! value.isEmpty())
+				args.add(value);
+		}
+
         //settings.putAll( extras );
 
         //if ( settings.containsKey( "properties" ) )
@@ -220,9 +232,12 @@ public class EclipseJavaCompiler
         //    }
         //}
 
+		// Output path
+		args.add("-d");
+		args.add(config.getOutputLocation());
+
 		// Annotation processors defined?
 		List<String> extraSourceDirs = new ArrayList<>();
-
 		if(!isPreJava16(config)) {
 			//now add jdk 1.6 annotation processing related parameters
 			String[] annotationProcessors = config.getAnnotationProcessors();
@@ -247,27 +262,26 @@ public class EclipseJavaCompiler
 				File generatedSourcesDir = config.getGeneratedSourcesDirectory();
 				if(generatedSourcesDir != null) {
 					generatedSourcesDir.mkdirs();
+					extraSourceDirs.add(generatedSourcesDir.getAbsolutePath());
+
+					//-- option to specify where annotation processor is to generate its output
+					args.add("-s");
+					args.add(generatedSourcesDir.getAbsolutePath());
 				}
 				if(config.getProc() != null) {
 					args.add("-proc:" + config.getProc());
 				}
-				extraSourceDirs.add(generatedSourcesDir.getAbsolutePath());
 			}
 		}
-
-		// Output path
-		args.add("-d");
-		args.add(config.getOutputLocation());
 
 		//-- Write .class files even when error occur, but make sure methods with compile errors do abort when called
 		//args.add("-proceedOnError:Fatal"); probably not a good plan as it will cause incremental compile to not work
 
 		//-- classpath
-		List<String> classpathEntries = config.getClasspathEntries();
-		if(classpathEntries.size() != 0) {
-			args.add("-classpath");
-			args.add(getPathString(classpathEntries));
-		}
+		List<String> classpathEntries = new ArrayList<>(config.getClasspathEntries());
+		classpathEntries.add(config.getOutputLocation());
+		args.add("-classpath");
+		args.add(getPathString(classpathEntries));
 
 		// ----------------------------------------------------------------------
         // Compile!
@@ -298,13 +312,13 @@ public class EclipseJavaCompiler
 				return new CompilerResult(true, Collections.EMPTY_LIST);
 			}
 
-			System.out.println(">>>> ECJ: " + args);
+			//System.out.println(">>>> ECJ: " + args);
 
 			StringWriter sw = new StringWriter();
 			PrintWriter devNull = new PrintWriter(sw);
 
 			//BatchCompiler.compile(args.toArray(new String[args.size()]), new PrintWriter(System.err), new PrintWriter(System.out), new CompilationProgress() {
-			boolean worked = BatchCompiler.compile(args.toArray(new String[args.size()]), devNull, devNull, new CompilationProgress() {
+			BatchCompiler.compile(args.toArray(new String[args.size()]), devNull, devNull, new CompilationProgress() {
 				@Override public void begin(int i) {
 
 				}
@@ -330,10 +344,6 @@ public class EclipseJavaCompiler
 			boolean hasError = false;
 			if(errorF.length() < 80) {
 				throw new IOException("Failed to run the ECJ compiler:\n" + sw.toString());
-				//messageList = new ArrayList<>();
-				//messageList.add(new CompilerMessage("Internal compiler error"));
-				//System.err.println(">> " + sw.toString());
-				//return new CompilerResult(false, messageList);
 			}
 			messageList = new EcjResponseParser().parse(errorF, errorsAsWarnings);
 
@@ -348,11 +358,11 @@ public class EclipseJavaCompiler
 		} catch(Exception x) {
         	throw new RuntimeException(x);				// sigh
 		} finally {
-			//if(null != errorF) {
-        		//try {
-        		//	errorF.delete();
-			//	} catch(Exception x) {}
-			//}
+			if(null != errorF) {
+        		try {
+        			errorF.delete();
+				} catch(Exception x) {}
+			}
 		}
     }
 
