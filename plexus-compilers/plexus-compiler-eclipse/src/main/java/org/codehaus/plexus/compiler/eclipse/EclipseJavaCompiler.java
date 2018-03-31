@@ -57,6 +57,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -259,7 +260,7 @@ public class EclipseJavaCompiler
 		args.add(config.getOutputLocation());
 
 		//-- Write .class files even when error occur, but make sure methods with compile errors do abort when called
-		args.add("-proceedOnError:Fatal");
+		//args.add("-proceedOnError:Fatal"); probably not a good plan as it will cause incremental compile to not work
 
 		//-- classpath
 		List<String> classpathEntries = config.getClasspathEntries();
@@ -280,6 +281,8 @@ public class EclipseJavaCompiler
 			args.add("-log");
 			args.add(errorF.toString());
 
+			// Add all sources.
+			int argCount = args.size();
 			for(String source : config.getSourceLocations()) {
 				File srcFile = new File(source);
 				if(srcFile.exists()) {
@@ -287,7 +290,13 @@ public class EclipseJavaCompiler
 					args.addAll(ss);
 				}
 			}
-
+			for(String extraSourceDir : extraSourceDirs) {
+				args.add(extraSourceDir);
+			}
+			if(args.size() == argCount) {
+				//-- Nothing to do -> bail out
+				return new CompilerResult(true, Collections.EMPTY_LIST);
+			}
 
 			System.out.println(">>>> ECJ: " + args);
 
@@ -320,10 +329,11 @@ public class EclipseJavaCompiler
 			List<CompilerMessage> messageList;
 			boolean hasError = false;
 			if(errorF.length() < 80) {
-				messageList = new ArrayList<>();
-				messageList.add(new CompilerMessage("Internal compiler error"));
-				System.err.println(">> " + sw.toString());
-				return new CompilerResult(false, messageList);
+				throw new IOException("Failed to run the ECJ compiler:\n" + sw.toString());
+				//messageList = new ArrayList<>();
+				//messageList.add(new CompilerMessage("Internal compiler error"));
+				//System.err.println(">> " + sw.toString());
+				//return new CompilerResult(false, messageList);
 			}
 			messageList = new EcjResponseParser().parse(errorF, errorsAsWarnings);
 
