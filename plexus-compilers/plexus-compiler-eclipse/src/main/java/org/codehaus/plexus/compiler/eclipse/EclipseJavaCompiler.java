@@ -38,9 +38,7 @@ import org.eclipse.jdt.core.compiler.IProblem;
 import org.eclipse.jdt.core.compiler.batch.BatchCompiler;
 import org.eclipse.jdt.internal.compiler.ClassFile;
 import org.eclipse.jdt.internal.compiler.CompilationResult;
-import org.eclipse.jdt.internal.compiler.DefaultErrorHandlingPolicies;
 import org.eclipse.jdt.internal.compiler.ICompilerRequestor;
-import org.eclipse.jdt.internal.compiler.IErrorHandlingPolicy;
 import org.eclipse.jdt.internal.compiler.classfmt.ClassFileReader;
 import org.eclipse.jdt.internal.compiler.classfmt.ClassFormatException;
 import org.eclipse.jdt.internal.compiler.env.ICompilationUnit;
@@ -56,14 +54,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.io.Writer;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -89,35 +84,28 @@ public class EclipseJavaCompiler
     public CompilerResult performCompile( CompilerConfiguration config )
         throws CompilerException
     {
-        List<CompilerMessage> errors = new LinkedList<CompilerMessage>();
 
-        List<String> classpathEntries = config.getClasspathEntries();
+        //URL[] urls = new URL[1 + classpathEntries.size()];
+		//
+        //int i = 0;
+		//
+        //try
+        //{
+        //    urls[i++] = new File( config.getOutputLocation() ).toURL();
+		//
+        //    for ( String entry : classpathEntries )
+        //    {
+        //        urls[i++] = new File( entry ).toURL();
+        //    }
+        //}
+        //catch ( MalformedURLException e )
+        //{
+        //    throw new CompilerException( "Error while converting the classpath entries to URLs.", e );
+        //}
 
-        URL[] urls = new URL[1 + classpathEntries.size()];
-
-        int i = 0;
-
-        try
-        {
-            urls[i++] = new File( config.getOutputLocation() ).toURL();
-
-            for ( String entry : classpathEntries )
-            {
-                urls[i++] = new File( entry ).toURL();
-            }
-        }
-        catch ( MalformedURLException e )
-        {
-            throw new CompilerException( "Error while converting the classpath entries to URLs.", e );
-        }
-
-        ClassLoader classLoader = new URLClassLoader( urls );
-
-        SourceCodeLocator sourceCodeLocator = new SourceCodeLocator( config.getSourceLocations() );
-
-        INameEnvironment env = new EclipseCompilerINameEnvironment( sourceCodeLocator, classLoader, errors );
-
-        IErrorHandlingPolicy policy = DefaultErrorHandlingPolicies.proceedWithAllProblems();
+        //ClassLoader classLoader = new URLClassLoader( urls );
+		//
+        //SourceCodeLocator sourceCodeLocator = new SourceCodeLocator( config.getSourceLocations() );
 
         // ----------------------------------------------------------------------
         // Build settings from configuration
@@ -192,6 +180,15 @@ public class EclipseJavaCompiler
 			this.errorsAsWarnings = true;
 		}
 
+		//-- Handle the properties silliness
+		String props = extras.get("properties");
+        if(null == props)
+        	props = extras.get("properties");
+        if(null != props) {
+        	File propFile = new File(props);
+        	if(! propFile.exists() || ! propFile.isFile())
+				throw new IllegalArgumentException("Properties file " + propFile + " does not exist");
+		}
         //settings.putAll( extras );
 
         //if ( settings.containsKey( "properties" ) )
@@ -257,6 +254,20 @@ public class EclipseJavaCompiler
 			}
 		}
 
+		// Output path
+		args.add("-d");
+		args.add(config.getOutputLocation());
+
+		//-- Write .class files even when error occur, but make sure methods with compile errors do abort when called
+		args.add("-proceedOnError:Fatal");
+
+		//-- classpath
+		List<String> classpathEntries = config.getClasspathEntries();
+		if(classpathEntries.size() != 0) {
+			args.add("-classpath");
+			args.add(getPathString(classpathEntries));
+		}
+
 		// ----------------------------------------------------------------------
         // Compile!
         // ----------------------------------------------------------------------
@@ -280,10 +291,11 @@ public class EclipseJavaCompiler
 
 			System.out.println(">>>> ECJ: " + args);
 
-			PrintWriter devNull = new PrintWriter(new NullWriter());
+			StringWriter sw = new StringWriter();
+			PrintWriter devNull = new PrintWriter(sw);
 
 			//BatchCompiler.compile(args.toArray(new String[args.size()]), new PrintWriter(System.err), new PrintWriter(System.out), new CompilationProgress() {
-			BatchCompiler.compile(args.toArray(new String[args.size()]), devNull, devNull, new CompilationProgress() {
+			boolean worked = BatchCompiler.compile(args.toArray(new String[args.size()]), devNull, devNull, new CompilationProgress() {
 				@Override public void begin(int i) {
 
 				}
@@ -305,16 +317,24 @@ public class EclipseJavaCompiler
 				}
 			});
 
-			List<CompilerMessage> messageList = new EcjResponseParser().parse(errorF, errorsAsWarnings);
-
+			List<CompilerMessage> messageList;
 			boolean hasError = false;
-			for(CompilerMessage compilerMessage : errors) {
+			if(errorF.length() < 80) {
+				messageList = new ArrayList<>();
+				messageList.add(new CompilerMessage("Internal compiler error"));
+				System.err.println(">> " + sw.toString());
+				return new CompilerResult(false, messageList);
+			}
+			messageList = new EcjResponseParser().parse(errorF, errorsAsWarnings);
+
+			for(CompilerMessage compilerMessage : messageList) {
 				if(compilerMessage.isError()) {
 					hasError = true;
 					break;
 				}
 			}
 			return new CompilerResult(! hasError, messageList);
+
 		} catch(Exception x) {
         	throw new RuntimeException(x);				// sigh
 		} finally {

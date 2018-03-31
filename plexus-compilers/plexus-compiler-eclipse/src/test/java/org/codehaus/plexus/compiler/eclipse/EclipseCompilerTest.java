@@ -24,13 +24,13 @@ package org.codehaus.plexus.compiler.eclipse;
  * SOFTWARE.
  */
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
-
 import org.codehaus.plexus.compiler.AbstractCompilerTest;
 import org.codehaus.plexus.compiler.Compiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>
@@ -117,7 +117,7 @@ public class EclipseCompilerTest
         }
         catch ( IllegalArgumentException e )
         {
-            assertEquals( "Properties file not exist", e.getMessage() );
+            assertTrue("Message must start with 'Properties file'", e.getMessage().startsWith("Properties file"));
         }
     }
 
