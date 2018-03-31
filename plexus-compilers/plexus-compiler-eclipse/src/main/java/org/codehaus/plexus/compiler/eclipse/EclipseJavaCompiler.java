@@ -33,24 +33,20 @@ import org.codehaus.plexus.compiler.CompilerResult;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
+import org.eclipse.jdt.core.compiler.CompilationProgress;
 import org.eclipse.jdt.core.compiler.IProblem;
 import org.eclipse.jdt.core.compiler.batch.BatchCompiler;
 import org.eclipse.jdt.internal.compiler.ClassFile;
 import org.eclipse.jdt.internal.compiler.CompilationResult;
-import org.eclipse.jdt.internal.compiler.Compiler;
 import org.eclipse.jdt.internal.compiler.DefaultErrorHandlingPolicies;
 import org.eclipse.jdt.internal.compiler.ICompilerRequestor;
 import org.eclipse.jdt.internal.compiler.IErrorHandlingPolicy;
-import org.eclipse.jdt.internal.compiler.IProblemFactory;
-import org.eclipse.jdt.internal.compiler.apt.dispatch.BatchAnnotationProcessorManager;
-import org.eclipse.jdt.internal.compiler.batch.CompilationUnit;
 import org.eclipse.jdt.internal.compiler.classfmt.ClassFileReader;
 import org.eclipse.jdt.internal.compiler.classfmt.ClassFormatException;
 import org.eclipse.jdt.internal.compiler.env.ICompilationUnit;
 import org.eclipse.jdt.internal.compiler.env.INameEnvironment;
 import org.eclipse.jdt.internal.compiler.env.NameEnvironmentAnswer;
 import org.eclipse.jdt.internal.compiler.impl.CompilerOptions;
-import org.eclipse.jdt.internal.compiler.problem.DefaultProblemFactory;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -59,16 +55,16 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -127,65 +123,63 @@ public class EclipseJavaCompiler
         // Build settings from configuration
         // ----------------------------------------------------------------------
 
-        Map<String, String> settings = new HashMap<String, String>();
-
+		List<String> args = new ArrayList<>();
         if ( config.isDebug() )
         {
-            settings.put( CompilerOptions.OPTION_LocalVariableAttribute, CompilerOptions.GENERATE );
-            settings.put( CompilerOptions.OPTION_LineNumberAttribute, CompilerOptions.GENERATE );
-            settings.put( CompilerOptions.OPTION_SourceFileAttribute, CompilerOptions.GENERATE );
-        }
-
-        if ( !config.isShowWarnings() )
-        {
-            Map opts = new CompilerOptions().getMap();
-            for (Object optKey : opts.keySet()) {
-                if (opts.get(optKey).equals(CompilerOptions.WARNING)) {
-                    settings.put((String) optKey, CompilerOptions.IGNORE);
-                }
-            }
-        }
+        	args.add("-preserveAllLocals");
+        	args.add("-g:lines,vars,source");
+        } else {
+			args.add("-g:lines,source");
+		}
 
         String sourceVersion = decodeVersion( config.getSourceVersion() );
 
         if ( sourceVersion != null )
         {
-            settings.put( CompilerOptions.OPTION_Source, sourceVersion );
+        	args.add("-source");
+        	args.add(sourceVersion);
         }
 
         String targetVersion = decodeVersion( config.getTargetVersion() );
 
         if ( targetVersion != null )
         {
-            settings.put( CompilerOptions.OPTION_TargetPlatform, targetVersion );
-            settings.put( CompilerOptions.OPTION_Compliance, targetVersion );
+        	args.add("-target");
+        	args.add(targetVersion);
         }
 
         if ( StringUtils.isNotEmpty( config.getSourceEncoding() ) )
         {
-            settings.put( CompilerOptions.OPTION_Encoding, config.getSourceEncoding() );
+        	args.add("-encoding");
+        	args.add(config.getSourceEncoding());
         }
 
-        if ( config.isShowDeprecation() )
-        {
-            settings.put( CompilerOptions.OPTION_ReportDeprecation, CompilerOptions.WARNING );
-        }
-        else
-        {
-            settings.put( CompilerOptions.OPTION_ReportDeprecation, CompilerOptions.IGNORE );
-        }
+		if ( !config.isShowWarnings() )
+		{
+			args.add("-warn:none");
+		}
+		else
+		{
+			StringBuilder warns = new StringBuilder();
 
-        if ( config.isParameters() )
-        {
-            settings.put( CompilerOptions.OPTION_MethodParametersAttribute, CompilerOptions.GENERATE );
-        }
+			if(config.isShowDeprecation()) {
+				append(warns, "+deprecation");
+			} else {
+				append(warns, "-deprecation");
+			}
+
+			//-- Make room for more warnings to be enabled/disabled
+			args.add("-warn:" + warns);
+		}
+
+		if(config.isParameters())
+		{
+			args.add("-parameters");
+		}
 
         // ----------------------------------------------------------------------
         // Set Eclipse-specific options
         // ----------------------------------------------------------------------
-
-        settings.put( CompilerOptions.OPTION_LineNumberAttribute, CompilerOptions.GENERATE );
-        settings.put( CompilerOptions.OPTION_SourceFileAttribute, CompilerOptions.GENERATE );
 
         // compiler-specific extra options override anything else in the config object...
         Map<String, String> extras = cleanKeyNames( config.getCustomCompilerArgumentsAsMap() );
@@ -193,115 +187,153 @@ public class EclipseJavaCompiler
         {
         	extras.remove( "errorsAsWarnings" );
         	this.errorsAsWarnings = true;
-        }
+        } else if(extras.containsKey("-errorsAsWarnings")) {
+			extras.remove( "-errorsAsWarnings" );
+			this.errorsAsWarnings = true;
+		}
 
-        settings.putAll( extras );
+        //settings.putAll( extras );
 
-        if ( settings.containsKey( "properties" ) )
-        {
-            initializeWarnings( settings.get( "properties" ), settings );
-            settings.remove( "properties" );
-        }
+        //if ( settings.containsKey( "properties" ) )
+        //{
+        //    initializeWarnings( settings.get( "properties" ), settings );
+        //    settings.remove( "properties" );
+        //}
 
-        IProblemFactory problemFactory = new DefaultProblemFactory( Locale.getDefault() );
+        //IProblemFactory problemFactory = new DefaultProblemFactory( Locale.getDefault() );
+		//
+        //ICompilerRequestor requestor = new EclipseCompilerICompilerRequestor( config.getOutputLocation(), errors );
+		//
+        //for ( String sourceRoot : config.getSourceLocations() )
+        //{
+        //    // annotations directory does not always exist and the below scanner fails on non existing directories
+        //    File potentialSourceDirectory = new File( sourceRoot );
+        //    if ( potentialSourceDirectory.exists() )
+        //    {
+        //        Set<String> sources = getSourceFilesForSourceRoot( config, sourceRoot );
+		//
+        //        for ( String source : sources )
+        //        {
+        //            CompilationUnit unit = new CompilationUnit( source, makeClassName( source, sourceRoot ), errors,
+        //                                                        config.getSourceEncoding() );
+		//
+        //            compilationUnits.add( unit );
+        //        }
+        //    }
+        //}
 
-        ICompilerRequestor requestor = new EclipseCompilerICompilerRequestor( config.getOutputLocation(), errors );
+		// Annotation processors defined?
+		List<String> extraSourceDirs = new ArrayList<>();
 
-        List<CompilationUnit> compilationUnits = new ArrayList<CompilationUnit>();
+		if(!isPreJava16(config)) {
+			//now add jdk 1.6 annotation processing related parameters
+			String[] annotationProcessors = config.getAnnotationProcessors();
+			List<String> processorPathEntries = config.getProcessorPathEntries();
+			if((annotationProcessors != null && annotationProcessors.length > 0) || (processorPathEntries != null && processorPathEntries.size() > 0)) {
+				if(annotationProcessors != null && annotationProcessors.length > 0) {
+					args.add("-processor");
+					StringBuilder sb = new StringBuilder();
+					for(String ap : annotationProcessors) {
+						if(sb.length() > 0)
+							sb.append(',');
+						sb.append(ap);
+					}
+					args.add(sb.toString());
+				}
 
-        for ( String sourceRoot : config.getSourceLocations() )
-        {
-            // annotations directory does not always exist and the below scanner fails on non existing directories
-            File potentialSourceDirectory = new File( sourceRoot );
-            if ( potentialSourceDirectory.exists() )
-            {
-                Set<String> sources = getSourceFilesForSourceRoot( config, sourceRoot );
+				if(processorPathEntries != null && processorPathEntries.size() > 0) {
+					args.add("-processorpath");
+					args.add(getPathString(processorPathEntries));
+				}
 
-                for ( String source : sources )
-                {
-                    CompilationUnit unit = new CompilationUnit( source, makeClassName( source, sourceRoot ), errors,
-                                                                config.getSourceEncoding() );
+				File generatedSourcesDir = config.getGeneratedSourcesDirectory();
+				if(generatedSourcesDir != null) {
+					generatedSourcesDir.mkdirs();
+				}
+				if(config.getProc() != null) {
+					args.add("-proc:" + config.getProc());
+				}
+				extraSourceDirs.add(generatedSourcesDir.getAbsolutePath());
+			}
+		}
 
-                    compilationUnits.add( unit );
-                }
-            }
-        }
-
-        // ----------------------------------------------------------------------
+		// ----------------------------------------------------------------------
         // Compile!
         // ----------------------------------------------------------------------
 
-        CompilerOptions options = new CompilerOptions( settings );
-        Compiler compiler = new Compiler( env, policy, options, requestor, problemFactory );
+		// Send all errors to xml temp file
+		File errorF = null;
+		try {
+			errorF = File.createTempFile("ecjerr-", ".xml");
 
-        // Annotation processors defined?
-        if ( !isPreJava16( config ) )
-        {
-            //now add jdk 1.6 annotation processing related parameters
+			args.add("-log");
+			args.add(errorF.toString());
 
-
-            String[] annotationProcessors = config.getAnnotationProcessors();
-            List<String> processorPathEntries = config.getProcessorPathEntries();
-            if((annotationProcessors != null && annotationProcessors.length > 0) || (processorPathEntries != null && processorPathEntries.size() > 0))
-            {
-                List<String> args = new ArrayList<>();
-                if (annotationProcessors != null && annotationProcessors.length > 0) {
-                    args.add("-processor");
-                    StringBuilder sb = new StringBuilder();
-                    for(String ap : annotationProcessors) {
-                        if(sb.length() > 0)
-                            sb.append(',');
-                        sb.append(ap);
-                    }
-                    args.add(sb.toString());
-                }
-
-                if(processorPathEntries != null && processorPathEntries.size() > 0) {
-                    args.add("-processorpath");
-                    args.add(getPathString(processorPathEntries));
-                }
-
-                File generatedSourcesDir = config.getGeneratedSourcesDirectory();
-                if ( generatedSourcesDir != null )
-                {
-                    generatedSourcesDir.mkdirs();
-
-                    //args.add( "-s" );
-                    //args.add( generatedSourcesDir.getAbsolutePath() );
-                }
-                if ( config.getProc() != null )
-                {
-                    args.add("-proc:" + config.getProc());
-                }
-
-                BatchAnnotationProcessorManager bapm = new BatchAnnotationProcessorManager();
-                bapm.configure(compiler, args.toArray(new String[args.size()]));
-                compiler.annotationProcessorManager = bapm;
-            }
-        }
-
-        BatchCompiler bc = BatchCompiler.
+			for(String source : config.getSourceLocations()) {
+				File srcFile = new File(source);
+				if(srcFile.exists()) {
+					Set<String> ss = getSourceFilesForSourceRoot( config, source );
+					args.addAll(ss);
+				}
+			}
 
 
-        ICompilationUnit[] units = compilationUnits.toArray( new ICompilationUnit[compilationUnits.size()] );
+			System.out.println(">>>> ECJ: " + args);
 
-        compiler.compile( units );
+			PrintWriter devNull = new PrintWriter(new NullWriter());
 
-        CompilerResult compilerResult = new CompilerResult().compilerMessages( errors );
+			//BatchCompiler.compile(args.toArray(new String[args.size()]), new PrintWriter(System.err), new PrintWriter(System.out), new CompilationProgress() {
+			BatchCompiler.compile(args.toArray(new String[args.size()]), devNull, devNull, new CompilationProgress() {
+				@Override public void begin(int i) {
 
-        for ( CompilerMessage compilerMessage : errors )
-        {
-            if ( compilerMessage.isError() )
-            {
-                compilerResult.setSuccess( false );
-                continue;
-            }
-        }
+				}
 
-        return compilerResult;
+				@Override public void done() {
+
+				}
+
+				@Override public boolean isCanceled() {
+					return false;
+				}
+
+				@Override public void setTaskName(String s) {
+
+				}
+
+				@Override public void worked(int i, int i1) {
+
+				}
+			});
+
+			List<CompilerMessage> messageList = new EcjResponseParser().parse(errorF, errorsAsWarnings);
+
+			boolean hasError = false;
+			for(CompilerMessage compilerMessage : errors) {
+				if(compilerMessage.isError()) {
+					hasError = true;
+					break;
+				}
+			}
+			return new CompilerResult(! hasError, messageList);
+		} catch(Exception x) {
+        	throw new RuntimeException(x);				// sigh
+		} finally {
+			//if(null != errorF) {
+        		//try {
+        		//	errorF.delete();
+			//	} catch(Exception x) {}
+			//}
+		}
     }
 
-    private boolean isPreJava16(CompilerConfiguration config) {
+	static private void append(StringBuilder warns, String s) {
+		if(warns.length() > 0)
+			warns.append(',');
+		warns.append(s);
+
+	}
+
+	private boolean isPreJava16(CompilerConfiguration config) {
         String s = config.getSourceVersion();
         if ( s == null )
         {
@@ -815,4 +847,15 @@ public class EclipseJavaCompiler
             setting.put( key, entry.getValue().toString() );
         }
     }
+
+    private class NullWriter extends Writer {
+		@Override public void write(char[] cbuf, int off, int len) throws IOException {
+		}
+
+		@Override public void close() {
+		}
+
+		@Override public void flush() {
+		}
+	}
 }
