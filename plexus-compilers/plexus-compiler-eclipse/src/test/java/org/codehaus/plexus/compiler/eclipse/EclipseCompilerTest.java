@@ -91,7 +91,7 @@ public class EclipseCompilerTest
         compilerConfig.addCompilerCustomArgument( "-key", "value" );
         compilerConfig.addCompilerCustomArgument( "cleanKey", "value" );
 
-        Map<String, String> cleaned = compiler.cleanKeyNames( compilerConfig.getCustomCompilerArgumentsAsMap() );
+        Map<String, String> cleaned = compiler.removeDashesFromAllKeys( compilerConfig.getCustomCompilerArgumentsAsMap() );
 
         assertTrue( "Key should have been cleaned", cleaned.containsKey( "key" ) );
 
