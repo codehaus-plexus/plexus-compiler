@@ -40,7 +40,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -125,7 +124,7 @@ public class EclipseJavaCompiler
 
         // Set Eclipse-specific options
         // compiler-specific extra options override anything else in the config object...
-        Map<String, String> extras = removeDashesFromAllKeys( config.getCustomCompilerArgumentsAsMap() );
+        Map<String, String> extras = config.getCustomCompilerArgumentsAsMap();
         if( extras.containsKey( "errorsAsWarnings" ) )
         {
             extras.remove( "errorsAsWarnings" );
@@ -137,21 +136,19 @@ public class EclipseJavaCompiler
             this.errorsAsWarnings = true;
         }
 
-        //-- Handle the properties silliness
-        String props = extras.get("properties");
-        if(null == props)
-            props = extras.get("properties");
+        //-- check for existence of the properties file manually
+        String props = extras.get("-properties");
         if(null != props) {
             File propFile = new File(props);
             if(! propFile.exists() || ! propFile.isFile())
-                throw new IllegalArgumentException("Properties file " + propFile + " does not exist");
+                throw new IllegalArgumentException("Properties file specified by -properties " + propFile + " does not exist");
         }
 
         for(Entry<String, String> entry : extras.entrySet())
         {
             String opt = entry.getKey();
             if(! opt.startsWith("-"))
-                opt = "-" + opt;					// This is beyond sad
+                opt = "-" + opt;					// compiler mojo apparently messes with this; make sure we are safe
             args.add(opt);
             String value = entry.getValue();
             if(null != value && ! value.isEmpty())
@@ -201,7 +198,7 @@ public class EclipseJavaCompiler
         }
 
         //-- Write .class files even when error occur, but make sure methods with compile errors do abort when called
-        if(extras.containsKey("-proceedOnError") || extras.containsKey("proceedOnError"))
+        if(extras.containsKey("-proceedOnError"))
             args.add("-proceedOnError:Fatal");      // Generate a class file even with errors, but make methods with errors fail when called
 
         //-- classpath
@@ -297,26 +294,6 @@ public class EclipseJavaCompiler
         }
         return s.startsWith( "1.5" ) || s.startsWith( "1.4" ) || s.startsWith( "1.3" ) || s.startsWith( "1.2" )
             || s.startsWith( "1.1" ) || s.startsWith( "1.0" );
-    }
-
-    /**
-     * The compiler mojo adds a dash to all keys which does not make sense for the eclipse compiler
-     */
-    Map<String, String> removeDashesFromAllKeys(Map<String, String> customCompilerArgumentsAsMap )
-    {
-        LinkedHashMap<String, String> cleanedMap = new LinkedHashMap<String, String>();
-
-        for ( Map.Entry<String, String> entry : customCompilerArgumentsAsMap.entrySet() )
-        {
-            String key = entry.getKey();
-            if ( key.startsWith( "-" ) )
-            {
-                key = key.substring( 1 );
-            }
-            cleanedMap.put( key, entry.getValue() );
-        }
-
-        return cleanedMap;
     }
 
     public String[] createCommandLine( CompilerConfiguration config )
