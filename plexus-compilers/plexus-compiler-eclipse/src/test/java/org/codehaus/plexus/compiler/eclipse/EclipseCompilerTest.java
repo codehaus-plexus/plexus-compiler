@@ -30,7 +30,6 @@ import org.codehaus.plexus.compiler.CompilerConfiguration;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Map;
 
 /**
  * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>
@@ -80,25 +79,6 @@ public class EclipseCompilerTest
         compilerConfig.addCompilerCustomArgument( "-key", "value" );
 
         compiler.performCompile( compilerConfig );
-    }
-
-    public void testCustomArgumentCleanup()
-    {
-        EclipseJavaCompiler compiler = new EclipseJavaCompiler();
-
-        CompilerConfiguration compilerConfig = createMinimalCompilerConfig();
-
-        compilerConfig.addCompilerCustomArgument( "-key", "value" );
-        compilerConfig.addCompilerCustomArgument( "cleanKey", "value" );
-
-        Map<String, String> cleaned = compiler.removeDashesFromAllKeys( compilerConfig.getCustomCompilerArgumentsAsMap() );
-
-        assertTrue( "Key should have been cleaned", cleaned.containsKey( "key" ) );
-
-        assertFalse( "Key should have been cleaned", cleaned.containsKey( "-key" ) );
-
-        assertTrue( "This key should not have been cleaned does not start with dash", cleaned.containsKey( "cleanKey" ) );
-
     }
 
     public void testInitializeWarningsForPropertiesArgument()
