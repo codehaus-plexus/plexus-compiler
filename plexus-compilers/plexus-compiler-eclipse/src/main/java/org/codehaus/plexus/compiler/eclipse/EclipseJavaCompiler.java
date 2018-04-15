@@ -64,8 +64,10 @@ public class EclipseJavaCompiler
     public CompilerResult performCompile(CompilerConfiguration config )
         throws CompilerException
     {
-        // Build settings from configuration
         List<String> args = new ArrayList<>();
+        args.add("-noExit");                            // Make sure ecj does not System.exit on us 8-/
+
+        // Build settings from configuration
         if ( config.isDebug() )
         {
             args.add("-preserveAllLocals");
@@ -146,13 +148,44 @@ public class EclipseJavaCompiler
 
         for(Entry<String, String> entry : extras.entrySet())
         {
+            /*
+             * The compiler mojo makes quite a mess of passing arguments, depending on exactly WHICH
+             * way is used to pass them. The method method using <compilerArguments> uses the tag names
+             * of its contents to denote option names, and so the compiler mojo happily adds a '-' to
+             * all of the names there and adds them to the "custom compiler arguments" map as a
+             * name, value pair where the name always contains a single '-'. The Eclipse compiler (and
+             * javac too, btw) has options with two dashes (like --add-modules for java 9). These cannot
+             * be passed using a <compilerArguments> tag.
+             *
+             * The other method is to use <compilerArgs>, where each SINGLE argument needs to be passed
+             * using an <arg>xxxx</arg> tag. In there the xxx is not manipulated by the compiler mojo, so
+             * if it starts with a dash or more dashes these are perfectly preserved. But of course these
+             * single <arg> entries are not a pair. So the compiler mojo adds them as pairs of (xxxx, null).
+             *
+             * We use that knowledge here: if a pair has a null value then do not mess up the key but
+             * render it as a single value. This should ensure that something like:
+             * <compilerArgs>
+             *     <arg>--add-modules</arg>
+             *     <arg>java.se.ee</arg>
+             * </compilerArgs>
+             *
+             * is actually added to the command like as such.
+             *
+             * (btw: the above example will still give an error when using ecj <= 4.8M6:
+             *      invalid module name: java.se.ee
+             * but that seems to be a bug in ecj).
+             */
             String opt = entry.getKey();
-            if(! opt.startsWith("-"))
-                opt = "-" + opt;					// compiler mojo apparently messes with this; make sure we are safe
-            args.add(opt);
-            String value = entry.getValue();
-            if(null != value && ! value.isEmpty())
-                args.add(value);
+            String optionValue = entry.getValue();
+            if(null == optionValue) {
+                //-- We have an option from compilerArgs: use the key as-is as a single option value
+                args.add(opt);
+            } else {
+                if(!opt.startsWith("-"))
+                    opt = "-" + opt;
+                args.add(opt);
+                args.add(optionValue);
+            }
         }
 
         // Output path
@@ -234,21 +267,31 @@ public class EclipseJavaCompiler
             PrintWriter devNull = new PrintWriter(sw);
 
             //BatchCompiler.compile(args.toArray(new String[args.size()]), new PrintWriter(System.err), new PrintWriter(System.out), new CompilationProgress() {
-            BatchCompiler.compile(args.toArray(new String[args.size()]), devNull, devNull, new CompilationProgress() {
-                @Override public void begin(int i) {
+            boolean success = BatchCompiler.compile(args.toArray(new String[args.size()]), devNull, devNull, new CompilationProgress() {
+                @Override
+                public void begin(int i)
+                {
                 }
 
-                @Override public void done() {
+                @Override
+                public void done()
+                {
                 }
 
-                @Override public boolean isCanceled() {
+                @Override
+                public boolean isCanceled()
+                {
                     return false;
                 }
 
-                @Override public void setTaskName(String s) {
+                @Override
+                public void setTaskName(String s)
+                {
                 }
 
-                @Override public void worked(int i, int i1) {
+                @Override
+                public void worked(int i, int i1)
+                {
                 }
             });
             getLogger().debug(sw.toString());
@@ -266,6 +309,20 @@ public class EclipseJavaCompiler
                     break;
                 }
             }
+            if(! hasError && ! success && ! errorsAsWarnings) {
+                //-- Compiler reported failure but we do not seem to have one -> probable exception
+                CompilerMessage cm = new CompilerMessage("[ecj] The compiler reported an error but has not written it to its logging", CompilerMessage.Kind.ERROR);
+                messageList.add(cm);
+                hasError = true;
+
+                //-- Try to find the actual message by reporting the last 5 lines as a message
+                String stdout = getLastLines(sw.toString(), 5);
+                if(stdout.length() > 0)
+                {
+                    cm = new CompilerMessage("[ecj] The following line(s) might indicate the issue:\n" + stdout, CompilerMessage.Kind.ERROR);
+                    messageList.add(cm);
+                }
+            }
             return new CompilerResult(! hasError, messageList);
 
         } catch(Exception x) {
@@ -277,6 +334,39 @@ public class EclipseJavaCompiler
                 } catch(Exception x) {}
             }
         }
+    }
+
+    private String getLastLines(String text, int lines)
+    {
+        List<String> lineList = new ArrayList<>();
+        text = text.replace("\r\n", "\n");
+        text = text.replace("\r", "\n");            // make sure eoln is \n
+
+        int index = text.length();
+        while(index > 0) {
+            int before = text.lastIndexOf('\n', index - 1);
+//            if(before == -1) {
+//                before = 0;
+//            }
+
+            if(before + 1 < index) {                        // Non empty line?
+                lineList.add(text.substring(before + 1, index));
+                lines--;
+                if(lines <= 0)
+                    break;
+            }
+
+            index = before;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for(int i = lineList.size() - 1; i >= 0; i--)
+        {
+            String s = lineList.get(i);
+            sb.append(s);
+            sb.append(System.getProperty("line.separator"));        // 8-/
+        }
+        return sb.toString();
     }
 
     static private void append(StringBuilder warns, String s) {
