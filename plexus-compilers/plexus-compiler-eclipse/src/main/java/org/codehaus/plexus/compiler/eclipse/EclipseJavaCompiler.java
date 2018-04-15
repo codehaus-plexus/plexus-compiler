@@ -310,8 +310,10 @@ public class EclipseJavaCompiler
                 }
             }
             if(! hasError && ! success && ! errorsAsWarnings) {
+                CompilerMessage.Kind kind = errorsAsWarnings ? CompilerMessage.Kind.WARNING : CompilerMessage.Kind.ERROR;
+
                 //-- Compiler reported failure but we do not seem to have one -> probable exception
-                CompilerMessage cm = new CompilerMessage("[ecj] The compiler reported an error but has not written it to its logging", CompilerMessage.Kind.ERROR);
+                CompilerMessage cm = new CompilerMessage("[ecj] The compiler reported an error but has not written it to its logging", kind);
                 messageList.add(cm);
                 hasError = true;
 
@@ -319,11 +321,11 @@ public class EclipseJavaCompiler
                 String stdout = getLastLines(sw.toString(), 5);
                 if(stdout.length() > 0)
                 {
-                    cm = new CompilerMessage("[ecj] The following line(s) might indicate the issue:\n" + stdout, CompilerMessage.Kind.ERROR);
+                    cm = new CompilerMessage("[ecj] The following line(s) might indicate the issue:\n" + stdout, kind);
                     messageList.add(cm);
                 }
             }
-            return new CompilerResult(! hasError, messageList);
+            return new CompilerResult(! hasError || errorsAsWarnings, messageList);
 
         } catch(Exception x) {
             throw new RuntimeException(x);				// sigh
@@ -345,9 +347,6 @@ public class EclipseJavaCompiler
         int index = text.length();
         while(index > 0) {
             int before = text.lastIndexOf('\n', index - 1);
-//            if(before == -1) {
-//                before = 0;
-//            }
 
             if(before + 1 < index) {                        // Non empty line?
                 lineList.add(text.substring(before + 1, index));
