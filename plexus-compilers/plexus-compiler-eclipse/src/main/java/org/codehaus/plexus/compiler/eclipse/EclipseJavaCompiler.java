@@ -242,7 +242,8 @@ public class EclipseJavaCompiler
 
         // Compile! Send all errors to xml temp file.
         File errorF = null;
-        try {
+        try
+        {
             errorF = File.createTempFile("ecjerr-", ".xml");
 
             args.add("-log");
@@ -250,18 +251,23 @@ public class EclipseJavaCompiler
 
             // Add all sources.
             int argCount = args.size();
-            for(String source : config.getSourceLocations()) {
+            for(String source : config.getSourceLocations())
+            {
                 File srcFile = new File(source);
-                if(srcFile.exists()) {
-                    Set<String> ss = getSourceFilesForSourceRoot( config, source );
+                if(srcFile.exists())
+                {
+                    Set<String> ss = getSourceFilesForSourceRoot(config, source);
                     args.addAll(ss);
                 }
             }
             args.addAll(extraSourceDirs);
-            if(args.size() == argCount) {
+            if(args.size() == argCount)
+            {
                 //-- Nothing to do -> bail out
                 return new CompilerResult(true, Collections.EMPTY_LIST);
             }
+
+            getLogger().debug("ecj command line: " + args);
 
             StringWriter sw = new StringWriter();
             PrintWriter devNull = new PrintWriter(sw);
@@ -298,18 +304,22 @@ public class EclipseJavaCompiler
 
             List<CompilerMessage> messageList;
             boolean hasError = false;
-            if(errorF.length() < 80) {
-                throw new IOException("Failed to run the ECJ compiler:\n" + sw.toString());
+            if(errorF.length() < 80)
+            {
+                throw new EcjFailureException(sw.toString());
             }
             messageList = new EcjResponseParser().parse(errorF, errorsAsWarnings);
 
-            for(CompilerMessage compilerMessage : messageList) {
-                if(compilerMessage.isError()) {
+            for(CompilerMessage compilerMessage : messageList)
+            {
+                if(compilerMessage.isError())
+                {
                     hasError = true;
                     break;
                 }
             }
-            if(! hasError && ! success && ! errorsAsWarnings) {
+            if(!hasError && !success && !errorsAsWarnings)
+            {
                 CompilerMessage.Kind kind = errorsAsWarnings ? CompilerMessage.Kind.WARNING : CompilerMessage.Kind.ERROR;
 
                 //-- Compiler reported failure but we do not seem to have one -> probable exception
@@ -325,8 +335,9 @@ public class EclipseJavaCompiler
                     messageList.add(cm);
                 }
             }
-            return new CompilerResult(! hasError || errorsAsWarnings, messageList);
-
+            return new CompilerResult(!hasError || errorsAsWarnings, messageList);
+        } catch(EcjFailureException x) {
+            throw x;
         } catch(Exception x) {
             throw new RuntimeException(x);				// sigh
         } finally {
