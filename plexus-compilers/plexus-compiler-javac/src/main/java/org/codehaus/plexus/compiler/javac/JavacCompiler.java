@@ -158,7 +158,9 @@ public class JavacCompiler
                 }
                 catch ( IOException e )
                 {
-                    getLogger().warn( "Unable to autodetect 'javac' path, using 'javac' from the environment." );
+                    if ( (getLogger() != null ) && getLogger().isWarnEnabled()) {
+                        getLogger().warn( "Unable to autodetect 'javac' path, using 'javac' from the environment." );
+                    }
                     executable = "javac";
                 }
             }
@@ -590,7 +592,9 @@ public class JavacCompiler
         final Thread thread = Thread.currentThread();
         final ClassLoader contextClassLoader = thread.getContextClassLoader();
         thread.setContextClassLoader( javacClass.getClassLoader() );
-        getLogger().debug( "ttcl changed run compileInProcessWithProperClassloader" );
+        if ( (getLogger() != null ) && getLogger().isDebugEnabled()) {
+            getLogger().debug("ttcl changed run compileInProcessWithProperClassloader");
+        }
         try
         {
             return compileInProcessWithProperClassloader(javacClass, args);
