@@ -1,6 +1,4 @@
-package org.codehaus.plexus.compiler.eclipse;
-
-/**
+/*
  * The MIT License
  *
  * Copyright (c) 2005, The Codehaus
@@ -23,17 +21,15 @@ package org.codehaus.plexus.compiler.eclipse;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package org.codehaus.plexus.compiler.eclipse;
 
 import org.codehaus.plexus.compiler.AbstractCompilerTckTest;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  */
-public class EclipseCompilerTckTest
-    extends AbstractCompilerTckTest
-{
-    public EclipseCompilerTckTest()
-    {
-        super( "eclipse" );
+public class EclipseCompilerTckTest extends AbstractCompilerTckTest {
+    public EclipseCompilerTckTest() {
+        super("eclipse");
     }
 }

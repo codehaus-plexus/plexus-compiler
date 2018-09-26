@@ -35,7 +35,6 @@ import org.eclipse.jdt.core.compiler.CompilationProgress;
 import org.eclipse.jdt.core.compiler.batch.BatchCompiler;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -143,7 +142,7 @@ public class EclipseJavaCompiler
         if(null != props) {
             File propFile = new File(props);
             if(! propFile.exists() || ! propFile.isFile())
-                throw new IllegalArgumentException("Properties file specified by -properties " + propFile + " does not exist");
+                throw new EcjFailureException("Properties file specified by -properties " + propFile + " does not exist");
         }
 
         for(Entry<String, String> entry : extras.entrySet())
