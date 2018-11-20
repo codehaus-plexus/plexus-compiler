@@ -3,6 +3,7 @@ jdk:
 
   - oraclejdk8
   - oraclejdk9
+  - oraclejdk11
   - openjdk7
   
 script: "mvn --show-version --errors --batch-mode clean verify -DredirectTestOutputToFile=false"

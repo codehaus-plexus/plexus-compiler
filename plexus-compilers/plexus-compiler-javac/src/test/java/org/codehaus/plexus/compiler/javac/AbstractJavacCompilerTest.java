@@ -60,14 +60,14 @@ public abstract class AbstractJavacCompilerTest
 
     protected int expectedErrors()
     {
-
-        if (getJavaVersion().contains("9.0")){
+        String javaVersion = getJavaVersion();
+        if (javaVersion.contains("9.0")||javaVersion.contains("11")){
             // lots of new warnings about obsoletions for future releases
             return 5;
         }
 
         // javac output changed for misspelled modifiers starting in 1.6...they now generate 2 errors per occurrence, not one.
-        if ( "1.5".compareTo( getJavaVersion() ) < 0 )
+        if ( "1.5".compareTo( javaVersion ) < 0 )
         {
             return 4;
         }
@@ -79,18 +79,21 @@ public abstract class AbstractJavacCompilerTest
 
     protected int expectedWarnings()
     {
-        if (getJavaVersion().contains("9.0")){
+        String javaVersion = getJavaVersion();
+        if (javaVersion.contains("11")){
+            return 1;
+        }
+        if (javaVersion.contains("9.0")){
             // lots of new warnings about obsoletions for future releases
             return 8;
         }
 
-
-        if (getJavaVersion().contains("1.8")){
+        if (javaVersion.contains("1.8")){
             // lots of new warnings about obsoletions for future releases
             return 30;
         }
 
-        if ( "1.6".compareTo( getJavaVersion() ) < 0 )
+        if ( "1.6".compareTo( javaVersion ) < 0 )
         {
             // with 1.7 some warning with bootstrap class path not set in conjunction with -source 1.3
             return 9;
@@ -102,8 +105,12 @@ public abstract class AbstractJavacCompilerTest
     @Override
     public String getTargetVersion()
     {
-        if (getJavaVersion().contains("9.0")){
+        String javaVersion = getJavaVersion();
+        if (javaVersion.contains("9.0")){
             return "1.7";
+        }
+        if (javaVersion.contains("11")){
+            return "11";
         }
         return super.getTargetVersion();
     }
@@ -111,15 +118,20 @@ public abstract class AbstractJavacCompilerTest
     @Override
     public String getSourceVersion()
     {
-        if (getJavaVersion().contains("9.0")){
+        String javaVersion = getJavaVersion();
+        if (javaVersion.contains("9.0")){
             return "1.7";
+        }
+        if (javaVersion.contains("11")){
+            return "11";
         }
         return super.getTargetVersion();
     }
 
     protected Collection<String> expectedOutputFiles()
     {
-        if (getJavaVersion().contains("9.0")){
+        String javaVersion = getJavaVersion();
+        if (javaVersion.contains("9.0")||javaVersion.contains("11")){
             return Arrays.asList( new String[]{ "org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ExternalDeps.class",
                 "org/codehaus/foo/Person.class"} );
         }
@@ -142,7 +154,7 @@ public abstract class AbstractJavacCompilerTest
 
     public void testBuildCompilerArgs13()
     {
-        List<String> expectedArguments = new ArrayList<String>();
+        List<String> expectedArguments = new ArrayList<>();
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
@@ -155,7 +167,7 @@ public abstract class AbstractJavacCompilerTest
 
     public void testBuildCompilerArgs14()
     {
-        List<String> expectedArguments = new ArrayList<String>();
+        List<String> expectedArguments = new ArrayList<>();
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
@@ -168,7 +180,7 @@ public abstract class AbstractJavacCompilerTest
 
     public void testBuildCompilerArgs15()
     {
-        List<String> expectedArguments = new ArrayList<String>();
+        List<String> expectedArguments = new ArrayList<>();
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
@@ -181,7 +193,7 @@ public abstract class AbstractJavacCompilerTest
 
     public void testBuildCompilerArgs18()
     {
-        List<String> expectedArguments = new ArrayList<String>();
+        List<String> expectedArguments = new ArrayList<>();
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
@@ -194,7 +206,7 @@ public abstract class AbstractJavacCompilerTest
 
     public void testBuildCompilerArgsUnspecifiedVersion()
     {
-        List<String> expectedArguments = new ArrayList<String>();
+        List<String> expectedArguments = new ArrayList<>();
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
@@ -205,7 +217,7 @@ public abstract class AbstractJavacCompilerTest
 
     public void testBuildCompilerDebugLevel()
     {
-        List<String> expectedArguments = new ArrayList<String>();
+        List<String> expectedArguments = new ArrayList<>();
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
@@ -221,7 +233,7 @@ public abstract class AbstractJavacCompilerTest
     // PLXCOMP-190
     public void testJRuntimeArguments()
     {
-        List<String> expectedArguments = new ArrayList<String>();
+        List<String> expectedArguments = new ArrayList<>();
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
@@ -251,7 +263,7 @@ public abstract class AbstractJavacCompilerTest
 
     public void testModulePath() throws Exception
     {
-        List<String> expectedArguments = new ArrayList<String>();
+        List<String> expectedArguments = new ArrayList<>();
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
@@ -278,7 +290,7 @@ public abstract class AbstractJavacCompilerTest
 
     public void testModuleVersion()
     {
-        List<String> expectedArguments = new ArrayList<String>();
+        List<String> expectedArguments = new ArrayList<>();
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
@@ -303,7 +315,7 @@ public abstract class AbstractJavacCompilerTest
 
     public void testReleaseVersion()
     {
-        List<String> expectedArguments = new ArrayList<String>();
+        List<String> expectedArguments = new ArrayList<>();
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
@@ -322,7 +334,7 @@ public abstract class AbstractJavacCompilerTest
 
     public void testFailOnWarning()
     {
-        List<String> expectedArguments = new ArrayList<String>();
+        List<String> expectedArguments = new ArrayList<>();
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
@@ -346,7 +358,7 @@ public abstract class AbstractJavacCompilerTest
 
     public void testMultipleAddExports()
     {
-        List<String> expectedArguments = new ArrayList<String>();
+        List<String> expectedArguments = new ArrayList<>();
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 

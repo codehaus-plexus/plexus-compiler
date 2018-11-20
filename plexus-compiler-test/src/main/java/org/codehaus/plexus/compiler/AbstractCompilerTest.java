@@ -115,9 +115,12 @@ public abstract class AbstractCompilerTest
 
         int numCompilerWarnings = messages.size() - numCompilerErrors;
 
-        if ( expectedErrors() != numCompilerErrors )
+        int expectedErrors = expectedErrors();
+
+        if ( expectedErrors != numCompilerErrors )
         {
             System.out.println( numCompilerErrors + " error(s) found:" );
+            List<String> errors = new ArrayList<>();
             for ( CompilerMessage error : messages )
             {
                 if ( !error.isError() )
@@ -129,13 +132,17 @@ public abstract class AbstractCompilerTest
                 System.out.println( error.getFile() );
                 System.out.println( error.getMessage() );
                 System.out.println( "----" );
+                errors.add( error.getMessage() );
             }
 
-            assertEquals( "Wrong number of compilation errors: " + messages, expectedErrors(), numCompilerErrors );
+            assertEquals( "Wrong number of compilation errors (" + numCompilerErrors + "/" + expectedErrors //
+                              + ") : " + errors, expectedErrors, numCompilerErrors );
         }
 
-        if ( expectedWarnings() != numCompilerWarnings )
+        int expectedWarnings = expectedWarnings();
+        if ( expectedWarnings != numCompilerWarnings )
         {
+            List<String> warnings = new ArrayList<>();
             System.out.println( numCompilerWarnings + " warning(s) found:" );
             for ( CompilerMessage error : messages )
             {
@@ -148,9 +155,11 @@ public abstract class AbstractCompilerTest
                 System.out.println( error.getFile() );
                 System.out.println( error.getMessage() );
                 System.out.println( "----" );
+                warnings.add( error.getMessage() );
             }
 
-            assertEquals( "Wrong number of compilation warnings.", expectedWarnings(), numCompilerWarnings );
+            assertEquals( "Wrong number (" + numCompilerWarnings + "/" + expectedWarnings + ") of compilation warnings: " + warnings, //
+                          expectedWarnings, numCompilerWarnings );
         }
 
         assertEquals( new TreeSet<>( normalizePaths( expectedOutputFiles() ) ), files );
@@ -224,7 +233,7 @@ public abstract class AbstractCompilerTest
 
     private List<String> normalizePaths( Collection<String> relativePaths )
     {
-        List<String> normalizedPaths = new ArrayList<String>();
+        List<String> normalizedPaths = new ArrayList<>();
         for ( String relativePath : relativePaths )
         {
             normalizedPaths.add( relativePath.replace( File.separatorChar, '/' ) );
