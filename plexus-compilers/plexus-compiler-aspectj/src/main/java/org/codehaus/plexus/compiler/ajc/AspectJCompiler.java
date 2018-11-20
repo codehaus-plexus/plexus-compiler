@@ -503,9 +503,21 @@ public class AspectJCompiler
     private void setSourceVersion( AjBuildConfig buildConfig, String sourceVersion )
         throws CompilerException
     {
-        if ( "1.9".equals( sourceVersion ) )
+        if ( "11".equals( sourceVersion ) )
         {
-            buildConfig.getOptions().sourceLevel = ClassFileConstants.JDK1_9;
+            buildConfig.getOptions().sourceLevel = ClassFileConstants.JDK11;
+        }
+        else if ( "10".equals( sourceVersion ) )
+        {
+            buildConfig.getOptions().sourceLevel = ClassFileConstants.JDK10;
+        }
+        else if ( "9".equals( sourceVersion ) )
+        {
+            buildConfig.getOptions().sourceLevel = ClassFileConstants.JDK9;
+        }
+        else if ( "1.9".equals( sourceVersion ) )
+        {
+            buildConfig.getOptions().sourceLevel = ClassFileConstants.JDK9;
         }
         else if ( "1.8".equals( sourceVersion ) )
         {
