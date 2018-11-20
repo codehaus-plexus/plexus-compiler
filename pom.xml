@@ -162,7 +162,7 @@
             <configuration>
               <rules>
                 <requireJavaVersion>
-                  <version>[8,)</version>
+                  <version>[1.8,)</version>
                   <message>[ERROR] OLD JDK [${java.version}] in use. This projects requires JDK 8 or newer</message>
                 </requireJavaVersion>
               </rules>
