@@ -28,7 +28,8 @@ public class AspectJCompilerTest
     {
         // olamy well I agree it's hackhish but I don't want to waste too much time with aspectj which is probably
         // not used a lot anymore...
-        if (getJavaVersion().startsWith( "9" ) || getJavaVersion().startsWith( "10" ))
+        String javaVersion = getJavaVersion();
+        if (javaVersion.equals( "11" ))
         {
             return 11;
         }
@@ -40,10 +41,10 @@ public class AspectJCompilerTest
         String javaVersion = System.getProperty( "java.version" );
         // olamy well I agree it's hackhish but I don't want to waste too much time with aspectj which is probably
         // not used a lot anymore...
-        if (javaVersion.startsWith( "9" ) || javaVersion.startsWith( "10" ))
-        {
-            return Collections.emptyList();
-        }
+//        if (javaVersion.startsWith( "9" ) || javaVersion.startsWith( "10" ))
+//        {
+//            return Collections.emptyList();
+//        }
         return Arrays.asList( new String[]{ "org/codehaus/foo/ExternalDeps.class", "org/codehaus/foo/Person.class" } );
     }
 
