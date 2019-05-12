@@ -679,9 +679,17 @@ public class JavacCompiler
             {
                 // javac output not detected by other parsing
                 // maybe better to ignore only the summary an mark the rest as error
-                if (buffer.length() > 0 && buffer.toString().startsWith("javac:"))
+                String bufferAsString = buffer.toString();
+                if ( buffer.length() > 0 )
                 {
-                    errors.add( new CompilerMessage( buffer.toString(), CompilerMessage.Kind.ERROR ) );
+                    if ( bufferAsString.startsWith("javac:"))
+                    {
+                        errors.add( new CompilerMessage( bufferAsString, CompilerMessage.Kind.ERROR ) );
+                    }
+                    else if ( bufferAsString.startsWith("Error occurred during initialization of boot layer"))
+                    {
+                        errors.add( new CompilerMessage( bufferAsString, CompilerMessage.Kind.OTHER ) );
+                    }
                 }
                 return errors;
             }

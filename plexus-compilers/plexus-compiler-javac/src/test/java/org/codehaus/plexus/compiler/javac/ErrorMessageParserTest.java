@@ -894,6 +894,18 @@ public class ErrorMessageParserTest
               ".tools.javac.Main.main(Main.java:43)" + EOL));
     }
 
+    public void testJvmError() throws Exception
+    {
+        String out = "Error occurred during initialization of boot layer" + EOL +
+        		"java.lang.module.FindException: Module java.xml.bind not found";
+
+        List<CompilerMessage> compilerErrors = JavacCompiler.parseModernStream( 1, new BufferedReader( new StringReader( out ) ));
+
+        assertNotNull( compilerErrors );
+
+        assertEquals( 1, compilerErrors.size() );
+    }
+
     private static void assertEquivalent(CompilerMessage expected, CompilerMessage actual){
         assertEquals("Message did not match", expected.getMessage(), actual.getMessage());
         assertEquals("Kind did not match", expected.getKind(), actual.getKind());
