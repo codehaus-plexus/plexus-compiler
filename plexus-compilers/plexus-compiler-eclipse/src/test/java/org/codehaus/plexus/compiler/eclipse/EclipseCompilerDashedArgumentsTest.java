@@ -45,7 +45,7 @@ import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
 
 /**
  * @author <a href="mailto:jal@etc.to">Frits Jalvingh</a>
- * Created on 22-4-18.
+ * @author <a href="jfaust@tsunamit.com">Jason Faust</a>
  */
 @PlexusTest
 public class EclipseCompilerDashedArgumentsTest {

@@ -128,6 +128,20 @@ public abstract class AbstractCompilerTest {
 
     protected void configureCompilerConfig(CompilerConfiguration compilerConfig) {}
 
+    /**
+     * Called once per compile iteration to allow configuration customization for
+     * tests.
+     *
+     * @param compilerConfig
+     *            configuration used for this compile iteration.
+     * @param filename
+     *            file about to be compiled this iteration.
+     * @since 2.14.0
+     */
+    protected void configureCompilerConfig(CompilerConfiguration compilerConfig, String filename) {
+        configureCompilerConfig(compilerConfig);
+    }
+
     @Test
     public void testCompilingSources() throws Exception {
         List<CompilerMessage> messages = new ArrayList<>();
@@ -257,7 +271,7 @@ public abstract class AbstractCompilerTest {
 
             compilerConfig.setForceJavacCompilerUse(this.forceJavacCompilerUse);
 
-            configureCompilerConfig(compilerConfig);
+            configureCompilerConfig(compilerConfig, filename);
 
             String target = getTargetVersion();
             if (StringUtils.isNotEmpty(target)) {
@@ -319,6 +333,12 @@ public abstract class AbstractCompilerTest {
         return 0;
     }
 
+    /**
+     * Count of output generated at the {@link Kind#NOTE} level.
+     *
+     * @return count
+     * @since 2.14.0
+     */
     protected int expectedNotes() {
         return 0;
     }
