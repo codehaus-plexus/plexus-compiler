@@ -17,15 +17,17 @@ import java.util.List;
 
 /**
  * @author <a href="mailto:jal@etc.to">Frits Jalvingh</a>
+ * @author <a href="mailto:jfaust@tsunamit.com">Jason Faust</a>
  * Created on 31-3-18.
  */
-public class EcjResponseParser {
+public class EcjResponseParser implements EcjLogParser {
 	/*--------------------------------------------------------------*/
 	/*	CODING:	Decode ECJ -log format results.						*/
 	/*--------------------------------------------------------------*/
 	/**
 	 * Scan the specified response file for compilation messages.
 	 */
+    @Override
 	public List<CompilerMessage> parse(File xmltf, boolean errorsAsWarnings) throws Exception {
 		//if(xmltf.length() < 80)
 		//	return;
@@ -87,17 +89,31 @@ public class EcjResponseParser {
 	private void decodeProblem(List<CompilerMessage> list, String sourcePath, XMLStreamReader xsr, boolean errorsAsWarnings) throws Exception {
 		String id = xsr.getAttributeValue(null, "optionKey");				// Key for the problem
 		int startline = getInt(xsr, "line");
-		int column = getInt(xsr, "charStart");
-		int endCol = getInt(xsr, "charEnd");
+		int column = 0;
+		int endCol = 0;
 		String sev = xsr.getAttributeValue(null, "severity");
 		String message = "Unknown message?";
 
-		//-- Go watch for "message"
+		//-- Go watch for "message" and "source_context"
 		while(xsr.hasNext()) {
 			int type = xsr.nextTag();
 			if(type == XMLStreamConstants.START_ELEMENT) {
 				if("message".equals(xsr.getLocalName())) {
 					message = xsr.getAttributeValue(null, "value");
+				}
+				if("source_context".equals(xsr.getLocalName())) {
+					column = getInt(xsr, "sourceStart");
+					if (column != -1) {
+						column += 1; // Offset to 1-based index
+					} else {
+						column = 0;
+					}
+					endCol = getInt(xsr, "sourceEnd");
+					if (endCol != -1) {
+						endCol += 1; // Offset to 1-based index
+					} else {
+						endCol = 0;
+					}
 				}
 				ignoreTillEnd(xsr);
 
