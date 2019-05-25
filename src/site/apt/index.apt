@@ -46,7 +46,7 @@ Plexus Compiler
 
     * {{{./plexus-compilers/plexus-compiler-javac/}<<<plexus-compiler-javac>>>}}: javac compiler,
 
-    * {{{./plexus-compilers/plexus-compiler-javac-errorprone/}<<<plexus-compiler-javac-errorprone>>>}}: javac compiler with {{{http://error-prone.googlecode.com}error-prone}} static analysis checks enabled ,
+    * {{{./plexus-compilers/plexus-compiler-javac-errorprone/}<<<plexus-compiler-javac-errorprone>>>}}: javac compiler with {{{https://errorprone.info}error-prone}} static analysis checks enabled,
 
     * {{{./plexus-compilers/plexus-compiler-jikes/}<<<plexus-compiler-jikes>>>}}: jikes compiler,
 
