@@ -744,6 +744,15 @@ public class JavacCompiler
 
                 buffer.append( EOL );
             }
+
+            //Captures a bad source file error in totality
+            if( line.contains( "correct subdirectory of the sourcepath" ) )
+            {
+                errors.add( parseModernError( exitCode, buffer.toString() ) );
+
+                // reset for next error block
+                buffer = new StringBuilder();
+            }
             
             if ( line.endsWith( "^" ) )
             {

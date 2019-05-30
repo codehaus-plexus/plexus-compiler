@@ -32,6 +32,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.codehaus.plexus.compiler.Compiler;
 import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.util.Os;
 
@@ -904,6 +905,59 @@ public class ErrorMessageParserTest
         assertNotNull( compilerErrors );
 
         assertEquals( 1, compilerErrors.size() );
+    }
+
+    public void testBadSourceFileError() throws Exception
+    {
+        String out = "/MTOOLCHAINS-19/src/main/java/ch/pecunifex/x/Cls1.java:12: error: cannot access Cls2\n" +
+                "    Cls2 tvar;\n" +
+                "    ^\n" +
+                "  bad source file: /MTOOLCHAINS-19/src/main/java/ch/pecunifex/x/Cls2.java\n" +
+                "    file does not contain class ch.pecunifex.x.Cls2\n" +
+                "    Please remove or make sure it appears in the correct subdirectory of the sourcepath.";
+
+        List<CompilerMessage> compilerErrors = JavacCompiler.parseModernStream( 1, new BufferedReader( new StringReader( out ) ));
+
+        assertNotNull( compilerErrors );
+
+        assertEquals( 1, compilerErrors.size() );
+
+        final CompilerMessage message = compilerErrors.get( 0 );
+        validateBadSourceFile(message);
+    }
+
+    public void testWarningFollowedByBadSourceFileError() throws Exception
+    {
+        String out = "/MTOOLCHAINS-19/src/main/java/ch/pecunifex/x/Cls1.java:3: warning: FontDesignMetrics is internal proprietary API and may be removed in a future release\n" +
+                "import sun.font.FontDesignMetrics;\n" +
+                "               ^\n" +
+                "/MTOOLCHAINS-19/src/main/java/ch/pecunifex/x/Cls1.java:12: error: cannot access Cls2\n" +
+                "    Cls2 tvar;\n" +
+                "    ^\n" +
+                "  bad source file: /MTOOLCHAINS-19/src/main/java/ch/pecunifex/x/Cls2.java\n" +
+                "    file does not contain class ch.pecunifex.x.Cls2\n" +
+                "    Please remove or make sure it appears in the correct subdirectory of the sourcepath.";
+
+        List<CompilerMessage> compilerErrors = JavacCompiler.parseModernStream( 1, new BufferedReader( new StringReader( out ) ));
+
+        assertNotNull( compilerErrors );
+
+        assertEquals( 2, compilerErrors.size() );
+
+        final CompilerMessage firstMessage = compilerErrors.get( 0 );
+        assertEquals( "Is a Warning", CompilerMessage.Kind.WARNING, firstMessage.getKind() );
+        assertEquals( "On Correct File","/MTOOLCHAINS-19/src/main/java/ch/pecunifex/x/Cls1.java", firstMessage.getFile() );
+        assertEquals( "Internal API Warning", "FontDesignMetrics is internal proprietary API and may be removed in a future release", firstMessage.getMessage() );
+
+        final CompilerMessage secondMessage = compilerErrors.get( 1 );
+        validateBadSourceFile(secondMessage);
+    }
+
+    private void validateBadSourceFile(CompilerMessage message)
+    {
+        assertEquals( "Is an Error", CompilerMessage.Kind.ERROR, message.getKind() );
+        assertEquals( "On Correct File","/MTOOLCHAINS-19/src/main/java/ch/pecunifex/x/Cls1.java", message.getFile() );
+        assertTrue( "Message starts with access Error", message.getMessage().startsWith("error: cannot access Cls2") );
     }
 
     private static void assertEquivalent(CompilerMessage expected, CompilerMessage actual){
