@@ -690,6 +690,11 @@ public class JavacCompiler
                     {
                         errors.add( new CompilerMessage( bufferAsString, CompilerMessage.Kind.OTHER ) );
                     }
+                    else if ( hasPointer )
+                    {
+                        //A compiler message remains in buffer at end of parse stream
+                        errors.add( parseModernError( exitCode, bufferAsString ) );
+                    }
                 }
                 return errors;
             }
