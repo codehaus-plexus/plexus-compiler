@@ -12,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +33,7 @@ public class EcjResponseParser {
 
 		List<CompilerMessage> list = new ArrayList<>();
 		XMLInputFactory xmlif = getStreamFactory();
-		try(Reader src = new BufferedReader(new InputStreamReader(new FileInputStream(xmltf), "utf-8"))) {
+		try(Reader src = new BufferedReader(new InputStreamReader(new FileInputStream(xmltf), StandardCharsets.UTF_8 ))) {
 			XMLStreamReader xsr = xmlif.createXMLStreamReader(src);
 
 			// scan for "source" elements, skip all else.
