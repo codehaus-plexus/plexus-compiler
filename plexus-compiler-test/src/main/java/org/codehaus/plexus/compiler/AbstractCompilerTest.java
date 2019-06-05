@@ -33,7 +33,6 @@ import org.apache.maven.artifact.versioning.VersionRange;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 
-import javax.print.DocFlavor;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;

@@ -25,16 +25,9 @@ package org.codehaus.plexus.compiler.javac;
  */
 
 import org.codehaus.plexus.compiler.AbstractCompilerTest;
-import org.codehaus.plexus.compiler.CompilerConfiguration;
-import org.codehaus.plexus.util.StringUtils;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>
