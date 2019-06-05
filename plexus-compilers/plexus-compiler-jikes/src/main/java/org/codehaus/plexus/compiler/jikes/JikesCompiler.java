@@ -159,7 +159,7 @@ public class JikesCompiler
             BufferedReader input =
                 new BufferedReader( new InputStreamReader( new ByteArrayInputStream( tmpErr.toByteArray() ) ) );
 
-            List<CompilerMessage> messages = new ArrayList<CompilerMessage>();
+            List<CompilerMessage> messages = new ArrayList<>();
 
             parseStream( input, messages );
 
@@ -179,7 +179,7 @@ public class JikesCompiler
     public String[] createCommandLine( CompilerConfiguration config )
         throws CompilerException
     {
-        List<String> args = new ArrayList<String>();
+        List<String> args = new ArrayList<>();
 
         args.add( "jikes" );
 
@@ -328,7 +328,7 @@ public class JikesCompiler
 
     private List<String> getBootClassPath()
     {
-        List<String> bootClassPath = new ArrayList<String>();
+        List<String> bootClassPath = new ArrayList<>();
         FileFilter filter = new FileFilter()
         {
 
@@ -365,7 +365,7 @@ public class JikesCompiler
 
     private List<String> asList( File[] files )
     {
-        List<String> filenames = new ArrayList<String>( files.length );
+        List<String> filenames = new ArrayList<>( files.length );
         for ( File file : files )
         {
             filenames.add( file.toString() );

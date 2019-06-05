@@ -102,7 +102,7 @@ public class JavacCompiler
 
     private static volatile Class<?> JAVAC_CLASS;
 
-    private List<Class<?>> javaccClasses = new CopyOnWriteArrayList<Class<?>>();
+    private List<Class<?>> javaccClasses = new CopyOnWriteArrayList<>();
 
     // ----------------------------------------------------------------------
     //
@@ -204,7 +204,7 @@ public class JavacCompiler
 
     public static String[] buildCompilerArguments( CompilerConfiguration config, String[] sourceFiles )
     {
-        List<String> args = new ArrayList<String>();
+        List<String> args = new ArrayList<>();
 
         // ----------------------------------------------------------------------
         // Set output
@@ -646,7 +646,7 @@ public class JavacCompiler
     static List<CompilerMessage> parseModernStream( int exitCode, BufferedReader input )
         throws IOException
     {
-        List<CompilerMessage> errors = new ArrayList<CompilerMessage>();
+        List<CompilerMessage> errors = new ArrayList<>();
 
         String line;
 

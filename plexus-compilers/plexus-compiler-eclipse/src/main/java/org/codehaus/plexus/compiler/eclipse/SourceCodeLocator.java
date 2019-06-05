@@ -42,7 +42,7 @@ public class SourceCodeLocator
     {
         this.sourceRoots = sourceRoots;
 
-        cache = new HashMap<String, File>();
+        cache = new HashMap<>();
     }
 
     public File findSourceCodeForClass( String className )

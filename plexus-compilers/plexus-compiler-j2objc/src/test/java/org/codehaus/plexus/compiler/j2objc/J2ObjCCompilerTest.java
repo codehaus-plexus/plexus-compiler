@@ -45,7 +45,7 @@ public class J2ObjCCompilerTest
     public void testJ2ObjCCompiler()
     {
         J2ObjCCompiler comp = new J2ObjCCompiler();
-        Map<String, String> customCompilerArguments = new HashMap<String, String>();
+        Map<String, String> customCompilerArguments = new HashMap<>();
         customCompilerArguments.put( "-use-arc", null );
         customCompilerArguments.put( "-sourcepath", "src/test/resources" );
         CompilerConfiguration cc = new CompilerConfiguration();

@@ -241,7 +241,7 @@ Options can be of the form -option or /option
     private String[] buildCompilerArguments( CompilerConfiguration config, String[] sourceFiles )
         throws CompilerException
     {
-        List<String> args = new ArrayList<String>();
+        List<String> args = new ArrayList<>();
 
         if ( config.isDebug() )
         {
@@ -539,7 +539,7 @@ Options can be of the form -option or /option
     public static List<CompilerMessage> parseCompilerOutput( BufferedReader bufferedReader )
         throws IOException
     {
-        List<CompilerMessage> messages = new ArrayList<CompilerMessage>();
+        List<CompilerMessage> messages = new ArrayList<>();
 
         String line = bufferedReader.readLine();
 
@@ -591,7 +591,7 @@ Options can be of the form -option or /option
     // added for debug purposes.... 
     protected static String[] getSourceFiles( CompilerConfiguration config )
     {
-        Set<String> sources = new HashSet<String>();
+        Set<String> sources = new HashSet<>();
 
         //Set sourceFiles = null;
         //was:
@@ -676,7 +676,7 @@ Options can be of the form -option or /option
 
         String[] sourceDirectorySources = scanner.getIncludedFiles();
 
-        Set<String> sources = new HashSet<String>();
+        Set<String> sources = new HashSet<>();
 
         for ( String source : sourceDirectorySources )
         {
