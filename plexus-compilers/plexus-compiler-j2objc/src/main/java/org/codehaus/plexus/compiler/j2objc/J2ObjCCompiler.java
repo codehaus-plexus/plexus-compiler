@@ -71,20 +71,19 @@ public class J2ObjCCompiler
      * Put the arguments of j2objc who takes one dash inside an array, in order
      * the check the command line.
      */
-    private static final List<String> ONE_DASH_ARGS = Arrays.asList(
-        new String[]{ "-pluginpath", "-pluginoptions", "-t", "-Xno-jsni-warnings", "-sourcepath", "-classpath", "-d",
-            "-encoding", "-g", "-q", "-v", "-Werror", "-h", "-use-arc", "-use-reference-counting", "-x" } );
+    private static final List<String> ONE_DASH_ARGS = Arrays.asList( "-pluginpath", "-pluginoptions", "-t",
+            "-Xno-jsni-warnings", "-sourcepath", "-classpath", "-d", "-encoding", "-g", "-q", "-v", "-Werror", "-h",
+            "-use-arc", "-use-reference-counting", "-x" );
 
     /**
      * Put the command line arguments with 2 dashes inside an array, in order
      * the check the command line and build it.
      */
-    private static final List<String> TWO_DASH_ARGS = Arrays.asList(
-        new String[]{ "--build-closure", "--dead-code-report", "--doc-comments", "--no-extract-unsequenced",
-            "--generate-deprecated", "--mapping", "--no-class-methods", "--no-final-methods-functions",
-            "--no-hide-private-members", "--no-package-directories", "--prefix", "--prefixes", "--preserve-full-paths",
-            "--strip-gwt-incompatible", "--strip-reflection", "--segmented-headers", "--timing-info", "--quiet",
-            "--verbose", "--help" } );
+    private static final List<String> TWO_DASH_ARGS = Arrays.asList( "--build-closure", "--dead-code-report",
+            "--doc-comments", "--no-extract-unsequenced", "--generate-deprecated", "--mapping", "--no-class-methods",
+            "--no-final-methods-functions", "--no-hide-private-members", "--no-package-directories", "--prefix",
+            "--prefixes", "--preserve-full-paths", "--strip-gwt-incompatible", "--strip-reflection",
+            "--segmented-headers", "--timing-info", "--quiet", "--verbose", "--help" );
 
     public J2ObjCCompiler()
     {

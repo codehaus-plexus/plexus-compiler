@@ -61,9 +61,9 @@ public class JikesCompilerTest
 
     protected Collection<String> expectedOutputFiles()
     {
-        return Arrays.asList( new String[]{ "org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ExternalDeps.class",
-            "org/codehaus/foo/Person.class", "org/codehaus/foo/ReservedWord.class",
-            "org/codehaus/foo/RightClassname.class" } );
+        return Arrays.asList( "org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ExternalDeps.class",
+                "org/codehaus/foo/Person.class", "org/codehaus/foo/ReservedWord.class",
+                "org/codehaus/foo/RightClassname.class" );
     }
 
 }

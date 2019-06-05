@@ -132,11 +132,11 @@ public abstract class AbstractJavacCompilerTest
     {
         String javaVersion = getJavaVersion();
         if (javaVersion.contains("9.0")||javaVersion.contains("11")){
-            return Arrays.asList( new String[]{ "org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ExternalDeps.class",
-                "org/codehaus/foo/Person.class"} );
+            return Arrays.asList( "org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ExternalDeps.class",
+                    "org/codehaus/foo/Person.class" );
         }
-        return Arrays.asList( new String[]{ "org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ExternalDeps.class",
-            "org/codehaus/foo/Person.class", "org/codehaus/foo/ReservedWord.class" } );
+        return Arrays.asList( "org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ExternalDeps.class",
+                "org/codehaus/foo/Person.class", "org/codehaus/foo/ReservedWord.class" );
     }
 
     public void internalTest( CompilerConfiguration compilerConfiguration, List<String> expectedArguments )

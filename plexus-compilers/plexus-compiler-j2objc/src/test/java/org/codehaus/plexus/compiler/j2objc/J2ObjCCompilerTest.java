@@ -31,6 +31,7 @@ import org.codehaus.plexus.compiler.CompilerException;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,7 +51,7 @@ public class J2ObjCCompilerTest
         customCompilerArguments.put( "-sourcepath", "src/test/resources" );
         CompilerConfiguration cc = new CompilerConfiguration();
         cc.setOutputLocation( "target/generated/objective-c" );
-        cc.setSourceLocations( Arrays.asList( new String[]{ "src/test/resources" } ) );
+        cc.setSourceLocations( Collections.singletonList( "src/test/resources" ) );
         cc.setWorkingDirectory( new File( "." ) );
         cc.setFork( true );
         cc.setCustomCompilerArgumentsAsMap( customCompilerArguments );

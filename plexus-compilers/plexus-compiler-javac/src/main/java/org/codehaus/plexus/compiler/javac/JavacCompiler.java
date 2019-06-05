@@ -620,7 +620,7 @@ public class JavacCompiler
 
         try
         {
-            Method compile = javacClass.getMethod( "compile", new Class[]{ String[].class, PrintWriter.class } );
+            Method compile = javacClass.getMethod( "compile", String[].class, PrintWriter.class );
 
             ok = (Integer) compile.invoke( null, new Object[]{ args, new PrintWriter( out ) } );
 

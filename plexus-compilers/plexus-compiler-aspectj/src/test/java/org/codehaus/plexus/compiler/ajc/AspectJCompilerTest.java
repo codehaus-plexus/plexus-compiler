@@ -44,7 +44,7 @@ public class AspectJCompilerTest
 //        {
 //            return Collections.emptyList();
 //        }
-        return Arrays.asList( new String[]{ "org/codehaus/foo/ExternalDeps.class", "org/codehaus/foo/Person.class" } );
+        return Arrays.asList( "org/codehaus/foo/ExternalDeps.class", "org/codehaus/foo/Person.class" );
     }
 
     protected List<String> getClasspath()
