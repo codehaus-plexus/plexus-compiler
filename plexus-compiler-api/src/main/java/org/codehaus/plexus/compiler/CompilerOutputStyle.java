@@ -57,12 +57,12 @@ public final class CompilerOutputStyle
 
     public boolean equals( Object other )
     {
-        if ( other == null || !( other instanceof CompilerOutputStyle ) )
+        if ( other instanceof CompilerOutputStyle )
         {
-            return false;
+            return id.equals( ( (CompilerOutputStyle) other ).id );
         }
 
-        return id.equals( ( (CompilerOutputStyle) other ).id );
+        return false;
     }
 
     public int hashCode()
