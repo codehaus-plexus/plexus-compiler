@@ -480,7 +480,7 @@ public class JikesCompiler
             message.append( ':' ).append( errorBits[i++] );
         }
 
-        return new CompilerMessage( file, type.indexOf( "Error" ) > -1, startline, startcolumn, endline, endcolumn,
+        return new CompilerMessage( file, type.contains( "Error" ), startline, startcolumn, endline, endcolumn,
                                     message.toString() );
     }
 }
