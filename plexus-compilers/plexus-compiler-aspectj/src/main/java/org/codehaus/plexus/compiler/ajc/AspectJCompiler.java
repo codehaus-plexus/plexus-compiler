@@ -324,7 +324,7 @@ public class AspectJCompiler
         }
 
         checkForAspectJRT( cp );
-        if ( cp != null && !cp.isEmpty() )
+        if ( !cp.isEmpty() )
         {
             List<String> elements = new ArrayList<>( cp.size() );
             for ( String path : cp )
