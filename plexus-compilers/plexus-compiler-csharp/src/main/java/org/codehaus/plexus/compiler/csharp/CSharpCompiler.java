@@ -396,7 +396,7 @@ Options can be of the form -option or /option
         // ----------------------------------------------------------------------
         args.addAll( Arrays.asList( sourceFiles ) );
 
-        return args.toArray( new String[args.size()] );
+        return args.toArray( new String[0] );
     }
 
     private void addResourceArgs( CompilerConfiguration config, List<String> args )
@@ -628,7 +628,7 @@ Options can be of the form -option or /option
         }
         else
         {
-            result = (String[]) sources.toArray( new String[sources.size()] );
+            result = (String[]) sources.toArray( new String[0] );
         }
 
         return result;
@@ -656,7 +656,7 @@ Options can be of the form -option or /option
 
         if ( includes != null && !includes.isEmpty() )
         {
-            String[] inclStrs = includes.toArray( new String[includes.size()] );
+            String[] inclStrs = includes.toArray( new String[0] );
             scanner.setIncludes( inclStrs );
         }
         else
@@ -668,7 +668,7 @@ Options can be of the form -option or /option
 
         if ( excludes != null && !excludes.isEmpty() )
         {
-            String[] exclStrs = excludes.toArray( new String[excludes.size()] );
+            String[] exclStrs = excludes.toArray( new String[0] );
             scanner.setIncludes( exclStrs );
         }
 

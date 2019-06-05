@@ -270,7 +270,7 @@ public class EclipseJavaCompiler
             PrintWriter devNull = new PrintWriter(sw);
 
             //BatchCompiler.compile(args.toArray(new String[args.size()]), new PrintWriter(System.err), new PrintWriter(System.out), new CompilationProgress() {
-            boolean success = BatchCompiler.compile(args.toArray(new String[args.size()]), devNull, devNull, new CompilationProgress() {
+            boolean success = BatchCompiler.compile(args.toArray( new String[0] ), devNull, devNull, new CompilationProgress() {
                 @Override
                 public void begin(int i)
                 {

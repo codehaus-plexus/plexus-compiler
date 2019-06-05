@@ -400,7 +400,7 @@ public class JavacCompiler
             args.add( value );
         }
 
-        return args.toArray( new String[args.size()] );
+        return args.toArray( new String[0] );
     }
 
     /**

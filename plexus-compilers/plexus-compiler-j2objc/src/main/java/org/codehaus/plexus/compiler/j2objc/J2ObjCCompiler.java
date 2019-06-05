@@ -254,7 +254,7 @@ public class J2ObjCCompiler
 
         args.addAll( Arrays.asList( sourceFiles ) );
 
-        return args.toArray( new String[args.size()] );
+        return args.toArray( new String[0] );
     }
 
     private List<CompilerMessage> compileOutOfProcess( File workingDirectory, File target, String executable,
