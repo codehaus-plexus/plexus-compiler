@@ -1040,7 +1040,7 @@ public class JavacCompiler
     private Class<?> getJavacClass( CompilerConfiguration compilerConfiguration )
         throws CompilerException
     {
-        Class<?> c = null;
+        Class<?> c;
         switch ( compilerConfiguration.getCompilerReuseStrategy() )
         {
             case AlwaysNew:

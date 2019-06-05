@@ -31,7 +31,7 @@ public class DefaultCSharpCompilerParser
 
     public static CompilerMessage parseLine( String line )
     {
-        CompilerMessage ce = null;
+        CompilerMessage ce;
 
         if ( isOutputWithNoColumnNumber( line ) )
         {
@@ -143,8 +143,8 @@ public class DefaultCSharpCompilerParser
 
             String linecol = line.substring( i + MAGIC_LINE_MARKER.length(), j - 2 );
 
-            String linenum = null;
-            String colnum = null;
+            String linenum;
+            String colnum;
 
             if ( linecol.contains( "," ) && linecol.split( "," ).length == 2 )
             {
