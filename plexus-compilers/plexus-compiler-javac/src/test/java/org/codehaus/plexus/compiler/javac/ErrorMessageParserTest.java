@@ -44,7 +44,6 @@ public class ErrorMessageParserTest
     private static final String EOL = System.getProperty( "line.separator" );
 
     public void testDeprecationMessage()
-        throws Exception
     {
         String error =
             "target/compiler-src/testDeprecation/Foo.java:1: warning: Date(java.lang.String) in java.util.Date has been deprecated"

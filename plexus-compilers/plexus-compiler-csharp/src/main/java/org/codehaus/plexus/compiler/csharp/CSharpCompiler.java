@@ -84,7 +84,6 @@ public class CSharpCompiler
     // ----------------------------------------------------------------------
 
     public boolean canUpdateTarget( CompilerConfiguration configuration )
-        throws CompilerException
     {
         return false;
     }

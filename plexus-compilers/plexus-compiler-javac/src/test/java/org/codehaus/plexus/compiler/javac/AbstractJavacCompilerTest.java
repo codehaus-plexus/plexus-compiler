@@ -261,7 +261,7 @@ public abstract class AbstractJavacCompilerTest
         internalTest( compilerConfiguration, expectedArguments );
     }
 
-    public void testModulePath() throws Exception
+    public void testModulePath()
     {
         List<String> expectedArguments = new ArrayList<>();
 

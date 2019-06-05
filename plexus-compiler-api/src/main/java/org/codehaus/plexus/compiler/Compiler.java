@@ -39,17 +39,14 @@ public interface Compiler
 
     CompilerOutputStyle getCompilerOutputStyle();
 
-    String getInputFileEnding( CompilerConfiguration configuration )
-        throws CompilerException;
+    String getInputFileEnding( CompilerConfiguration configuration );
 
-    String getOutputFileEnding( CompilerConfiguration configuration )
-        throws CompilerException;
+    String getOutputFileEnding( CompilerConfiguration configuration );
 
     String getOutputFile( CompilerConfiguration configuration )
         throws CompilerException;
 
-    boolean canUpdateTarget( CompilerConfiguration configuration )
-        throws CompilerException;
+    boolean canUpdateTarget( CompilerConfiguration configuration );
 
     /**
      * Performs the compilation of the project. Clients must implement this

@@ -569,7 +569,6 @@ public class AspectJCompiler
      * @return null
      */
     public String[] createCommandLine( CompilerConfiguration config )
-        throws CompilerException
     {
         return null;
     }

@@ -93,13 +93,11 @@ public abstract class AbstractCompiler
     }
 
     public String getInputFileEnding( CompilerConfiguration configuration )
-        throws CompilerException
     {
         return inputFileEnding;
     }
 
     public String getOutputFileEnding( CompilerConfiguration configuration )
-        throws CompilerException
     {
         if ( compilerOutputStyle != CompilerOutputStyle.ONE_OUTPUT_FILE_PER_INPUT_FILE )
         {
@@ -121,7 +119,6 @@ public abstract class AbstractCompiler
     }
 
     public boolean canUpdateTarget( CompilerConfiguration configuration )
-        throws CompilerException
     {
         return true;
     }

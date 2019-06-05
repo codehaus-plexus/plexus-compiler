@@ -96,7 +96,6 @@ public class J2ObjCCompiler
     // ----------------------------------------------------------------------
 
     public boolean canUpdateTarget( CompilerConfiguration configuration )
-        throws CompilerException
     {
         return false;
     }
@@ -142,7 +141,6 @@ public class J2ObjCCompiler
     }
 
     public String[] createCommandLine( CompilerConfiguration config )
-        throws CompilerException
     {
         return buildCompilerArguments( config, J2ObjCCompiler.getSourceFiles( config ) );
     }
@@ -176,10 +174,8 @@ public class J2ObjCCompiler
      * @param config
      * @param sourceFiles
      * @return The List<String> to give to the command line tool
-     * @throws CompilerException
      */
     private String[] buildCompilerArguments( CompilerConfiguration config, String[] sourceFiles )
-        throws CompilerException
     {
         /*
 		 * j2objc --help Usage: j2objc <options> <source files>

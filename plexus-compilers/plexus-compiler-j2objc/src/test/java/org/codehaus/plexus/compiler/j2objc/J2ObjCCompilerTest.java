@@ -30,7 +30,6 @@ import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerException;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,7 +43,6 @@ public class J2ObjCCompilerTest
 {
 
     public void testJ2ObjCCompiler()
-        throws IOException
     {
         J2ObjCCompiler comp = new J2ObjCCompiler();
         Map<String, String> customCompilerArguments = new HashMap<String, String>();

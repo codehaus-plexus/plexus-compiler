@@ -26,7 +26,6 @@ package org.codehaus.plexus.compiler.eclipse;
 
 import org.codehaus.plexus.compiler.AbstractCompiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
-import org.codehaus.plexus.compiler.CompilerException;
 import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.compiler.CompilerOutputStyle;
 import org.codehaus.plexus.compiler.CompilerResult;
@@ -61,7 +60,6 @@ public class EclipseJavaCompiler
     boolean errorsAsWarnings = false;
 
     public CompilerResult performCompile(CompilerConfiguration config )
-        throws CompilerException
     {
         List<String> args = new ArrayList<>();
         args.add("-noExit");                            // Make sure ecj does not System.exit on us 8-/
@@ -396,7 +394,6 @@ public class EclipseJavaCompiler
     }
 
     public String[] createCommandLine( CompilerConfiguration config )
-        throws CompilerException
     {
         return null;
     }

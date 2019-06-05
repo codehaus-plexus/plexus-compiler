@@ -198,7 +198,6 @@ public class JavacCompiler
     }
 
     public String[] createCommandLine( CompilerConfiguration config )
-        throws CompilerException
     {
         return buildCompilerArguments( config, getSourceFiles( config ) );
     }
