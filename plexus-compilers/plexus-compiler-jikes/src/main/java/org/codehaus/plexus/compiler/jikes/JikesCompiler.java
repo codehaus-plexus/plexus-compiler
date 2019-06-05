@@ -170,11 +170,7 @@ public class JikesCompiler
 
             return new CompilerResult().compilerMessages( messages );
         }
-        catch ( IOException e )
-        {
-            throw new CompilerException( "Error while compiling.", e );
-        }
-        catch ( InterruptedException e )
+        catch ( IOException | InterruptedException e )
         {
             throw new CompilerException( "Error while compiling.", e );
         }
