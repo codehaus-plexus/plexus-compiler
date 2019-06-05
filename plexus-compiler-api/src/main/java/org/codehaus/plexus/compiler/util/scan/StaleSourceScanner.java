@@ -64,7 +64,6 @@ public class StaleSourceScanner
     // ----------------------------------------------------------------------
 
     public Set<File> getIncludedSources( File sourceDir, File targetDir )
-        throws InclusionScanException
     {
         List<SourceMapping> srcMappings = getSourceMappings();
 

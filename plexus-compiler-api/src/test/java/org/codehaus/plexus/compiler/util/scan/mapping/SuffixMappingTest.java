@@ -17,7 +17,6 @@ package org.codehaus.plexus.compiler.util.scan.mapping;
  */
 
 import junit.framework.TestCase;
-import org.codehaus.plexus.compiler.util.scan.InclusionScanException;
 
 import java.io.File;
 import java.util.HashSet;
@@ -30,7 +29,6 @@ public class SuffixMappingTest
     extends TestCase
 {
     public void testShouldReturnSingleClassFileForSingleJavaFile()
-        throws InclusionScanException
     {
         String base = "path/to/file";
 
@@ -46,7 +44,6 @@ public class SuffixMappingTest
     }
 
     public void testShouldNotReturnClassFileWhenSourceFileHasWrongSuffix()
-        throws InclusionScanException
     {
         String base = "path/to/file";
 
@@ -60,7 +57,6 @@ public class SuffixMappingTest
     }
 
     public void testShouldReturnOneClassFileAndOneXmlFileForSingleJavaFile()
-        throws InclusionScanException
     {
         String base = "path/to/file";
 
@@ -82,7 +78,6 @@ public class SuffixMappingTest
     }
 
     public void testShouldReturnNoTargetFilesWhenSourceFileHasWrongSuffix()
-        throws InclusionScanException
     {
         String base = "path/to/file";
 
@@ -100,7 +95,6 @@ public class SuffixMappingTest
     }
 
     public void testSingleTargetMapper()
-        throws InclusionScanException
     {
         String base = "path/to/file";
 

@@ -16,8 +16,6 @@ package org.codehaus.plexus.compiler.util.scan.mapping;
  * limitations under the License.
  */
 
-import org.codehaus.plexus.compiler.util.scan.InclusionScanException;
-
 import java.io.File;
 import java.util.Set;
 
@@ -26,6 +24,5 @@ import java.util.Set;
  */
 public interface SourceMapping
 {
-    Set<File> getTargetFiles( File targetDir, String source )
-        throws InclusionScanException;
+    Set<File> getTargetFiles( File targetDir, String source );
 }

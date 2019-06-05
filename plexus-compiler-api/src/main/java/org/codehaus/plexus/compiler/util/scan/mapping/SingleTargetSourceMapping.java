@@ -24,8 +24,6 @@ package org.codehaus.plexus.compiler.util.scan.mapping;
  * SOFTWARE.
  */
 
-import org.codehaus.plexus.compiler.util.scan.InclusionScanException;
-
 import java.util.Set;
 import java.util.Collections;
 import java.io.File;
@@ -50,7 +48,6 @@ public class SingleTargetSourceMapping
     }
 
     public Set<File> getTargetFiles( File targetDir, String source )
-        throws InclusionScanException
     {
         if ( !source.endsWith( sourceSuffix ) )
         {
