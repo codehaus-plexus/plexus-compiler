@@ -59,7 +59,7 @@ public abstract class AbstractSourceInclusionScannerTest
 
         Set<File> includedSources = scanner.getIncludedSources( base, base );
 
-        assertTrue( "no sources were included", !includedSources.isEmpty() );
+        assertFalse( "no sources were included", includedSources.isEmpty() );
 
         for ( File file : includedSources )
         {
