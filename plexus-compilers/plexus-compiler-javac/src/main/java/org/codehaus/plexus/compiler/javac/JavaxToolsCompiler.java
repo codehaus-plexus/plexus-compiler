@@ -49,7 +49,7 @@ public class JavaxToolsCompiler
     @SuppressWarnings( "restriction" )
     static final JavaCompiler COMPILER = ToolProvider.getSystemJavaCompiler();
 
-    private static List<JavaCompiler> JAVA_COMPILERS = new CopyOnWriteArrayList<>();
+    private static final List<JavaCompiler> JAVA_COMPILERS = new CopyOnWriteArrayList<>();
 
     protected static JavaCompiler getJavaCompiler( CompilerConfiguration compilerConfiguration )
     {
