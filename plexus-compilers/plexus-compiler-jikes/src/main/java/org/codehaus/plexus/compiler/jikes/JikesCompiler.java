@@ -95,6 +95,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -306,10 +307,7 @@ public class JikesCompiler
         }
         else
         {
-            for ( int i = 0; i < sourceFiles.length; i++ )
-            {
-                args.add( sourceFiles[i] );
-            }
+            Collections.addAll( args, sourceFiles );
 
         }
 

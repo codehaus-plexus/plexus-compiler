@@ -394,10 +394,7 @@ Options can be of the form -option or /option
         // ----------------------------------------------------------------------
         // add source files
         // ----------------------------------------------------------------------
-        for ( String sourceFile : sourceFiles )
-        {
-            args.add( sourceFile );
-        }
+        args.addAll( Arrays.asList( sourceFiles ) );
 
         return args.toArray( new String[args.size()] );
     }

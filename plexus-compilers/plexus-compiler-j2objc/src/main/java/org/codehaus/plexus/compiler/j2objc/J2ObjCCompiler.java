@@ -252,10 +252,7 @@ public class J2ObjCCompiler
             }
         }
 
-        for ( String sourceFile : sourceFiles )
-        {
-            args.add( sourceFile );
-        }
+        args.addAll( Arrays.asList( sourceFiles ) );
 
         return args.toArray( new String[args.size()] );
     }
