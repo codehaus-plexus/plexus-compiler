@@ -211,7 +211,7 @@ public class ErrorMessageParserTest
             JavacCompiler.parseModernStream( 0, new BufferedReader( new StringReader( errors ) ) );
 
         assertEquals( 1, messages.size() );
-        assertFalse( ( (CompilerMessage) messages.get( 0 ) ).isError() );
+        assertFalse( messages.get( 0 ).isError() );
     }
 
     public void testUnixFileNames()

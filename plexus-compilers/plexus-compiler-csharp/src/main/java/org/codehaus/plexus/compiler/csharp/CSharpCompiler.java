@@ -357,7 +357,7 @@ Options can be of the form -option or /option
 
         if ( !StringUtils.isEmpty( resourcefile ) )
         {
-            String resourceTarget = (String) compilerArguments.get( "-resourcetarget" );
+            String resourceTarget = compilerArguments.get( "-resourcetarget" );
             args.add( "/res:" + new File( resourcefile ).getAbsolutePath() + "," + resourceTarget );
         }
 
@@ -434,7 +434,7 @@ Options can be of the form -option or /option
         
         Map<String, String> compilerArguments = getCompilerArguments( config );
         
-        String tempResourcesDirAsString = (String) compilerArguments.get( "-resourceDir" );
+        String tempResourcesDirAsString = compilerArguments.get( "-resourceDir" );
         File filteredResourceDir = null;
         if ( tempResourcesDirAsString != null )
         {
@@ -628,7 +628,7 @@ Options can be of the form -option or /option
         }
         else
         {
-            result = (String[]) sources.toArray( new String[0] );
+            result = sources.toArray( new String[0] );
         }
 
         return result;

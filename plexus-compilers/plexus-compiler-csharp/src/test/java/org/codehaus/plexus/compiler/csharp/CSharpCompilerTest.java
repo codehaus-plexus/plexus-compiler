@@ -180,9 +180,9 @@ public class CSharpCompilerTest
         assertEquals( 24, messagesWinCsc.size() );
 
         assertTrue( "Check that the line number is not -1",
-                    ( (CompilerMessage) messagesWinCsc.get( 0 ) ).getStartLine() != -1 );
+                    messagesWinCsc.get( 0 ).getStartLine() != -1 );
         assertTrue( "Check that the column number is not -1",
-                    ( (CompilerMessage) messagesWinCsc.get( 0 ) ).getStartColumn() != -1 );
+                    messagesWinCsc.get( 0 ).getStartColumn() != -1 );
 
     }
 
@@ -211,9 +211,9 @@ public class CSharpCompilerTest
         assertEquals( 5, messagesMonoWin.size() );
 
         assertTrue( "Check that the line number is not -1",
-                    ( (CompilerMessage) messagesMonoWin.get( 0 ) ).getStartLine() != -1 );
+                    messagesMonoWin.get( 0 ).getStartLine() != -1 );
         assertTrue( "Check that the column number is not -1",
-                    ( (CompilerMessage) messagesMonoWin.get( 0 ) ).getStartColumn() != -1 );
+                    messagesMonoWin.get( 0 ).getStartColumn() != -1 );
 
     }
 

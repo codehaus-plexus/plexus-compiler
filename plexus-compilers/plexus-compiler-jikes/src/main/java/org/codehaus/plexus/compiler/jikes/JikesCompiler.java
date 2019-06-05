@@ -307,7 +307,7 @@ public class JikesCompiler
 
         }
 
-        return (String[]) args.toArray( new String[0] );
+        return args.toArray( new String[0] );
     }
 
     // -----------------------------------------------------------------------
