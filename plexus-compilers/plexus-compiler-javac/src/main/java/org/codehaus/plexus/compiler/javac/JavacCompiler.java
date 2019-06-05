@@ -628,7 +628,7 @@ public class JavacCompiler
 
             ok = (Integer) compile.invoke( null, new Object[]{ args, new PrintWriter( out ) } );
 
-            messages = parseModernStream( ok.intValue(), new BufferedReader( new StringReader( out.toString() ) ) );
+            messages = parseModernStream( ok, new BufferedReader( new StringReader( out.toString() ) ) );
         }
         catch ( NoSuchMethodException e )
         {
@@ -647,7 +647,7 @@ public class JavacCompiler
             throw new CompilerException( "Error while executing the compiler.", e );
         }
 
-        boolean success = ok.intValue() == 0;
+        boolean success = ok == 0;
         return new CompilerResult( success, messages );
     }
 
