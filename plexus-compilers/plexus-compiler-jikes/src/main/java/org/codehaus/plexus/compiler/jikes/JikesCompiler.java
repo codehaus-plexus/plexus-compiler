@@ -286,9 +286,9 @@ public class JikesCompiler
 
                 tempFile.getParentFile().mkdirs();
                 fw = new BufferedWriter( new FileWriter( tempFile ) );
-                for ( int i = 0; i < sourceFiles.length; i++ )
+                for ( String sourceFile : sourceFiles )
                 {
-                    fw.write( sourceFiles[i] );
+                    fw.write( sourceFile );
                     fw.newLine();
                 }
                 fw.flush();

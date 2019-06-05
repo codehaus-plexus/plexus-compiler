@@ -410,8 +410,7 @@ Options can be of the form -option or /option
             scanner.addDefaultExcludes();
             scanner.scan();
 
-            List<String> includedFiles = Arrays.asList( scanner.getIncludedFiles() );
-            for ( String name : includedFiles )
+            for ( String name : scanner.getIncludedFiles() )
             {
                 File filteredResource = new File( filteredResourceDir, name );
                 String assemblyResourceName = this.convertNameToAssemblyResourceName( name );
