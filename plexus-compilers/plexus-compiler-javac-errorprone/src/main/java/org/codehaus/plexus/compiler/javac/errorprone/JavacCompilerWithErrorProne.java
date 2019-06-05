@@ -86,8 +86,7 @@ public class JavacCompilerWithErrorProne
 
         try
         {
-            CompilerResult compilerResult = (CompilerResult) getInvoker().invoke( null, new Object[]{ args } );
-            return compilerResult;
+            return (CompilerResult) getInvoker().invoke( null, new Object[]{ args } );
         }
         catch ( Exception e )
         {
