@@ -283,11 +283,22 @@ public class JavacCompiler
                 args.add( buffer.toString() );
             }
             if ( config.getProcessorPathEntries() != null && !config.getProcessorPathEntries().isEmpty() ) {
-                args.add( "-processorpath" );
 
-                args.add( getPathString( config.getProcessorPathEntries() ) );
+                //TODO check if has module-info
+                if(!isPreJava9(config)){
+                    args.add( "--processor-module-path" );
+
+                    args.add( getPathString( config.getProcessorPathEntries() ) );
+                } else {
+                    args.add( "-processorpath" );
+
+                    args.add( getPathString( config.getProcessorPathEntries() ) );
+                }
             }
+
         }
+
+
 
         if ( config.isOptimize() )
         {
@@ -466,7 +477,31 @@ public class JavacCompiler
             return true;
         }
 
-        return v.startsWith( "1.7" ) || v.startsWith( "1.6" ) || v.startsWith( "1.5" ) || v.startsWith( "1.4" )
+        return v.startsWith( "7" ) || v.startsWith( "1.7" ) || v.startsWith( "1.6" ) || v.startsWith( "1.5" ) || v.startsWith( "1.4" )
+                || v.startsWith( "1.3" ) || v.startsWith( "1.2" ) || v.startsWith( "1.1" ) || v.startsWith( "1.0" );
+    }
+
+    private static boolean isPreJava9( CompilerConfiguration config )
+    {
+
+        String v = config.getReleaseVersion();
+
+        if ( v == null )
+        {
+            v = config.getCompilerVersion();
+        }
+
+        if ( v == null )
+        {
+            v = config.getSourceVersion();
+        }
+
+        if ( v == null )
+        {
+            return true;
+        }
+
+        return v.startsWith( "8" )  || v.startsWith( "1.8" )  || v.startsWith( "7" ) || v.startsWith( "1.7" ) || v.startsWith( "1.6" ) || v.startsWith( "1.5" ) || v.startsWith( "1.4" )
                 || v.startsWith( "1.3" ) || v.startsWith( "1.2" ) || v.startsWith( "1.1" ) || v.startsWith( "1.0" );
     }
 
