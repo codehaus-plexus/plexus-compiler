@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.codehaus.plexus</groupId>
     <artifactId>plexus-components</artifactId>
-    <version>4.0</version>
+    <version>6.1</version>
   </parent>
 
   <artifactId>plexus-compiler</artifactId>
@@ -44,6 +44,7 @@
     <scm.url>scm:git:git@github.com:codehaus-plexus/plexus-compiler.git</scm.url>
     <javaVersion>7</javaVersion>
     <redirectTestOutputToFile>true</redirectTestOutputToFile>
+    <project.build.outputTimestamp>2020-01-20T18:52:37Z</project.build.outputTimestamp>
   </properties>
 
   <dependencyManagement>
