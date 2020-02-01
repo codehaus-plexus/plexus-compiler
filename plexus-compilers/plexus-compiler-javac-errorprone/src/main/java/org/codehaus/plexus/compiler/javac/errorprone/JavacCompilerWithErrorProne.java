@@ -30,7 +30,6 @@ import javax.tools.DiagnosticListener;
 import javax.tools.JavaFileObject;
 import java.io.File;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -53,7 +52,6 @@ public class JavacCompilerWithErrorProne
     }
 
     public String[] createCommandLine( CompilerConfiguration config )
-        throws CompilerException
     {
         return new String[0];
     }
@@ -88,8 +86,7 @@ public class JavacCompilerWithErrorProne
 
         try
         {
-            CompilerResult compilerResult = (CompilerResult) getInvoker().invoke( null, new Object[]{ args } );
-            return compilerResult;
+            return (CompilerResult) getInvoker().invoke( null, new Object[]{ args } );
         }
         catch ( Exception e )
         {
@@ -103,7 +100,6 @@ public class JavacCompilerWithErrorProne
         ClassLoader original;
 
         public NonDelegatingClassLoader( URL[] urls, ClassLoader original )
-            throws MalformedURLException
         {
             super( urls, null );
             this.original = original;

@@ -102,7 +102,7 @@ public class JavacCompiler
 
     private static volatile Class<?> JAVAC_CLASS;
 
-    private List<Class<?>> javaccClasses = new CopyOnWriteArrayList<Class<?>>();
+    private final List<Class<?>> javaccClasses = new CopyOnWriteArrayList<>();
 
     // ----------------------------------------------------------------------
     //
@@ -198,14 +198,13 @@ public class JavacCompiler
     }
 
     public String[] createCommandLine( CompilerConfiguration config )
-        throws CompilerException
     {
         return buildCompilerArguments( config, getSourceFiles( config ) );
     }
 
     public static String[] buildCompilerArguments( CompilerConfiguration config, String[] sourceFiles )
     {
-        List<String> args = new ArrayList<String>();
+        List<String> args = new ArrayList<>();
 
         // ----------------------------------------------------------------------
         // Set output
@@ -401,7 +400,7 @@ public class JavacCompiler
             args.add( value );
         }
 
-        return args.toArray( new String[args.size()] );
+        return args.toArray( new String[0] );
     }
 
     /**
@@ -563,11 +562,7 @@ public class JavacCompiler
 
             messages = parseModernStream( returnCode, new BufferedReader( new StringReader( out.getOutput() ) ) );
         }
-        catch ( CommandLineException e )
-        {
-            throw new CompilerException( "Error while executing the external compiler.", e );
-        }
-        catch ( IOException e )
+        catch ( CommandLineException | IOException e )
         {
             throw new CompilerException( "Error while executing the external compiler.", e );
         }
@@ -625,30 +620,18 @@ public class JavacCompiler
 
         try
         {
-            Method compile = javacClass.getMethod( "compile", new Class[]{ String[].class, PrintWriter.class } );
+            Method compile = javacClass.getMethod( "compile", String[].class, PrintWriter.class );
 
             ok = (Integer) compile.invoke( null, new Object[]{ args, new PrintWriter( out ) } );
 
-            messages = parseModernStream( ok.intValue(), new BufferedReader( new StringReader( out.toString() ) ) );
+            messages = parseModernStream( ok, new BufferedReader( new StringReader( out.toString() ) ) );
         }
-        catch ( NoSuchMethodException e )
-        {
-            throw new CompilerException( "Error while executing the compiler.", e );
-        }
-        catch ( IllegalAccessException e )
-        {
-            throw new CompilerException( "Error while executing the compiler.", e );
-        }
-        catch ( InvocationTargetException e )
-        {
-            throw new CompilerException( "Error while executing the compiler.", e );
-        }
-        catch ( IOException e )
+        catch ( NoSuchMethodException | IOException | InvocationTargetException | IllegalAccessException e )
         {
             throw new CompilerException( "Error while executing the compiler.", e );
         }
 
-        boolean success = ok.intValue() == 0;
+        boolean success = ok == 0;
         return new CompilerResult( success, messages );
     }
 
@@ -663,7 +646,7 @@ public class JavacCompiler
     static List<CompilerMessage> parseModernStream( int exitCode, BufferedReader input )
         throws IOException
     {
-        List<CompilerMessage> errors = new ArrayList<CompilerMessage>();
+        List<CompilerMessage> errors = new ArrayList<>();
 
         String line;
 
@@ -769,9 +752,9 @@ public class JavacCompiler
     
     private static boolean startsWithPrefix( String line, String[] prefixes )
     {
-        for ( int i = 0; i < prefixes.length; i++ )
+        for ( String prefix : prefixes )
         {
-            if ( line.startsWith( prefixes[i] ) )
+            if ( line.startsWith( prefix ) )
             {
                 return true;
             }
@@ -914,10 +897,6 @@ public class JavacCompiler
         {
             return new CompilerMessage( "no more tokens - could not parse error message: " + error, isError );
         }
-        catch ( NumberFormatException e )
-        {
-            return new CompilerMessage( "could not parse error message: " + error, isError );
-        }
         catch ( Exception e )
         {
             return new CompilerMessage( "could not parse error message: " + error, isError );
@@ -926,11 +905,11 @@ public class JavacCompiler
 
     private static String getWarnPrefix( String msg )
     {
-        for ( int i = 0; i < WARNING_PREFIXES.length; i++ )
+        for ( String warningPrefix : WARNING_PREFIXES )
         {
-            if ( msg.startsWith( WARNING_PREFIXES[i] ) )
+            if ( msg.startsWith( warningPrefix ) )
             {
-                return WARNING_PREFIXES[i];
+                return warningPrefix;
             }
         }
         return null;
@@ -963,9 +942,9 @@ public class JavacCompiler
 
             writer = new PrintWriter( new FileWriter( tempFile ) );
 
-            for ( int i = 0; i < args.length; i++ )
+            for ( String arg : args )
             {
-                String argValue = args[i].replace( File.separatorChar, '/' );
+                String argValue = arg.replace( File.separatorChar, '/' );
 
                 writer.write( "\"" + argValue + "\"" );
 
@@ -1061,7 +1040,7 @@ public class JavacCompiler
     private Class<?> getJavacClass( CompilerConfiguration compilerConfiguration )
         throws CompilerException
     {
-        Class<?> c = null;
+        Class<?> c;
         switch ( compilerConfiguration.getCompilerReuseStrategy() )
         {
             case AlwaysNew:

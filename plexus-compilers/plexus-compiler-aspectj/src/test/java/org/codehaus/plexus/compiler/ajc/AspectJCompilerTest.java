@@ -3,7 +3,6 @@ package org.codehaus.plexus.compiler.ajc;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import org.codehaus.plexus.compiler.AbstractCompilerTest;
@@ -45,7 +44,7 @@ public class AspectJCompilerTest
 //        {
 //            return Collections.emptyList();
 //        }
-        return Arrays.asList( new String[]{ "org/codehaus/foo/ExternalDeps.class", "org/codehaus/foo/Person.class" } );
+        return Arrays.asList( "org/codehaus/foo/ExternalDeps.class", "org/codehaus/foo/Person.class" );
     }
 
     protected List<String> getClasspath()

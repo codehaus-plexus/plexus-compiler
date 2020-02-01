@@ -31,7 +31,7 @@ import java.util.Set;
 public abstract class AbstractSourceInclusionScanner
     implements SourceInclusionScanner
 {
-    private final List<SourceMapping> sourceMappings = new ArrayList<SourceMapping>();
+    private final List<SourceMapping> sourceMappings = new ArrayList<>();
 
     public final void addSourceMapping( SourceMapping sourceMapping )
     {
@@ -56,7 +56,7 @@ public abstract class AbstractSourceInclusionScanner
         }
         else
         {
-            includes = sourceIncludes.toArray( new String[sourceIncludes.size()] );
+            includes = sourceIncludes.toArray( new String[0] );
         }
 
         ds.setIncludes( includes );
@@ -68,7 +68,7 @@ public abstract class AbstractSourceInclusionScanner
         }
         else
         {
-            excludes = sourceExcludes.toArray( new String[sourceExcludes.size()] );
+            excludes = sourceExcludes.toArray( new String[0] );
         }
 
         ds.setExcludes( excludes );

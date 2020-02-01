@@ -26,7 +26,6 @@ package org.codehaus.plexus.compiler.eclipse;
 
 import org.codehaus.plexus.compiler.AbstractCompiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
-import org.codehaus.plexus.compiler.CompilerException;
 import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.compiler.CompilerOutputStyle;
 import org.codehaus.plexus.compiler.CompilerResult;
@@ -35,7 +34,6 @@ import org.eclipse.jdt.core.compiler.CompilationProgress;
 import org.eclipse.jdt.core.compiler.batch.BatchCompiler;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -62,7 +60,6 @@ public class EclipseJavaCompiler
     boolean errorsAsWarnings = false;
 
     public CompilerResult performCompile(CompilerConfiguration config )
-        throws CompilerException
     {
         List<String> args = new ArrayList<>();
         args.add("-noExit");                            // Make sure ecj does not System.exit on us 8-/
@@ -273,7 +270,7 @@ public class EclipseJavaCompiler
             PrintWriter devNull = new PrintWriter(sw);
 
             //BatchCompiler.compile(args.toArray(new String[args.size()]), new PrintWriter(System.err), new PrintWriter(System.out), new CompilationProgress() {
-            boolean success = BatchCompiler.compile(args.toArray(new String[args.size()]), devNull, devNull, new CompilationProgress() {
+            boolean success = BatchCompiler.compile(args.toArray( new String[0] ), devNull, devNull, new CompilationProgress() {
                 @Override
                 public void begin(int i)
                 {
@@ -320,10 +317,8 @@ public class EclipseJavaCompiler
             }
             if(!hasError && !success && !errorsAsWarnings)
             {
-                CompilerMessage.Kind kind = errorsAsWarnings ? CompilerMessage.Kind.WARNING : CompilerMessage.Kind.ERROR;
-
                 //-- Compiler reported failure but we do not seem to have one -> probable exception
-                CompilerMessage cm = new CompilerMessage("[ecj] The compiler reported an error but has not written it to its logging", kind);
+                CompilerMessage cm = new CompilerMessage("[ecj] The compiler reported an error but has not written it to its logging", CompilerMessage.Kind.ERROR);
                 messageList.add(cm);
                 hasError = true;
 
@@ -331,7 +326,7 @@ public class EclipseJavaCompiler
                 String stdout = getLastLines(sw.toString(), 5);
                 if(stdout.length() > 0)
                 {
-                    cm = new CompilerMessage("[ecj] The following line(s) might indicate the issue:\n" + stdout, kind);
+                    cm = new CompilerMessage("[ecj] The following line(s) might indicate the issue:\n" + stdout, CompilerMessage.Kind.ERROR);
                     messageList.add(cm);
                 }
             }
@@ -397,7 +392,6 @@ public class EclipseJavaCompiler
     }
 
     public String[] createCommandLine( CompilerConfiguration config )
-        throws CompilerException
     {
         return null;
     }

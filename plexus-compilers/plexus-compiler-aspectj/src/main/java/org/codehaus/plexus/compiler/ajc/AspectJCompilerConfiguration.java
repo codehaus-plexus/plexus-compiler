@@ -17,21 +17,21 @@ public class AspectJCompilerConfiguration
     extends CompilerConfiguration
 {
 
-    private List<String> aspectPath = new LinkedList<String>();
+    private List<String> aspectPath = new LinkedList<>();
 
-    private List<String> inJars = new LinkedList<String>();
+    private List<String> inJars = new LinkedList<>();
 
-    private List<String> inPath = new LinkedList<String>();
+    private List<String> inPath = new LinkedList<>();
 
     private String outputJar;
 
-    private Map<String, String> ajOptions = new TreeMap<String, String>();
+    private Map<String, String> ajOptions = new TreeMap<>();
 
     private Map<String, File> sourcePathResources;
 
     public void setAspectPath( List<String> aspectPath )
     {
-        this.aspectPath = new LinkedList<String>( aspectPath );
+        this.aspectPath = new LinkedList<>( aspectPath );
     }
 
     public void addAspectPath( String aspectPath )
@@ -46,7 +46,7 @@ public class AspectJCompilerConfiguration
 
     public void setInJars( List<String> inJars )
     {
-        this.inJars = new LinkedList<String>( inJars );
+        this.inJars = new LinkedList<>( inJars );
     }
 
     public void addInJar( String inJar )
@@ -61,7 +61,7 @@ public class AspectJCompilerConfiguration
 
     public void setInPath( List<String> inPath )
     {
-        this.inPath = new LinkedList<String>( inPath );
+        this.inPath = new LinkedList<>( inPath );
     }
 
     public void addInPath( String inPath )
@@ -110,7 +110,7 @@ public class AspectJCompilerConfiguration
 
     public void setSourcePathResources( Map<String, File> sourcePathResources )
     {
-        this.sourcePathResources = new TreeMap<String, File>( sourcePathResources );
+        this.sourcePathResources = new TreeMap<>( sourcePathResources );
     }
 
     public Map<String, File> getSourcePathResources()

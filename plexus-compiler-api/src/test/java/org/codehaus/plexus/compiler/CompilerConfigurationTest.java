@@ -12,7 +12,6 @@ public class CompilerConfigurationTest
     
     @Override
     protected void setUp()
-        throws Exception
     {
         configuration = new CompilerConfiguration();
     }

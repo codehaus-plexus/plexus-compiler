@@ -44,7 +44,6 @@ public class ErrorMessageParserTest
     private static final String EOL = System.getProperty( "line.separator" );
 
     public void testDeprecationMessage()
-        throws Exception
     {
         String error =
             "target/compiler-src/testDeprecation/Foo.java:1: warning: Date(java.lang.String) in java.util.Date has been deprecated"
@@ -212,7 +211,7 @@ public class ErrorMessageParserTest
             JavacCompiler.parseModernStream( 0, new BufferedReader( new StringReader( errors ) ) );
 
         assertEquals( 1, messages.size() );
-        assertFalse( ( (CompilerMessage) messages.get( 0 ) ).isError() );
+        assertFalse( messages.get( 0 ).isError() );
     }
 
     public void testUnixFileNames()
@@ -624,7 +623,7 @@ public class ErrorMessageParserTest
         List<CompilerMessage> compilerMessages =
             JavacCompiler.parseModernStream( 0, new BufferedReader( new StringReader( errors ) ) );
         assertEquals( "count", 187, compilerMessages.size() );
-        List<CompilerMessage> compilerErrors = new ArrayList<CompilerMessage>( 3 );
+        List<CompilerMessage> compilerErrors = new ArrayList<>( 3 );
         for ( CompilerMessage message : compilerMessages ) {
             if ( message.getKind() != CompilerMessage.Kind.OTHER ) {
                 compilerErrors.add( message );

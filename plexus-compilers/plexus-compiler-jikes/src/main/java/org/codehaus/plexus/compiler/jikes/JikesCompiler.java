@@ -95,6 +95,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -158,7 +159,7 @@ public class JikesCompiler
             BufferedReader input =
                 new BufferedReader( new InputStreamReader( new ByteArrayInputStream( tmpErr.toByteArray() ) ) );
 
-            List<CompilerMessage> messages = new ArrayList<CompilerMessage>();
+            List<CompilerMessage> messages = new ArrayList<>();
 
             parseStream( input, messages );
 
@@ -169,11 +170,7 @@ public class JikesCompiler
 
             return new CompilerResult().compilerMessages( messages );
         }
-        catch ( IOException e )
-        {
-            throw new CompilerException( "Error while compiling.", e );
-        }
-        catch ( InterruptedException e )
+        catch ( IOException | InterruptedException e )
         {
             throw new CompilerException( "Error while compiling.", e );
         }
@@ -182,7 +179,7 @@ public class JikesCompiler
     public String[] createCommandLine( CompilerConfiguration config )
         throws CompilerException
     {
-        List<String> args = new ArrayList<String>();
+        List<String> args = new ArrayList<>();
 
         args.add( "jikes" );
 
@@ -285,9 +282,9 @@ public class JikesCompiler
 
                 tempFile.getParentFile().mkdirs();
                 fw = new BufferedWriter( new FileWriter( tempFile ) );
-                for ( int i = 0; i < sourceFiles.length; i++ )
+                for ( String sourceFile : sourceFiles )
                 {
-                    fw.write( sourceFiles[i] );
+                    fw.write( sourceFile );
                     fw.newLine();
                 }
                 fw.flush();
@@ -306,14 +303,11 @@ public class JikesCompiler
         }
         else
         {
-            for ( int i = 0; i < sourceFiles.length; i++ )
-            {
-                args.add( sourceFiles[i] );
-            }
+            Collections.addAll( args, sourceFiles );
 
         }
 
-        return (String[]) args.toArray( new String[args.size()] );
+        return args.toArray( new String[0] );
     }
 
     // -----------------------------------------------------------------------
@@ -334,7 +328,7 @@ public class JikesCompiler
 
     private List<String> getBootClassPath()
     {
-        List<String> bootClassPath = new ArrayList<String>();
+        List<String> bootClassPath = new ArrayList<>();
         FileFilter filter = new FileFilter()
         {
 
@@ -371,7 +365,7 @@ public class JikesCompiler
 
     private List<String> asList( File[] files )
     {
-        List<String> filenames = new ArrayList<String>( files.length );
+        List<String> filenames = new ArrayList<>( files.length );
         for ( File file : files )
         {
             filenames.add( file.toString() );
@@ -482,7 +476,7 @@ public class JikesCompiler
             message.append( ':' ).append( errorBits[i++] );
         }
 
-        return new CompilerMessage( file, type.indexOf( "Error" ) > -1, startline, startcolumn, endline, endcolumn,
+        return new CompilerMessage( file, type.contains( "Error" ), startline, startcolumn, endline, endcolumn,
                                     message.toString() );
     }
 }

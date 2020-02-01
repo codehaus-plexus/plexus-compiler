@@ -93,13 +93,11 @@ public abstract class AbstractCompiler
     }
 
     public String getInputFileEnding( CompilerConfiguration configuration )
-        throws CompilerException
     {
         return inputFileEnding;
     }
 
     public String getOutputFileEnding( CompilerConfiguration configuration )
-        throws CompilerException
     {
         if ( compilerOutputStyle != CompilerOutputStyle.ONE_OUTPUT_FILE_PER_INPUT_FILE )
         {
@@ -121,7 +119,6 @@ public abstract class AbstractCompiler
     }
 
     public boolean canUpdateTarget( CompilerConfiguration configuration )
-        throws CompilerException
     {
         return true;
     }
@@ -152,7 +149,7 @@ public abstract class AbstractCompiler
 
         if ( includes != null && !includes.isEmpty() )
         {
-            String[] inclStrs = includes.toArray( new String[includes.size()] );
+            String[] inclStrs = includes.toArray( new String[0] );
             scanner.setIncludes( inclStrs );
         }
         else
@@ -164,7 +161,7 @@ public abstract class AbstractCompiler
 
         if ( excludes != null && !excludes.isEmpty() )
         {
-            String[] exclStrs = excludes.toArray( new String[excludes.size()] );
+            String[] exclStrs = excludes.toArray( new String[0] );
             scanner.setExcludes( exclStrs );
         }
 
@@ -213,7 +210,7 @@ public abstract class AbstractCompiler
         }
         else
         {
-            result = sources.toArray( new String[sources.size()] );
+            result = sources.toArray( new String[0] );
         }
 
         return result;

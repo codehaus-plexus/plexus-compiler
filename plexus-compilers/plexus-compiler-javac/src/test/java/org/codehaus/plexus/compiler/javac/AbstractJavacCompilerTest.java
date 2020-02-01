@@ -132,11 +132,11 @@ public abstract class AbstractJavacCompilerTest
     {
         String javaVersion = getJavaVersion();
         if (javaVersion.contains("9.0")||javaVersion.contains("11")){
-            return Arrays.asList( new String[]{ "org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ExternalDeps.class",
-                "org/codehaus/foo/Person.class"} );
+            return Arrays.asList( "org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ExternalDeps.class",
+                    "org/codehaus/foo/Person.class" );
         }
-        return Arrays.asList( new String[]{ "org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ExternalDeps.class",
-            "org/codehaus/foo/Person.class", "org/codehaus/foo/ReservedWord.class" } );
+        return Arrays.asList( "org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ExternalDeps.class",
+                "org/codehaus/foo/Person.class", "org/codehaus/foo/ReservedWord.class" );
     }
 
     public void internalTest( CompilerConfiguration compilerConfiguration, List<String> expectedArguments )
@@ -253,7 +253,7 @@ public abstract class AbstractJavacCompilerTest
         expectedArguments.add( "1.3" );
 
         // customCompilerArguments
-        Map<String, String> customCompilerArguments = new LinkedHashMap<String, String>();
+        Map<String, String> customCompilerArguments = new LinkedHashMap<>();
         customCompilerArguments.put( "-J-Duser.language=en_us", null );
         compilerConfiguration.setCustomCompilerArgumentsAsMap( customCompilerArguments );
         // don't expect this argument!!
@@ -261,7 +261,7 @@ public abstract class AbstractJavacCompilerTest
         internalTest( compilerConfiguration, expectedArguments );
     }
 
-    public void testModulePath() throws Exception
+    public void testModulePath()
     {
         List<String> expectedArguments = new ArrayList<>();
 
@@ -426,7 +426,7 @@ public abstract class AbstractJavacCompilerTest
 
         // classpathEntires
 
-        List<String> classpathEntries = new ArrayList<String>();
+        List<String> classpathEntries = new ArrayList<>();
 
         classpathEntries.add( "/myjar1.jar" );
 
@@ -440,7 +440,7 @@ public abstract class AbstractJavacCompilerTest
 
         // sourceRoots
 
-        List<String> compileSourceRoots = new ArrayList<String>();
+        List<String> compileSourceRoots = new ArrayList<>();
 
         compileSourceRoots.add( "/src/main/one" );
 
@@ -512,7 +512,7 @@ public abstract class AbstractJavacCompilerTest
 
         // customerCompilerArguments
 
-        Map<String, String> customerCompilerArguments = new LinkedHashMap<String, String>();
+        Map<String, String> customerCompilerArguments = new LinkedHashMap<>();
 
         customerCompilerArguments.put( "arg1", null );
 

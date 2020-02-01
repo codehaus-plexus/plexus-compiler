@@ -71,20 +71,19 @@ public class J2ObjCCompiler
      * Put the arguments of j2objc who takes one dash inside an array, in order
      * the check the command line.
      */
-    private static final List<String> ONE_DASH_ARGS = Arrays.asList(
-        new String[]{ "-pluginpath", "-pluginoptions", "-t", "-Xno-jsni-warnings", "-sourcepath", "-classpath", "-d",
-            "-encoding", "-g", "-q", "-v", "-Werror", "-h", "-use-arc", "-use-reference-counting", "-x" } );
+    private static final List<String> ONE_DASH_ARGS = Arrays.asList( "-pluginpath", "-pluginoptions", "-t",
+            "-Xno-jsni-warnings", "-sourcepath", "-classpath", "-d", "-encoding", "-g", "-q", "-v", "-Werror", "-h",
+            "-use-arc", "-use-reference-counting", "-x" );
 
     /**
      * Put the command line arguments with 2 dashes inside an array, in order
      * the check the command line and build it.
      */
-    private static final List<String> TWO_DASH_ARGS = Arrays.asList(
-        new String[]{ "--build-closure", "--dead-code-report", "--doc-comments", "--no-extract-unsequenced",
-            "--generate-deprecated", "--mapping", "--no-class-methods", "--no-final-methods-functions",
-            "--no-hide-private-members", "--no-package-directories", "--prefix", "--prefixes", "--preserve-full-paths",
-            "--strip-gwt-incompatible", "--strip-reflection", "--segmented-headers", "--timing-info", "--quiet",
-            "--verbose", "--help" } );
+    private static final List<String> TWO_DASH_ARGS = Arrays.asList( "--build-closure", "--dead-code-report",
+            "--doc-comments", "--no-extract-unsequenced", "--generate-deprecated", "--mapping", "--no-class-methods",
+            "--no-final-methods-functions", "--no-hide-private-members", "--no-package-directories", "--prefix",
+            "--prefixes", "--preserve-full-paths", "--strip-gwt-incompatible", "--strip-reflection",
+            "--segmented-headers", "--timing-info", "--quiet", "--verbose", "--help" );
 
     public J2ObjCCompiler()
     {
@@ -96,7 +95,6 @@ public class J2ObjCCompiler
     // ----------------------------------------------------------------------
 
     public boolean canUpdateTarget( CompilerConfiguration configuration )
-        throws CompilerException
     {
         return false;
     }
@@ -142,7 +140,6 @@ public class J2ObjCCompiler
     }
 
     public String[] createCommandLine( CompilerConfiguration config )
-        throws CompilerException
     {
         return buildCompilerArguments( config, J2ObjCCompiler.getSourceFiles( config ) );
     }
@@ -176,15 +173,13 @@ public class J2ObjCCompiler
      * @param config
      * @param sourceFiles
      * @return The List<String> to give to the command line tool
-     * @throws CompilerException
      */
     private String[] buildCompilerArguments( CompilerConfiguration config, String[] sourceFiles )
-        throws CompilerException
     {
         /*
 		 * j2objc --help Usage: j2objc <options> <source files>
 		 */
-        List<String> args = new ArrayList<String>();
+        List<String> args = new ArrayList<>();
         Map<String, String> compilerArguments = config.getCustomCompilerArgumentsAsMap();
 
         // Verbose
@@ -199,7 +194,7 @@ public class J2ObjCCompiler
 
         if ( !config.getClasspathEntries().isEmpty() )
         {
-            List<String> classpath = new ArrayList<String>();
+            List<String> classpath = new ArrayList<>();
             for ( String element : config.getClasspathEntries() )
             {
                 File f = new File( element );
@@ -256,12 +251,9 @@ public class J2ObjCCompiler
             }
         }
 
-        for ( String sourceFile : sourceFiles )
-        {
-            args.add( sourceFile );
-        }
+        args.addAll( Arrays.asList( sourceFiles ) );
 
-        return args.toArray( new String[args.size()] );
+        return args.toArray( new String[0] );
     }
 
     private List<CompilerMessage> compileOutOfProcess( File workingDirectory, File target, String executable,
@@ -293,11 +285,7 @@ public class J2ObjCCompiler
 
             messages = parseCompilerOutput( new BufferedReader( new StringReader( stringWriter.toString() ) ) );
         }
-        catch ( CommandLineException e )
-        {
-            throw new CompilerException( "Error while executing the external compiler.", e );
-        }
-        catch ( IOException e )
+        catch ( CommandLineException | IOException e )
         {
             throw new CompilerException( "Error while executing the external compiler.", e );
         }
@@ -316,7 +304,7 @@ public class J2ObjCCompiler
     public static List<CompilerMessage> parseCompilerOutput( BufferedReader bufferedReader )
         throws IOException
     {
-        List<CompilerMessage> messages = new ArrayList<CompilerMessage>();
+        List<CompilerMessage> messages = new ArrayList<>();
 
         String line = bufferedReader.readLine();
 

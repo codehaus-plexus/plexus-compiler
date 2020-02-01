@@ -30,8 +30,8 @@ import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerException;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,15 +44,14 @@ public class J2ObjCCompilerTest
 {
 
     public void testJ2ObjCCompiler()
-        throws IOException
     {
         J2ObjCCompiler comp = new J2ObjCCompiler();
-        Map<String, String> customCompilerArguments = new HashMap<String, String>();
+        Map<String, String> customCompilerArguments = new HashMap<>();
         customCompilerArguments.put( "-use-arc", null );
         customCompilerArguments.put( "-sourcepath", "src/test/resources" );
         CompilerConfiguration cc = new CompilerConfiguration();
         cc.setOutputLocation( "target/generated/objective-c" );
-        cc.setSourceLocations( Arrays.asList( new String[]{ "src/test/resources" } ) );
+        cc.setSourceLocations( Collections.singletonList( "src/test/resources" ) );
         cc.setWorkingDirectory( new File( "." ) );
         cc.setFork( true );
         cc.setCustomCompilerArgumentsAsMap( customCompilerArguments );

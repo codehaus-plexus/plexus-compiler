@@ -84,7 +84,6 @@ public class CSharpCompiler
     // ----------------------------------------------------------------------
 
     public boolean canUpdateTarget( CompilerConfiguration configuration )
-        throws CompilerException
     {
         return false;
     }
@@ -242,7 +241,7 @@ Options can be of the form -option or /option
     private String[] buildCompilerArguments( CompilerConfiguration config, String[] sourceFiles )
         throws CompilerException
     {
-        List<String> args = new ArrayList<String>();
+        List<String> args = new ArrayList<>();
 
         if ( config.isDebug() )
         {
@@ -358,7 +357,7 @@ Options can be of the form -option or /option
 
         if ( !StringUtils.isEmpty( resourcefile ) )
         {
-            String resourceTarget = (String) compilerArguments.get( "-resourcetarget" );
+            String resourceTarget = compilerArguments.get( "-resourcetarget" );
             args.add( "/res:" + new File( resourcefile ).getAbsolutePath() + "," + resourceTarget );
         }
 
@@ -395,12 +394,9 @@ Options can be of the form -option or /option
         // ----------------------------------------------------------------------
         // add source files
         // ----------------------------------------------------------------------
-        for ( String sourceFile : sourceFiles )
-        {
-            args.add( sourceFile );
-        }
+        args.addAll( Arrays.asList( sourceFiles ) );
 
-        return args.toArray( new String[args.size()] );
+        return args.toArray( new String[0] );
     }
 
     private void addResourceArgs( CompilerConfiguration config, List<String> args )
@@ -414,8 +410,7 @@ Options can be of the form -option or /option
             scanner.addDefaultExcludes();
             scanner.scan();
 
-            List<String> includedFiles = Arrays.asList( scanner.getIncludedFiles() );
-            for ( String name : includedFiles )
+            for ( String name : scanner.getIncludedFiles() )
             {
                 File filteredResource = new File( filteredResourceDir, name );
                 String assemblyResourceName = this.convertNameToAssemblyResourceName( name );
@@ -439,7 +434,7 @@ Options can be of the form -option or /option
         
         Map<String, String> compilerArguments = getCompilerArguments( config );
         
-        String tempResourcesDirAsString = (String) compilerArguments.get( "-resourceDir" );
+        String tempResourcesDirAsString = compilerArguments.get( "-resourceDir" );
         File filteredResourceDir = null;
         if ( tempResourcesDirAsString != null )
         {
@@ -525,11 +520,7 @@ Options can be of the form -option or /option
 
             messages = parseCompilerOutput( new BufferedReader( new StringReader( stringWriter.toString() ) ) );
         }
-        catch ( CommandLineException e )
-        {
-            throw new CompilerException( "Error while executing the external compiler.", e );
-        }
-        catch ( IOException e )
+        catch ( CommandLineException | IOException e )
         {
             throw new CompilerException( "Error while executing the external compiler.", e );
         }
@@ -548,7 +539,7 @@ Options can be of the form -option or /option
     public static List<CompilerMessage> parseCompilerOutput( BufferedReader bufferedReader )
         throws IOException
     {
-        List<CompilerMessage> messages = new ArrayList<CompilerMessage>();
+        List<CompilerMessage> messages = new ArrayList<>();
 
         String line = bufferedReader.readLine();
 
@@ -600,7 +591,7 @@ Options can be of the form -option or /option
     // added for debug purposes.... 
     protected static String[] getSourceFiles( CompilerConfiguration config )
     {
-        Set<String> sources = new HashSet<String>();
+        Set<String> sources = new HashSet<>();
 
         //Set sourceFiles = null;
         //was:
@@ -637,7 +628,7 @@ Options can be of the form -option or /option
         }
         else
         {
-            result = (String[]) sources.toArray( new String[sources.size()] );
+            result = sources.toArray( new String[0] );
         }
 
         return result;
@@ -665,7 +656,7 @@ Options can be of the form -option or /option
 
         if ( includes != null && !includes.isEmpty() )
         {
-            String[] inclStrs = includes.toArray( new String[includes.size()] );
+            String[] inclStrs = includes.toArray( new String[0] );
             scanner.setIncludes( inclStrs );
         }
         else
@@ -677,7 +668,7 @@ Options can be of the form -option or /option
 
         if ( excludes != null && !excludes.isEmpty() )
         {
-            String[] exclStrs = excludes.toArray( new String[excludes.size()] );
+            String[] exclStrs = excludes.toArray( new String[0] );
             scanner.setIncludes( exclStrs );
         }
 
@@ -685,7 +676,7 @@ Options can be of the form -option or /option
 
         String[] sourceDirectorySources = scanner.getIncludedFiles();
 
-        Set<String> sources = new HashSet<String>();
+        Set<String> sources = new HashSet<>();
 
         for ( String source : sourceDirectorySources )
         {

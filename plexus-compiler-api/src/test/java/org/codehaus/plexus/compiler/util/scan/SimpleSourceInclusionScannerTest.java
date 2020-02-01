@@ -38,7 +38,7 @@ public class SimpleSourceInclusionScannerTest
         super.setUp();
 
         includes = Collections.singleton( "*.java" );
-        excludes = new HashSet<String>();
+        excludes = new HashSet<>();
         scanner = new SimpleSourceInclusionScanner( includes, excludes );
     }
 
