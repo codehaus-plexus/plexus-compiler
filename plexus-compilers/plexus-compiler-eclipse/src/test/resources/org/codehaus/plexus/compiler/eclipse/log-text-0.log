@@ -1,0 +1,15 @@
+# 9/26/18 4:37:25 PM EDT
+# Eclipse Compiler for Java(TM) v20180905-0317, 3.15.0, Copyright IBM Corp 2000, 2015. All rights reserved.
+incorrect classpath: C:\devenv\gitrepo\plexus-compiler\plexus-compilers\plexus-compiler-eclipse/target/eclipse/classes-0
+----------
+1. ERROR in C:\devenv\gitrepo\plexus-compiler\plexus-compilers\plexus-compiler-eclipse\src\test-input\src\main\org\codehaus\foo\Bad.java (at line 6)
+	pubic String name;
+	^^^^^
+Syntax error on token "pubic", public expected
+----------
+2. ERROR in C:\devenv\gitrepo\plexus-compiler\plexus-compilers\plexus-compiler-eclipse\src\test-input\src\main\org\codehaus\foo\Bad.java (at line 6)
+	pubic String name;
+	^^^^^
+pubic cannot be resolved to a type
+----------
+2 problems (2 errors)

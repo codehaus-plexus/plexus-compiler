@@ -1,6 +1,4 @@
-package org.codehaus.plexus.compiler.eclipse;
-
-/**
+/*
  * The MIT License
  *
  * Copyright (c) 2005, The Codehaus
@@ -23,41 +21,37 @@ package org.codehaus.plexus.compiler.eclipse;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package org.codehaus.plexus.compiler.eclipse;
 
 import java.util.Collections;
 
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 
 /**
- * Created on 2018-04-22.
- * 
- * @author <a href="mailto:jal@etc.to">Frits Jalvingh</a>
+ * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>
  * @author <a href="jfaust@tsunamit.com">Jason Faust</a>
  */
-public class EclipseCompilerDashedArgumentsTest extends AbstractEclipseCompilerTest {
-
-    public static final String BAD_DOUBLEDASH_OPTION = "--grubbelparkplace";
+public class EclipseCompilerCustomArgumentTest extends AbstractEclipseCompilerTest {
 
     @SuppressWarnings("unchecked")
-    public EclipseCompilerDashedArgumentsTest() {
+    public EclipseCompilerCustomArgumentTest() {
         super(0, 0, 0, Collections.EMPTY_LIST);
     }
 
     @Override
     protected void configureCompilerConfig(CompilerConfiguration compilerConfig) {
         super.configureCompilerConfig(compilerConfig);
-        compilerConfig.addCompilerCustomArgument(BAD_DOUBLEDASH_OPTION, "b0rk3d");
+        compilerConfig.addCompilerCustomArgument("-key", "value");
     }
 
     @Override
     public void testCompilingSources() throws Exception {
         try {
             super.testCompilingSources();
-            fail("Expected an exception to be thrown");
+            fail("Compile should of thrown an exception");
         } catch (EcjFailureException e) {
-            String ecjOutput = e.getEcjOutput();
-            assertTrue("The output should report the failure with two dashes: " + ecjOutput,
-                    ecjOutput.contains(BAD_DOUBLEDASH_OPTION) && !ecjOutput.contains("-" + BAD_DOUBLEDASH_OPTION));
+            assertTrue("Unexpected compiler error",
+                    e.getMessage().startsWith("Failed to run the ecj compiler: Unrecognized option : -key"));
         }
     }
 

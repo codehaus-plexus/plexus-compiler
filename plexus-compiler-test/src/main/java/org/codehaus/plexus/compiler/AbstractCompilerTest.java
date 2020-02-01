@@ -29,11 +29,10 @@ import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.artifact.test.ArtifactTestCase;
 import org.apache.maven.artifact.versioning.VersionRange;
-
+import org.codehaus.plexus.compiler.CompilerMessage.Kind;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 
-import javax.print.DocFlavor;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -91,6 +90,22 @@ public abstract class AbstractCompilerTest
 
     }
 
+
+    /**
+     * Called once per compile iteration to allow configuration customization for
+     * tests.
+     * 
+     * @param compilerConfig
+     *            configuration used for this compile iteration.
+     * @param filename
+     *            file about to be compiled this iteration.
+     * @since 2.8.6
+     */
+    protected void configureCompilerConfig(CompilerConfiguration compilerConfig, String filename)
+    {
+        configureCompilerConfig( compilerConfig );
+    }
+
     public void testCompilingSources()
         throws Exception
     {
@@ -113,7 +128,9 @@ public abstract class AbstractCompilerTest
 
         int numCompilerErrors = compilerErrorCount( messages );
 
-        int numCompilerWarnings = messages.size() - numCompilerErrors;
+        int numCompilerWarnings = compilerWarningCount( messages );
+
+        int numCompilerNotes = compilerNoteCount( messages );
 
         int expectedErrors = expectedErrors();
 
@@ -123,7 +140,7 @@ public abstract class AbstractCompilerTest
             List<String> errors = new ArrayList<>();
             for ( CompilerMessage error : messages )
             {
-                if ( !error.isError() )
+                if ( error.getKind() != Kind.ERROR )
                 {
                     continue;
                 }
@@ -146,7 +163,7 @@ public abstract class AbstractCompilerTest
             System.out.println( numCompilerWarnings + " warning(s) found:" );
             for ( CompilerMessage error : messages )
             {
-                if ( error.isError() )
+                if ( error.getKind() == Kind.ERROR || error.getKind() == Kind.NOTE )
                 {
                     continue;
                 }
@@ -160,6 +177,25 @@ public abstract class AbstractCompilerTest
 
             assertEquals( "Wrong number (" + numCompilerWarnings + "/" + expectedWarnings + ") of compilation warnings: " + warnings, //
                           expectedWarnings, numCompilerWarnings );
+        }
+
+        if ( expectedNotes() != numCompilerNotes )
+        {
+            System.out.println( numCompilerWarnings + " notes(s) found:" );
+            for (CompilerMessage error : messages)
+            {
+                if ( error.getKind() != Kind.NOTE )
+                {
+                    continue;
+                }
+
+                System.out.println( "----" );
+                System.out.println( error.getFile() );
+                System.out.println( error.getMessage() );
+                System.out.println( "----" );
+            }
+
+            assertEquals( "Wrong number of compilation notes.", expectedNotes(), numCompilerNotes );
         }
 
         assertEquals( new TreeSet<>( normalizePaths( expectedOutputFiles() ) ), files );
@@ -199,7 +235,7 @@ public abstract class AbstractCompilerTest
 
             compilerConfig.setForceJavacCompilerUse( this.forceJavacCompilerUse );
 
-            configureCompilerConfig( compilerConfig );
+            configureCompilerConfig( compilerConfig, filename );
 
             String target = getTargetVersion();
             if( StringUtils.isNotEmpty( target) )
@@ -241,16 +277,32 @@ public abstract class AbstractCompilerTest
         return normalizedPaths;
     }
 
-    protected int compilerErrorCount( List<CompilerMessage> messages )
+    private int compilerErrorCount(List<CompilerMessage> messages)
     {
-        int count = 0;
+        return countKind( messages, Kind.ERROR );
+    }
 
-        for ( CompilerMessage message : messages )
+    private int compilerWarningCount(List<CompilerMessage> messages)
+    {
+        return messages.size() - (compilerErrorCount( messages ) + compilerNoteCount( messages ));
+    }
+
+    private int compilerNoteCount(List<CompilerMessage> messages)
+    {
+        return countKind( messages, Kind.NOTE );
+    }
+
+    private int countKind(List<CompilerMessage> messages, Kind kind)
+    {
+        int c = 0;
+        for (CompilerMessage message : messages)
         {
-            count += message.isError() ? 1 : 0;
+            if ( message.getKind() == kind )
+            {
+                c++;
+            }
         }
-
-        return count;
+        return c;
     }
 
     protected int expectedErrors()
@@ -259,6 +311,17 @@ public abstract class AbstractCompilerTest
     }
 
     protected int expectedWarnings()
+    {
+        return 0;
+    }
+
+    /**
+     * Count of output generated at the {@link Kind#NOTE} level.
+     * 
+     * @return count
+     * @since 2.8.6
+     */
+    protected int expectedNotes()
     {
         return 0;
     }

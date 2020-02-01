@@ -143,7 +143,7 @@ public class EclipseJavaCompiler
         if(null != props) {
             File propFile = new File(props);
             if(! propFile.exists() || ! propFile.isFile())
-                throw new IllegalArgumentException("Properties file specified by -properties " + propFile + " does not exist");
+                throw new EcjFailureException("Properties file specified by -properties " + propFile + " does not exist");
         }
 
         for(Entry<String, String> entry : extras.entrySet())
@@ -230,6 +230,27 @@ public class EclipseJavaCompiler
             }
         }
 
+        // Check for custom -log
+        boolean tempLog;
+        File logFile;
+        EcjLogParser logParser;
+        if (extras.containsKey("-log")) {
+            String key = extras.get("-log");
+            logFile = new File(key);
+            tempLog = false;
+            logParser = key.endsWith(".xml") ? new EcjResponseParser() : new EcjTextLogParser();
+        } else {
+            try {
+                logFile = File.createTempFile("ecjerr-", ".xml");
+            } catch (IOException e) {
+                throw new CompilerException("Unable to create temporary file for compiler output", e);
+            }
+            args.add("-log");
+            args.add(logFile.toString());
+            tempLog = true;
+            logParser = new EcjResponseParser();
+        }
+
         //-- Write .class files even when error occur, but make sure methods with compile errors do abort when called
         if(extras.containsKey("-proceedOnError"))
             args.add("-proceedOnError:Fatal");      // Generate a class file even with errors, but make methods with errors fail when called
@@ -240,15 +261,8 @@ public class EclipseJavaCompiler
         args.add("-classpath");
         args.add(getPathString(classpathEntries));
 
-        // Compile! Send all errors to xml temp file.
-        File errorF = null;
         try
         {
-            errorF = File.createTempFile("ecjerr-", ".xml");
-
-            args.add("-log");
-            args.add(errorF.toString());
-
             // Add all sources.
             int argCount = args.size();
             for(String source : config.getSourceLocations())
@@ -304,11 +318,11 @@ public class EclipseJavaCompiler
 
             List<CompilerMessage> messageList;
             boolean hasError = false;
-            if(errorF.length() < 80)
+            if(logFile.length() < 80)
             {
                 throw new EcjFailureException(sw.toString());
             }
-            messageList = new EcjResponseParser().parse(errorF, errorsAsWarnings);
+            messageList = logParser.parse(logFile, errorsAsWarnings);
 
             for(CompilerMessage compilerMessage : messageList)
             {
@@ -341,9 +355,9 @@ public class EclipseJavaCompiler
         } catch(Exception x) {
             throw new RuntimeException(x);				// sigh
         } finally {
-            if(null != errorF) {
+            if(tempLog) {
                 try {
-                    errorF.delete();
+                    logFile.delete();
                 } catch(Exception x) {}
             }
         }
