@@ -30,20 +30,29 @@ import org.codehaus.plexus.compiler.CompilerException;
 import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.compiler.CompilerOutputStyle;
 import org.codehaus.plexus.compiler.CompilerResult;
+import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.jdt.core.compiler.CompilationProgress;
 import org.eclipse.jdt.core.compiler.batch.BatchCompiler;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.ServiceLoader;
 import java.util.Set;
+
+import javax.tools.Diagnostic;
+import javax.tools.DiagnosticListener;
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardJavaFileManager;
 
 /**
  * @plexus.component role="org.codehaus.plexus.compiler.Compiler" role-hint="eclipse"
@@ -61,6 +70,7 @@ public class EclipseJavaCompiler
     // ----------------------------------------------------------------------
     boolean errorsAsWarnings = false;
 
+    @Override
     public CompilerResult performCompile(CompilerConfiguration config )
         throws CompilerException
     {
@@ -240,97 +250,166 @@ public class EclipseJavaCompiler
         args.add("-classpath");
         args.add(getPathString(classpathEntries));
 
-        // Compile! Send all errors to xml temp file.
-        File errorF = null;
-        try
+        // Collect sources
+        List<String> allSources = new ArrayList<>();
+        for (String source : config.getSourceLocations())
         {
-            errorF = File.createTempFile("ecjerr-", ".xml");
-
-            args.add("-log");
-            args.add(errorF.toString());
-
-            // Add all sources.
-            int argCount = args.size();
-            for(String source : config.getSourceLocations())
+            File srcFile = new File(source);
+            if (srcFile.exists())
             {
-                File srcFile = new File(source);
-                if(srcFile.exists())
-                {
-                    Set<String> ss = getSourceFilesForSourceRoot(config, source);
-                    args.addAll(ss);
-                }
+                Set<String> ss = getSourceFilesForSourceRoot(config, source);
+                allSources.addAll(ss);
             }
-            args.addAll(extraSourceDirs);
-            if(args.size() == argCount)
-            {
-                //-- Nothing to do -> bail out
-                return new CompilerResult(true, Collections.EMPTY_LIST);
+        }
+        for (String extraSrcDir : extraSourceDirs) {
+            File extraDir = new File(extraSrcDir);
+            if (extraDir.isDirectory()) {
+                addExtraSources(extraDir, allSources);
             }
+        }
+        List<CompilerMessage> messageList = new ArrayList<>();
+        if (allSources.isEmpty()) {
+            // -- Nothing to do -> bail out
+            return new CompilerResult(true, messageList);
+        }
 
-            getLogger().debug("ecj command line: " + args);
-
+        // Compile
+        try {
             StringWriter sw = new StringWriter();
             PrintWriter devNull = new PrintWriter(sw);
-
-            //BatchCompiler.compile(args.toArray(new String[args.size()]), new PrintWriter(System.err), new PrintWriter(System.out), new CompilationProgress() {
-            boolean success = BatchCompiler.compile(args.toArray(new String[args.size()]), devNull, devNull, new CompilationProgress() {
-                @Override
-                public void begin(int i)
-                {
+            JavaCompiler compiler = getEcj();
+            boolean success = false;
+            if (compiler != null) {
+                getLogger().debug("Using JSR-199 EclipseCompiler");
+                // ECJ JSR-199 compiles against the latest Java version it supports if no source
+                // version is given explicitly. BatchCompiler uses 1.3 as default. So check
+                // whether a source version is specified, and if not supply 1.3 explicitly.
+                String srcVersion = null;
+                Iterator<String> allArgs = args.iterator();
+                while (allArgs.hasNext()) {
+                    String option = allArgs.next();
+                    if ("-source".equals(option) && allArgs.hasNext()) {
+                        srcVersion = allArgs.next();
+                        break;
+                    }
                 }
-
-                @Override
-                public void done()
-                {
+                if (srcVersion == null) {
+                    getLogger().debug("ecj: no source level specified, defaulting to Java 1.3");
+                    args.add("-source");
+                    args.add("1.3");
                 }
+                final Locale defaultLocale = Locale.getDefault();
+                final List<CompilerMessage> messages = messageList;
+                DiagnosticListener<? super JavaFileObject> messageCollector = new DiagnosticListener<JavaFileObject>() {
 
-                @Override
-                public boolean isCanceled()
-                {
-                    return false;
+                    @Override
+                    public void report(Diagnostic<? extends JavaFileObject> diagnostic) {
+                        // Convert to Plexus' CompilerMessage and append to messageList
+                        String fileName = "Unknown source";
+                        try {
+                            JavaFileObject file = diagnostic.getSource();
+                            if (file != null) {
+                                fileName = file.getName();
+                            }
+                        } catch (NullPointerException e) {
+                            // ECJ bug: diagnostic.getSource() may throw an NPE if there is no source
+                        }
+                        long startColumn = diagnostic.getColumnNumber();
+                        // endColumn may be wrong if the endPosition is not on the same line.
+                        long endColumn = startColumn + (diagnostic.getEndPosition() - diagnostic.getStartPosition());
+                        CompilerMessage message = new CompilerMessage(fileName,
+                                convert(diagnostic.getKind()), (int) diagnostic.getLineNumber(), (int) startColumn,
+                                (int) diagnostic.getLineNumber(), (int) endColumn,
+                                diagnostic.getMessage(defaultLocale));
+                        messages.add(message);
+                    }
+                };
+                StandardJavaFileManager manager = compiler.getStandardFileManager(messageCollector, defaultLocale,
+                        Charset.defaultCharset());
+
+                getLogger().debug("ecj command line: " + args);
+                getLogger().debug("ecj input source files: " + allSources);
+
+                Iterable<? extends JavaFileObject> units = manager.getJavaFileObjectsFromStrings(allSources);
+                try {
+                    success = Boolean.TRUE
+                            .equals(compiler.getTask(devNull, manager, messageCollector, args, null, units).call());
+                } catch (RuntimeException e) {
+                    throw new EcjFailureException(e.getLocalizedMessage());
                 }
+                getLogger().debug(sw.toString());
+            } else {
+                // Use the BatchCompiler and send all errors to xml temp file.
+                File errorF = null;
+                try {
+                    errorF = File.createTempFile("ecjerr-", ".xml");
+                    getLogger().debug("Using legacy BatchCompiler; error file " + errorF);
 
-                @Override
-                public void setTaskName(String s)
-                {
+                    args.add("-log");
+                    args.add(errorF.toString());
+                    args.addAll(allSources);
+
+                    getLogger().debug("ecj command line: " + args);
+
+                    success = BatchCompiler.compile(args.toArray(new String[args.size()]), devNull, devNull,
+                            new CompilationProgress() {
+                                @Override
+                                public void begin(int i) {
+                                }
+
+                                @Override
+                                public void done() {
+                                }
+
+                                @Override
+                                public boolean isCanceled() {
+                                    return false;
+                                }
+
+                                @Override
+                                public void setTaskName(String s) {
+                                }
+
+                                @Override
+                                public void worked(int i, int i1) {
+                                }
+                            });
+                    getLogger().debug(sw.toString());
+
+                    if (errorF.length() < 80) {
+                        throw new EcjFailureException(sw.toString());
+                    }
+                    messageList = new EcjResponseParser().parse(errorF, errorsAsWarnings);
+                } finally {
+                    if (null != errorF) {
+                        try {
+                            errorF.delete();
+                        } catch (Exception x) {
+                        }
+                    }
                 }
-
-                @Override
-                public void worked(int i, int i1)
-                {
-                }
-            });
-            getLogger().debug(sw.toString());
-
-            List<CompilerMessage> messageList;
-            boolean hasError = false;
-            if(errorF.length() < 80)
-            {
-                throw new EcjFailureException(sw.toString());
             }
-            messageList = new EcjResponseParser().parse(errorF, errorsAsWarnings);
-
-            for(CompilerMessage compilerMessage : messageList)
-            {
-                if(compilerMessage.isError())
-                {
+            boolean hasError = false;
+            for (CompilerMessage compilerMessage : messageList) {
+                if (compilerMessage.isError()) {
                     hasError = true;
                     break;
                 }
             }
-            if(!hasError && !success && !errorsAsWarnings)
-            {
-                CompilerMessage.Kind kind = errorsAsWarnings ? CompilerMessage.Kind.WARNING : CompilerMessage.Kind.ERROR;
+            if (!hasError && !success && !errorsAsWarnings) {
+                CompilerMessage.Kind kind = errorsAsWarnings ? CompilerMessage.Kind.WARNING
+                        : CompilerMessage.Kind.ERROR;
 
-                //-- Compiler reported failure but we do not seem to have one -> probable exception
-                CompilerMessage cm = new CompilerMessage("[ecj] The compiler reported an error but has not written it to its logging", kind);
+                // -- Compiler reported failure but we do not seem to have one -> probable
+                // exception
+                CompilerMessage cm = new CompilerMessage(
+                        "[ecj] The compiler reported an error but has not written it to its logging", kind);
                 messageList.add(cm);
                 hasError = true;
 
-                //-- Try to find the actual message by reporting the last 5 lines as a message
+                // -- Try to find the actual message by reporting the last 5 lines as a message
                 String stdout = getLastLines(sw.toString(), 5);
-                if(stdout.length() > 0)
-                {
+                if (stdout.length() > 0) {
                     cm = new CompilerMessage("[ecj] The following line(s) might indicate the issue:\n" + stdout, kind);
                     messageList.add(cm);
                 }
@@ -339,13 +418,57 @@ public class EclipseJavaCompiler
         } catch(EcjFailureException x) {
             throw x;
         } catch(Exception x) {
-            throw new RuntimeException(x);				// sigh
-        } finally {
-            if(null != errorF) {
-                try {
-                    errorF.delete();
-                } catch(Exception x) {}
+            throw new RuntimeException(x); // sigh
+        }
+    }
+
+    private JavaCompiler getEcj() {
+        ServiceLoader<JavaCompiler> javaCompilerLoader = ServiceLoader.load(JavaCompiler.class,
+                BatchCompiler.class.getClassLoader());
+        Class<?> c = null;
+        try {
+            c = Class.forName("org.eclipse.jdt.internal.compiler.tool.EclipseCompiler", false,
+                    BatchCompiler.class.getClassLoader());
+        } catch (ClassNotFoundException e) {
+            // Ignore
+        }
+        if (c != null) {
+            for (JavaCompiler javaCompiler : javaCompilerLoader) {
+                if (c.isInstance(javaCompiler)) {
+                    return javaCompiler;
+                }
             }
+        }
+        getLogger().debug("Cannot find org.eclipse.jdt.internal.compiler.tool.EclipseCompiler");
+        return null;
+    }
+
+    private void addExtraSources(File dir, List<String> allSources) {
+        DirectoryScanner scanner = new DirectoryScanner();
+        scanner.setBasedir(dir.getAbsolutePath());
+        scanner.setIncludes(new String[] { "**/*.java" });
+        scanner.scan();
+        for (String file : scanner.getIncludedFiles()) {
+            allSources.add(new File(dir, file).getAbsolutePath());
+        }
+    }
+
+    private CompilerMessage.Kind convert(Diagnostic.Kind kind) {
+        if (kind == null) {
+            return CompilerMessage.Kind.OTHER;
+        }
+        switch (kind) {
+        case ERROR:
+            return errorsAsWarnings ? CompilerMessage.Kind.WARNING : CompilerMessage.Kind.ERROR;
+        case WARNING:
+            return CompilerMessage.Kind.WARNING;
+        case MANDATORY_WARNING:
+            return CompilerMessage.Kind.MANDATORY_WARNING;
+        case NOTE:
+            return CompilerMessage.Kind.NOTE;
+        case OTHER:
+        default:
+            return CompilerMessage.Kind.OTHER;
         }
     }
 
@@ -396,6 +519,7 @@ public class EclipseJavaCompiler
             || s.startsWith( "1.1" ) || s.startsWith( "1.0" );
     }
 
+    @Override
     public String[] createCommandLine( CompilerConfiguration config )
         throws CompilerException
     {
