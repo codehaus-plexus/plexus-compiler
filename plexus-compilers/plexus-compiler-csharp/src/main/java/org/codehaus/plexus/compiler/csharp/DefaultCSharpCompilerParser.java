@@ -5,11 +5,12 @@ import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Handles output from both mono with only the line number
- * <p/>
+ * <p>
  * ex error = "/home/trygvis/dev/com.myrealbox/trunk/mcs/nunit20/core/./TestRunnerThread.cs(29) error CS0246: Cannot find type 'NameValueCollection'"
- * <p/>
- * and errors from mono & csc on windows which has column num also
- * <p/>
+ * </p>
+ * <p>
+ * and errors from mono &amp; csc on windows which has column num also
+ * </p>
  * ex error = "src\\test\\csharp\\Hierarchy\\Logger.cs(98,4): warning CS0618: 'NUnit.Framework.Assertion' is obsolete: 'Use Assert class instead'";
  *
  * @author <a href="mailto:gdodinet@karmicsoft.com">Gilles Dodinet</a>

@@ -104,6 +104,13 @@
           <artifactId>maven-javadoc-plugin</artifactId>
           <configuration>
             <additionalparam>-Xdoclint:none</additionalparam>
+            <tagletArtifacts>
+              <tagletArtifact combine.id="org.codehaus.plexus:plexus-javadoc">
+                <groupId>org.codehaus.plexus</groupId>
+                <artifactId>plexus-javadoc</artifactId>
+                <version>1.0</version>
+              </tagletArtifact>
+            </tagletArtifacts>
           </configuration>
         </plugin>
       </plugins>
