@@ -39,6 +39,8 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -284,13 +286,19 @@ public class EclipseJavaCompiler
                 // ECJ JSR-199 compiles against the latest Java version it supports if no source
                 // version is given explicitly. BatchCompiler uses 1.3 as default. So check
                 // whether a source version is specified, and if not supply 1.3 explicitly.
+                //
+                // Also check for the encoding. Could have been set via the CompilerConfig
+                // above, or also via the arguments explicitly. We need the charset for the
+                // StandardJavaFileManager below.
                 String srcVersion = null;
+                String encoding = null;
                 Iterator<String> allArgs = args.iterator();
-                while (allArgs.hasNext()) {
+                while ((srcVersion == null || encoding == null) && allArgs.hasNext()) {
                     String option = allArgs.next();
                     if ("-source".equals(option) && allArgs.hasNext()) {
                         srcVersion = allArgs.next();
-                        break;
+                    } else if ("-encoding".equals(option) && allArgs.hasNext()) {
+                        encoding = allArgs.next();
                     }
                 }
                 if (srcVersion == null) {
@@ -324,11 +332,27 @@ public class EclipseJavaCompiler
                         messages.add(message);
                     }
                 };
+                Charset charset = null;
+                if (encoding != null) {
+                    encoding = encoding.trim();
+                    try {
+                        charset = Charset.forName(encoding);
+                    } catch (IllegalCharsetNameException | UnsupportedCharsetException e) {
+                        getLogger().warn("ecj: invalid or unsupported character set '" + encoding + "', using default");
+                        // charset remains null
+                    }
+                }
+                if (charset == null) {
+                    charset = Charset.defaultCharset();
+                }
                 StandardJavaFileManager manager = compiler.getStandardFileManager(messageCollector, defaultLocale,
-                        Charset.defaultCharset());
+                        charset);
 
-                getLogger().debug("ecj command line: " + args);
-                getLogger().debug("ecj input source files: " + allSources);
+                if (getLogger().isDebugEnabled()) {
+                    getLogger().debug("ecj: using character set " + charset.displayName());
+                    getLogger().debug("ecj command line: " + args);
+                    getLogger().debug("ecj input source files: " + allSources);
+                }
 
                 Iterable<? extends JavaFileObject> units = manager.getJavaFileObjectsFromStrings(allSources);
                 try {
