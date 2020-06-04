@@ -284,16 +284,14 @@ public class JavacCompiler
             }
             if ( config.getProcessorPathEntries() != null && !config.getProcessorPathEntries().isEmpty() ) {
 
-                //TODO check if has module-info
-                if(!isPreJava9(config)){
+                if(!isPreJava9(config) && Arrays.asList(sourceFiles).contains("module-info.java")){
                     args.add( "--processor-module-path" );
 
-                    args.add( getPathString( config.getProcessorPathEntries() ) );
                 } else {
                     args.add( "-processorpath" );
 
-                    args.add( getPathString( config.getProcessorPathEntries() ) );
                 }
+                args.add( getPathString( config.getProcessorPathEntries() ) );
             }
 
         }
@@ -443,29 +441,12 @@ public class JavacCompiler
      */
     private static boolean isPreJava16( CompilerConfiguration config )
     {
-        String v = config.getCompilerVersion();
+        String v = config.getReleaseVersion();
 
         if ( v == null )
         {
-            //mkleint: i haven't completely understood the reason for the
-            //compiler version parameter, checking source as well, as most projects will have this one set, not the compiler
-            String s = config.getSourceVersion();
-            if ( s == null )
-            {
-                //now return true, as the 1.6 version is not the default - 1.4 is.
-                return true;
-            }
-            return s.startsWith( "1.5" ) || s.startsWith( "1.4" ) || s.startsWith( "1.3" ) || s.startsWith( "1.2" )
-                || s.startsWith( "1.1" ) || s.startsWith( "1.0" );
+            v = config.getCompilerVersion();
         }
-
-        return v.startsWith( "1.5" ) || v.startsWith( "1.4" ) || v.startsWith( "1.3" ) || v.startsWith( "1.2" )
-            || v.startsWith( "1.1" ) || v.startsWith( "1.0" );
-    }
-
-    private static boolean isPreJava18( CompilerConfiguration config )
-    {
-        String v = config.getCompilerVersion();
 
         if ( v == null )
         {
@@ -477,7 +458,30 @@ public class JavacCompiler
             return true;
         }
 
-        return v.startsWith( "7" ) || v.startsWith( "1.7" ) || v.startsWith( "1.6" ) || v.startsWith( "1.5" ) || v.startsWith( "1.4" )
+        return v.startsWith( "5" ) || v.startsWith( "1.5" ) || v.startsWith( "1.4" ) || v.startsWith( "1.3" ) || v.startsWith( "1.2" )
+            || v.startsWith( "1.1" ) || v.startsWith( "1.0" );
+    }
+
+    private static boolean isPreJava18( CompilerConfiguration config )
+    {
+        String v = config.getReleaseVersion();
+
+        if ( v == null )
+        {
+            v = config.getCompilerVersion();
+        }
+
+        if ( v == null )
+        {
+            v = config.getSourceVersion();
+        }
+
+        if ( v == null )
+        {
+            return true;
+        }
+
+        return v.startsWith( "7" ) || v.startsWith( "1.7" ) || v.startsWith( "6" ) ||v.startsWith( "1.6" ) || v.startsWith( "1.5" ) || v.startsWith( "1.4" )
                 || v.startsWith( "1.3" ) || v.startsWith( "1.2" ) || v.startsWith( "1.1" ) || v.startsWith( "1.0" );
     }
 
