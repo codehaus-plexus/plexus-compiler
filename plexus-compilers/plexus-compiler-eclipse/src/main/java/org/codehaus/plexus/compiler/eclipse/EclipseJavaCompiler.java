@@ -216,7 +216,7 @@ public class EclipseJavaCompiler
 
         // Annotation processors defined?
         List<String> extraSourceDirs = new ArrayList<>();
-        if(!isPreJava16(config)) {
+        if(!isPreJava1_6(config)) {
             //now add jdk 1.6 annotation processing related parameters
             String[] annotationProcessors = config.getAnnotationProcessors();
             List<String> processorPathEntries = config.getProcessorPathEntries();
@@ -550,7 +550,7 @@ public class EclipseJavaCompiler
         warns.append(s);
     }
 
-    private boolean isPreJava16(CompilerConfiguration config) {
+    private boolean isPreJava1_6(CompilerConfiguration config) {
         String s = config.getSourceVersion();
         if ( s == null )
         {
