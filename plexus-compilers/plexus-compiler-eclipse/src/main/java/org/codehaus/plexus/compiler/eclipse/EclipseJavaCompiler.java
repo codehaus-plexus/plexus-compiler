@@ -88,20 +88,30 @@ public class EclipseJavaCompiler
             args.add("-g:lines,source");
         }
 
-        String sourceVersion = decodeVersion( config.getSourceVersion() );
-
-        if ( sourceVersion != null )
+        String releaseVersion = decodeVersion( config.getReleaseVersion() );
+        // EcjFailureException: Failed to run the ecj compiler: option -source is not supported when --release is used
+        if ( releaseVersion != null )
         {
-            args.add("-source");
-            args.add(sourceVersion);
+            args.add("--release");
+            args.add(releaseVersion);
         }
-
-        String targetVersion = decodeVersion( config.getTargetVersion() );
-
-        if ( targetVersion != null )
+        else
         {
-            args.add("-target");
-            args.add(targetVersion);
+            String sourceVersion = decodeVersion( config.getSourceVersion() );
+
+            if ( sourceVersion != null )
+            {
+                args.add("-source");
+                args.add(sourceVersion);
+            }
+
+            String targetVersion = decodeVersion( config.getTargetVersion() );
+
+            if ( targetVersion != null )
+            {
+                args.add("-target");
+                args.add(targetVersion);
+            }
         }
 
         if ( StringUtils.isNotEmpty( config.getSourceEncoding() ) )
@@ -286,25 +296,22 @@ public class EclipseJavaCompiler
                 // ECJ JSR-199 compiles against the latest Java version it supports if no source
                 // version is given explicitly. BatchCompiler uses 1.3 as default. So check
                 // whether a source version is specified, and if not supply 1.3 explicitly.
-                //
+                if (!haveSourceOrReleaseArgument(args)) {
+                    getLogger().debug("ecj: no source level nor release specified, defaulting to Java 1.3");
+                    args.add("-source");
+                    args.add("1.3");
+                }
+
                 // Also check for the encoding. Could have been set via the CompilerConfig
                 // above, or also via the arguments explicitly. We need the charset for the
                 // StandardJavaFileManager below.
-                String srcVersion = null;
                 String encoding = null;
                 Iterator<String> allArgs = args.iterator();
-                while ((srcVersion == null || encoding == null) && allArgs.hasNext()) {
+                while (encoding == null && allArgs.hasNext()) {
                     String option = allArgs.next();
-                    if ("-source".equals(option) && allArgs.hasNext()) {
-                        srcVersion = allArgs.next();
-                    } else if ("-encoding".equals(option) && allArgs.hasNext()) {
+                    if ("-encoding".equals(option) && allArgs.hasNext()) {
                         encoding = allArgs.next();
                     }
-                }
-                if (srcVersion == null) {
-                    getLogger().debug("ecj: no source level specified, defaulting to Java 1.3");
-                    args.add("-source");
-                    args.add("1.3");
                 }
                 final Locale defaultLocale = Locale.getDefault();
                 final List<CompilerMessage> messages = messageList;
@@ -444,6 +451,17 @@ public class EclipseJavaCompiler
         } catch(Exception x) {
             throw new RuntimeException(x); // sigh
         }
+    }
+
+    private static boolean haveSourceOrReleaseArgument(List<String> args) {
+        Iterator<String> allArgs = args.iterator();
+        while (allArgs.hasNext()) {
+            String option = allArgs.next();
+            if (("-source".equals(option) || "--release".equals(option)) && allArgs.hasNext()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private JavaCompiler getEcj() {
