@@ -80,11 +80,11 @@ public class JavacErrorProneCompilerTest
     protected int expectedWarnings()
     {
         if ( java8() ) {
-            return 0;
+            return 1;
         }
         else
         {
-            return 1;
+            return 2;
         }
     }
 
