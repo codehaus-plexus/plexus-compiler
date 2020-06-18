@@ -47,7 +47,12 @@ public class JavaxToolsCompiler
      * is that thread safe ???
      */
     @SuppressWarnings( "restriction" )
-    private final JavaCompiler COMPILER = ToolProvider.getSystemJavaCompiler();
+    private final JavaCompiler COMPILER = newJavaCompiler();
+
+	protected JavaCompiler newJavaCompiler()
+	{
+		return ToolProvider.getSystemJavaCompiler();
+	}
 
     private List<JavaCompiler> JAVA_COMPILERS = new CopyOnWriteArrayList<>();
 
@@ -56,7 +61,7 @@ public class JavaxToolsCompiler
         switch ( compilerConfiguration.getCompilerReuseStrategy() )
         {
             case AlwaysNew:
-                return ToolProvider.getSystemJavaCompiler();
+                return newJavaCompiler();
             case ReuseCreated:
                 JavaCompiler javaCompiler;
                 synchronized ( JAVA_COMPILERS )
@@ -68,7 +73,7 @@ public class JavaxToolsCompiler
                         return javaCompiler;
                     }
                 }
-                javaCompiler = ToolProvider.getSystemJavaCompiler();
+                javaCompiler = newJavaCompiler();
                 return javaCompiler;
             case ReuseSame:
             default:

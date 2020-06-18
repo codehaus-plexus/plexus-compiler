@@ -173,7 +173,7 @@ public class JavacCompiler
             {
                 // use fqcn to prevent loading of the class on 1.5 environment !
                 result =
-                    new org.codehaus.plexus.compiler.javac.JavaxToolsCompiler().compileInProcess( args, config, sourceFiles );
+                    javaxToolsCompiler().compileInProcess( args, config, sourceFiles );
             }
             else
             {
@@ -183,6 +183,11 @@ public class JavacCompiler
 
         return result;
     }
+
+	protected JavaxToolsCompiler javaxToolsCompiler()
+	{
+		return new org.codehaus.plexus.compiler.javac.JavaxToolsCompiler();
+	}
 
     protected static boolean isJava16()
     {
