@@ -41,7 +41,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author <a href="mailto:david.lloyd@redhat.com">David M. Lloyd</a>
  * @since 2.0
  */
-public class JavaxToolsCompiler
+public class JavaxToolsCompiler implements InProcessCompiler
 {
     /**
      * is that thread safe ???
@@ -95,7 +95,7 @@ public class JavaxToolsCompiler
         }
     }
 
-    CompilerResult compileInProcess( String[] args, final CompilerConfiguration config, String[] sourceFiles )
+    public CompilerResult compileInProcess( String[] args, final CompilerConfiguration config, String[] sourceFiles )
         throws CompilerException
     {
         JavaCompiler compiler = getJavaCompiler( config );
