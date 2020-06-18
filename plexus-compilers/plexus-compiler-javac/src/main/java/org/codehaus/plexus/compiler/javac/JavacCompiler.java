@@ -173,7 +173,7 @@ public class JavacCompiler
             {
                 // use fqcn to prevent loading of the class on 1.5 environment !
                 result =
-                    org.codehaus.plexus.compiler.javac.JavaxToolsCompiler.compileInProcess( args, config, sourceFiles );
+                    new org.codehaus.plexus.compiler.javac.JavaxToolsCompiler().compileInProcess( args, config, sourceFiles );
             }
             else
             {

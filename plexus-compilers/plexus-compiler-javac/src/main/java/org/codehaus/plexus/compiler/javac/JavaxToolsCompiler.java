@@ -47,11 +47,11 @@ public class JavaxToolsCompiler
      * is that thread safe ???
      */
     @SuppressWarnings( "restriction" )
-    private static final JavaCompiler COMPILER = ToolProvider.getSystemJavaCompiler();
+    private final JavaCompiler COMPILER = ToolProvider.getSystemJavaCompiler();
 
-    private static List<JavaCompiler> JAVA_COMPILERS = new CopyOnWriteArrayList<>();
+    private List<JavaCompiler> JAVA_COMPILERS = new CopyOnWriteArrayList<>();
 
-    private static JavaCompiler getJavaCompiler( CompilerConfiguration compilerConfiguration )
+    private JavaCompiler getJavaCompiler( CompilerConfiguration compilerConfiguration )
     {
         switch ( compilerConfiguration.getCompilerReuseStrategy() )
         {
@@ -77,7 +77,7 @@ public class JavaxToolsCompiler
 
     }
 
-    private static void releaseJavaCompiler( JavaCompiler javaCompiler, CompilerConfiguration compilerConfiguration )
+    private void releaseJavaCompiler( JavaCompiler javaCompiler, CompilerConfiguration compilerConfiguration )
     {
         if ( javaCompiler == null )
         {
@@ -90,7 +90,7 @@ public class JavaxToolsCompiler
         }
     }
 
-    static CompilerResult compileInProcess( String[] args, final CompilerConfiguration config, String[] sourceFiles )
+    CompilerResult compileInProcess( String[] args, final CompilerConfiguration config, String[] sourceFiles )
         throws CompilerException
     {
         JavaCompiler compiler = getJavaCompiler( config );
@@ -179,7 +179,7 @@ public class JavaxToolsCompiler
         }
     }
 
-    private static CompilerMessage.Kind convertKind(Diagnostic<? extends JavaFileObject> diagnostic) {
+    private CompilerMessage.Kind convertKind(Diagnostic<? extends JavaFileObject> diagnostic) {
         CompilerMessage.Kind kind;
         switch ( diagnostic.getKind() )
         {
