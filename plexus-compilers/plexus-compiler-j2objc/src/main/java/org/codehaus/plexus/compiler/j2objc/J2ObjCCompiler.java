@@ -184,7 +184,7 @@ public class J2ObjCCompiler
         /*
 		 * j2objc --help Usage: j2objc <options> <source files>
 		 */
-        List<String> args = new ArrayList<String>();
+        List<String> args = new ArrayList<>();
         Map<String, String> compilerArguments = config.getCustomCompilerArgumentsAsMap();
 
         // Verbose
@@ -199,7 +199,7 @@ public class J2ObjCCompiler
 
         if ( !config.getClasspathEntries().isEmpty() )
         {
-            List<String> classpath = new ArrayList<String>();
+            List<String> classpath = new ArrayList<>();
             for ( String element : config.getClasspathEntries() )
             {
                 File f = new File( element );
@@ -316,7 +316,7 @@ public class J2ObjCCompiler
     public static List<CompilerMessage> parseCompilerOutput( BufferedReader bufferedReader )
         throws IOException
     {
-        List<CompilerMessage> messages = new ArrayList<CompilerMessage>();
+        List<CompilerMessage> messages = new ArrayList<>();
 
         String line = bufferedReader.readLine();
 
