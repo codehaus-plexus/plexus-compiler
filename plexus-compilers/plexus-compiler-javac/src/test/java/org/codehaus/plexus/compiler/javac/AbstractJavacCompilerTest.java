@@ -61,7 +61,7 @@ public abstract class AbstractJavacCompilerTest
     protected int expectedErrors()
     {
         String javaVersion = getJavaVersion();
-        if (Arrays.asList("9.0","11", "14").contains( javaVersion )){
+        if (javaVersion.contains("9.0")||javaVersion.contains("11")||javaVersion.contains("14")){
             // lots of new warnings about obsoletions for future releases
             return 5;
         }
@@ -80,7 +80,7 @@ public abstract class AbstractJavacCompilerTest
     protected int expectedWarnings()
     {
         String javaVersion = getJavaVersion();
-        if (Arrays.asList("11", "14").contains( javaVersion )){
+        if (javaVersion.contains("9.0")||javaVersion.contains("11")||javaVersion.contains("14")){
             return 1;
         }
         if (javaVersion.contains("9.0")){
@@ -140,7 +140,7 @@ public abstract class AbstractJavacCompilerTest
     protected Collection<String> expectedOutputFiles()
     {
         String javaVersion = getJavaVersion();
-        if (Arrays.asList( "9.0", "11", "14").contains( javaVersion ))
+        if (javaVersion.contains("9.0")||javaVersion.contains("11")||javaVersion.contains("14"))
         {
             return Arrays.asList( new String[]{ "org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ExternalDeps.class",
                 "org/codehaus/foo/Person.class"} );
