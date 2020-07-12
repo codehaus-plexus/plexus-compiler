@@ -1,2 +1,4 @@
-_extends: .github
-tag-template: plexus-compiler-$NEXT_MINOR_VERSION
+template: |
+  ## What’s Changed
+
+  $CHANGES
