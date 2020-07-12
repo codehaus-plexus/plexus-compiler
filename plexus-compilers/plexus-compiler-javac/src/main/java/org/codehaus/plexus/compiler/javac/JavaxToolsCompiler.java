@@ -41,22 +41,27 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author <a href="mailto:david.lloyd@redhat.com">David M. Lloyd</a>
  * @since 2.0
  */
-public class JavaxToolsCompiler
+public class JavaxToolsCompiler implements InProcessCompiler
 {
     /**
      * is that thread safe ???
      */
     @SuppressWarnings( "restriction" )
-    static final JavaCompiler COMPILER = ToolProvider.getSystemJavaCompiler();
+    private final JavaCompiler COMPILER = newJavaCompiler();
 
-    private static List<JavaCompiler> JAVA_COMPILERS = new CopyOnWriteArrayList<>();
+	protected JavaCompiler newJavaCompiler()
+	{
+		return ToolProvider.getSystemJavaCompiler();
+	}
 
-    protected static JavaCompiler getJavaCompiler( CompilerConfiguration compilerConfiguration )
+    private List<JavaCompiler> JAVA_COMPILERS = new CopyOnWriteArrayList<>();
+
+    private JavaCompiler getJavaCompiler( CompilerConfiguration compilerConfiguration )
     {
         switch ( compilerConfiguration.getCompilerReuseStrategy() )
         {
             case AlwaysNew:
-                return ToolProvider.getSystemJavaCompiler();
+                return newJavaCompiler();
             case ReuseCreated:
                 JavaCompiler javaCompiler;
                 synchronized ( JAVA_COMPILERS )
@@ -68,7 +73,7 @@ public class JavaxToolsCompiler
                         return javaCompiler;
                     }
                 }
-                javaCompiler = ToolProvider.getSystemJavaCompiler();
+                javaCompiler = newJavaCompiler();
                 return javaCompiler;
             case ReuseSame:
             default:
@@ -77,7 +82,7 @@ public class JavaxToolsCompiler
 
     }
 
-    static void releaseJavaCompiler( JavaCompiler javaCompiler, CompilerConfiguration compilerConfiguration )
+    private void releaseJavaCompiler( JavaCompiler javaCompiler, CompilerConfiguration compilerConfiguration )
     {
         if ( javaCompiler == null )
         {
@@ -90,7 +95,7 @@ public class JavaxToolsCompiler
         }
     }
 
-    static CompilerResult compileInProcess( String[] args, final CompilerConfiguration config, String[] sourceFiles )
+    public CompilerResult compileInProcess( String[] args, final CompilerConfiguration config, String[] sourceFiles )
         throws CompilerException
     {
         JavaCompiler compiler = getJavaCompiler( config );
@@ -179,7 +184,7 @@ public class JavaxToolsCompiler
         }
     }
 
-    public static CompilerMessage.Kind convertKind(Diagnostic<? extends JavaFileObject> diagnostic) {
+    private CompilerMessage.Kind convertKind(Diagnostic<? extends JavaFileObject> diagnostic) {
         CompilerMessage.Kind kind;
         switch ( diagnostic.getKind() )
         {

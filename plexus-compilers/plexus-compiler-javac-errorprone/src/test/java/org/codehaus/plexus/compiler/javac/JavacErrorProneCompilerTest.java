@@ -24,17 +24,14 @@ package org.codehaus.plexus.compiler.javac;
  * SOFTWARE.
  */
 
+import org.codehaus.classworlds.DefaultClassRealm;
 import org.codehaus.plexus.compiler.AbstractCompilerTest;
-import org.codehaus.plexus.compiler.CompilerConfiguration;
-import org.codehaus.plexus.util.StringUtils;
 
-import java.io.File;
-import java.util.ArrayList;
+import java.lang.reflect.Field;
+import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Collections;
 
 /**
  * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>
@@ -43,31 +40,69 @@ public class JavacErrorProneCompilerTest
     extends AbstractCompilerTest
 {
 
+    protected boolean java8() {
+        return System.getProperty( "java.version" ).startsWith( "1.8" );
+    }
+    
+    private ClassLoader originalTCCL;
+    
     public void setUp()
         throws Exception
     {
         super.setUp();
-        setForceJavacCompilerUse( true );
+        if ( java8() ) {
+            ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+            this.originalTCCL = contextClassLoader;
+            Field realmField = contextClassLoader.getClass().getDeclaredField("realm");
+            realmField.setAccessible(true);
+            DefaultClassRealm realm = (DefaultClassRealm) realmField.get(contextClassLoader);
+            Field foreignClassLoaderField = realm.getClass().getDeclaredField("foreignClassLoader");
+            foreignClassLoaderField.setAccessible(true);
+            URLClassLoader foreignClassLoader = (URLClassLoader) foreignClassLoaderField.get(realm);
+            Thread.currentThread().setContextClassLoader(foreignClassLoader);
+        }
+    }
+
+    public void tearDown()
+        throws Exception
+    {
+        if ( java8() ) {
+            Thread.currentThread().setContextClassLoader(originalTCCL);
+        }
+        super.tearDown();
     }
 
     protected String getRoleHint()
     {
         return "javac-with-errorprone";
     }
+
     protected int expectedWarnings()
     {
-        return 10;
+        if ( java8() ) {
+            return 1;
+        }
+        else
+        {
+            return 2;
+        }
     }
 
     @Override
     protected int expectedErrors()
     {
-        return 4;
+        return 1;
     }
 
-    protected Collection<String> expectedOutputFiles()
+    @Override
+    public String getSourceVersion()
     {
-        return Arrays.asList( new String[]{ "org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ExternalDeps.class",
-            "org/codehaus/foo/Person.class", "org/codehaus/foo/ReservedWord.class" } );
+        return "1.8";
+    }
+
+    @Override
+    public String getTargetVersion()
+    {
+        return "1.8";
     }
 }
