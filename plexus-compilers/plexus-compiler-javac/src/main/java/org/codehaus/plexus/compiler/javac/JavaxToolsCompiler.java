@@ -106,8 +106,9 @@ public class JavaxToolsCompiler
             final String sourceEncoding = config.getSourceEncoding();
             final Charset sourceCharset = sourceEncoding == null ? null : Charset.forName( sourceEncoding );
             final DiagnosticCollector<JavaFileObject> collector = new DiagnosticCollector<JavaFileObject>();
-            final StandardJavaFileManager standardFileManager =
-                compiler.getStandardFileManager( collector, null, sourceCharset );
+            try ( final StandardJavaFileManager standardFileManager =
+                compiler.getStandardFileManager( collector, null, sourceCharset ) )
+            {
 
             final Iterable<? extends JavaFileObject> fileObjects =
                 standardFileManager.getJavaFileObjectsFromStrings( Arrays.asList( sourceFiles ) );
@@ -167,6 +168,7 @@ public class JavaxToolsCompiler
             }
 
             return new CompilerResult( result, compilerMsgs );
+            }
         }
         catch ( Exception e )
         {
