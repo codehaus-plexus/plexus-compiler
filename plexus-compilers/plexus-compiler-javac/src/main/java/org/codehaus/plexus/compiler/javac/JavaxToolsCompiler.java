@@ -110,64 +110,64 @@ public class JavaxToolsCompiler
                 compiler.getStandardFileManager( collector, null, sourceCharset ) )
             {
 
-            final Iterable<? extends JavaFileObject> fileObjects =
-                standardFileManager.getJavaFileObjectsFromStrings( Arrays.asList( sourceFiles ) );
+                final Iterable<? extends JavaFileObject> fileObjects =
+                    standardFileManager.getJavaFileObjectsFromStrings( Arrays.asList( sourceFiles ) );
 
-             /*(Writer out,
-             JavaFileManager fileManager,
-             DiagnosticListener<? super JavaFileObject> diagnosticListener,
-             Iterable<String> options,
-             Iterable<String> classes,
-             Iterable<? extends JavaFileObject> compilationUnits)*/
+                 /*(Writer out,
+                 JavaFileManager fileManager,
+                 DiagnosticListener<? super JavaFileObject> diagnosticListener,
+                 Iterable<String> options,
+                 Iterable<String> classes,
+                 Iterable<? extends JavaFileObject> compilationUnits)*/
 
-            List<String> arguments = Arrays.asList( args );
+                List<String> arguments = Arrays.asList( args );
 
-            final JavaCompiler.CompilationTask task =
-                compiler.getTask( null, standardFileManager, collector, arguments, null, fileObjects );
-            final Boolean result = task.call();
-            final ArrayList<CompilerMessage> compilerMsgs = new ArrayList<CompilerMessage>();
-            for ( Diagnostic<? extends JavaFileObject> diagnostic : collector.getDiagnostics() )
-            {
-                CompilerMessage.Kind kind = convertKind(diagnostic);
-                String baseMessage = diagnostic.getMessage( null );
-                if ( baseMessage == null )
+                final JavaCompiler.CompilationTask task =
+                    compiler.getTask( null, standardFileManager, collector, arguments, null, fileObjects );
+                final Boolean result = task.call();
+                final ArrayList<CompilerMessage> compilerMsgs = new ArrayList<CompilerMessage>();
+                for ( Diagnostic<? extends JavaFileObject> diagnostic : collector.getDiagnostics() )
                 {
-                    continue;
-                }
-                JavaFileObject source = diagnostic.getSource();
-                String longFileName = source == null ? null : source.toUri().getPath();
-                String shortFileName = source == null ? null : source.getName();
-                String formattedMessage = baseMessage;
-                int lineNumber = Math.max( 0, (int) diagnostic.getLineNumber() );
-                int columnNumber = Math.max( 0, (int) diagnostic.getColumnNumber() );
-                if ( source != null && lineNumber > 0 )
-                {
-                    // Some compilers like to copy the file name into the message, which makes it appear twice.
-                    String possibleTrimming = longFileName + ":" + lineNumber + ": ";
-                    if ( formattedMessage.startsWith( possibleTrimming ) )
+                    CompilerMessage.Kind kind = convertKind(diagnostic);
+                    String baseMessage = diagnostic.getMessage( null );
+                    if ( baseMessage == null )
                     {
-                        formattedMessage = formattedMessage.substring( possibleTrimming.length() );
+                        continue;
                     }
-                    else
+                    JavaFileObject source = diagnostic.getSource();
+                    String longFileName = source == null ? null : source.toUri().getPath();
+                    String shortFileName = source == null ? null : source.getName();
+                    String formattedMessage = baseMessage;
+                    int lineNumber = Math.max( 0, (int) diagnostic.getLineNumber() );
+                    int columnNumber = Math.max( 0, (int) diagnostic.getColumnNumber() );
+                    if ( source != null && lineNumber > 0 )
                     {
-                        possibleTrimming = shortFileName + ":" + lineNumber + ": ";
+                        // Some compilers like to copy the file name into the message, which makes it appear twice.
+                        String possibleTrimming = longFileName + ":" + lineNumber + ": ";
                         if ( formattedMessage.startsWith( possibleTrimming ) )
                         {
                             formattedMessage = formattedMessage.substring( possibleTrimming.length() );
                         }
+                        else
+                        {
+                            possibleTrimming = shortFileName + ":" + lineNumber + ": ";
+                            if ( formattedMessage.startsWith( possibleTrimming ) )
+                            {
+                                formattedMessage = formattedMessage.substring( possibleTrimming.length() );
+                            }
+                        }
                     }
+                    compilerMsgs.add(
+                        new CompilerMessage( longFileName, kind, lineNumber, columnNumber, lineNumber, columnNumber,
+                                             formattedMessage ) );
                 }
-                compilerMsgs.add(
-                    new CompilerMessage( longFileName, kind, lineNumber, columnNumber, lineNumber, columnNumber,
-                                         formattedMessage ) );
-            }
-            if ( result != Boolean.TRUE && compilerMsgs.isEmpty() )
-            {
-                compilerMsgs.add(
-                    new CompilerMessage( "An unknown compilation problem occurred", CompilerMessage.Kind.ERROR ) );
-            }
+                if ( result != Boolean.TRUE && compilerMsgs.isEmpty() )
+                {
+                    compilerMsgs.add(
+                        new CompilerMessage( "An unknown compilation problem occurred", CompilerMessage.Kind.ERROR ) );
+                }
 
-            return new CompilerResult( result, compilerMsgs );
+                return new CompilerResult( result, compilerMsgs );
             }
         }
         catch ( Exception e )
