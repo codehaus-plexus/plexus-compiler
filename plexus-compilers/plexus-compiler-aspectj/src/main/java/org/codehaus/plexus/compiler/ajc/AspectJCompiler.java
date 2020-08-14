@@ -10,11 +10,13 @@ import org.aspectj.bridge.MessageHandler;
 import org.aspectj.org.eclipse.jdt.internal.compiler.classfmt.ClassFileConstants;
 import org.aspectj.tools.ajc.Main;
 import org.codehaus.plexus.compiler.AbstractCompiler;
+import org.codehaus.plexus.compiler.Compiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerException;
 import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.compiler.CompilerOutputStyle;
 import org.codehaus.plexus.compiler.CompilerResult;
+import org.codehaus.plexus.component.annotations.Component;
 
 import java.io.File;
 import java.io.IOException;
@@ -281,8 +283,8 @@ import java.util.Map;
  * </p>
  *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- * @plexus.component role="org.codehaus.plexus.compiler.Compiler" role-hint="aspectj"
  */
+@Component( role = Compiler.class, hint = "aspectj")
 public class AspectJCompiler
     extends AbstractCompiler
 {

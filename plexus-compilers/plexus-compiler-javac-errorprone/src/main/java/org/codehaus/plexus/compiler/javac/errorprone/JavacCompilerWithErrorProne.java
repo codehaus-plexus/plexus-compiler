@@ -18,6 +18,7 @@ package org.codehaus.plexus.compiler.javac.errorprone;
 
 import com.google.errorprone.ErrorProneJavaCompiler;
 
+import org.codehaus.plexus.compiler.Compiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerException;
 import org.codehaus.plexus.compiler.CompilerMessage;
@@ -25,6 +26,7 @@ import org.codehaus.plexus.compiler.CompilerResult;
 import org.codehaus.plexus.compiler.javac.InProcessCompiler;
 import org.codehaus.plexus.compiler.javac.JavacCompiler;
 import org.codehaus.plexus.compiler.javac.JavaxToolsCompiler;
+import org.codehaus.plexus.component.annotations.Component;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
@@ -38,8 +40,8 @@ import java.net.URLClassLoader;
  * entry point into Javac.
  *
  * @author <a href="mailto:alexeagle@google.com">Alex Eagle</a>
- * @plexus.component role="org.codehaus.plexus.compiler.Compiler" role-hint="javac-with-errorprone"
  */
+@Component( role = Compiler.class, hint = "javac-with-errorprone")
 public class JavacCompilerWithErrorProne
     extends JavacCompiler
 {

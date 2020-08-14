@@ -18,10 +18,12 @@ package org.codehaus.plexus.compiler.javac;
  * under the License.
  */
 
+import org.codehaus.plexus.compiler.Compiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.compiler.CompilerException;
 import org.codehaus.plexus.compiler.CompilerResult;
+import org.codehaus.plexus.component.annotations.Component;
 
 import javax.tools.Diagnostic;
 import javax.tools.DiagnosticCollector;
@@ -41,6 +43,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author <a href="mailto:david.lloyd@redhat.com">David M. Lloyd</a>
  * @since 2.0
  */
+@Component( role = Compiler.class )
 public class JavaxToolsCompiler implements InProcessCompiler
 {
     /**

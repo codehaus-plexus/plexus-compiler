@@ -74,13 +74,14 @@ package org.codehaus.plexus.compiler.jikes;
 */
 
 import org.codehaus.plexus.compiler.AbstractCompiler;
+import org.codehaus.plexus.compiler.Compiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerException;
 import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.compiler.CompilerOutputStyle;
 import org.codehaus.plexus.compiler.CompilerResult;
 import org.codehaus.plexus.compiler.util.StreamPumper;
-import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -98,9 +99,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @plexus.component role="org.codehaus.plexus.compiler.Compiler" role-hint="jikes"
- */
+@Component( role = Compiler.class, hint = "jikes" )
 public class JikesCompiler
     extends AbstractCompiler
 {
@@ -158,7 +157,7 @@ public class JikesCompiler
             BufferedReader input =
                 new BufferedReader( new InputStreamReader( new ByteArrayInputStream( tmpErr.toByteArray() ) ) );
 
-            List<CompilerMessage> messages = new ArrayList<CompilerMessage>();
+            List<CompilerMessage> messages = new ArrayList<>();
 
             parseStream( input, messages );
 
@@ -169,11 +168,7 @@ public class JikesCompiler
 
             return new CompilerResult().compilerMessages( messages );
         }
-        catch ( IOException e )
-        {
-            throw new CompilerException( "Error while compiling.", e );
-        }
-        catch ( InterruptedException e )
+        catch ( IOException | InterruptedException e )
         {
             throw new CompilerException( "Error while compiling.", e );
         }
@@ -182,7 +177,7 @@ public class JikesCompiler
     public String[] createCommandLine( CompilerConfiguration config )
         throws CompilerException
     {
-        List<String> args = new ArrayList<String>();
+        List<String> args = new ArrayList<>();
 
         args.add( "jikes" );
 
@@ -204,14 +199,12 @@ public class JikesCompiler
 
         args.add( "+E" );
 
-        if ( config.getCustomCompilerArguments().size() > 0 )
+        for ( Map.Entry<String, String> arg : config.getCustomCompilerArgumentsAsMap().entrySet() )
         {
-            for ( Map.Entry<String, String> arg : config.getCustomCompilerArgumentsAsMap().entrySet() )
-            {
-                args.add( arg.getKey() );
-                args.add( arg.getValue() );
-            }
+            args.add( arg.getKey() );
+            args.add( arg.getValue() );
         }
+
 
         args.add( "-target" );
         if ( StringUtils.isNotEmpty( config.getTargetVersion() ) )
@@ -275,31 +268,27 @@ public class JikesCompiler
         if ( Os.isFamily( Os.FAMILY_WINDOWS ) )
         {
             String tempFileName = null;
-            BufferedWriter fw = null;
-
             try
             {
                 File tempFile = File.createTempFile( "compList", ".cmp" );
                 tempFileName = tempFile.getAbsolutePath();
-                getLogger().debug( "create TempFile" + tempFileName );
-
-                tempFile.getParentFile().mkdirs();
-                fw = new BufferedWriter( new FileWriter( tempFile ) );
-                for ( int i = 0; i < sourceFiles.length; i++ )
+                try (BufferedWriter fw = new BufferedWriter( new FileWriter( tempFile ) ))
                 {
-                    fw.write( sourceFiles[i] );
-                    fw.newLine();
+
+                    getLogger().debug( "create TempFile" + tempFileName );
+
+                    tempFile.getParentFile().mkdirs();
+                    for ( int i = 0; i < sourceFiles.length; i++ )
+                    {
+                        fw.write( sourceFiles[i] );
+                        fw.newLine();
+                    }
+                    tempFile.deleteOnExit();
                 }
-                fw.flush();
-                tempFile.deleteOnExit();
             }
             catch ( IOException e )
             {
                 throw new CompilerException( "Could not create temporary file " + tempFileName, e );
-            }
-            finally
-            {
-                IOUtil.close( fw );
             }
 
             args.add( "@" + tempFileName );
@@ -313,7 +302,7 @@ public class JikesCompiler
 
         }
 
-        return (String[]) args.toArray( new String[args.size()] );
+        return args.toArray( new String[args.size()] );
     }
 
     // -----------------------------------------------------------------------
@@ -334,7 +323,7 @@ public class JikesCompiler
 
     private List<String> getBootClassPath()
     {
-        List<String> bootClassPath = new ArrayList<String>();
+        List<String> bootClassPath = new ArrayList<>();
         FileFilter filter = new FileFilter()
         {
 
@@ -371,7 +360,7 @@ public class JikesCompiler
 
     private List<String> asList( File[] files )
     {
-        List<String> filenames = new ArrayList<String>( files.length );
+        List<String> filenames = new ArrayList<>( files.length );
         for ( File file : files )
         {
             filenames.add( file.toString() );

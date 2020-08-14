@@ -2,19 +2,19 @@ package org.codehaus.plexus.compiler.eclipse;
 
 /**
  * The MIT License
- *
+ * <p>
  * Copyright (c) 2005, The Codehaus
- *
+ * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
  * the Software without restriction, including without limitation the rights to
  * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
  * of the Software, and to permit persons to whom the Software is furnished to do
  * so, subject to the following conditions:
- *
+ * <p>
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- *
+ * <p>
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,16 +25,23 @@ package org.codehaus.plexus.compiler.eclipse;
  */
 
 import org.codehaus.plexus.compiler.AbstractCompiler;
+import org.codehaus.plexus.compiler.Compiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerException;
 import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.compiler.CompilerOutputStyle;
 import org.codehaus.plexus.compiler.CompilerResult;
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.jdt.core.compiler.CompilationProgress;
 import org.eclipse.jdt.core.compiler.batch.BatchCompiler;
 
+import javax.tools.Diagnostic;
+import javax.tools.DiagnosticListener;
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardJavaFileManager;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -50,15 +57,10 @@ import java.util.Map.Entry;
 import java.util.ServiceLoader;
 import java.util.Set;
 
-import javax.tools.Diagnostic;
-import javax.tools.DiagnosticListener;
-import javax.tools.JavaCompiler;
-import javax.tools.JavaFileObject;
-import javax.tools.StandardJavaFileManager;
-
 /**
- * @plexus.component role="org.codehaus.plexus.compiler.Compiler" role-hint="eclipse"
+ *
  */
+@Component( role = Compiler.class, hint = "eclipse" )
 public class EclipseJavaCompiler
     extends AbstractCompiler
 {
@@ -73,27 +75,29 @@ public class EclipseJavaCompiler
     boolean errorsAsWarnings = false;
 
     @Override
-    public CompilerResult performCompile(CompilerConfiguration config )
+    public CompilerResult performCompile( CompilerConfiguration config )
         throws CompilerException
     {
         List<String> args = new ArrayList<>();
-        args.add("-noExit");                            // Make sure ecj does not System.exit on us 8-/
+        args.add( "-noExit" );                            // Make sure ecj does not System.exit on us 8-/
 
         // Build settings from configuration
         if ( config.isDebug() )
         {
-            args.add("-preserveAllLocals");
-            args.add("-g:lines,vars,source");
-        } else {
-            args.add("-g:lines,source");
+            args.add( "-preserveAllLocals" );
+            args.add( "-g:lines,vars,source" );
+        }
+        else
+        {
+            args.add( "-g:lines,source" );
         }
 
         String releaseVersion = decodeVersion( config.getReleaseVersion() );
         // EcjFailureException: Failed to run the ecj compiler: option -source is not supported when --release is used
         if ( releaseVersion != null )
         {
-            args.add("--release");
-            args.add(releaseVersion);
+            args.add( "--release" );
+            args.add( releaseVersion );
         }
         else
         {
@@ -101,74 +105,78 @@ public class EclipseJavaCompiler
 
             if ( sourceVersion != null )
             {
-                args.add("-source");
-                args.add(sourceVersion);
+                args.add( "-source" );
+                args.add( sourceVersion );
             }
 
             String targetVersion = decodeVersion( config.getTargetVersion() );
 
             if ( targetVersion != null )
             {
-                args.add("-target");
-                args.add(targetVersion);
+                args.add( "-target" );
+                args.add( targetVersion );
             }
         }
 
         if ( StringUtils.isNotEmpty( config.getSourceEncoding() ) )
         {
-            args.add("-encoding");
-            args.add(config.getSourceEncoding());
+            args.add( "-encoding" );
+            args.add( config.getSourceEncoding() );
         }
 
         if ( !config.isShowWarnings() )
         {
-            args.add("-warn:none");
+            args.add( "-warn:none" );
         }
         else
         {
             StringBuilder warns = new StringBuilder();
 
-            if(config.isShowDeprecation())
+            if ( config.isShowDeprecation() )
             {
-                append(warns, "+deprecation");
+                append( warns, "+deprecation" );
             }
             else
             {
-                append(warns, "-deprecation");
+                append( warns, "-deprecation" );
             }
 
             //-- Make room for more warnings to be enabled/disabled
-            args.add("-warn:" + warns);
+            args.add( "-warn:" + warns );
         }
 
-        if(config.isParameters())
+        if ( config.isParameters() )
         {
-            args.add("-parameters");
+            args.add( "-parameters" );
         }
 
         // Set Eclipse-specific options
         // compiler-specific extra options override anything else in the config object...
         Map<String, String> extras = config.getCustomCompilerArgumentsAsMap();
-        if( extras.containsKey( "errorsAsWarnings" ) )
+        if ( extras.containsKey( "errorsAsWarnings" ) )
         {
             extras.remove( "errorsAsWarnings" );
             this.errorsAsWarnings = true;
         }
-        else if(extras.containsKey("-errorsAsWarnings"))
+        else if ( extras.containsKey( "-errorsAsWarnings" ) )
         {
             extras.remove( "-errorsAsWarnings" );
             this.errorsAsWarnings = true;
         }
 
         //-- check for existence of the properties file manually
-        String props = extras.get("-properties");
-        if(null != props) {
-            File propFile = new File(props);
-            if(! propFile.exists() || ! propFile.isFile())
-                throw new IllegalArgumentException("Properties file specified by -properties " + propFile + " does not exist");
+        String props = extras.get( "-properties" );
+        if ( null != props )
+        {
+            File propFile = new File( props );
+            if ( !propFile.exists() || !propFile.isFile() )
+            {
+                throw new IllegalArgumentException(
+                    "Properties file specified by -properties " + propFile + " does not exist" );
+            }
         }
 
-        for(Entry<String, String> entry : extras.entrySet())
+        for ( Entry<String, String> entry : extras.entrySet() )
         {
             /*
              * The compiler mojo makes quite a mess of passing arguments, depending on exactly WHICH
@@ -199,107 +207,131 @@ public class EclipseJavaCompiler
              */
             String opt = entry.getKey();
             String optionValue = entry.getValue();
-            if(null == optionValue) {
+            if ( null == optionValue )
+            {
                 //-- We have an option from compilerArgs: use the key as-is as a single option value
-                args.add(opt);
-            } else {
-                if(!opt.startsWith("-"))
+                args.add( opt );
+            }
+            else
+            {
+                if ( !opt.startsWith( "-" ) )
+                {
                     opt = "-" + opt;
-                args.add(opt);
-                args.add(optionValue);
+                }
+                args.add( opt );
+                args.add( optionValue );
             }
         }
 
         // Output path
-        args.add("-d");
-        args.add(config.getOutputLocation());
+        args.add( "-d" );
+        args.add( config.getOutputLocation() );
 
         // Annotation processors defined?
         List<String> extraSourceDirs = new ArrayList<>();
-        if(!isPreJava1_6(config)) {
+        if ( !isPreJava1_6( config ) )
+        {
             //now add jdk 1.6 annotation processing related parameters
             String[] annotationProcessors = config.getAnnotationProcessors();
             List<String> processorPathEntries = config.getProcessorPathEntries();
-            if((annotationProcessors != null && annotationProcessors.length > 0) || (processorPathEntries != null && processorPathEntries.size() > 0)) {
-                if(annotationProcessors != null && annotationProcessors.length > 0) {
-                    args.add("-processor");
+            if ( ( annotationProcessors != null && annotationProcessors.length > 0 ) || ( processorPathEntries != null
+                && processorPathEntries.size() > 0 ) )
+            {
+                if ( annotationProcessors != null && annotationProcessors.length > 0 )
+                {
+                    args.add( "-processor" );
                     StringBuilder sb = new StringBuilder();
-                    for(String ap : annotationProcessors) {
-                        if(sb.length() > 0)
-                            sb.append(',');
-                        sb.append(ap);
+                    for ( String ap : annotationProcessors )
+                    {
+                        if ( sb.length() > 0 )
+                        {
+                            sb.append( ',' );
+                        }
+                        sb.append( ap );
                     }
-                    args.add(sb.toString());
+                    args.add( sb.toString() );
                 }
 
-                if(processorPathEntries != null && processorPathEntries.size() > 0) {
-                    args.add("-processorpath");
-                    args.add(getPathString(processorPathEntries));
+                if ( processorPathEntries != null && processorPathEntries.size() > 0 )
+                {
+                    args.add( "-processorpath" );
+                    args.add( getPathString( processorPathEntries ) );
                 }
 
                 File generatedSourcesDir = config.getGeneratedSourcesDirectory();
-                if(generatedSourcesDir != null) {
+                if ( generatedSourcesDir != null )
+                {
                     generatedSourcesDir.mkdirs();
-                    extraSourceDirs.add(generatedSourcesDir.getAbsolutePath());
+                    extraSourceDirs.add( generatedSourcesDir.getAbsolutePath() );
 
                     //-- option to specify where annotation processor is to generate its output
-                    args.add("-s");
-                    args.add(generatedSourcesDir.getAbsolutePath());
+                    args.add( "-s" );
+                    args.add( generatedSourcesDir.getAbsolutePath() );
                 }
-                if(config.getProc() != null) {
-                    args.add("-proc:" + config.getProc());
+                if ( config.getProc() != null )
+                {
+                    args.add( "-proc:" + config.getProc() );
                 }
             }
         }
 
         //-- Write .class files even when error occur, but make sure methods with compile errors do abort when called
-        if(extras.containsKey("-proceedOnError"))
-            args.add("-proceedOnError:Fatal");      // Generate a class file even with errors, but make methods with errors fail when called
+        if ( extras.containsKey( "-proceedOnError" ) )
+        {
+            // Generate a class file even with errors, but make methods with errors fail when called
+            args.add( "-proceedOnError:Fatal" );
+        }
 
         //-- classpath
-        List<String> classpathEntries = new ArrayList<>(config.getClasspathEntries());
-        classpathEntries.add(config.getOutputLocation());
-        args.add("-classpath");
-        args.add(getPathString(classpathEntries));
+        List<String> classpathEntries = new ArrayList<>( config.getClasspathEntries() );
+        classpathEntries.add( config.getOutputLocation() );
+        args.add( "-classpath" );
+        args.add( getPathString( classpathEntries ) );
 
         // Collect sources
         List<String> allSources = new ArrayList<>();
-        for (String source : config.getSourceLocations())
+        for ( String source : config.getSourceLocations() )
         {
-            File srcFile = new File(source);
-            if (srcFile.exists())
+            File srcFile = new File( source );
+            if ( srcFile.exists() )
             {
-                Set<String> ss = getSourceFilesForSourceRoot(config, source);
-                allSources.addAll(ss);
+                Set<String> ss = getSourceFilesForSourceRoot( config, source );
+                allSources.addAll( ss );
             }
         }
-        for (String extraSrcDir : extraSourceDirs) {
-            File extraDir = new File(extraSrcDir);
-            if (extraDir.isDirectory()) {
-                addExtraSources(extraDir, allSources);
+        for ( String extraSrcDir : extraSourceDirs )
+        {
+            File extraDir = new File( extraSrcDir );
+            if ( extraDir.isDirectory() )
+            {
+                addExtraSources( extraDir, allSources );
             }
         }
         List<CompilerMessage> messageList = new ArrayList<>();
-        if (allSources.isEmpty()) {
+        if ( allSources.isEmpty() )
+        {
             // -- Nothing to do -> bail out
-            return new CompilerResult(true, messageList);
+            return new CompilerResult( true, messageList );
         }
 
         // Compile
-        try {
+        try
+        {
             StringWriter sw = new StringWriter();
-            PrintWriter devNull = new PrintWriter(sw);
+            PrintWriter devNull = new PrintWriter( sw );
             JavaCompiler compiler = getEcj();
             boolean success = false;
-            if (compiler != null) {
-                getLogger().debug("Using JSR-199 EclipseCompiler");
+            if ( compiler != null )
+            {
+                getLogger().debug( "Using JSR-199 EclipseCompiler" );
                 // ECJ JSR-199 compiles against the latest Java version it supports if no source
                 // version is given explicitly. BatchCompiler uses 1.3 as default. So check
                 // whether a source version is specified, and if not supply 1.3 explicitly.
-                if (!haveSourceOrReleaseArgument(args)) {
-                    getLogger().debug("ecj: no source level nor release specified, defaulting to Java 1.3");
-                    args.add("-source");
-                    args.add("1.3");
+                if ( !haveSourceOrReleaseArgument( args ) )
+                {
+                    getLogger().debug( "ecj: no source level nor release specified, defaulting to Java 1.3" );
+                    args.add( "-source" );
+                    args.add( "1.3" );
                 }
 
                 // Also check for the encoding. Could have been set via the CompilerConfig
@@ -307,250 +339,319 @@ public class EclipseJavaCompiler
                 // StandardJavaFileManager below.
                 String encoding = null;
                 Iterator<String> allArgs = args.iterator();
-                while (encoding == null && allArgs.hasNext()) {
+                while ( encoding == null && allArgs.hasNext() )
+                {
                     String option = allArgs.next();
-                    if ("-encoding".equals(option) && allArgs.hasNext()) {
+                    if ( "-encoding".equals( option ) && allArgs.hasNext() )
+                    {
                         encoding = allArgs.next();
                     }
                 }
                 final Locale defaultLocale = Locale.getDefault();
                 final List<CompilerMessage> messages = messageList;
-                DiagnosticListener<? super JavaFileObject> messageCollector = new DiagnosticListener<JavaFileObject>() {
+                DiagnosticListener<? super JavaFileObject> messageCollector = new DiagnosticListener<JavaFileObject>()
+                {
 
                     @Override
-                    public void report(Diagnostic<? extends JavaFileObject> diagnostic) {
+                    public void report( Diagnostic<? extends JavaFileObject> diagnostic )
+                    {
                         // Convert to Plexus' CompilerMessage and append to messageList
                         String fileName = "Unknown source";
-                        try {
+                        try
+                        {
                             JavaFileObject file = diagnostic.getSource();
-                            if (file != null) {
+                            if ( file != null )
+                            {
                                 fileName = file.getName();
                             }
-                        } catch (NullPointerException e) {
+                        }
+                        catch ( NullPointerException e )
+                        {
                             // ECJ bug: diagnostic.getSource() may throw an NPE if there is no source
                         }
                         long startColumn = diagnostic.getColumnNumber();
                         // endColumn may be wrong if the endPosition is not on the same line.
-                        long endColumn = startColumn + (diagnostic.getEndPosition() - diagnostic.getStartPosition());
-                        CompilerMessage message = new CompilerMessage(fileName,
-                                convert(diagnostic.getKind()), (int) diagnostic.getLineNumber(), (int) startColumn,
-                                (int) diagnostic.getLineNumber(), (int) endColumn,
-                                diagnostic.getMessage(defaultLocale));
-                        messages.add(message);
+                        long endColumn = startColumn + ( diagnostic.getEndPosition() - diagnostic.getStartPosition() );
+                        CompilerMessage message = new CompilerMessage( fileName, convert( diagnostic.getKind() ),
+                                                                       (int) diagnostic.getLineNumber(),
+                                                                       (int) startColumn,
+                                                                       (int) diagnostic.getLineNumber(),
+                                                                       (int) endColumn,
+                                                                       diagnostic.getMessage( defaultLocale ) );
+                        messages.add( message );
                     }
                 };
                 Charset charset = null;
-                if (encoding != null) {
+                if ( encoding != null )
+                {
                     encoding = encoding.trim();
-                    try {
-                        charset = Charset.forName(encoding);
-                    } catch (IllegalCharsetNameException | UnsupportedCharsetException e) {
-                        getLogger().warn("ecj: invalid or unsupported character set '" + encoding + "', using default");
+                    try
+                    {
+                        charset = Charset.forName( encoding );
+                    }
+                    catch ( IllegalCharsetNameException | UnsupportedCharsetException e )
+                    {
+                        getLogger().warn(
+                            "ecj: invalid or unsupported character set '" + encoding + "', using default" );
                         // charset remains null
                     }
                 }
-                if (charset == null) {
+                if ( charset == null )
+                {
                     charset = Charset.defaultCharset();
                 }
-                StandardJavaFileManager manager = compiler.getStandardFileManager(messageCollector, defaultLocale,
-                        charset);
+                StandardJavaFileManager manager =
+                    compiler.getStandardFileManager( messageCollector, defaultLocale, charset );
 
-                if (getLogger().isDebugEnabled()) {
-                    getLogger().debug("ecj: using character set " + charset.displayName());
-                    getLogger().debug("ecj command line: " + args);
-                    getLogger().debug("ecj input source files: " + allSources);
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug( "ecj: using character set " + charset.displayName() );
+                    getLogger().debug( "ecj command line: " + args );
+                    getLogger().debug( "ecj input source files: " + allSources );
                 }
 
-                Iterable<? extends JavaFileObject> units = manager.getJavaFileObjectsFromStrings(allSources);
-                try {
-                    success = Boolean.TRUE
-                            .equals(compiler.getTask(devNull, manager, messageCollector, args, null, units).call());
-                } catch (RuntimeException e) {
-                    throw new EcjFailureException(e.getLocalizedMessage());
+                Iterable<? extends JavaFileObject> units = manager.getJavaFileObjectsFromStrings( allSources );
+                try
+                {
+                    success = Boolean.TRUE.equals(
+                        compiler.getTask( devNull, manager, messageCollector, args, null, units ).call() );
                 }
-                getLogger().debug(sw.toString());
-            } else {
+                catch ( RuntimeException e )
+                {
+                    throw new EcjFailureException( e.getLocalizedMessage() );
+                }
+                getLogger().debug( sw.toString() );
+            }
+            else
+            {
                 // Use the BatchCompiler and send all errors to xml temp file.
                 File errorF = null;
-                try {
-                    errorF = File.createTempFile("ecjerr-", ".xml");
-                    getLogger().debug("Using legacy BatchCompiler; error file " + errorF);
+                try
+                {
+                    errorF = File.createTempFile( "ecjerr-", ".xml" );
+                    getLogger().debug( "Using legacy BatchCompiler; error file " + errorF );
 
-                    args.add("-log");
-                    args.add(errorF.toString());
-                    args.addAll(allSources);
+                    args.add( "-log" );
+                    args.add( errorF.toString() );
+                    args.addAll( allSources );
 
-                    getLogger().debug("ecj command line: " + args);
+                    getLogger().debug( "ecj command line: " + args );
 
-                    success = BatchCompiler.compile(args.toArray(new String[args.size()]), devNull, devNull,
-                            new CompilationProgress() {
-                                @Override
-                                public void begin(int i) {
-                                }
+                    success = BatchCompiler.compile( args.toArray( new String[args.size()] ), devNull, devNull,
+                                                     new CompilationProgress()
+                                                     {
+                                                         @Override
+                                                         public void begin( int i )
+                                                         {
+                                                         }
 
-                                @Override
-                                public void done() {
-                                }
+                                                         @Override
+                                                         public void done()
+                                                         {
+                                                         }
 
-                                @Override
-                                public boolean isCanceled() {
-                                    return false;
-                                }
+                                                         @Override
+                                                         public boolean isCanceled()
+                                                         {
+                                                             return false;
+                                                         }
 
-                                @Override
-                                public void setTaskName(String s) {
-                                }
+                                                         @Override
+                                                         public void setTaskName( String s )
+                                                         {
+                                                         }
 
-                                @Override
-                                public void worked(int i, int i1) {
-                                }
-                            });
-                    getLogger().debug(sw.toString());
+                                                         @Override
+                                                         public void worked( int i, int i1 )
+                                                         {
+                                                         }
+                                                     } );
+                    getLogger().debug( sw.toString() );
 
-                    if (errorF.length() < 80) {
-                        throw new EcjFailureException(sw.toString());
+                    if ( errorF.length() < 80 )
+                    {
+                        throw new EcjFailureException( sw.toString() );
                     }
-                    messageList = new EcjResponseParser().parse(errorF, errorsAsWarnings);
-                } finally {
-                    if (null != errorF) {
-                        try {
+                    messageList = new EcjResponseParser().parse( errorF, errorsAsWarnings );
+                }
+                finally
+                {
+                    if ( null != errorF )
+                    {
+                        try
+                        {
                             errorF.delete();
-                        } catch (Exception x) {
+                        }
+                        catch ( Exception x )
+                        {
                         }
                     }
                 }
             }
             boolean hasError = false;
-            for (CompilerMessage compilerMessage : messageList) {
-                if (compilerMessage.isError()) {
+            for ( CompilerMessage compilerMessage : messageList )
+            {
+                if ( compilerMessage.isError() )
+                {
                     hasError = true;
                     break;
                 }
             }
-            if (!hasError && !success && !errorsAsWarnings) {
-                CompilerMessage.Kind kind = errorsAsWarnings ? CompilerMessage.Kind.WARNING
-                        : CompilerMessage.Kind.ERROR;
+            if ( !hasError && !success && !errorsAsWarnings )
+            {
+                CompilerMessage.Kind kind =
+                    errorsAsWarnings ? CompilerMessage.Kind.WARNING : CompilerMessage.Kind.ERROR;
 
                 // -- Compiler reported failure but we do not seem to have one -> probable
                 // exception
-                CompilerMessage cm = new CompilerMessage(
-                        "[ecj] The compiler reported an error but has not written it to its logging", kind);
-                messageList.add(cm);
+                CompilerMessage cm =
+                    new CompilerMessage( "[ecj] The compiler reported an error but has not written it to its logging",
+                                         kind );
+                messageList.add( cm );
                 hasError = true;
 
                 // -- Try to find the actual message by reporting the last 5 lines as a message
-                String stdout = getLastLines(sw.toString(), 5);
-                if (stdout.length() > 0) {
-                    cm = new CompilerMessage("[ecj] The following line(s) might indicate the issue:\n" + stdout, kind);
-                    messageList.add(cm);
+                String stdout = getLastLines( sw.toString(), 5 );
+                if ( stdout.length() > 0 )
+                {
+                    cm =
+                        new CompilerMessage( "[ecj] The following line(s) might indicate the issue:\n" + stdout, kind );
+                    messageList.add( cm );
                 }
             }
-            return new CompilerResult(!hasError || errorsAsWarnings, messageList);
-        } catch(EcjFailureException x) {
+            return new CompilerResult( !hasError || errorsAsWarnings, messageList );
+        }
+        catch ( EcjFailureException x )
+        {
             throw x;
-        } catch(Exception x) {
-            throw new RuntimeException(x); // sigh
+        }
+        catch ( Exception x )
+        {
+            throw new RuntimeException( x ); // sigh
         }
     }
 
-    private static boolean haveSourceOrReleaseArgument(List<String> args) {
+    private static boolean haveSourceOrReleaseArgument( List<String> args )
+    {
         Iterator<String> allArgs = args.iterator();
-        while (allArgs.hasNext()) {
+        while ( allArgs.hasNext() )
+        {
             String option = allArgs.next();
-            if (("-source".equals(option) || "--release".equals(option)) && allArgs.hasNext()) {
+            if ( ( "-source".equals( option ) || "--release".equals( option ) ) && allArgs.hasNext() )
+            {
                 return true;
             }
         }
         return false;
     }
 
-    private JavaCompiler getEcj() {
-        ServiceLoader<JavaCompiler> javaCompilerLoader = ServiceLoader.load(JavaCompiler.class,
-                BatchCompiler.class.getClassLoader());
+    private JavaCompiler getEcj()
+    {
+        ServiceLoader<JavaCompiler> javaCompilerLoader =
+            ServiceLoader.load( JavaCompiler.class, BatchCompiler.class.getClassLoader() );
         Class<?> c = null;
-        try {
-            c = Class.forName("org.eclipse.jdt.internal.compiler.tool.EclipseCompiler", false,
-                    BatchCompiler.class.getClassLoader());
-        } catch (ClassNotFoundException e) {
+        try
+        {
+            c = Class.forName( "org.eclipse.jdt.internal.compiler.tool.EclipseCompiler", false,
+                               BatchCompiler.class.getClassLoader() );
+        }
+        catch ( ClassNotFoundException e )
+        {
             // Ignore
         }
-        if (c != null) {
-            for (JavaCompiler javaCompiler : javaCompilerLoader) {
-                if (c.isInstance(javaCompiler)) {
+        if ( c != null )
+        {
+            for ( JavaCompiler javaCompiler : javaCompilerLoader )
+            {
+                if ( c.isInstance( javaCompiler ) )
+                {
                     return javaCompiler;
                 }
             }
         }
-        getLogger().debug("Cannot find org.eclipse.jdt.internal.compiler.tool.EclipseCompiler");
+        getLogger().debug( "Cannot find org.eclipse.jdt.internal.compiler.tool.EclipseCompiler" );
         return null;
     }
 
-    private void addExtraSources(File dir, List<String> allSources) {
+    private void addExtraSources( File dir, List<String> allSources )
+    {
         DirectoryScanner scanner = new DirectoryScanner();
-        scanner.setBasedir(dir.getAbsolutePath());
-        scanner.setIncludes(new String[] { "**/*.java" });
+        scanner.setBasedir( dir.getAbsolutePath() );
+        scanner.setIncludes( new String[]{ "**/*.java" } );
         scanner.scan();
-        for (String file : scanner.getIncludedFiles()) {
-            allSources.add(new File(dir, file).getAbsolutePath());
+        for ( String file : scanner.getIncludedFiles() )
+        {
+            allSources.add( new File( dir, file ).getAbsolutePath() );
         }
     }
 
-    private CompilerMessage.Kind convert(Diagnostic.Kind kind) {
-        if (kind == null) {
+    private CompilerMessage.Kind convert( Diagnostic.Kind kind )
+    {
+        if ( kind == null )
+        {
             return CompilerMessage.Kind.OTHER;
         }
-        switch (kind) {
-        case ERROR:
-            return errorsAsWarnings ? CompilerMessage.Kind.WARNING : CompilerMessage.Kind.ERROR;
-        case WARNING:
-            return CompilerMessage.Kind.WARNING;
-        case MANDATORY_WARNING:
-            return CompilerMessage.Kind.MANDATORY_WARNING;
-        case NOTE:
-            return CompilerMessage.Kind.NOTE;
-        case OTHER:
-        default:
-            return CompilerMessage.Kind.OTHER;
+        switch ( kind )
+        {
+            case ERROR:
+                return errorsAsWarnings ? CompilerMessage.Kind.WARNING : CompilerMessage.Kind.ERROR;
+            case WARNING:
+                return CompilerMessage.Kind.WARNING;
+            case MANDATORY_WARNING:
+                return CompilerMessage.Kind.MANDATORY_WARNING;
+            case NOTE:
+                return CompilerMessage.Kind.NOTE;
+            case OTHER:
+            default:
+                return CompilerMessage.Kind.OTHER;
         }
     }
 
-    private String getLastLines(String text, int lines)
+    private String getLastLines( String text, int lines )
     {
         List<String> lineList = new ArrayList<>();
-        text = text.replace("\r\n", "\n");
-        text = text.replace("\r", "\n");            // make sure eoln is \n
+        text = text.replace( "\r\n", "\n" );
+        text = text.replace( "\r", "\n" );            // make sure eoln is \n
 
         int index = text.length();
-        while(index > 0) {
-            int before = text.lastIndexOf('\n', index - 1);
+        while ( index > 0 )
+        {
+            int before = text.lastIndexOf( '\n', index - 1 );
 
-            if(before + 1 < index) {                        // Non empty line?
-                lineList.add(text.substring(before + 1, index));
+            if ( before + 1 < index )
+            {                        // Non empty line?
+                lineList.add( text.substring( before + 1, index ) );
                 lines--;
-                if(lines <= 0)
+                if ( lines <= 0 )
+                {
                     break;
+                }
             }
 
             index = before;
         }
 
         StringBuilder sb = new StringBuilder();
-        for(int i = lineList.size() - 1; i >= 0; i--)
+        for ( int i = lineList.size() - 1; i >= 0; i-- )
         {
-            String s = lineList.get(i);
-            sb.append(s);
-            sb.append(System.getProperty("line.separator"));        // 8-/
+            String s = lineList.get( i );
+            sb.append( s );
+            sb.append( System.getProperty( "line.separator" ) );        // 8-/
         }
         return sb.toString();
     }
 
-    static private void append(StringBuilder warns, String s) {
-        if(warns.length() > 0)
-            warns.append(',');
-        warns.append(s);
+    static private void append( StringBuilder warns, String s )
+    {
+        if ( warns.length() > 0 )
+        {
+            warns.append( ',' );
+        }
+        warns.append( s );
     }
 
-    private boolean isPreJava1_6(CompilerConfiguration config) {
+    private boolean isPreJava1_6( CompilerConfiguration config )
+    {
         String s = config.getSourceVersion();
         if ( s == null )
         {
@@ -581,8 +682,9 @@ public class EclipseJavaCompiler
             return null;
         }
 
-        if(versionSpec.equals("1.9")) {
-            getLogger().warn("Version 9 should be specified as 9, not 1.9");
+        if ( versionSpec.equals( "1.9" ) )
+        {
+            getLogger().warn( "Version 9 should be specified as 9, not 1.9" );
             return "9";
         }
         return versionSpec;
