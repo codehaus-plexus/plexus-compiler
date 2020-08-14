@@ -61,11 +61,10 @@ public abstract class AbstractJavacCompilerTest
     protected int expectedErrors()
     {
         String javaVersion = getJavaVersion();
-        if (javaVersion.contains("9.0")||javaVersion.contains("11")||javaVersion.contains("14")){
+        if (javaVersion.contains("9.0")||javaVersion.contains("11")||javaVersion.contains("14")||javaVersion.contains("15")){
             // lots of new warnings about obsoletions for future releases
             return 5;
         }
-
         // javac output changed for misspelled modifiers starting in 1.6...they now generate 2 errors per occurrence, not one.
         if ( "1.5".compareTo( javaVersion ) < 0 )
         {
@@ -80,7 +79,7 @@ public abstract class AbstractJavacCompilerTest
     protected int expectedWarnings()
     {
         String javaVersion = getJavaVersion();
-        if (javaVersion.contains("9.0")||javaVersion.contains("11")||javaVersion.contains("14")){
+        if (javaVersion.contains("9.0")||javaVersion.contains("11")||javaVersion.contains("14")||javaVersion.contains("15")){
             return 1;
         }
         if (javaVersion.contains("9.0")){
@@ -115,6 +114,9 @@ public abstract class AbstractJavacCompilerTest
         if (javaVersion.contains("14")){
             return "14";
         }
+        if (javaVersion.contains("15")){
+            return "15";
+        }
         return super.getTargetVersion();
     }
 
@@ -134,13 +136,17 @@ public abstract class AbstractJavacCompilerTest
         {
             return "14";
         }
+        if (javaVersion.contains("15"))
+        {
+            return "15";
+        }
         return super.getTargetVersion();
     }
 
     protected Collection<String> expectedOutputFiles()
     {
         String javaVersion = getJavaVersion();
-        if (javaVersion.contains("9.0")||javaVersion.contains("11")||javaVersion.contains("14"))
+        if (javaVersion.contains("9.0")||javaVersion.contains("11")||javaVersion.contains("14")||javaVersion.contains("15"))
         {
             return Arrays.asList( new String[]{ "org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ExternalDeps.class",
                 "org/codehaus/foo/Person.class"} );
