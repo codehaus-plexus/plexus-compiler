@@ -568,11 +568,7 @@ public class JavacCompiler
 
             messages = parseModernStream( returnCode, new BufferedReader( new StringReader( out.getOutput() ) ) );
         }
-        catch ( CommandLineException e )
-        {
-            throw new CompilerException( "Error while executing the external compiler.", e );
-        }
-        catch ( IOException e )
+        catch ( CommandLineException | IOException e )
         {
             throw new CompilerException( "Error while executing the external compiler.", e );
         }

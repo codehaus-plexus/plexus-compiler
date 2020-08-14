@@ -315,9 +315,10 @@ public class J2ObjCCompiler
         List<CompilerMessage> messages = new ArrayList<>();
 
         String line = bufferedReader.readLine();
-
+        System.out.println("start output");
         while ( line != null )
         {
+            System.out.println(line);
             CompilerMessage compilerError = DefaultJ2ObjCCompilerParser.parseLine( line );
 
             if ( compilerError != null )
@@ -327,7 +328,7 @@ public class J2ObjCCompiler
 
             line = bufferedReader.readLine();
         }
-
+        System.out.println("end output");
         return messages;
     }
 

@@ -55,6 +55,7 @@ public class J2ObjCCompilerTest
         cc.setSourceLocations( Arrays.asList( new String[]{ "src/test/resources" } ) );
         cc.setWorkingDirectory( new File( "." ) );
         cc.setFork( true );
+        cc.setVerbose( true );
         cc.setCustomCompilerArgumentsAsMap( customCompilerArguments );
         try
         {
