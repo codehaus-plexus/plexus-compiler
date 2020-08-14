@@ -14,7 +14,7 @@
   <description>AspectJ Compiler support for Plexus Compiler component.</description>
 
   <properties>
-    <aspectj.version>1.9.2</aspectj.version>
+    <aspectj.version>1.9.6</aspectj.version>
   </properties>
 
   <dependencies>
