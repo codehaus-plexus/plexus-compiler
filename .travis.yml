@@ -13,6 +13,3 @@ cache:
 branches:
     except:
         - gh-pages
-notifications:
-    email:
-        - olamy@apache.org
