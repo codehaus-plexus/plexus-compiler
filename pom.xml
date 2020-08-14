@@ -60,6 +60,11 @@
         <version>${project.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-annotations</artifactId>
+        <version>1.7.1</version>
+      </dependency>
+      <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
         <scope>test</scope>
@@ -104,13 +109,6 @@
           <artifactId>maven-javadoc-plugin</artifactId>
           <configuration>
             <additionalparam>-Xdoclint:none</additionalparam>
-            <tagletArtifacts>
-              <tagletArtifact combine.id="org.codehaus.plexus:plexus-javadoc">
-                <groupId>org.codehaus.plexus</groupId>
-                <artifactId>plexus-javadoc</artifactId>
-                <version>1.0</version>
-              </tagletArtifact>
-            </tagletArtifacts>
           </configuration>
         </plugin>
       </plugins>
@@ -139,7 +137,6 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>animal-sniffer-maven-plugin</artifactId>
         <version>1.19</version>
-
         <executions>
           <execution>
             <phase>test</phase>

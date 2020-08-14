@@ -63,11 +63,13 @@ import java.util.StringTokenizer;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.codehaus.plexus.compiler.AbstractCompiler;
+import org.codehaus.plexus.compiler.Compiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerException;
 import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.compiler.CompilerOutputStyle;
 import org.codehaus.plexus.compiler.CompilerResult;
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
@@ -80,9 +82,9 @@ import org.codehaus.plexus.util.cli.Commandline;
  * @author <a href="mailto:matthew.pocock@ncl.ac.uk">Matthew Pocock</a>
  * @author <a href="mailto:joerg.wassmer@web.de">J&ouml;rg Wa&szlig;mer</a>
  * @author Others
- * @plexus.component role="org.codehaus.plexus.compiler.Compiler"
- * role-hint="javac"
+ *
  */
+@Component( role = Compiler.class, hint = "javac ")
 public class JavacCompiler
     extends AbstractCompiler
 {
