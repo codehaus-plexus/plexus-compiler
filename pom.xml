@@ -21,6 +21,7 @@
     <module>plexus-compiler-manager</module>
     <module>plexus-compilers</module>
     <module>plexus-compiler-test</module>
+    <module>plexus-compiler-its</module>
   </modules>
 
   <scm>
@@ -57,6 +58,16 @@
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-compiler-test</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-compiler-javac-errorprone</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-compiler-javac</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
