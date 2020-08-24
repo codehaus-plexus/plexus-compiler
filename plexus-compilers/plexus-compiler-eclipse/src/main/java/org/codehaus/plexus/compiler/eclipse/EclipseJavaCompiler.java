@@ -400,9 +400,6 @@ public class EclipseJavaCompiler
                 {
                     charset = Charset.defaultCharset();
                 }
-                StandardJavaFileManager manager =
-                    compiler.getStandardFileManager( messageCollector, defaultLocale, charset );
-
                 if ( getLogger().isDebugEnabled() )
                 {
                     getLogger().debug( "ecj: using character set " + charset.displayName() );
@@ -410,9 +407,9 @@ public class EclipseJavaCompiler
                     getLogger().debug( "ecj input source files: " + allSources );
                 }
 
-                Iterable<? extends JavaFileObject> units = manager.getJavaFileObjectsFromStrings( allSources );
-                try
-                {
+                try ( StandardJavaFileManager manager =
+                    compiler.getStandardFileManager( messageCollector, defaultLocale, charset ) ) {
+                    Iterable<? extends JavaFileObject> units = manager.getJavaFileObjectsFromStrings( allSources );
                     success = Boolean.TRUE.equals(
                         compiler.getTask( devNull, manager, messageCollector, args, null, units ).call() );
                 }
