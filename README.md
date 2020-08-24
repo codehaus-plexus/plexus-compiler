@@ -11,3 +11,5 @@ The canonical git repository is located at https://github.com/codehaus-plexus/pl
 #### Error Prone usage 
 
 Please refer to [documentation](https://errorprone.info/docs/installation#maven) 
+
+Or the project [it test](plexus-compiler-its/src/main/it/error-prone-compiler/pom.xml)
