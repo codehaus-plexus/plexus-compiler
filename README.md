@@ -8,7 +8,7 @@ Plexus-Compiler
 The canonical git repository is located at https://github.com/codehaus-plexus/plexus-compiler
 
 
-#### Error Prone usage 
+### Error Prone usage 
 
 Please refer to [documentation](https://errorprone.info/docs/installation#maven) 
 
