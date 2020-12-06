@@ -52,7 +52,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ServiceLoader;
 import java.util.Set;
@@ -152,76 +151,7 @@ public class EclipseJavaCompiler
 
         // Set Eclipse-specific options
         // compiler-specific extra options override anything else in the config object...
-        Map<String, String> extras = config.getCustomCompilerArgumentsAsMap();
-        if ( extras.containsKey( "errorsAsWarnings" ) )
-        {
-            extras.remove( "errorsAsWarnings" );
-            this.errorsAsWarnings = true;
-        }
-        else if ( extras.containsKey( "-errorsAsWarnings" ) )
-        {
-            extras.remove( "-errorsAsWarnings" );
-            this.errorsAsWarnings = true;
-        }
-
-        //-- check for existence of the properties file manually
-        String props = extras.get( "-properties" );
-        if ( null != props )
-        {
-            File propFile = new File( props );
-            if ( !propFile.exists() || !propFile.isFile() )
-            {
-                throw new IllegalArgumentException(
-                    "Properties file specified by -properties " + propFile + " does not exist" );
-            }
-        }
-
-        for ( Entry<String, String> entry : extras.entrySet() )
-        {
-            /*
-             * The compiler mojo makes quite a mess of passing arguments, depending on exactly WHICH
-             * way is used to pass them. The method method using <compilerArguments> uses the tag names
-             * of its contents to denote option names, and so the compiler mojo happily adds a '-' to
-             * all of the names there and adds them to the "custom compiler arguments" map as a
-             * name, value pair where the name always contains a single '-'. The Eclipse compiler (and
-             * javac too, btw) has options with two dashes (like --add-modules for java 9). These cannot
-             * be passed using a <compilerArguments> tag.
-             *
-             * The other method is to use <compilerArgs>, where each SINGLE argument needs to be passed
-             * using an <arg>xxxx</arg> tag. In there the xxx is not manipulated by the compiler mojo, so
-             * if it starts with a dash or more dashes these are perfectly preserved. But of course these
-             * single <arg> entries are not a pair. So the compiler mojo adds them as pairs of (xxxx, null).
-             *
-             * We use that knowledge here: if a pair has a null value then do not mess up the key but
-             * render it as a single value. This should ensure that something like:
-             * <compilerArgs>
-             *     <arg>--add-modules</arg>
-             *     <arg>java.se.ee</arg>
-             * </compilerArgs>
-             *
-             * is actually added to the command like as such.
-             *
-             * (btw: the above example will still give an error when using ecj <= 4.8M6:
-             *      invalid module name: java.se.ee
-             * but that seems to be a bug in ecj).
-             */
-            String opt = entry.getKey();
-            String optionValue = entry.getValue();
-            if ( null == optionValue )
-            {
-                //-- We have an option from compilerArgs: use the key as-is as a single option value
-                args.add( opt );
-            }
-            else
-            {
-                if ( !opt.startsWith( "-" ) )
-                {
-                    opt = "-" + opt;
-                }
-                args.add( opt );
-                args.add( optionValue );
-            }
-        }
+        this.errorsAsWarnings = processCustomArguments(config, args);
 
         // Output path
         args.add( "-d" );
@@ -273,13 +203,6 @@ public class EclipseJavaCompiler
                     args.add( "-proc:" + config.getProc() );
                 }
             }
-        }
-
-        //-- Write .class files even when error occur, but make sure methods with compile errors do abort when called
-        if ( extras.containsKey( "-proceedOnError" ) )
-        {
-            // Generate a class file even with errors, but make methods with errors fail when called
-            args.add( "-proceedOnError:Fatal" );
         }
 
         //-- classpath
@@ -528,7 +451,89 @@ public class EclipseJavaCompiler
         }
     }
 
-    private static boolean haveSourceOrReleaseArgument( List<String> args )
+    static boolean processCustomArguments( CompilerConfiguration config, List<String> args )
+    {
+        boolean result = false;
+
+        for ( Entry<String, String> entry : config.getCustomCompilerArgumentsEntries() )
+        {
+            // handle errorsAsWarnings options
+            if ( entry.getKey().equals("errorsAsWarnings") || entry.getKey().equals("-errorsAsWarnings") )
+            {
+                result = true;
+                continue;
+            }
+
+            if ( entry.getKey().equals( "-properties" ) )
+            {
+                String props = entry.getValue();
+                if ( null != props )
+                {
+                    File propFile = new File( props );
+                    if ( !propFile.exists() || !propFile.isFile() )
+                    {
+                        throw new IllegalArgumentException(
+                                        "Properties file specified by -properties " + propFile + " does not exist" );
+                    }
+                }
+            }
+
+            //-- Write .class files even when error occur, but make sure methods with compile errors do abort when called
+            if ( entry.getKey().equals( "-proceedOnError" ) )
+            {
+                // Generate a class file even with errors, but make methods with errors fail when called
+                args.add( "-proceedOnError:Fatal" );
+                continue;
+            }
+
+            /*
+            * The compiler mojo makes quite a mess of passing arguments, depending on exactly WHICH
+            * way is used to pass them. The method method using <compilerArguments> uses the tag names
+            * of its contents to denote option names, and so the compiler mojo happily adds a '-' to
+            * all of the names there and adds them to the "custom compiler arguments" map as a
+            * name, value pair where the name always contains a single '-'. The Eclipse compiler (and
+            * javac too, btw) has options with two dashes (like --add-modules for java 9). These cannot
+            * be passed using a <compilerArguments> tag.
+            *
+            * The other method is to use <compilerArgs>, where each SINGLE argument needs to be passed
+            * using an <arg>xxxx</arg> tag. In there the xxx is not manipulated by the compiler mojo, so
+            * if it starts with a dash or more dashes these are perfectly preserved. But of course these
+            * single <arg> entries are not a pair. So the compiler mojo adds them as pairs of (xxxx, null).
+            *
+            * We use that knowledge here: if a pair has a null value then do not mess up the key but
+            * render it as a single value. This should ensure that something like:
+            * <compilerArgs>
+            *     <arg>--add-modules</arg>
+            *     <arg>java.se.ee</arg>
+            * </compilerArgs>
+            *
+            * is actually added to the command like as such.
+            *
+            * (btw: the above example will still give an error when using ecj <= 4.8M6:
+            *      invalid module name: java.se.ee
+            * but that seems to be a bug in ecj).
+            */
+            String opt = entry.getKey();
+            String optionValue = entry.getValue();
+            if ( null == optionValue )
+            {
+                //-- We have an option from compilerArgs: use the key as-is as a single option value
+                args.add( opt );
+            }
+            else
+            {
+                if ( !opt.startsWith( "-" ) )
+                {
+                    opt = "-" + opt;
+                }
+                args.add( opt );
+                args.add( optionValue );
+            }
+        }
+        return result;
+    }
+
+		private static boolean haveSourceOrReleaseArgument( List<String> args )
     {
         Iterator<String> allArgs = args.iterator();
         while ( allArgs.hasNext() )
