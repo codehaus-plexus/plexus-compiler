@@ -457,19 +457,21 @@ public class EclipseJavaCompiler
 
         for ( Entry<String, String> entry : config.getCustomCompilerArgumentsEntries() )
         {
+            String opt = entry.getKey();
+            String optionValue = entry.getValue();
+
             // handle errorsAsWarnings options
-            if ( entry.getKey().equals("errorsAsWarnings") || entry.getKey().equals("-errorsAsWarnings") )
+            if ( opt.equals("errorsAsWarnings") || opt.equals("-errorsAsWarnings") )
             {
                 result = true;
                 continue;
             }
 
-            if ( entry.getKey().equals( "-properties" ) )
+            if ( opt.equals( "-properties" ) )
             {
-                String props = entry.getValue();
-                if ( null != props )
+                if ( null != optionValue )
                 {
-                    File propFile = new File( props );
+                    File propFile = new File( optionValue );
                     if ( !propFile.exists() || !propFile.isFile() )
                     {
                         throw new IllegalArgumentException(
@@ -479,7 +481,7 @@ public class EclipseJavaCompiler
             }
 
             //-- Write .class files even when error occur, but make sure methods with compile errors do abort when called
-            if ( entry.getKey().equals( "-proceedOnError" ) )
+            if ( opt.equals( "-proceedOnError" ) )
             {
                 // Generate a class file even with errors, but make methods with errors fail when called
                 args.add( "-proceedOnError:Fatal" );
@@ -513,8 +515,6 @@ public class EclipseJavaCompiler
             *      invalid module name: java.se.ee
             * but that seems to be a bug in ecj).
             */
-            String opt = entry.getKey();
-            String optionValue = entry.getValue();
             if ( null == optionValue )
             {
                 //-- We have an option from compilerArgs: use the key as-is as a single option value
@@ -533,7 +533,7 @@ public class EclipseJavaCompiler
         return result;
     }
 
-		private static boolean haveSourceOrReleaseArgument( List<String> args )
+    private static boolean haveSourceOrReleaseArgument( List<String> args )
     {
         Iterator<String> allArgs = args.iterator();
         while ( allArgs.hasNext() )
