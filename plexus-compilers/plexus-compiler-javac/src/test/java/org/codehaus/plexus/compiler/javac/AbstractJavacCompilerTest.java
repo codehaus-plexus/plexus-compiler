@@ -122,6 +122,9 @@ public abstract class AbstractJavacCompilerTest
         if (javaVersion.contains("16")){
             return "16";
         }
+        if (javaVersion.contains("17")){
+            return "17";
+        }
         return super.getTargetVersion();
     }
 
@@ -147,6 +150,9 @@ public abstract class AbstractJavacCompilerTest
         }
         if (javaVersion.contains("16")){
             return "16";
+        }
+        if (javaVersion.contains("17")){
+            return "17";
         }
         return super.getTargetVersion();
     }
