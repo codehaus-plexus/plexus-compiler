@@ -154,8 +154,8 @@ public abstract class AbstractJavacCompilerTest
     protected Collection<String> expectedOutputFiles()
     {
         String javaVersion = getJavaVersion();
-        if (javaVersion.contains("9.0")||javaVersion.contains("11")||javaVersion.contains("14")||javaVersion.contains("15"))
-        {
+        if (javaVersion.contains("9.0")||javaVersion.contains("11")||javaVersion.contains("14")||
+            javaVersion.contains("15")||javaVersion.contains("16")||javaVersion.contains("17")){
             return Arrays.asList( new String[]{ "org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ExternalDeps.class",
                 "org/codehaus/foo/Person.class"} );
         }
