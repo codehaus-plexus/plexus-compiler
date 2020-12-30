@@ -60,8 +60,10 @@ public class J2ObjCCompilerTest
         try
         {
             comp.performCompile( cc );
-            Assert.assertTrue( new File( "target/generated/objective-c/de/test/App.h" ).exists() );
-            Assert.assertTrue( new File( "target/generated/objective-c/de/test/App.m" ).exists() );
+            File f = new File( "target/generated/objective-c/de/test/App.h" );
+            Assert.assertTrue("file not exists:" + f, f.exists() );
+            f = new File( "target/generated/objective-c/de/test/App.m" );
+            Assert.assertTrue("file not exists:" + f, f.exists() );
         }
         catch ( CompilerException ce )
         {
