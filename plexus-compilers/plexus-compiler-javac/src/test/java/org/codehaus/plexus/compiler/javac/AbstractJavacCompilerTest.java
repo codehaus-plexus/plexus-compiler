@@ -61,7 +61,8 @@ public abstract class AbstractJavacCompilerTest
     protected int expectedErrors()
     {
         String javaVersion = getJavaVersion();
-        if (javaVersion.contains("9.0")||javaVersion.contains("11")||javaVersion.contains("14")||javaVersion.contains("15")){
+        if (javaVersion.contains("9.0")||javaVersion.contains("11")||javaVersion.contains("14")||
+            javaVersion.contains("15")||javaVersion.contains("16")||javaVersion.contains("17")){
             // lots of new warnings about obsoletions for future releases
             return 5;
         }
@@ -79,7 +80,8 @@ public abstract class AbstractJavacCompilerTest
     protected int expectedWarnings()
     {
         String javaVersion = getJavaVersion();
-        if (javaVersion.contains("9.0")||javaVersion.contains("11")||javaVersion.contains("14")||javaVersion.contains("15")){
+        if (javaVersion.contains("9.0")||javaVersion.contains("11")||javaVersion.contains("14")||
+            javaVersion.contains("15")||javaVersion.contains("16")||javaVersion.contains("17")){
             return 1;
         }
         if (javaVersion.contains("9.0")){
