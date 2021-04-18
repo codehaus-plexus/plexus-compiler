@@ -49,6 +49,9 @@
                 <goal>clean</goal>
                 <goal>test-compile</goal>
               </goals>
+              <scriptVariables>
+                <errorprone.version>${errorprone.version}</errorprone.version>
+              </scriptVariables>
             </configuration>
           </execution>
         </executions>
