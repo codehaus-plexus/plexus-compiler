@@ -235,7 +235,7 @@ public class JavacCompiler
 
             args.add( getPathString( classpathEntries ) );
         }
-        
+
         List<String> modulepathEntries = config.getModulepathEntries();
         if ( modulepathEntries != null && !modulepathEntries.isEmpty() )
         {
@@ -343,8 +343,15 @@ public class JavacCompiler
         if ( !config.isShowWarnings() )
         {
             args.add( "-nowarn" );
+        } else
+        {
+            String warnings = config.getWarnings();
+            if (StringUtils.isNotEmpty(warnings))
+            {
+                args.add("-Xlint:" +  warnings);
+            }
         }
-        
+
         if ( config.isFailOnWarning() )
         {
             args.add( "-Werror" );
@@ -380,7 +387,7 @@ public class JavacCompiler
             {
                 args.add( "-source" );
                 args.add( config.getSourceVersion() );
-            }            
+            }
         }
 
 
@@ -710,13 +717,13 @@ public class JavacCompiler
         String line;
 
         StringBuilder buffer = new StringBuilder();
-        
+
         boolean hasPointer = false;
 
         while ( true )
         {
             line = input.readLine();
-            
+
             if ( line == null )
             {
                 // javac output not detected by other parsing
@@ -760,10 +767,10 @@ public class JavacCompiler
             {
                 // add the error bean
                 errors.add( parseModernError( exitCode, buffer.toString() ) );
-                
+
                 // reset for next error block
                 buffer = new StringBuilder(); // this is quicker than clearing it
-                
+
                 hasPointer = false;
             }
 
@@ -791,14 +798,14 @@ public class JavacCompiler
 
                 buffer.append( EOL );
             }
-            
+
             if ( line.endsWith( "^" ) )
             {
                 hasPointer = true;
             }
         }
     }
-    
+
     private static boolean isMisc( String line )
     {
         return startsWithPrefix( line, MISC_PREFIXES );
@@ -808,7 +815,7 @@ public class JavacCompiler
     {
         return startsWithPrefix( line, NOTE_PREFIXES );
     }
-    
+
     private static boolean startsWithPrefix( String line, String[] prefixes )
     {
         for ( int i = 0; i < prefixes.length; i++ )
@@ -909,9 +916,9 @@ public class JavacCompiler
             msgBuffer.append( EOL );
 
             String context = tokens.nextToken( EOL );
-            
+
             String pointer = null;
-            
+
             do
             {
                 final String msgLine = tokens.nextToken( EOL );
