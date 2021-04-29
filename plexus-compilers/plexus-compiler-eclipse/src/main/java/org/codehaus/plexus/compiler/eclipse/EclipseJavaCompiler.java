@@ -129,7 +129,10 @@ public class EclipseJavaCompiler
         }
         else
         {
-            StringBuilder warns = new StringBuilder();
+            String warnings = config.getWarnings();
+            StringBuilder warns = StringUtils.isEmpty(warnings)
+                    ? new StringBuilder()
+                    : new StringBuilder(warnings).append(',');
 
             if ( config.isShowDeprecation() )
             {

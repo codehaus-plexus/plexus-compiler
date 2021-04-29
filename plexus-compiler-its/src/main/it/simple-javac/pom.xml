@@ -55,6 +55,11 @@
           </compilerArgs>
         </configuration>
         <dependencies>
+            <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-compiler-api</artifactId>
+            <version>@pom.version@</version>
+          </dependency>
           <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-compiler-javac</artifactId>
