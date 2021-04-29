@@ -70,6 +70,8 @@ public class CompilerConfiguration
     private boolean showWarnings = true;
 
     private String warnings;
+    
+    private boolean showLint;
 
     /**
      * -Werror argument as supported since Java 1.7
@@ -341,14 +343,19 @@ public class CompilerConfiguration
         return debugLevel;
     }
 
-    public void setShowWarnings( boolean showWarnings )
+    public void setWarnings( String warnings )
     {
-        this.showWarnings = showWarnings;
+        this.warnings = warnings;
     }
 
     public boolean isShowWarnings()
     {
         return showWarnings;
+    }
+
+    public void setShowWarnings( boolean showWarnings )
+    {
+        this.showWarnings = showWarnings;
     }
 
     public boolean isShowDeprecation()
@@ -361,9 +368,16 @@ public class CompilerConfiguration
         return warnings;
     }
 
-    public void setShowLint( String warnings )
+
+
+    public void setShowLint( boolean showLint )
     {
-        this.warnings = warnings;
+        this.showLint = showLint;
+    }
+
+    public boolean isShowLint()
+    {
+        return this.showLint;
     }
 
     public void setShowDeprecation( boolean showDeprecation )

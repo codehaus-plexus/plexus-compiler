@@ -343,12 +343,20 @@ public class JavacCompiler
         if ( !config.isShowWarnings() )
         {
             args.add( "-nowarn" );
-        } else
+        }
+        else
         {
             String warnings = config.getWarnings();
-            if (StringUtils.isNotEmpty(warnings))
+            if (config.isShowLint())
             {
-                args.add("-Xlint:" +  warnings);
+                if(config.isShowWarnings() && StringUtils.isNotEmpty(warnings))
+                {
+                    args.add( "-Xlint:" + warnings );
+                }
+                else
+                {
+                    args.add( "-Xlint" );
+                }
             }
         }
 

@@ -50,6 +50,7 @@
         <configuration>
           <target>8</target>
           <source>8</source>
+<!--          <showLint>true</showLint>-->
           <compilerArgs>
             <compilerArg>-Xlint:-path</compilerArg>
           </compilerArgs>
