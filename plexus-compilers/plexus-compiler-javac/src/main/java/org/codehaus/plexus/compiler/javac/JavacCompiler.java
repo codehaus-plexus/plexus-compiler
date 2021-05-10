@@ -291,7 +291,7 @@ public class JavacCompiler
             }
             if ( config.getProcessorPathEntries() != null && !config.getProcessorPathEntries().isEmpty() ) {
 
-                if(!isPreJava9(config) && Arrays.asList(sourceFiles).contains("module-info.java")){
+                if(!isPreJava9(config) && containsModuleInfo(sourceFiles)){
                     args.add( "--processor-module-path" );
 
                 } else {
@@ -531,6 +531,19 @@ public class JavacCompiler
                 || v.startsWith( "1.3" ) || v.startsWith( "1.2" ) || v.startsWith( "1.1" ) || v.startsWith( "1.0" );
     }
 
+    /**
+     * Check if a list of paths contains a module-info.java file
+     * @param sourceFiles list of source files
+     * @return true if a module-info.java is contained
+     */
+    private static boolean containsModuleInfo(String[] sourceFiles){
+        for (String sourceFile : sourceFiles) {
+            if (sourceFile.endsWith("module-info.java")) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     private static boolean suppressSource( CompilerConfiguration config )
     {
