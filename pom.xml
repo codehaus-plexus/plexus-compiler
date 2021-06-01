@@ -46,6 +46,7 @@
     <javaVersion>7</javaVersion>
     <redirectTestOutputToFile>true</redirectTestOutputToFile>
     <project.build.outputTimestamp>2020-08-24T00:30:49Z</project.build.outputTimestamp>
+    <junit.version>4.13.2</junit.version>
     <errorprone.version>2.6.0</errorprone.version>
   </properties>
 
@@ -80,7 +81,7 @@
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
         <scope>test</scope>
-        <version>4.13.2</version>
+        <version>${junit.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
