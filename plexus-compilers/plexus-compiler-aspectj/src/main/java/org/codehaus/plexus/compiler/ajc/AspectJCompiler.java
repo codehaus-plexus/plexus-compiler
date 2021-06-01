@@ -17,6 +17,7 @@ import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.compiler.CompilerOutputStyle;
 import org.codehaus.plexus.compiler.CompilerResult;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.util.DirectoryScanner;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,9 +26,11 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * <p>
@@ -295,7 +298,9 @@ public class AspectJCompiler
 
     public AspectJCompiler()
     {
-        super( CompilerOutputStyle.ONE_OUTPUT_FILE_PER_INPUT_FILE, ".java", ".class", null );
+        // Input file ending "" means: Give me all files, I am going to filter them myself later. We are doing this,
+        // because in method 'getSourceFiles' we need to search for both ".java" and ".aj" files.
+        super( CompilerOutputStyle.ONE_OUTPUT_FILE_PER_INPUT_FILE, "", ".class", null );
     }
 
     public CompilerResult performCompile( CompilerConfiguration config )
@@ -344,15 +349,17 @@ public class AspectJCompiler
             buildConfig.setFiles( buildFileList( Arrays.asList( files ) ) );
         }
 
-        setSourceVersion( buildConfig, config.getSourceVersion() );
+        String releaseVersion = config.getReleaseVersion();
+        setSourceVersion( buildConfig, releaseVersion == null ? config.getSourceVersion() : releaseVersion );
+        setTargetVersion( buildConfig, releaseVersion == null ? config.getTargetVersion() : releaseVersion );
 
         if ( config.isDebug() )
         {
             buildConfig.getOptions().produceDebugAttributes =
-                ClassFileConstants.ATTR_SOURCE + ClassFileConstants.ATTR_LINES + ClassFileConstants.ATTR_VARS;
+              ClassFileConstants.ATTR_SOURCE + ClassFileConstants.ATTR_LINES + ClassFileConstants.ATTR_VARS;
         }
 
-        Map<String, String> javaOpts = config.getCustomCompilerArguments();
+        Map<String, String> javaOpts = config.getCustomCompilerArgumentsAsMap();
         if ( javaOpts != null && !javaOpts.isEmpty() )
         {
             // TODO support customCompilerArguments
@@ -557,7 +564,7 @@ public class AspectJCompiler
     }
 
     /**
-     * Set the source version in ajc compiler
+     * Set the source version in AspectJ compiler
      *
      * @param buildConfig
      * @param sourceVersion
@@ -565,66 +572,60 @@ public class AspectJCompiler
     private void setSourceVersion( AjBuildConfig buildConfig, String sourceVersion )
         throws CompilerException
     {
-        if ( "11".equals( sourceVersion ) )
+        buildConfig.getOptions().sourceLevel = versionStringToMajorMinor( sourceVersion );
+    }
+
+    /**
+     * Set the target version in AspectJ compiler
+     *
+     * @param buildConfig
+     * @param targetVersion
+     */
+    private void setTargetVersion( AjBuildConfig buildConfig, String targetVersion )
+        throws CompilerException
+    {
+        buildConfig.getOptions().targetJDK = versionStringToMajorMinor( targetVersion );
+    }
+
+    private static long versionStringToMajorMinor(String version) throws CompilerException
+    {
+        if ( version == null )
         {
-            buildConfig.getOptions().sourceLevel = ClassFileConstants.JDK11;
+            version = "";
         }
-        else if ( "10".equals( sourceVersion ) )
+        // Note: We avoid using org.codehaus.plexus:plexus-java here on purpose, because Maven Compiler might depend on
+        // a different (older) versionm, e.g. not having the 'asMajor' method yet. This can cause problems for users
+        // trying to compile their AspectJ code using Plexus.
+        
+        version = version.trim()
+            // Cut off leading "1.", focusing on the Java major
+            .replaceFirst( "^1[.]", "" )
+            // Accept, but cut off trailing ".0", as ECJ/ACJ explicitly support versions like 5.0, 8.0, 11.0
+            .replaceFirst("[.]0$", "");
+
+        switch ( version )
         {
-            buildConfig.getOptions().sourceLevel = ClassFileConstants.JDK10;
+            // Java 1.6 as a default source/target seems to make sense. Maven Compiler should set its own default
+            // anyway, so this probably never needs to be used. But not having a default feels bad, too.
+            case "" : return ClassFileConstants.JDK1_6;
+            case "1" : return ClassFileConstants.JDK1_1;
+            case "2" : return ClassFileConstants.JDK1_2;
+            case "3" : return ClassFileConstants.JDK1_3;
+            case "4" : return ClassFileConstants.JDK1_4;
+            case "5" : return ClassFileConstants.JDK1_5;
+            case "6" : return ClassFileConstants.JDK1_6;
+            case "7" : return ClassFileConstants.JDK1_7;
+            case "8" : return ClassFileConstants.JDK1_8;
+            case "9" : return ClassFileConstants.JDK9;
+            case "10" : return ClassFileConstants.JDK10;
+            case "11" : return ClassFileConstants.JDK11;
+            case "12" : return ClassFileConstants.JDK12;
+            case "13" : return ClassFileConstants.JDK13;
+            case "14" : return ClassFileConstants.JDK14;
+            case "15" : return ClassFileConstants.JDK15;
+            case "16" : return ClassFileConstants.JDK16;
         }
-        else if ( "9".equals( sourceVersion ) )
-        {
-            buildConfig.getOptions().sourceLevel = ClassFileConstants.JDK9;
-        }
-        else if ( "1.9".equals( sourceVersion ) )
-        {
-            buildConfig.getOptions().sourceLevel = ClassFileConstants.JDK9;
-        }
-        else if ( "1.8".equals( sourceVersion ) )
-        {
-            buildConfig.getOptions().sourceLevel = ClassFileConstants.JDK1_8;
-        }
-        else if ( "1.7".equals( sourceVersion ) )
-        {
-            buildConfig.getOptions().sourceLevel = ClassFileConstants.JDK1_7;
-        }
-        else if ( "1.6".equals( sourceVersion ) )
-        {
-            buildConfig.getOptions().sourceLevel = ClassFileConstants.JDK1_6;
-        }
-        else if ( "1.5".equals( sourceVersion ) )
-        {
-            buildConfig.getOptions().sourceLevel = ClassFileConstants.JDK1_5;
-        }
-        else if ( "5.0".equals( sourceVersion ) )
-        {
-            buildConfig.getOptions().sourceLevel = ClassFileConstants.JDK1_5;
-        }
-        else if ( "1.4".equals( sourceVersion ) )
-        {
-            buildConfig.getOptions().sourceLevel = ClassFileConstants.JDK1_4;
-        }
-        else if ( "1.3".equals( sourceVersion ) )
-        {
-            buildConfig.getOptions().sourceLevel = ClassFileConstants.JDK1_3;
-        }
-        else if ( "1.2".equals( sourceVersion ) )
-        {
-            buildConfig.getOptions().sourceLevel = ClassFileConstants.JDK1_2;
-        }
-        else if ( "1.1".equals( sourceVersion ) )
-        {
-            buildConfig.getOptions().sourceLevel = ClassFileConstants.JDK1_1;
-        }
-        else if ( sourceVersion == null || sourceVersion.length() <= 0 )
-        {
-            buildConfig.getOptions().sourceLevel = ClassFileConstants.JDK1_3;
-        }
-        else
-        {
-            throw new CompilerException( "The source version was not recognized: " + sourceVersion );
-        }
+        throw new CompilerException( "Unknown Java source/target version number: " + version );
     }
 
     /**
@@ -634,6 +635,86 @@ public class AspectJCompiler
         throws CompilerException
     {
         return null;
+    }
+
+    protected static String[] getSourceFiles( CompilerConfiguration config )
+    {
+        Set<String> sources = new HashSet<>();
+
+        Set<File> sourceFiles = config.getSourceFiles();
+
+        if ( sourceFiles != null && !sourceFiles.isEmpty() )
+        {
+            for ( File sourceFile : sourceFiles )
+            {
+                if ( sourceFile.getName().endsWith( ".java" ) || sourceFile.getName().endsWith( ".aj" ) )
+                {
+                    sources.add( sourceFile.getAbsolutePath() );
+                }
+            }
+        }
+        else
+        {
+            for ( String sourceLocation : config.getSourceLocations() )
+            {
+                sources.addAll( getSourceFilesForSourceRoot( config, sourceLocation ) );
+            }
+        }
+
+        String[] result;
+
+        if ( sources.isEmpty() )
+        {
+            result = new String[0];
+        }
+        else
+        {
+            result = sources.toArray( new String[sources.size()] );
+        }
+
+        return result;
+    }
+
+    protected static Set<String> getSourceFilesForSourceRoot( CompilerConfiguration config, String sourceLocation )
+    {
+        DirectoryScanner scanner = new DirectoryScanner();
+
+        scanner.setBasedir( sourceLocation );
+
+        Set<String> includes = config.getIncludes();
+
+        if ( includes != null && !includes.isEmpty() )
+        {
+            String[] inclStrs = includes.toArray( new String[includes.size()] );
+            scanner.setIncludes( inclStrs );
+        }
+        else
+        {
+            scanner.setIncludes( new String[] {"**/*.java", "**/*.aj"} );
+        }
+
+        Set<String> excludes = config.getExcludes();
+
+        if ( excludes != null && !excludes.isEmpty() )
+        {
+            String[] exclStrs = excludes.toArray( new String[excludes.size()] );
+            scanner.setExcludes( exclStrs );
+        }
+
+        scanner.scan();
+
+        String[] sourceDirectorySources = scanner.getIncludedFiles();
+
+        Set<String> sources = new HashSet<>();
+
+        for ( String sourceDirectorySource : sourceDirectorySources )
+        {
+            File f = new File( sourceLocation, sourceDirectorySource );
+
+            sources.add( f.getPath() );
+        }
+
+        return sources;
     }
 
 }
