@@ -13,10 +13,6 @@
   <name>Plexus AspectJ Compiler</name>
   <description>AspectJ Compiler support for Plexus Compiler component.</description>
 
-  <properties>
-    <aspectj.version>1.9.6</aspectj.version>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
