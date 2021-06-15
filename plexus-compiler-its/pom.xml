@@ -39,7 +39,8 @@
               <goal>verify</goal>
             </goals>
             <configuration>
-              <debug>true</debug>
+              <debug>false</debug>
+              <streamLogsOnFailures>true</streamLogsOnFailures>
               <projectsDirectory>src/main/it</projectsDirectory>
               <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
               <postBuildHookScript>verify</postBuildHookScript>
