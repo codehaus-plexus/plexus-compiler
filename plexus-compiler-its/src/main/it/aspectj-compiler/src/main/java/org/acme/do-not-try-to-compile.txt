@@ -1,0 +1,7 @@
+The Apache Maven Compiler (MC) API only allows a single source file extension, such as '.java'.
+The AspectJ Compiler (AJC) should consider two default extensions, though: '.java' and '.aj'.
+In order to achieve that, the Plexus AJC component tells MC to give it all files,
+subsequently filtering for those two extensions.
+
+The purpose of this file is to make sure that even though MC finds it in the source folder,
+Plexus AJC filters it out and AJC does not try to compile it. 
