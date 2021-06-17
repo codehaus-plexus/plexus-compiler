@@ -164,6 +164,17 @@ public class EclipseJavaCompiler
         List<String> extraSourceDirs = new ArrayList<>();
         if ( !isPreJava1_6( config ) )
         {
+            File generatedSourcesDir = config.getGeneratedSourcesDirectory();
+            if ( generatedSourcesDir != null )
+            {
+                generatedSourcesDir.mkdirs();
+                extraSourceDirs.add( generatedSourcesDir.getAbsolutePath() );
+
+                //-- option to specify where annotation processor is to generate its output
+                args.add( "-s" );
+                args.add( generatedSourcesDir.getAbsolutePath() );
+            }
+
             //now add jdk 1.6 annotation processing related parameters
             String[] annotationProcessors = config.getAnnotationProcessors();
             List<String> processorPathEntries = config.getProcessorPathEntries();
@@ -191,16 +202,6 @@ public class EclipseJavaCompiler
                     args.add( getPathString( processorPathEntries ) );
                 }
 
-                File generatedSourcesDir = config.getGeneratedSourcesDirectory();
-                if ( generatedSourcesDir != null )
-                {
-                    generatedSourcesDir.mkdirs();
-                    extraSourceDirs.add( generatedSourcesDir.getAbsolutePath() );
-
-                    //-- option to specify where annotation processor is to generate its output
-                    args.add( "-s" );
-                    args.add( generatedSourcesDir.getAbsolutePath() );
-                }
                 if ( config.getProc() != null )
                 {
                     args.add( "-proc:" + config.getProc() );
