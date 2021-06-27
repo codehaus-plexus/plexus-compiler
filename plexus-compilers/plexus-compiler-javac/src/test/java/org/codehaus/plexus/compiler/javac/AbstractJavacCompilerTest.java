@@ -301,7 +301,7 @@ public abstract class AbstractJavacCompilerTest
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
-        final String[] source = {"module-info.java"};
+        final String[] source = {"/src/main/one/module-info.java"};
 
         // outputLocation
         compilerConfiguration.setOutputLocation( "/output" );
