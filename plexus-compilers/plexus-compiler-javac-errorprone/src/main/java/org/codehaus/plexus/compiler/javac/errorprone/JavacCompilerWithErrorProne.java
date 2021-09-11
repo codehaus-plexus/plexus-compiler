@@ -29,7 +29,6 @@ import org.codehaus.plexus.compiler.javac.JavaxToolsCompiler;
 import org.codehaus.plexus.component.annotations.Component;
 
 import javax.tools.JavaCompiler;
-import javax.tools.ToolProvider;
 
 import java.net.MalformedURLException;
 import java.net.URL;

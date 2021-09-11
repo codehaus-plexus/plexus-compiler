@@ -29,9 +29,6 @@ import org.codehaus.plexus.compiler.AbstractCompilerTest;
 
 import java.lang.reflect.Field;
 import java.net.URLClassLoader;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 
 /**
  * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>
