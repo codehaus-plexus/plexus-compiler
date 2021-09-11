@@ -473,11 +473,7 @@ public class AspectJCompiler
         {
             manager.batchBuild( buildConfig, messageHandler );
         }
-        catch ( AbortException e )
-        {
-            throw new CompilerException( "Unknown error while compiling", e );
-        }
-        catch ( IOException e )
+        catch ( AbortException | IOException e )
         {
             throw new CompilerException( "Unknown error while compiling", e );
         }

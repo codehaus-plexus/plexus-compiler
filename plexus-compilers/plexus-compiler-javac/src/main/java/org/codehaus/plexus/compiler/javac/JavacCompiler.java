@@ -688,19 +688,7 @@ public class JavacCompiler
 
             messages = parseModernStream( ok, new BufferedReader( new StringReader( out.toString() ) ) );
         }
-        catch ( NoSuchMethodException e )
-        {
-            throw new CompilerException( "Error while executing the compiler.", e );
-        }
-        catch ( IllegalAccessException e )
-        {
-            throw new CompilerException( "Error while executing the compiler.", e );
-        }
-        catch ( InvocationTargetException e )
-        {
-            throw new CompilerException( "Error while executing the compiler.", e );
-        }
-        catch ( IOException e )
+        catch ( NoSuchMethodException | IOException | InvocationTargetException | IllegalAccessException e )
         {
             throw new CompilerException( "Error while executing the compiler.", e );
         }
@@ -970,12 +958,7 @@ public class JavacCompiler
         catch ( NoSuchElementException e )
         {
             return new CompilerMessage( "no more tokens - could not parse error message: " + error, isError );
-        }
-        catch ( NumberFormatException e )
-        {
-            return new CompilerMessage( "could not parse error message: " + error, isError );
-        }
-        catch ( Exception e )
+        } catch ( Exception e )
         {
             return new CompilerMessage( "could not parse error message: " + error, isError );
         }

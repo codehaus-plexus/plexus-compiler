@@ -526,11 +526,7 @@ Options can be of the form -option or /option
 
             messages = parseCompilerOutput( new BufferedReader( new StringReader( stringWriter.toString() ) ) );
         }
-        catch ( CommandLineException e )
-        {
-            throw new CompilerException( "Error while executing the external compiler.", e );
-        }
-        catch ( IOException e )
+        catch ( CommandLineException | IOException e )
         {
             throw new CompilerException( "Error while executing the external compiler.", e );
         }
