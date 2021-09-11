@@ -684,6 +684,11 @@ public class EclipseJavaCompiler
         return null;
     }
 
+    @Override
+    public boolean supportsIncrementalCompilation()
+    {
+        return true;
+    }
 
     /**
      * Change any Maven Java version number to ECJ's version number. Do not check the validity

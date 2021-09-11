@@ -89,4 +89,15 @@ public interface Compiler
      */
     String[] createCommandLine( CompilerConfiguration config )
         throws CompilerException;
+    
+
+    /**
+     * Based on this flag the caller can decide the strategy how to compile. E.g. is incrementCompilation is not supported,
+     * it could decide to clear to outputDirectory to enforce a complete recompilation.
+     * 
+     * @return {@code true} if incrementalCompilation is supported, otherwise {@code false} 
+     */
+    default boolean supportsIncrementalCompilation() {
+        return false;
+    }
 }
