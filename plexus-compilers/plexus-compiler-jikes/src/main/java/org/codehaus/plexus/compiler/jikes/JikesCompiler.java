@@ -278,9 +278,9 @@ public class JikesCompiler
                     getLogger().debug( "create TempFile" + tempFileName );
 
                     tempFile.getParentFile().mkdirs();
-                    for ( int i = 0; i < sourceFiles.length; i++ )
+                    for ( String sourceFile : sourceFiles )
                     {
-                        fw.write( sourceFiles[i] );
+                        fw.write( sourceFile );
                         fw.newLine();
                     }
                     tempFile.deleteOnExit();
@@ -295,9 +295,9 @@ public class JikesCompiler
         }
         else
         {
-            for ( int i = 0; i < sourceFiles.length; i++ )
+            for ( String sourceFile : sourceFiles )
             {
-                args.add( sourceFiles[i] );
+                args.add( sourceFile );
             }
 
         }
@@ -471,7 +471,7 @@ public class JikesCompiler
             message.append( ':' ).append( errorBits[i++] );
         }
 
-        return new CompilerMessage( file, type.indexOf( "Error" ) > -1, startline, startcolumn, endline, endcolumn,
+        return new CompilerMessage( file, type.contains("Error"), startline, startcolumn, endline, endcolumn,
                                     message.toString() );
     }
 }

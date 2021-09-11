@@ -109,7 +109,7 @@ public class AspectJCompilerConfiguration
 
     public void setSourcePathResources( Map<String, File> sourcePathResources )
     {
-        this.sourcePathResources = new TreeMap<String, File>( sourcePathResources );
+        this.sourcePathResources = new TreeMap<>( sourcePathResources );
     }
 
     public Map<String, File> getSourcePathResources()

@@ -77,9 +77,9 @@ public abstract class AbstractCompilerTckTest
 
         assertFalse( error.isError() );
 
-        assertTrue( error.getMessage().indexOf( "Date" ) != -1 );
+        assertTrue( error.getMessage().contains( "Date" ) );
 
-        assertTrue( error.getMessage().indexOf( "deprecated" ) != -1 );
+        assertTrue( error.getMessage().contains( "deprecated" ) );
     }
 
     public void testWarning()
@@ -111,7 +111,7 @@ public abstract class AbstractCompilerTckTest
 
         assertFalse( error.isError() );
 
-        assertTrue( error.getMessage().indexOf( "finally block does not complete normally" ) != -1 );
+        assertTrue( error.getMessage().contains( "finally block does not complete normally" ) );
     }
 
     protected List<CompilerMessage> compile( CompilerConfiguration configuration )

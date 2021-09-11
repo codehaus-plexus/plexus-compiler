@@ -104,7 +104,7 @@ public class JavacCompiler
 
     private static volatile Class<?> JAVAC_CLASS;
 
-    private List<Class<?>> javaccClasses = new CopyOnWriteArrayList<Class<?>>();
+    private List<Class<?>> javaccClasses = new CopyOnWriteArrayList<>();
 
     // ----------------------------------------------------------------------
     //
@@ -682,26 +682,14 @@ public class JavacCompiler
 
             ok = (Integer) compile.invoke( null, new Object[]{ args, new PrintWriter( out ) } );
 
-            messages = parseModernStream( ok.intValue(), new BufferedReader( new StringReader( out.toString() ) ) );
+            messages = parseModernStream( ok, new BufferedReader( new StringReader( out.toString() ) ) );
         }
-        catch ( NoSuchMethodException e )
-        {
-            throw new CompilerException( "Error while executing the compiler.", e );
-        }
-        catch ( IllegalAccessException e )
-        {
-            throw new CompilerException( "Error while executing the compiler.", e );
-        }
-        catch ( InvocationTargetException e )
-        {
-            throw new CompilerException( "Error while executing the compiler.", e );
-        }
-        catch ( IOException e )
+        catch ( NoSuchMethodException | IOException | InvocationTargetException | IllegalAccessException e )
         {
             throw new CompilerException( "Error while executing the compiler.", e );
         }
 
-        boolean success = ok.intValue() == 0;
+        boolean success = ok == 0;
         return new CompilerResult( success, messages );
     }
 
@@ -822,9 +810,9 @@ public class JavacCompiler
 
     private static boolean startsWithPrefix( String line, String[] prefixes )
     {
-        for ( int i = 0; i < prefixes.length; i++ )
+        for ( String prefix : prefixes )
         {
-            if ( line.startsWith( prefixes[i] ) )
+            if ( line.startsWith( prefix ) )
             {
                 return true;
             }
@@ -966,12 +954,7 @@ public class JavacCompiler
         catch ( NoSuchElementException e )
         {
             return new CompilerMessage( "no more tokens - could not parse error message: " + error, isError );
-        }
-        catch ( NumberFormatException e )
-        {
-            return new CompilerMessage( "could not parse error message: " + error, isError );
-        }
-        catch ( Exception e )
+        } catch ( Exception e )
         {
             return new CompilerMessage( "could not parse error message: " + error, isError );
         }
@@ -979,11 +962,11 @@ public class JavacCompiler
 
     private static String getWarnPrefix( String msg )
     {
-        for ( int i = 0; i < WARNING_PREFIXES.length; i++ )
+        for ( String warningPrefix : WARNING_PREFIXES )
         {
-            if ( msg.startsWith( WARNING_PREFIXES[i] ) )
+            if ( msg.startsWith( warningPrefix ) )
             {
-                return WARNING_PREFIXES[i];
+                return warningPrefix;
             }
         }
         return null;
@@ -1016,9 +999,9 @@ public class JavacCompiler
 
             writer = new PrintWriter( new FileWriter( tempFile ) );
 
-            for ( int i = 0; i < args.length; i++ )
+            for ( String arg : args )
             {
-                String argValue = args[i].replace( File.separatorChar, '/' );
+                String argValue = arg.replace( File.separatorChar, '/' );
 
                 writer.write( "\"" + argValue + "\"" );
 

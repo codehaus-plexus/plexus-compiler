@@ -21,19 +21,12 @@ public class JarUtil {
                 f.mkdir();
                 continue;
             }
-            InputStream is = jar.getInputStream( file );
-            FileOutputStream fos = new FileOutputStream( f );
-            try
+            try ( InputStream is = jar.getInputStream( file ); FileOutputStream fos = new FileOutputStream( f ) )
             {
                 while ( is.available() > 0 )
                 {
                     fos.write( is.read() );
                 }
-            }
-            finally
-            {
-                is.close();
-                fos.close();
             }
         }
     }
