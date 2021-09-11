@@ -826,9 +826,9 @@ public class JavacCompiler
 
     private static boolean startsWithPrefix( String line, String[] prefixes )
     {
-        for ( int i = 0; i < prefixes.length; i++ )
+        for ( String prefix : prefixes )
         {
-            if ( line.startsWith( prefixes[i] ) )
+            if ( line.startsWith( prefix ) )
             {
                 return true;
             }
@@ -983,11 +983,11 @@ public class JavacCompiler
 
     private static String getWarnPrefix( String msg )
     {
-        for ( int i = 0; i < WARNING_PREFIXES.length; i++ )
+        for ( String warningPrefix : WARNING_PREFIXES )
         {
-            if ( msg.startsWith( WARNING_PREFIXES[i] ) )
+            if ( msg.startsWith( warningPrefix ) )
             {
-                return WARNING_PREFIXES[i];
+                return warningPrefix;
             }
         }
         return null;
@@ -1020,9 +1020,9 @@ public class JavacCompiler
 
             writer = new PrintWriter( new FileWriter( tempFile ) );
 
-            for ( int i = 0; i < args.length; i++ )
+            for ( String arg : args )
             {
-                String argValue = args[i].replace( File.separatorChar, '/' );
+                String argValue = arg.replace( File.separatorChar, '/' );
 
                 writer.write( "\"" + argValue + "\"" );
 
