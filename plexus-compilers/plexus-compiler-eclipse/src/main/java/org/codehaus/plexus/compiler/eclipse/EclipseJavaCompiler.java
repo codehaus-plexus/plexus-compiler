@@ -178,8 +178,11 @@ public class EclipseJavaCompiler
             //now add jdk 1.6 annotation processing related parameters
             String[] annotationProcessors = config.getAnnotationProcessors();
             List<String> processorPathEntries = config.getProcessorPathEntries();
-            if ( ( annotationProcessors != null && annotationProcessors.length > 0 ) || ( processorPathEntries != null
-                && processorPathEntries.size() > 0 ) )
+            List<String> processorModulePathEntries = config.getProcessorModulePathEntries();
+            
+            if ( ( annotationProcessors != null && annotationProcessors.length > 0 ) 
+                            || ( processorPathEntries != null && processorPathEntries.size() > 0 ) 
+                            || ( processorModulePathEntries != null && processorModulePathEntries.size() > 0 ) )
             {
                 if ( annotationProcessors != null && annotationProcessors.length > 0 )
                 {
@@ -200,6 +203,12 @@ public class EclipseJavaCompiler
                 {
                     args.add( "-processorpath" );
                     args.add( getPathString( processorPathEntries ) );
+                }
+                
+                if ( processorModulePathEntries != null && processorModulePathEntries.size() > 0 )
+                {
+                    args.add( "-processorpath" );
+                    args.add( getPathString( processorModulePathEntries ) );
                 }
 
                 if ( config.getProc() != null )

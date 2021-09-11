@@ -315,7 +315,7 @@ public abstract class AbstractJavacCompilerTest
         expectedArguments.add( "/repo/a/b/1.0/b-1.0.jar" + File.pathSeparator +
                 "/repo/c/d/1.0/d-1.0.jar" + File.pathSeparator );
 
-        compilerConfiguration.setProcessorPathEntries(Arrays.asList("/repo/a/b/1.0/annotations-1.0.jar",
+        compilerConfiguration.setProcessorModulePathEntries(Arrays.asList("/repo/a/b/1.0/annotations-1.0.jar",
                 "/repo/f/a/1.0/annotations-4.0.jar"));
         expectedArguments.add( "--processor-module-path" );
         expectedArguments.add("/repo/a/b/1.0/annotations-1.0.jar" + File.pathSeparator +

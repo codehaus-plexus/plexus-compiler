@@ -289,21 +289,17 @@ public class JavacCompiler
                 }
                 args.add( buffer.toString() );
             }
-            if ( config.getProcessorPathEntries() != null && !config.getProcessorPathEntries().isEmpty() ) {
-
-                if(!isPreJava9(config) && Arrays.asList(sourceFiles).contains("module-info.java")){
-                    args.add( "--processor-module-path" );
-
-                } else {
-                    args.add( "-processorpath" );
-
-                }
+            if ( config.getProcessorPathEntries() != null && !config.getProcessorPathEntries().isEmpty() ) 
+            {
+                args.add( "-processorpath" );
                 args.add( getPathString( config.getProcessorPathEntries() ) );
             }
-
+            if ( config.getProcessorModulePathEntries() != null && !config.getProcessorModulePathEntries().isEmpty() ) 
+            {
+                args.add( "--processor-module-path" );
+                args.add( getPathString( config.getProcessorModulePathEntries() ) );
+            }
         }
-
-
 
         if ( config.isOptimize() )
         {

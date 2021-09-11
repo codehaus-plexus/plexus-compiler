@@ -154,6 +154,12 @@ public class CompilerConfiguration
     private List<String> processorPathEntries;
 
     /**
+     * --processor-module-path parameter in jdk 9+. If specified, annotation processors are only searched in the processor
+     * path. Otherwise they are searched in the modulepath.
+     */
+    private List<String> processorModulePathEntries;
+
+    /**
      * default value {@link CompilerReuseStrategy#ReuseCreated}
      *
      * @since 1.9
@@ -684,6 +690,26 @@ public class CompilerConfiguration
         this.processorPathEntries = processorPathEntries;
     }
 
+    
+    public void addProcessorModulePathEntry(String entry) {
+        if ( processorModulePathEntries == null ) {
+            processorModulePathEntries = new LinkedList<>();
+        }
+
+        processorModulePathEntries.add( entry );
+    }
+    
+    public List<String> getProcessorModulePathEntries()
+    {
+        return processorModulePathEntries;
+    }
+    
+    public void setProcessorModulePathEntries( List<String> processorModulePathEntries )
+    {
+        this.processorModulePathEntries = processorModulePathEntries;
+    }
+    
+    
     public CompilerReuseStrategy getCompilerReuseStrategy()
     {
         return compilerReuseStrategy;
