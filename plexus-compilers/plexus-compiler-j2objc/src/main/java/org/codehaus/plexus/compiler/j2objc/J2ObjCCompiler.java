@@ -17,12 +17,14 @@ package org.codehaus.plexus.compiler.j2objc;
  */
 
 import org.codehaus.plexus.compiler.AbstractCompiler;
+import org.codehaus.plexus.compiler.Compiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerException;
 import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.compiler.CompilerMessage.Kind;
 import org.codehaus.plexus.compiler.CompilerOutputStyle;
 import org.codehaus.plexus.compiler.CompilerResult;
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
@@ -47,8 +49,9 @@ import java.util.Map;
  *
  * @author <a href="mailto:ludovic.maitre@effervens.com">Ludovic
  *         Ma&icirc;tre</a>
- * @plexus.component role="org.codehaus.plexus.compiler.Compiler" role-hint="j2objc"
+ *
  */
+@Component( role = Compiler.class, hint = "j2objc ")
 public class J2ObjCCompiler
     extends AbstractCompiler
 {
@@ -184,7 +187,7 @@ public class J2ObjCCompiler
         /*
 		 * j2objc --help Usage: j2objc <options> <source files>
 		 */
-        List<String> args = new ArrayList<String>();
+        List<String> args = new ArrayList<>();
         Map<String, String> compilerArguments = config.getCustomCompilerArgumentsAsMap();
 
         // Verbose
@@ -199,7 +202,7 @@ public class J2ObjCCompiler
 
         if ( !config.getClasspathEntries().isEmpty() )
         {
-            List<String> classpath = new ArrayList<String>();
+            List<String> classpath = new ArrayList<>();
             for ( String element : config.getClasspathEntries() )
             {
                 File f = new File( element );
@@ -293,11 +296,7 @@ public class J2ObjCCompiler
 
             messages = parseCompilerOutput( new BufferedReader( new StringReader( stringWriter.toString() ) ) );
         }
-        catch ( CommandLineException e )
-        {
-            throw new CompilerException( "Error while executing the external compiler.", e );
-        }
-        catch ( IOException e )
+        catch ( CommandLineException | IOException e )
         {
             throw new CompilerException( "Error while executing the external compiler.", e );
         }
@@ -316,12 +315,13 @@ public class J2ObjCCompiler
     public static List<CompilerMessage> parseCompilerOutput( BufferedReader bufferedReader )
         throws IOException
     {
-        List<CompilerMessage> messages = new ArrayList<CompilerMessage>();
+        List<CompilerMessage> messages = new ArrayList<>();
 
         String line = bufferedReader.readLine();
-
+        System.out.println("start output");
         while ( line != null )
         {
+            System.out.println(line);
             CompilerMessage compilerError = DefaultJ2ObjCCompilerParser.parseLine( line );
 
             if ( compilerError != null )
@@ -331,7 +331,7 @@ public class J2ObjCCompiler
 
             line = bufferedReader.readLine();
         }
-
+        System.out.println("end output");
         return messages;
     }
 

@@ -24,7 +24,7 @@ package org.codehaus.plexus.compiler.j2objc;
  * SOFTWARE.
  */
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import junit.framework.TestCase;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerException;
@@ -47,7 +47,7 @@ public class J2ObjCCompilerTest
         throws IOException
     {
         J2ObjCCompiler comp = new J2ObjCCompiler();
-        Map<String, String> customCompilerArguments = new HashMap<String, String>();
+        Map<String, String> customCompilerArguments = new HashMap<>();
         customCompilerArguments.put( "-use-arc", null );
         customCompilerArguments.put( "-sourcepath", "src/test/resources" );
         CompilerConfiguration cc = new CompilerConfiguration();
@@ -55,12 +55,15 @@ public class J2ObjCCompilerTest
         cc.setSourceLocations( Arrays.asList( new String[]{ "src/test/resources" } ) );
         cc.setWorkingDirectory( new File( "." ) );
         cc.setFork( true );
+        cc.setVerbose( true );
         cc.setCustomCompilerArgumentsAsMap( customCompilerArguments );
         try
         {
             comp.performCompile( cc );
-            Assert.assertTrue( new File( "target/generated/objective-c/de/test/App.h" ).exists() );
-            Assert.assertTrue( new File( "target/generated/objective-c/de/test/App.m" ).exists() );
+            File f = new File( "target/generated/objective-c/de/test/App.h" );
+            Assert.assertTrue("file not exists:" + f, f.exists() );
+            f = new File( "target/generated/objective-c/de/test/App.m" );
+            Assert.assertTrue("file not exists:" + f, f.exists() );
         }
         catch ( CompilerException ce )
         {

@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.codehaus.plexus</groupId>
     <artifactId>plexus-compilers</artifactId>
-    <version>2.8.6-SNAPSHOT</version>
+    <version>2.8.9-SNAPSHOT</version>
   </parent>
 
   <artifactId>plexus-compiler-javac-errorprone</artifactId>
@@ -29,24 +29,38 @@
     <dependency>
       <groupId>com.google.errorprone</groupId>
       <artifactId>error_prone_core</artifactId>
-      <version>2.3.2</version>
+      <version>${errorprone.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-component-annotations</artifactId>
     </dependency>
   </dependencies>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <!--
-          FIXME enable that with fixing classloader hierarchy
-          it's a bit different from the one used by maven plugins
-          -->
-          <skipTests>true</skipTests>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+  <profiles>
+    <profile>
+      <id>16+</id>
+      <activation>
+        <jdk>[16,)</jdk>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <skip>true</skip>
+<!--              <argLine>-->
+<!--                &#45;&#45;add-modules java.se-->
+<!--                &#45;&#45;add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED-->
+<!--                &#45;&#45;add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED-->
+<!--                &#45;&#45;add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED-->
+<!--              </argLine>-->
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 </project>

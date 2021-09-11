@@ -16,87 +16,35 @@
 
 package org.codehaus.plexus.compiler.javac.errorprone;
 
-import com.google.errorprone.ErrorProneCompiler;
-import org.codehaus.plexus.compiler.AbstractCompiler;
+import com.google.errorprone.ErrorProneJavaCompiler;
+
+import org.codehaus.plexus.compiler.Compiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerException;
 import org.codehaus.plexus.compiler.CompilerMessage;
-import org.codehaus.plexus.compiler.CompilerOutputStyle;
 import org.codehaus.plexus.compiler.CompilerResult;
+import org.codehaus.plexus.compiler.javac.InProcessCompiler;
 import org.codehaus.plexus.compiler.javac.JavacCompiler;
+import org.codehaus.plexus.compiler.javac.JavaxToolsCompiler;
+import org.codehaus.plexus.component.annotations.Component;
 
-import javax.tools.Diagnostic;
-import javax.tools.DiagnosticListener;
-import javax.tools.JavaFileObject;
-import java.io.File;
-import java.lang.reflect.Method;
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * This class overrides JavacCompiler with modifications to use the error-prone
  * entry point into Javac.
  *
  * @author <a href="mailto:alexeagle@google.com">Alex Eagle</a>
- * @plexus.component role="org.codehaus.plexus.compiler.Compiler" role-hint="javac-with-errorprone"
  */
+@Component( role = Compiler.class, hint = "javac-with-errorprone")
 public class JavacCompilerWithErrorProne
-    extends AbstractCompiler
+    extends JavacCompiler
 {
-    public JavacCompilerWithErrorProne()
-    {
-        super( CompilerOutputStyle.ONE_OUTPUT_FILE_PER_INPUT_FILE, ".java", ".class", null );
-    }
-
-    public String[] createCommandLine( CompilerConfiguration config )
-        throws CompilerException
-    {
-        return new String[0];
-    }
-
-    @Override
-    public CompilerResult performCompile( CompilerConfiguration config )
-        throws CompilerException
-    {
-        File destinationDir = new File( config.getOutputLocation() );
-
-        if ( !destinationDir.exists() )
-        {
-            destinationDir.mkdirs();
-        }
-
-        String[] sourceFiles = getSourceFiles( config );
-
-        if ( ( sourceFiles == null ) || ( sourceFiles.length == 0 ) )
-        {
-            return new CompilerResult();
-        }
-
-        if ( ( getLogger() != null ) && getLogger().isInfoEnabled() )
-        {
-            getLogger().info( "Compiling " + sourceFiles.length + " " //
-                                  + "source file" //
-                                  + ( sourceFiles.length == 1 ? "" : "s" ) //
-                                  + " to " + destinationDir.getAbsolutePath() );
-        }
-
-        String[] args = JavacCompiler.buildCompilerArguments( config, sourceFiles );
-
-        try
-        {
-            CompilerResult compilerResult = (CompilerResult) getInvoker().invoke( null, new Object[]{ args } );
-            return compilerResult;
-        }
-        catch ( Exception e )
-        {
-            throw new CompilerException( e.getMessage(), e );
-        }
-    }
-
     private static class NonDelegatingClassLoader
         extends URLClassLoader
     {
@@ -115,6 +63,10 @@ public class JavacCompilerWithErrorProne
         {
             // Classes loaded inside CompilerInvoker that need to reach back to the caller
             if ( name.contentEquals( CompilerResult.class.getName() )
+                || name.contentEquals( InProcessCompiler.class.getName() )
+                || name.contentEquals( CompilerConfiguration.class.getName() )
+                || name.contentEquals( CompilerConfiguration.CompilerReuseStrategy.class.getName() )
+                || name.contentEquals( CompilerException.class.getName() )
                 || name.contentEquals( CompilerMessage.class.getName() )
                 || name.contentEquals( CompilerMessage.Kind.class.getName() ) )
             {
@@ -140,12 +92,9 @@ public class JavacCompilerWithErrorProne
         }
     }
 
-    private Method invokerMethod;
-
-    private Method getInvoker()
-        throws CompilerException
+    protected InProcessCompiler inProcessCompiler()
     {
-        if ( invokerMethod == null )
+        if ( Thread.currentThread().getContextClassLoader().getResource("java/lang/module/ModuleReference.class") == null )
         {
             ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
             URL[] urls = ( (URLClassLoader) contextClassLoader ).getURLs();
@@ -154,14 +103,14 @@ public class JavacCompilerWithErrorProne
             {
                 loader = new NonDelegatingClassLoader( urls, contextClassLoader );
                 Class<?> clazz = Class.forName( CompilerInvoker.class.getName(), true, loader );
-                invokerMethod = clazz.getMethod( "compile", String[].class );
+                return ( InProcessCompiler ) clazz.newInstance();
             }
             catch ( Exception e )
             {
-                throw new CompilerException( e.getMessage(), e );
+                throw new IllegalStateException( e );
             }
         }
-        return invokerMethod;
+        return new CompilerInvoker();
     }
 
     /**
@@ -170,57 +119,12 @@ public class JavacCompilerWithErrorProne
      * javac.jar instead of from the bootclasspath.
      */
     public static class CompilerInvoker
+    	extends JavaxToolsCompiler
     {
-        private static class MessageListener
-            implements DiagnosticListener<JavaFileObject>
-        {
-            private final List<CompilerMessage> messages;
-
-            MessageListener( List<CompilerMessage> messages )
-            {
-                this.messages = messages;
-            }
-
-            public static CompilerMessage.Kind convertKind( Diagnostic<? extends JavaFileObject> diagnostic )
-            {
-                switch ( diagnostic.getKind() )
-                {
-                    case ERROR:
-                        return CompilerMessage.Kind.ERROR;
-                    case WARNING:
-                        return CompilerMessage.Kind.WARNING;
-                    case MANDATORY_WARNING:
-                        return CompilerMessage.Kind.MANDATORY_WARNING;
-                    case NOTE:
-                        return CompilerMessage.Kind.NOTE;
-                    default:
-                        return CompilerMessage.Kind.OTHER;
-                }
-            }
-
-            public void report( Diagnostic<? extends JavaFileObject> diagnostic )
-            {
-                CompilerMessage compilerMessage =
-                    new CompilerMessage( diagnostic.getSource() == null ? null : diagnostic.getSource().getName(), //
-                                         convertKind( diagnostic ), //
-                                         (int) diagnostic.getLineNumber(), //
-                                         (int) diagnostic.getColumnNumber(), //
-                                         -1, //
-                                         -1,
-                                         // end pos line:column is hard to calculate
-                                         diagnostic.getMessage( Locale.getDefault() ) );
-                messages.add( compilerMessage );
-            }
-        }
-
-        public static CompilerResult compile( String[] args )
-        {
-            List<CompilerMessage> messages = new ArrayList<>();
-            ErrorProneCompiler compiler = //
-                ErrorProneCompiler.builder() //
-                    .listenToDiagnostics( new MessageListener( messages ) ) //
-                    .build();
-            return new CompilerResult( compiler.run( args ).isOK(), messages );
-        }
+    	@Override
+    	protected JavaCompiler newJavaCompiler()
+    	{
+    		return new ErrorProneJavaCompiler();
+    	}
     }
 }

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.codehaus.plexus</groupId>
+    <artifactId>plexus-compiler</artifactId>
+    <version>2.8.9-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>plexus-compiler-its</artifactId>
+  <packaging>pom</packaging>
+
+  <name>Plexus Compiler It Tests</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-compiler-javac-errorprone</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-compiler-javac</artifactId>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-invoker-plugin</artifactId>
+        <version>3.2.2</version>
+        <executions>
+          <execution>
+            <id>integration-tests</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>install</goal>
+              <goal>run</goal>
+              <goal>verify</goal>
+            </goals>
+            <configuration>
+              <debug>false</debug>
+              <streamLogsOnFailures>true</streamLogsOnFailures>
+              <projectsDirectory>src/main/it</projectsDirectory>
+              <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
+              <postBuildHookScript>verify</postBuildHookScript>
+              <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
+              <settingsFile>src/main/it/settings.xml</settingsFile>
+              <goals>
+                <goal>clean</goal>
+                <goal>test-compile</goal>
+              </goals>
+              <scriptVariables>
+                <errorprone.version>${errorprone.version}</errorprone.version>
+              </scriptVariables>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

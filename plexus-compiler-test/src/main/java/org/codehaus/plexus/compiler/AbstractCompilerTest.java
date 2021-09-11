@@ -33,7 +33,6 @@ import org.apache.maven.artifact.versioning.VersionRange;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 
-import javax.print.DocFlavor;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -136,7 +135,7 @@ public abstract class AbstractCompilerTest
             }
 
             assertEquals( "Wrong number of compilation errors (" + numCompilerErrors + "/" + expectedErrors //
-                              + ") : " + errors, expectedErrors, numCompilerErrors );
+                              + ") : " + displayLines( errors ), expectedErrors, numCompilerErrors );
         }
 
         int expectedWarnings = expectedWarnings();
@@ -158,11 +157,23 @@ public abstract class AbstractCompilerTest
                 warnings.add( error.getMessage() );
             }
 
-            assertEquals( "Wrong number (" + numCompilerWarnings + "/" + expectedWarnings + ") of compilation warnings: " + warnings, //
-                          expectedWarnings, numCompilerWarnings );
+            assertEquals( "Wrong number (" + numCompilerWarnings + "/"
+                              + expectedWarnings + ") of compilation warnings: " + displayLines( warnings ), //
+                          expectedWarnings, numCompilerWarnings);
         }
 
         assertEquals( new TreeSet<>( normalizePaths( expectedOutputFiles() ) ), files );
+    }
+
+    protected String displayLines( List<String> warnings)
+    {
+        // with java8 could be as simple as String.join(System.lineSeparator(), warnings)
+        StringBuilder sb = new StringBuilder( System.lineSeparator() );
+        for ( String warning : warnings )
+        {
+            sb.append( '-' ).append( warning ).append( System.lineSeparator() );
+        }
+        return sb.toString();
     }
 
     private List<CompilerConfiguration> getCompilerConfigurations()

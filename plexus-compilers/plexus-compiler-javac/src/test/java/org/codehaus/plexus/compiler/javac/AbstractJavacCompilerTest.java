@@ -61,11 +61,11 @@ public abstract class AbstractJavacCompilerTest
     protected int expectedErrors()
     {
         String javaVersion = getJavaVersion();
-        if (javaVersion.contains("9.0")||javaVersion.contains("11")){
+        if (javaVersion.contains("9.0")||javaVersion.contains("11")||javaVersion.contains("14")||
+            javaVersion.contains("15")||javaVersion.contains("16")||javaVersion.contains("17")){
             // lots of new warnings about obsoletions for future releases
             return 5;
         }
-
         // javac output changed for misspelled modifiers starting in 1.6...they now generate 2 errors per occurrence, not one.
         if ( "1.5".compareTo( javaVersion ) < 0 )
         {
@@ -80,7 +80,8 @@ public abstract class AbstractJavacCompilerTest
     protected int expectedWarnings()
     {
         String javaVersion = getJavaVersion();
-        if (javaVersion.contains("11")){
+        if (javaVersion.contains("9.0")||javaVersion.contains("11")||javaVersion.contains("14")||
+            javaVersion.contains("15")||javaVersion.contains("16")||javaVersion.contains("17")){
             return 1;
         }
         if (javaVersion.contains("9.0")){
@@ -112,6 +113,18 @@ public abstract class AbstractJavacCompilerTest
         if (javaVersion.contains("11")){
             return "11";
         }
+        if (javaVersion.contains("14")){
+            return "14";
+        }
+        if (javaVersion.contains("15")){
+            return "15";
+        }
+        if (javaVersion.contains("16")){
+            return "16";
+        }
+        if (javaVersion.contains("17")){
+            return "17";
+        }
         return super.getTargetVersion();
     }
 
@@ -119,11 +132,27 @@ public abstract class AbstractJavacCompilerTest
     public String getSourceVersion()
     {
         String javaVersion = getJavaVersion();
-        if (javaVersion.contains("9.0")){
+        if (javaVersion.contains("9.0"))
+        {
             return "1.7";
         }
-        if (javaVersion.contains("11")){
+        if (javaVersion.contains("11"))
+        {
             return "11";
+        }
+        if (javaVersion.contains("14"))
+        {
+            return "14";
+        }
+        if (javaVersion.contains("15"))
+        {
+            return "15";
+        }
+        if (javaVersion.contains("16")){
+            return "16";
+        }
+        if (javaVersion.contains("17")){
+            return "17";
         }
         return super.getTargetVersion();
     }
@@ -131,7 +160,8 @@ public abstract class AbstractJavacCompilerTest
     protected Collection<String> expectedOutputFiles()
     {
         String javaVersion = getJavaVersion();
-        if (javaVersion.contains("9.0")||javaVersion.contains("11")){
+        if (javaVersion.contains("9.0")||javaVersion.contains("11")||javaVersion.contains("14")||
+            javaVersion.contains("15")||javaVersion.contains("16")||javaVersion.contains("17")){
             return Arrays.asList( new String[]{ "org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ExternalDeps.class",
                 "org/codehaus/foo/Person.class"} );
         }
@@ -139,9 +169,13 @@ public abstract class AbstractJavacCompilerTest
             "org/codehaus/foo/Person.class", "org/codehaus/foo/ReservedWord.class" } );
     }
 
-    public void internalTest( CompilerConfiguration compilerConfiguration, List<String> expectedArguments )
+    public void internalTest(CompilerConfiguration compilerConfiguration, List<String> expectedArguments) {
+        internalTest(compilerConfiguration, expectedArguments, new String[0]);
+    }
+
+    public void internalTest(CompilerConfiguration compilerConfiguration, List<String> expectedArguments, String[] sources)
     {
-        String[] actualArguments = JavacCompiler.buildCompilerArguments( compilerConfiguration, new String[0] );
+        String[] actualArguments = JavacCompiler.buildCompilerArguments( compilerConfiguration, sources );
 
         assertEquals( "The expected and actual argument list sizes differ.", expectedArguments.size(),
                       actualArguments.length );
@@ -259,6 +293,40 @@ public abstract class AbstractJavacCompilerTest
         // don't expect this argument!!
 
         internalTest( compilerConfiguration, expectedArguments );
+    }
+
+    public void testModulePathAnnotations() throws Exception
+    {
+        List<String> expectedArguments = new ArrayList<>();
+
+        CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
+
+        final String[] source = {"module-info.java"};
+
+        // outputLocation
+        compilerConfiguration.setOutputLocation( "/output" );
+        expectedArguments.add( "-d" );
+        expectedArguments.add( new File( "/output" ).getAbsolutePath() );
+
+        // failOnWarning
+        compilerConfiguration.setModulepathEntries( Arrays.asList( "/repo/a/b/1.0/b-1.0.jar",
+                "/repo/c/d/1.0/d-1.0.jar" ) );
+        expectedArguments.add( "--module-path" );
+        expectedArguments.add( "/repo/a/b/1.0/b-1.0.jar" + File.pathSeparator +
+                "/repo/c/d/1.0/d-1.0.jar" + File.pathSeparator );
+
+        compilerConfiguration.setProcessorPathEntries(Arrays.asList("/repo/a/b/1.0/annotations-1.0.jar",
+                "/repo/f/a/1.0/annotations-4.0.jar"));
+        expectedArguments.add( "--processor-module-path" );
+        expectedArguments.add("/repo/a/b/1.0/annotations-1.0.jar" + File.pathSeparator +
+                "/repo/f/a/1.0/annotations-4.0.jar" + File.pathSeparator );
+
+        // releaseVersion
+        compilerConfiguration.setReleaseVersion( "9" );
+        expectedArguments.add( "--release" );
+        expectedArguments.add( "9" );
+
+        internalTest( compilerConfiguration, expectedArguments, source);
     }
 
     public void testModulePath() throws Exception

@@ -18,10 +18,12 @@ package org.codehaus.plexus.compiler.javac;
  * under the License.
  */
 
+import org.codehaus.plexus.compiler.Compiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.compiler.CompilerException;
 import org.codehaus.plexus.compiler.CompilerResult;
+import org.codehaus.plexus.component.annotations.Component;
 
 import javax.tools.Diagnostic;
 import javax.tools.DiagnosticCollector;
@@ -41,22 +43,28 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author <a href="mailto:david.lloyd@redhat.com">David M. Lloyd</a>
  * @since 2.0
  */
-public class JavaxToolsCompiler
+@Component( role = Compiler.class )
+public class JavaxToolsCompiler implements InProcessCompiler
 {
     /**
      * is that thread safe ???
      */
     @SuppressWarnings( "restriction" )
-    static final JavaCompiler COMPILER = ToolProvider.getSystemJavaCompiler();
+    private final JavaCompiler COMPILER = newJavaCompiler();
 
-    private static List<JavaCompiler> JAVA_COMPILERS = new CopyOnWriteArrayList<>();
+	protected JavaCompiler newJavaCompiler()
+	{
+		return ToolProvider.getSystemJavaCompiler();
+	}
 
-    protected static JavaCompiler getJavaCompiler( CompilerConfiguration compilerConfiguration )
+    private List<JavaCompiler> JAVA_COMPILERS = new CopyOnWriteArrayList<>();
+
+    private JavaCompiler getJavaCompiler( CompilerConfiguration compilerConfiguration )
     {
         switch ( compilerConfiguration.getCompilerReuseStrategy() )
         {
             case AlwaysNew:
-                return ToolProvider.getSystemJavaCompiler();
+                return newJavaCompiler();
             case ReuseCreated:
                 JavaCompiler javaCompiler;
                 synchronized ( JAVA_COMPILERS )
@@ -68,7 +76,7 @@ public class JavaxToolsCompiler
                         return javaCompiler;
                     }
                 }
-                javaCompiler = ToolProvider.getSystemJavaCompiler();
+                javaCompiler = newJavaCompiler();
                 return javaCompiler;
             case ReuseSame:
             default:
@@ -77,7 +85,7 @@ public class JavaxToolsCompiler
 
     }
 
-    static void releaseJavaCompiler( JavaCompiler javaCompiler, CompilerConfiguration compilerConfiguration )
+    private void releaseJavaCompiler( JavaCompiler javaCompiler, CompilerConfiguration compilerConfiguration )
     {
         if ( javaCompiler == null )
         {
@@ -90,7 +98,7 @@ public class JavaxToolsCompiler
         }
     }
 
-    static CompilerResult compileInProcess( String[] args, final CompilerConfiguration config, String[] sourceFiles )
+    public CompilerResult compileInProcess( String[] args, final CompilerConfiguration config, String[] sourceFiles )
         throws CompilerException
     {
         JavaCompiler compiler = getJavaCompiler( config );
@@ -106,67 +114,69 @@ public class JavaxToolsCompiler
             final String sourceEncoding = config.getSourceEncoding();
             final Charset sourceCharset = sourceEncoding == null ? null : Charset.forName( sourceEncoding );
             final DiagnosticCollector<JavaFileObject> collector = new DiagnosticCollector<JavaFileObject>();
-            final StandardJavaFileManager standardFileManager =
-                compiler.getStandardFileManager( collector, null, sourceCharset );
-
-            final Iterable<? extends JavaFileObject> fileObjects =
-                standardFileManager.getJavaFileObjectsFromStrings( Arrays.asList( sourceFiles ) );
-
-             /*(Writer out,
-             JavaFileManager fileManager,
-             DiagnosticListener<? super JavaFileObject> diagnosticListener,
-             Iterable<String> options,
-             Iterable<String> classes,
-             Iterable<? extends JavaFileObject> compilationUnits)*/
-
-            List<String> arguments = Arrays.asList( args );
-
-            final JavaCompiler.CompilationTask task =
-                compiler.getTask( null, standardFileManager, collector, arguments, null, fileObjects );
-            final Boolean result = task.call();
-            final ArrayList<CompilerMessage> compilerMsgs = new ArrayList<CompilerMessage>();
-            for ( Diagnostic<? extends JavaFileObject> diagnostic : collector.getDiagnostics() )
+            try ( final StandardJavaFileManager standardFileManager =
+                compiler.getStandardFileManager( collector, null, sourceCharset ) )
             {
-                CompilerMessage.Kind kind = convertKind(diagnostic);
-                String baseMessage = diagnostic.getMessage( null );
-                if ( baseMessage == null )
+
+                final Iterable<? extends JavaFileObject> fileObjects =
+                    standardFileManager.getJavaFileObjectsFromStrings( Arrays.asList( sourceFiles ) );
+
+                 /*(Writer out,
+                 JavaFileManager fileManager,
+                 DiagnosticListener<? super JavaFileObject> diagnosticListener,
+                 Iterable<String> options,
+                 Iterable<String> classes,
+                 Iterable<? extends JavaFileObject> compilationUnits)*/
+
+                List<String> arguments = Arrays.asList( args );
+
+                final JavaCompiler.CompilationTask task =
+                    compiler.getTask( null, standardFileManager, collector, arguments, null, fileObjects );
+                final Boolean result = task.call();
+                final ArrayList<CompilerMessage> compilerMsgs = new ArrayList<CompilerMessage>();
+                for ( Diagnostic<? extends JavaFileObject> diagnostic : collector.getDiagnostics() )
                 {
-                    continue;
-                }
-                JavaFileObject source = diagnostic.getSource();
-                String longFileName = source == null ? null : source.toUri().getPath();
-                String shortFileName = source == null ? null : source.getName();
-                String formattedMessage = baseMessage;
-                int lineNumber = Math.max( 0, (int) diagnostic.getLineNumber() );
-                int columnNumber = Math.max( 0, (int) diagnostic.getColumnNumber() );
-                if ( source != null && lineNumber > 0 )
-                {
-                    // Some compilers like to copy the file name into the message, which makes it appear twice.
-                    String possibleTrimming = longFileName + ":" + lineNumber + ": ";
-                    if ( formattedMessage.startsWith( possibleTrimming ) )
+                    CompilerMessage.Kind kind = convertKind(diagnostic);
+                    String baseMessage = diagnostic.getMessage( null );
+                    if ( baseMessage == null )
                     {
-                        formattedMessage = formattedMessage.substring( possibleTrimming.length() );
+                        continue;
                     }
-                    else
+                    JavaFileObject source = diagnostic.getSource();
+                    String longFileName = source == null ? null : source.toUri().getPath();
+                    String shortFileName = source == null ? null : source.getName();
+                    String formattedMessage = baseMessage;
+                    int lineNumber = Math.max( 0, (int) diagnostic.getLineNumber() );
+                    int columnNumber = Math.max( 0, (int) diagnostic.getColumnNumber() );
+                    if ( source != null && lineNumber > 0 )
                     {
-                        possibleTrimming = shortFileName + ":" + lineNumber + ": ";
+                        // Some compilers like to copy the file name into the message, which makes it appear twice.
+                        String possibleTrimming = longFileName + ":" + lineNumber + ": ";
                         if ( formattedMessage.startsWith( possibleTrimming ) )
                         {
                             formattedMessage = formattedMessage.substring( possibleTrimming.length() );
                         }
+                        else
+                        {
+                            possibleTrimming = shortFileName + ":" + lineNumber + ": ";
+                            if ( formattedMessage.startsWith( possibleTrimming ) )
+                            {
+                                formattedMessage = formattedMessage.substring( possibleTrimming.length() );
+                            }
+                        }
                     }
+                    compilerMsgs.add(
+                        new CompilerMessage( longFileName, kind, lineNumber, columnNumber, lineNumber, columnNumber,
+                                             formattedMessage ) );
                 }
-                compilerMsgs.add(
-                    new CompilerMessage( longFileName, kind, lineNumber, columnNumber, lineNumber, columnNumber,
-                                         formattedMessage ) );
-            }
-            if ( result != Boolean.TRUE && compilerMsgs.isEmpty() )
-            {
-                compilerMsgs.add(
-                    new CompilerMessage( "An unknown compilation problem occurred", CompilerMessage.Kind.ERROR ) );
-            }
+                if ( result != Boolean.TRUE && compilerMsgs.isEmpty() )
+                {
+                    compilerMsgs.add(
+                        new CompilerMessage( "An unknown compilation problem occurred", CompilerMessage.Kind.ERROR ) );
+                }
 
-            return new CompilerResult( result, compilerMsgs );
+                return new CompilerResult( result, compilerMsgs );
+            }
         }
         catch ( Exception e )
         {
@@ -179,7 +189,7 @@ public class JavaxToolsCompiler
         }
     }
 
-    public static CompilerMessage.Kind convertKind(Diagnostic<? extends JavaFileObject> diagnostic) {
+    private CompilerMessage.Kind convertKind(Diagnostic<? extends JavaFileObject> diagnostic) {
         CompilerMessage.Kind kind;
         switch ( diagnostic.getKind() )
         {

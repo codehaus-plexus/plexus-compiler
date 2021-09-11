@@ -17,11 +17,13 @@ package org.codehaus.plexus.compiler.csharp;
  */
 
 import org.codehaus.plexus.compiler.AbstractCompiler;
+import org.codehaus.plexus.compiler.Compiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerException;
 import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.compiler.CompilerOutputStyle;
 import org.codehaus.plexus.compiler.CompilerResult;
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.Os;
@@ -54,9 +56,8 @@ import java.util.Set;
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  * @author <a href="mailto:matthew.pocock@ncl.ac.uk">Matthew Pocock</a>
  * @author <a href="mailto:chris.stevenson@gmail.com">Chris Stevenson</a>
- * @plexus.component role="org.codehaus.plexus.compiler.Compiler"
- * role-hint="csharp"
  */
+@Component( role = Compiler.class, hint = "csharp" )
 public class CSharpCompiler
     extends AbstractCompiler
 {
@@ -242,7 +243,7 @@ Options can be of the form -option or /option
     private String[] buildCompilerArguments( CompilerConfiguration config, String[] sourceFiles )
         throws CompilerException
     {
-        List<String> args = new ArrayList<String>();
+        List<String> args = new ArrayList<>();
 
         if ( config.isDebug() )
         {
@@ -358,7 +359,7 @@ Options can be of the form -option or /option
 
         if ( !StringUtils.isEmpty( resourcefile ) )
         {
-            String resourceTarget = (String) compilerArguments.get( "-resourcetarget" );
+            String resourceTarget = compilerArguments.get( "-resourcetarget" );
             args.add( "/res:" + new File( resourcefile ).getAbsolutePath() + "," + resourceTarget );
         }
 
@@ -439,7 +440,7 @@ Options can be of the form -option or /option
         
         Map<String, String> compilerArguments = getCompilerArguments( config );
         
-        String tempResourcesDirAsString = (String) compilerArguments.get( "-resourceDir" );
+        String tempResourcesDirAsString = compilerArguments.get( "-resourceDir" );
         File filteredResourceDir = null;
         if ( tempResourcesDirAsString != null )
         {
@@ -548,7 +549,7 @@ Options can be of the form -option or /option
     public static List<CompilerMessage> parseCompilerOutput( BufferedReader bufferedReader )
         throws IOException
     {
-        List<CompilerMessage> messages = new ArrayList<CompilerMessage>();
+        List<CompilerMessage> messages = new ArrayList<>();
 
         String line = bufferedReader.readLine();
 
@@ -582,7 +583,7 @@ Options can be of the form -option or /option
     private String getTypeExtension( CompilerConfiguration configuration )
         throws CompilerException
     {
-        String type = getType( configuration.getCustomCompilerArguments() );
+        String type = getType( configuration.getCustomCompilerArgumentsAsMap() );
 
         if ( "exe".equals( type ) || "winexe".equals( type ) )
         {
@@ -600,7 +601,7 @@ Options can be of the form -option or /option
     // added for debug purposes.... 
     protected static String[] getSourceFiles( CompilerConfiguration config )
     {
-        Set<String> sources = new HashSet<String>();
+        Set<String> sources = new HashSet<>();
 
         //Set sourceFiles = null;
         //was:
@@ -637,7 +638,7 @@ Options can be of the form -option or /option
         }
         else
         {
-            result = (String[]) sources.toArray( new String[sources.size()] );
+            result = sources.toArray( new String[sources.size()] );
         }
 
         return result;
@@ -685,7 +686,7 @@ Options can be of the form -option or /option
 
         String[] sourceDirectorySources = scanner.getIncludedFiles();
 
-        Set<String> sources = new HashSet<String>();
+        Set<String> sources = new HashSet<>();
 
         for ( String source : sourceDirectorySources )
         {

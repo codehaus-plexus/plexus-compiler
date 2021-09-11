@@ -68,7 +68,11 @@ public class CompilerConfiguration
     private String debugLevel;
 
     private boolean showWarnings = true;
+
+    private String warnings;
     
+    private boolean showLint;
+
     /**
      * -Werror argument as supported since Java 1.7
      */
@@ -79,7 +83,7 @@ public class CompilerConfiguration
     private String sourceVersion;
 
     private String targetVersion;
-    
+
     /**
      * value of -release parameter in java 9+
      */
@@ -339,9 +343,9 @@ public class CompilerConfiguration
         return debugLevel;
     }
 
-    public void setShowWarnings( boolean showWarnings )
+    public void setWarnings( String warnings )
     {
-        this.showWarnings = showWarnings;
+        this.warnings = warnings;
     }
 
     public boolean isShowWarnings()
@@ -349,21 +353,43 @@ public class CompilerConfiguration
         return showWarnings;
     }
 
+    public void setShowWarnings( boolean showWarnings )
+    {
+        this.showWarnings = showWarnings;
+    }
+
     public boolean isShowDeprecation()
     {
         return showDeprecation;
+    }
+
+    public String getWarnings()
+    {
+        return warnings;
+    }
+
+
+
+    public void setShowLint( boolean showLint )
+    {
+        this.showLint = showLint;
+    }
+
+    public boolean isShowLint()
+    {
+        return this.showLint;
     }
 
     public void setShowDeprecation( boolean showDeprecation )
     {
         this.showDeprecation = showDeprecation;
     }
-    
+
     public boolean isFailOnWarning()
     {
         return failOnWarning;
     }
-    
+
     public void setFailOnWarning( boolean failOnWarnings )
     {
         this.failOnWarning = failOnWarnings;
@@ -388,7 +414,7 @@ public class CompilerConfiguration
     {
         this.targetVersion = targetVersion;
     }
-    
+
     public String getReleaseVersion()
     {
         return releaseVersion;
@@ -451,7 +477,7 @@ public class CompilerConfiguration
 
     /**
      * Get all unique argument keys and their value. In case of duplicate keys, last one added wins.
-     * 
+     *
      * @return
      * @see CompilerConfiguration#getCustomCompilerArgumentsEntries()
      */
@@ -473,10 +499,10 @@ public class CompilerConfiguration
             this.customCompilerArguments.addAll( customCompilerArguments.entrySet() );
         }
     }
-    
+
     /**
      * In case argument keys are not unique, this will return all entries
-     * 
+     *
      * @return
      */
     public Collection<Map.Entry<String,String>> getCustomCompilerArgumentsEntries()
