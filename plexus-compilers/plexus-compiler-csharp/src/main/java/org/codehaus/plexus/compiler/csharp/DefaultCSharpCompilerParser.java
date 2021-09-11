@@ -62,7 +62,7 @@ public class DefaultCSharpCompilerParser
 
         String chunk2 = chunk1.substring( 0, j );
 
-        return ( chunk2.indexOf( "," ) == -1 );
+        return !chunk2.contains( "," );
     }
 
     private static CompilerMessage parseLineWithNoColumnNumber( String line )
@@ -86,7 +86,7 @@ public class DefaultCSharpCompilerParser
 
             return null;
         }
-        else if ( line.indexOf( MAGIC_LINE_MARKER ) != -1 )
+        else if ( line.contains( MAGIC_LINE_MARKER ) )
         {
             int i = line.indexOf( MAGIC_LINE_MARKER );
 
@@ -102,7 +102,7 @@ public class DefaultCSharpCompilerParser
 
             message = line.substring( j + 1 + ERROR_PREFIX.length() );
 
-            error = line.indexOf( ") error" ) != -1;
+            error = line.contains( ") error" );
         }
         else
         {
@@ -134,7 +134,7 @@ public class DefaultCSharpCompilerParser
         {
             return null;
         }
-        else if ( line.indexOf( MAGIC_LINE_MARKER ) != -1 )
+        else if ( line.contains( MAGIC_LINE_MARKER ) )
         {
             int i = line.indexOf( MAGIC_LINE_MARKER );
 
@@ -147,7 +147,7 @@ public class DefaultCSharpCompilerParser
             String linenum = null;
             String colnum = null;
 
-            if ( linecol.indexOf( "," ) > -1 && linecol.split( "," ).length == 2 )
+            if ( linecol.contains( "," ) && linecol.split( "," ).length == 2 )
             {
                 linenum = linecol.split( "," )[0];
                 colnum = linecol.split( "," )[1];
@@ -173,7 +173,7 @@ public class DefaultCSharpCompilerParser
 
             message = line.substring( j + 1 + ERROR_PREFIX.length() );
 
-            error = line.indexOf( "): error" ) != -1;
+            error = line.contains( "): error" );
         }
         else
         {
