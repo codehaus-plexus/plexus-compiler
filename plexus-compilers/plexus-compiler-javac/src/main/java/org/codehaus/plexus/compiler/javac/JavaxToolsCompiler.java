@@ -113,7 +113,7 @@ public class JavaxToolsCompiler implements InProcessCompiler
             }
             final String sourceEncoding = config.getSourceEncoding();
             final Charset sourceCharset = sourceEncoding == null ? null : Charset.forName( sourceEncoding );
-            final DiagnosticCollector<JavaFileObject> collector = new DiagnosticCollector<JavaFileObject>();
+            final DiagnosticCollector<JavaFileObject> collector = new DiagnosticCollector<>();
             try ( final StandardJavaFileManager standardFileManager =
                 compiler.getStandardFileManager( collector, null, sourceCharset ) )
             {
@@ -133,7 +133,7 @@ public class JavaxToolsCompiler implements InProcessCompiler
                 final JavaCompiler.CompilationTask task =
                     compiler.getTask( null, standardFileManager, collector, arguments, null, fileObjects );
                 final Boolean result = task.call();
-                final ArrayList<CompilerMessage> compilerMsgs = new ArrayList<CompilerMessage>();
+                final ArrayList<CompilerMessage> compilerMsgs = new ArrayList<>();
                 for ( Diagnostic<? extends JavaFileObject> diagnostic : collector.getDiagnostics() )
                 {
                     CompilerMessage.Kind kind = convertKind(diagnostic);

@@ -287,7 +287,7 @@ public abstract class AbstractJavacCompilerTest
         expectedArguments.add( "1.3" );
 
         // customCompilerArguments
-        Map<String, String> customCompilerArguments = new LinkedHashMap<String, String>();
+        Map<String, String> customCompilerArguments = new LinkedHashMap<>();
         customCompilerArguments.put( "-J-Duser.language=en_us", null );
         compilerConfiguration.setCustomCompilerArgumentsAsMap( customCompilerArguments );
         // don't expect this argument!!
@@ -494,7 +494,7 @@ public abstract class AbstractJavacCompilerTest
 
         // classpathEntires
 
-        List<String> classpathEntries = new ArrayList<String>();
+        List<String> classpathEntries = new ArrayList<>();
 
         classpathEntries.add( "/myjar1.jar" );
 
@@ -508,7 +508,7 @@ public abstract class AbstractJavacCompilerTest
 
         // sourceRoots
 
-        List<String> compileSourceRoots = new ArrayList<String>();
+        List<String> compileSourceRoots = new ArrayList<>();
 
         compileSourceRoots.add( "/src/main/one" );
 
@@ -580,7 +580,7 @@ public abstract class AbstractJavacCompilerTest
 
         // customerCompilerArguments
 
-        Map<String, String> customerCompilerArguments = new LinkedHashMap<String, String>();
+        Map<String, String> customerCompilerArguments = new LinkedHashMap<>();
 
         customerCompilerArguments.put( "arg1", null );
 

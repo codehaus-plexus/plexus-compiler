@@ -366,7 +366,7 @@ public class AspectJCompiler
             // buildConfig.setJavaOptions( javaOpts );
         }
 
-        List<String> cp = new LinkedList<String>( config.getClasspathEntries() );
+        List<String> cp = new LinkedList<>( config.getClasspathEntries() );
 
         File javaHomeDir = new File( System.getProperty( "java.home" ) );
         File[] jars = new File( javaHomeDir, "lib" ).listFiles();
@@ -395,7 +395,7 @@ public class AspectJCompiler
         checkForAspectJRT( cp );
         if ( cp != null && !cp.isEmpty() )
         {
-            List<String> elements = new ArrayList<String>( cp.size() );
+            List<String> elements = new ArrayList<>( cp.size() );
             for ( String path : cp )
             {
                 elements.add( ( new File( path ) ).getAbsolutePath() );
@@ -489,7 +489,7 @@ public class AspectJCompiler
 
         boolean errors = messageHandler.hasAnyMessage( IMessage.ERROR, true );
 
-        List<CompilerMessage> messages = new ArrayList<CompilerMessage>();
+        List<CompilerMessage> messages = new ArrayList<>();
         if ( errors )
         {
             IMessage[] errorMessages = messageHandler.getMessages( IMessage.ERROR, true );
@@ -550,7 +550,7 @@ public class AspectJCompiler
 
     private List<File> buildFileList( List<String> locations )
     {
-        List<File> fileList = new LinkedList<File>();
+        List<File> fileList = new LinkedList<>();
         for ( String location : locations )
         {
             fileList.add( new File( location ) );

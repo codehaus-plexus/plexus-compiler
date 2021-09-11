@@ -624,7 +624,7 @@ public class ErrorMessageParserTest
         List<CompilerMessage> compilerMessages =
             JavacCompiler.parseModernStream( 0, new BufferedReader( new StringReader( errors ) ) );
         assertEquals( "count", 187, compilerMessages.size() );
-        List<CompilerMessage> compilerErrors = new ArrayList<CompilerMessage>( 3 );
+        List<CompilerMessage> compilerErrors = new ArrayList<>( 3 );
         for ( CompilerMessage message : compilerMessages ) {
             if ( message.getKind() != CompilerMessage.Kind.OTHER ) {
                 compilerErrors.add( message );

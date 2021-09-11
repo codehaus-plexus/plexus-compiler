@@ -104,7 +104,7 @@ public class JavacCompiler
 
     private static volatile Class<?> JAVAC_CLASS;
 
-    private List<Class<?>> javaccClasses = new CopyOnWriteArrayList<Class<?>>();
+    private List<Class<?>> javaccClasses = new CopyOnWriteArrayList<>();
 
     // ----------------------------------------------------------------------
     //
