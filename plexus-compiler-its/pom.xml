@@ -16,11 +16,15 @@
   <dependencies>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-compiler-javac-errorprone</artifactId>
+      <artifactId>plexus-compiler-aspectj</artifactId>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-compiler-javac</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-compiler-javac-errorprone</artifactId>
     </dependency>
   </dependencies>
   <build>

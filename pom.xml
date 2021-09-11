@@ -65,6 +65,11 @@
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-compiler-aspectj</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-compiler-javac-errorprone</artifactId>
         <version>${project.version}</version>
       </dependency>
