@@ -151,6 +151,11 @@ public class EclipseJavaCompiler
         {
             args.add( "-parameters" );
         }
+        
+        if(config.isFailOnWarning())
+        {
+        	args.add("-failOnWarning");
+        }
 
         // Set Eclipse-specific options
         // compiler-specific extra options override anything else in the config object...
