@@ -1,4 +1,7 @@
 package org.codehaus.plexus.compiler.javac;
+
+import org.junit.jupiter.api.BeforeEach;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -24,6 +27,7 @@ package org.codehaus.plexus.compiler.javac;
 public class JavacCompilerTest
     extends AbstractJavacCompilerTest
 {
+    @BeforeEach
     public void setUp()
         throws Exception
     {

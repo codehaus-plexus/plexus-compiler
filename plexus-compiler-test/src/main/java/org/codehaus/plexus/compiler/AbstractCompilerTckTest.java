@@ -24,28 +24,49 @@ package org.codehaus.plexus.compiler;
  * SOFTWARE.
  */
 
-import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.util.FileUtils;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import org.codehaus.plexus.testing.PlexusTest;
+import org.codehaus.plexus.util.FileUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  */
+@PlexusTest
 public abstract class AbstractCompilerTckTest
-    extends PlexusTestCase
 {
     private static final String EOL = System.lineSeparator();
 
-    private String roleHint;
+    private final String roleHint;
+    
+    private TestInfo testInfo;
+    
+    @Inject
+    private Map<String, Compiler> compilers;
 
     protected AbstractCompilerTckTest( String roleHint )
     {
         this.roleHint = roleHint;
     }
+    
+    @BeforeEach
+    final void setup( TestInfo testInfo )
+    {
+        this.testInfo = testInfo;
+    }
 
+    @Test
     public void testDeprecation()
         throws Exception
     {
@@ -69,19 +90,18 @@ public abstract class AbstractCompilerTckTest
         //
         // ----------------------------------------------------------------------
 
-        assertEquals( 1, result.size() );
+        assertThat( result.size() ).isEqualTo( 1 );
 
         CompilerMessage error = result.get( 0 );
 
-        System.out.println( error.getMessage() );
+        assertThat( error.isError() ).isFalse();
 
-        assertFalse( error.isError() );
+        assertThat( error.getMessage() ).contains( "Date" );
 
-        assertTrue( error.getMessage().contains( "Date" ) );
-
-        assertTrue( error.getMessage().contains( "deprecated" ) );
+        assertThat( error.getMessage() ).contains( "deprecated" );
     }
 
+    @Test
     public void testWarning()
         throws Exception
     {
@@ -105,15 +125,15 @@ public abstract class AbstractCompilerTckTest
         //
         // ----------------------------------------------------------------------
 
-        assertEquals( 1, result.size() );
+        assertThat( result.size() ).isEqualTo( 1 );
 
         CompilerMessage error = result.get( 0 );
 
-        assertFalse( error.isError() );
+        assertThat( error.isError() ).isFalse();
 
-        assertTrue( error.getMessage().contains( "finally block does not complete normally" ) );
+        assertThat( error.getMessage() ).contains( "finally block does not complete normally" );
     }
-
+    
     protected List<CompilerMessage> compile( CompilerConfiguration configuration )
         throws Exception
     {
@@ -134,23 +154,25 @@ public abstract class AbstractCompilerTckTest
         // Compile!
         // ----------------------------------------------------------------------
 
-        Compiler compiler = (Compiler) lookup( Compiler.ROLE, roleHint );
+        List<CompilerMessage> result = getCompiler().performCompile( configuration ).getCompilerMessages();
 
-        List<CompilerMessage> result = compiler.performCompile( configuration ).getCompilerMessages();
-
-        assertNotNull( result );
+        assertThat( result ).isNotNull();
 
         return result;
     }
 
+    private Compiler getCompiler() {
+        return compilers.get( roleHint );
+    }
+    
     private File getCompilerOutput()
     {
-        return getTestFile( "target/compiler-output/" + getName() );
+        return new File( "target/compiler-output/" + testInfo.getTestMethod().map( Method::getName ).orElseThrow( null ) );
     }
 
     private File getSrc()
     {
-        return getTestFile( "target/compiler-src/" + getName() );
+        return new File( "target/compiler-src/" + testInfo.getTestMethod().map( Method::getName ).orElseThrow( null ) );
     }
 
     protected void writeFileWithDeprecatedApi( File path, String className )
@@ -160,7 +182,7 @@ public abstract class AbstractCompilerTckTest
 
         if ( !parent.exists() )
         {
-            assertTrue( parent.mkdirs() );
+            assertThat( parent.mkdirs() ).isTrue();
         }
 
         String source = "import java.util.Date;" + EOL +
@@ -186,7 +208,7 @@ public abstract class AbstractCompilerTckTest
 
         if ( !parent.exists() )
         {
-            assertTrue( parent.mkdirs() );
+            assertThat( parent.mkdirs() ).isTrue();
         }
 
         String source = "public class " + className + "" + EOL +

@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.codehaus.plexus.compiler.AbstractCompilerTest;
+import org.junit.jupiter.api.BeforeEach;
 
 /**
  * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>
@@ -40,25 +41,27 @@ public class JikesCompilerTest
         return "jikes";
     }
 
+    @BeforeEach
     public void setUp()
         throws Exception
     {
-        super.setUp();
-
         setCompilerDebug( true );
         setCompilerDeprecationWarnings( true );
     }
 
+    @Override
     protected int expectedErrors()
     {
         return 2;
     }
 
+    @Override
     protected int expectedWarnings()
     {
         return 3;
     }
 
+    @Override
     protected Collection<String> expectedOutputFiles()
     {
         return Arrays.asList( new String[]{ "org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ExternalDeps.class",

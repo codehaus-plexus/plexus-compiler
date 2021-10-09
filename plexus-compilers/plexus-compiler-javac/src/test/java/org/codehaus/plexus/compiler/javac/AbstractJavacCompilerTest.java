@@ -27,6 +27,8 @@ package org.codehaus.plexus.compiler.javac;
 import org.codehaus.plexus.compiler.AbstractCompilerTest;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.util.StringUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -36,6 +38,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 /**
  * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>
  */
@@ -44,20 +48,22 @@ public abstract class AbstractJavacCompilerTest
 {
     private static final String PS = File.pathSeparator;
 
+    @BeforeEach
     public void setUp()
         throws Exception
     {
-        super.setUp();
         setCompilerDebug( true );
         setCompilerDeprecationWarnings( true );
 
     }
 
+    @Override
     protected String getRoleHint()
     {
         return "javac";
     }
 
+    @Override
     protected int expectedErrors()
     {
         String javaVersion = getJavaVersion();
@@ -77,6 +83,7 @@ public abstract class AbstractJavacCompilerTest
         }
     }
 
+    @Override
     protected int expectedWarnings()
     {
         String javaVersion = getJavaVersion();
@@ -157,6 +164,7 @@ public abstract class AbstractJavacCompilerTest
         return super.getTargetVersion();
     }
 
+    @Override
     protected Collection<String> expectedOutputFiles()
     {
         String javaVersion = getJavaVersion();
@@ -177,15 +185,15 @@ public abstract class AbstractJavacCompilerTest
     {
         String[] actualArguments = JavacCompiler.buildCompilerArguments( compilerConfiguration, sources );
 
-        assertEquals( "The expected and actual argument list sizes differ.", expectedArguments.size(),
-                      actualArguments.length );
+        assertThat( actualArguments ).as( "The expected and actual argument list sizes differ." ).hasSize( expectedArguments.size() );
 
         for ( int i = 0; i < actualArguments.length; i++ )
         {
-            assertEquals( "Unexpected argument", expectedArguments.get( i ), actualArguments[i] );
+            assertThat( actualArguments[i] ).as( "Unexpected argument").isEqualTo( expectedArguments.get( i ) );
         }
     }
 
+    @Test
     public void testBuildCompilerArgs13()
     {
         List<String> expectedArguments = new ArrayList<>();
@@ -199,6 +207,7 @@ public abstract class AbstractJavacCompilerTest
         internalTest( compilerConfiguration, expectedArguments );
     }
 
+    @Test
     public void testBuildCompilerArgs14()
     {
         List<String> expectedArguments = new ArrayList<>();
@@ -212,6 +221,7 @@ public abstract class AbstractJavacCompilerTest
         internalTest( compilerConfiguration, expectedArguments );
     }
 
+    @Test
     public void testBuildCompilerArgs15()
     {
         List<String> expectedArguments = new ArrayList<>();
@@ -225,6 +235,7 @@ public abstract class AbstractJavacCompilerTest
         internalTest( compilerConfiguration, expectedArguments );
     }
 
+    @Test
     public void testBuildCompilerArgs18()
     {
         List<String> expectedArguments = new ArrayList<>();
@@ -238,6 +249,7 @@ public abstract class AbstractJavacCompilerTest
         internalTest( compilerConfiguration, expectedArguments );
     }
 
+    @Test
     public void testBuildCompilerArgsUnspecifiedVersion()
     {
         List<String> expectedArguments = new ArrayList<>();
@@ -249,6 +261,7 @@ public abstract class AbstractJavacCompilerTest
         internalTest( compilerConfiguration, expectedArguments );
     }
 
+    @Test
     public void testBuildCompilerDebugLevel()
     {
         List<String> expectedArguments = new ArrayList<>();
@@ -265,6 +278,7 @@ public abstract class AbstractJavacCompilerTest
     }
 
     // PLXCOMP-190
+    @Test
     public void testJRuntimeArguments()
     {
         List<String> expectedArguments = new ArrayList<>();
@@ -295,6 +309,7 @@ public abstract class AbstractJavacCompilerTest
         internalTest( compilerConfiguration, expectedArguments );
     }
 
+    @Test
     public void testModulePathAnnotations() throws Exception
     {
         List<String> expectedArguments = new ArrayList<>();
@@ -329,6 +344,7 @@ public abstract class AbstractJavacCompilerTest
         internalTest( compilerConfiguration, expectedArguments, source);
     }
 
+    @Test
     public void testModulePath() throws Exception
     {
         List<String> expectedArguments = new ArrayList<>();
@@ -356,6 +372,7 @@ public abstract class AbstractJavacCompilerTest
         internalTest( compilerConfiguration, expectedArguments );
     }
 
+    @Test
     public void testModuleVersion()
     {
         List<String> expectedArguments = new ArrayList<>();
@@ -381,6 +398,7 @@ public abstract class AbstractJavacCompilerTest
         internalTest( compilerConfiguration, expectedArguments );
     }
 
+    @Test
     public void testReleaseVersion()
     {
         List<String> expectedArguments = new ArrayList<>();
@@ -400,6 +418,7 @@ public abstract class AbstractJavacCompilerTest
         internalTest( compilerConfiguration, expectedArguments );
     }
 
+    @Test
     public void testFailOnWarning()
     {
         List<String> expectedArguments = new ArrayList<>();
@@ -424,6 +443,7 @@ public abstract class AbstractJavacCompilerTest
         internalTest( compilerConfiguration, expectedArguments );
     }
 
+    @Test
     public void testMultipleAddExports()
     {
         List<String> expectedArguments = new ArrayList<>();

@@ -18,16 +18,19 @@ public class AspectJCompilerTest
         super();
     }
 
+    @Override
     protected String getRoleHint()
     {
         return "aspectj";
     }
 
+    @Override
     protected Collection<String> expectedOutputFiles()
     {
         return Arrays.asList( "org/codehaus/foo/ExternalDeps.class", "org/codehaus/foo/Person.class" );
     }
 
+    @Override
     protected List<String> getClasspath()
         throws Exception
     {
