@@ -17,38 +17,20 @@
 
 name: GitHub CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches-ignore:
+      - dependabot/**
+  pull_request:
 
 jobs:
+
   build:
+    name: Build it
+    uses: codehaus-plexus/.github/.github/workflows/maven.yml@v0.0.1
+    with:
+      jdk-matrix: '["8", "11", "14", "15", "16", "17"]'
+      jdk-distribution-matrix: '["adopt-hotspot", "zulu", "adopt-openj9", "temurin"]'
+      os-matrix: '["ubuntu-latest","windows-latest", "macOS-latest"]'
+      maven_args: 'mvn verify javadoc:javadoc -e -B -V -fae -Pno-tests-if-not-on-osx'
 
-    strategy:
-      matrix:
-        os: [ubuntu-latest,windows-latest, macOS-latest]
-        java: [8, 11, 14, 15, 16, 17-ea]
-        jdk: [adopt-hotspot, zulu, adopt-openj9]
-      fail-fast: false
-
-    runs-on: ${{ matrix.os }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Set up cache for ~./m2/repository
-        uses: actions/cache@v2.1.6
-        with:
-          path: ~/.m2/repository
-          key: maven-${{ matrix.os }}-java${{ matrix.java }}-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            maven-${{ matrix.os }}-java${{ matrix.java }}-
-            maven-${{ matrix.os }}-
-
-      - name: Set up JDK
-        uses: actions/setup-java@v2
-        with:
-          distribution: ${{ matrix.jdk }}
-          java-version: ${{ matrix.java }}
-
-      - name: Build with Maven
-        run: mvn verify javadoc:javadoc -e -B -V -fae -Pno-tests-if-not-on-osx
