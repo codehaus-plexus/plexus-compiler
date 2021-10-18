@@ -32,5 +32,5 @@ jobs:
       jdk-matrix: '["8", "11", "14", "15", "16", "17"]'
       jdk-distribution-matrix: '["adopt-hotspot", "zulu", "adopt-openj9", "temurin"]'
       os-matrix: '["ubuntu-latest","windows-latest", "macOS-latest"]'
-      maven_args: 'mvn verify javadoc:javadoc -e -B -V -fae -Pno-tests-if-not-on-osx'
+      maven_args: 'verify javadoc:javadoc -e -B -V -fae -Pno-tests-if-not-on-osx'
 
