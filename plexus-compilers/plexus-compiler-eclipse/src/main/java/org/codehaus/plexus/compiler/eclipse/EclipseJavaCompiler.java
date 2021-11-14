@@ -151,7 +151,7 @@ public class EclipseJavaCompiler
         {
             args.add( "-parameters" );
         }
-        
+
         if(config.isFailOnWarning())
         {
         	args.add("-failOnWarning");
@@ -184,9 +184,9 @@ public class EclipseJavaCompiler
             String[] annotationProcessors = config.getAnnotationProcessors();
             List<String> processorPathEntries = config.getProcessorPathEntries();
             List<String> processorModulePathEntries = config.getProcessorModulePathEntries();
-            
-            if ( ( annotationProcessors != null && annotationProcessors.length > 0 ) 
-                            || ( processorPathEntries != null && processorPathEntries.size() > 0 ) 
+
+            if ( ( annotationProcessors != null && annotationProcessors.length > 0 )
+                            || ( processorPathEntries != null && processorPathEntries.size() > 0 )
                             || ( processorModulePathEntries != null && processorModulePathEntries.size() > 0 ) )
             {
                 if ( annotationProcessors != null && annotationProcessors.length > 0 )
@@ -209,10 +209,10 @@ public class EclipseJavaCompiler
                     args.add( "-processorpath" );
                     args.add( getPathString( processorPathEntries ) );
                 }
-                
+
                 if ( processorModulePathEntries != null && processorModulePathEntries.size() > 0 )
                 {
-                    args.add( "-processorpath" );
+                    args.add( "--processor-module-path" );
                     args.add( getPathString( processorModulePathEntries ) );
                 }
 
@@ -228,6 +228,13 @@ public class EclipseJavaCompiler
         classpathEntries.add( config.getOutputLocation() );
         args.add( "-classpath" );
         args.add( getPathString( classpathEntries ) );
+
+        List<String> modulepathEntries = config.getModulepathEntries();
+        if ( modulepathEntries != null && !modulepathEntries.isEmpty() )
+        {
+            args.add( "--module-path" );
+            args.add( getPathString( modulepathEntries ) );
+        }
 
         // Collect sources
         List<String> allSources = new ArrayList<>();
