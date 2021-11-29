@@ -755,6 +755,10 @@ public class JavacCompiler
                 errors.add( new CompilerMessage( buffer.toString(), CompilerMessage.Kind.ERROR ) );
                 return errors;
             }
+            else if ( line.startsWith( "An annotation processor threw an uncaught exception." ) ) {
+                CompilerMessage annotationProcessingError = parseAnnotationProcessorStream( input );
+                errors.add( annotationProcessingError );
+            }
 
             // new error block?
             if ( !line.startsWith( " " ) && hasPointer )
@@ -798,6 +802,23 @@ public class JavacCompiler
                 hasPointer = true;
             }
         }
+    }
+
+    private static CompilerMessage parseAnnotationProcessorStream( final BufferedReader input )
+            throws IOException
+    {
+        String line = input.readLine();
+        final StringBuilder buffer = new StringBuilder();
+
+        while (line != null) {
+            if (!line.startsWith( "Consult the following stack trace for details." )) {
+                buffer.append(line);
+                buffer.append(EOL);
+            }
+            line = input.readLine();
+        }
+
+        return new CompilerMessage( buffer.toString(), CompilerMessage.Kind.ERROR );
     }
 
     private static boolean isMisc( String line )
