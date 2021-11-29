@@ -46,7 +46,7 @@
     <javaVersion>8</javaVersion>
     <redirectTestOutputToFile>true</redirectTestOutputToFile>
     <project.build.outputTimestamp>2021-10-18T08:22:06Z</project.build.outputTimestamp>
-    <jupiter.version>5.8.1</jupiter.version>
+    <jupiter.version>5.8.2</jupiter.version>
     <aspectj.version>1.9.7.M3</aspectj.version>
     <errorprone.version>2.10.0</errorprone.version>
   </properties>
