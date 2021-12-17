@@ -559,7 +559,7 @@ public class JavacCompiler
 
         try
         {
-            File argumentsFile = createFileWithArguments( args, config.getOutputLocation() );
+            File argumentsFile = createFileWithArguments( args, config.getBuildDirectory() );
             cli.addArguments(
                 new String[]{ "@" + argumentsFile.getCanonicalPath().replace( File.separatorChar, '/' ) } );
 
@@ -595,7 +595,7 @@ public class JavacCompiler
         if ( ( getLogger() != null ) && getLogger().isDebugEnabled() )
         {
             File commandLineFile =
-                new File( config.getOutputLocation(), "javac." + ( Os.isFamily( Os.FAMILY_WINDOWS ) ? "bat" : "sh" ) );
+                new File( config.getBuildDirectory(), "javac." + ( Os.isFamily( Os.FAMILY_WINDOWS ) ? "bat" : "sh" ) );
             try
             {
                 FileUtils.fileWrite( commandLineFile.getAbsolutePath(), cli.toString().replaceAll( "'", "" ) );
@@ -979,7 +979,7 @@ public class JavacCompiler
      * @return the temporary file wth the arguments
      * @throws IOException
      */
-    private File createFileWithArguments( String[] args, String outputDirectory )
+    private File createFileWithArguments( String[] args, File outputDirectory )
         throws IOException
     {
         PrintWriter writer = null;
@@ -989,7 +989,7 @@ public class JavacCompiler
             if ( ( getLogger() != null ) && getLogger().isDebugEnabled() )
             {
                 tempFile =
-                    File.createTempFile( JavacCompiler.class.getName(), "arguments", new File( outputDirectory ) );
+                    File.createTempFile( JavacCompiler.class.getName(), "arguments", outputDirectory );
             }
             else
             {
