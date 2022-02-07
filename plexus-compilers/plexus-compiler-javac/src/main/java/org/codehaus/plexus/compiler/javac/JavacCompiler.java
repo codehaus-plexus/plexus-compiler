@@ -559,7 +559,7 @@ public class JavacCompiler
 
         try
         {
-            File argumentsFile = createFileWithArguments( args, config.getOutputLocation() );
+            File argumentsFile = createFileWithArguments( args, config.getBuildDirectory().getAbsolutePath() );
             cli.addArguments(
                 new String[]{ "@" + argumentsFile.getCanonicalPath().replace( File.separatorChar, '/' ) } );
 
@@ -594,8 +594,10 @@ public class JavacCompiler
 
         if ( ( getLogger() != null ) && getLogger().isDebugEnabled() )
         {
+            String debugFileName = StringUtils.isEmpty(config.getDebugFileName()) ? "javac" : config.getDebugFileName();
+
             File commandLineFile =
-                new File( config.getOutputLocation(), "javac." + ( Os.isFamily( Os.FAMILY_WINDOWS ) ? "bat" : "sh" ) );
+                new File( config.getBuildDirectory(),  StringUtils.trim(debugFileName) + "." + ( Os.isFamily( Os.FAMILY_WINDOWS ) ? "bat" : "sh" ) );
             try
             {
                 FileUtils.fileWrite( commandLineFile.getAbsolutePath(), cli.toString().replaceAll( "'", "" ) );

@@ -23,7 +23,7 @@ J2ObjC Plexus compiler
               <dependency>
                 <groupId>org.codehaus.plexus</groupId>
                 <artifactId>plexus-compiler-j2objc</artifactId>
-                <version>2.8.1-SNAPSHOT</version>
+                <version>2.9.1-SNAPSHOT</version>
               </dependency>          
             </dependencies>
           </plugin>
