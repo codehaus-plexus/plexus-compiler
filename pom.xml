@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.codehaus.plexus</groupId>
     <artifactId>plexus-components</artifactId>
-    <version>6.5</version>
+    <version>6.6</version>
   </parent>
 
   <artifactId>plexus-compiler</artifactId>
