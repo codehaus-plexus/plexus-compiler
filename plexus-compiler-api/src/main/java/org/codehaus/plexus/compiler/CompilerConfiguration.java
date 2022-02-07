@@ -172,6 +172,12 @@ public class CompilerConfiguration
      */
     private boolean forceJavacCompilerUse=false;
 
+    /**
+     * force a different of the debug file containing the forked command run (such javac.sh)
+     * @since 2.9.1
+     */
+    private String debugFileName;
+
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
@@ -718,6 +724,16 @@ public class CompilerConfiguration
     public void setCompilerReuseStrategy( CompilerReuseStrategy compilerReuseStrategy )
     {
         this.compilerReuseStrategy = compilerReuseStrategy;
+    }
+
+    public String getDebugFileName()
+    {
+        return debugFileName;
+    }
+
+    public void setDebugFileName(String debugFileName)
+    {
+        this.debugFileName = debugFileName;
     }
 
     /**
