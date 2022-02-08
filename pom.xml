@@ -28,7 +28,6 @@
     <connection>${scm.url}</connection>
     <developerConnection>${scm.url}</developerConnection>
     <url>http://github.com/codehaus-plexus/plexus-compiler/tree/${project.scm.tag}/</url>
-    <tag>master</tag>
   </scm>
   <issueManagement>
     <system>github</system>
@@ -43,7 +42,7 @@
 
   <properties>
     <scm.url>scm:git:git@github.com:codehaus-plexus/plexus-compiler.git</scm.url>
-    <javaVersion>8</javaVersion>
+    <javaVersion>11</javaVersion>
     <redirectTestOutputToFile>true</redirectTestOutputToFile>
     <project.build.outputTimestamp>2021-10-18T08:22:06Z</project.build.outputTimestamp>
     <jupiter.version>5.8.2</jupiter.version>
@@ -123,6 +122,13 @@
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <configuration>
+            <release>8</release>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-release-plugin</artifactId>
           <configuration>
             <releaseProfiles>plexus-release,tools.jar</releaseProfiles>
@@ -192,8 +198,8 @@
             <configuration>
               <rules>
                 <requireJavaVersion>
-                  <version>[1.8,)</version>
-                  <message>[ERROR] OLD JDK [${java.version}] in use. This projects requires JDK 8 or newer</message>
+                  <version>[11,)</version>
+                  <message>[ERROR] OLD JDK [${java.version}] in use. This projects requires JDK 11 or newer</message>
                 </requireJavaVersion>
               </rules>
             </configuration>
