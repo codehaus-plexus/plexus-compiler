@@ -24,8 +24,6 @@ package org.codehaus.plexus.compiler;
  * SOFTWARE.
  */
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
@@ -39,6 +37,9 @@ import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
+import org.hamcrest.io.FileMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -49,9 +50,13 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.is;
 
 /**
  *
@@ -125,8 +130,8 @@ public abstract class AbstractCompilerTest
 
         File file = getLocalArtifactPath( "commons-lang", "commons-lang", "2.0", "jar" );
 
-        assertThat( file.canRead() ).as( "test prerequisite: commons-lang library must be available in local repository, expected "
-                        + file.getAbsolutePath() ).isTrue();
+        assertThat("test prerequisite: commons-lang library must be available in local repository, expected ",
+                file, FileMatchers.aReadableFile());
 
         cp.add( file.getAbsolutePath() );
 
@@ -143,7 +148,7 @@ public abstract class AbstractCompilerTest
         throws Exception
     {
         List<CompilerMessage> messages = new ArrayList<>();
-        Collection<String> files = new TreeSet<>();
+        Collection<String> files = new ArrayList<>();
 
         for ( CompilerConfiguration compilerConfig : getCompilerConfigurations() )
         {
@@ -181,8 +186,9 @@ public abstract class AbstractCompilerTest
                 errors.add( error.getMessage() );
             }
 
-            assertThat( numCompilerErrors ).as( "Wrong number of compilation errors (" + numCompilerErrors + "/" + expectedErrors //
-                              + ") : " + displayLines( errors ) ).isEqualTo( expectedErrors );
+            assertThat("Wrong number of compilation errors (" + numCompilerErrors + "/" + expectedErrors //
+                            + ") : " + displayLines( errors ),
+                    numCompilerErrors, is( expectedErrors ) );
         }
 
         int expectedWarnings = expectedWarnings();
@@ -204,12 +210,12 @@ public abstract class AbstractCompilerTest
                 warnings.add( error.getMessage() );
             }
 
-            assertThat( numCompilerWarnings ).as( "Wrong number ("
+            assertThat( "Wrong number ("
                 + numCompilerWarnings + "/" + expectedWarnings + ") of compilation warnings: "
-                + displayLines( warnings ) ).isEqualTo( expectedWarnings );
+                + displayLines( warnings ), numCompilerWarnings, is( expectedWarnings ) );
         }
 
-        assertThat( files ).isEqualTo( new TreeSet<>( normalizePaths( expectedOutputFiles() ) ) );
+        assertThat( files, containsInAnyOrder(normalizePaths(expectedOutputFiles()).toArray(new String[0])));
     }
 
     protected String displayLines( List<String> warnings)
@@ -291,12 +297,9 @@ public abstract class AbstractCompilerTest
 
     private List<String> normalizePaths( Collection<String> relativePaths )
     {
-        List<String> normalizedPaths = new ArrayList<>();
-        for ( String relativePath : relativePaths )
-        {
-            normalizedPaths.add( relativePath.replace( File.separatorChar, '/' ) );
-        }
-        return normalizedPaths;
+        return relativePaths.stream()
+                .map( s -> s.replace( File.separatorChar, '/' ) )
+                .collect(Collectors.toList());
     }
 
     protected int compilerErrorCount( List<CompilerMessage> messages )

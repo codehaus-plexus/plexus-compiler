@@ -16,21 +16,25 @@ package org.codehaus.plexus.compiler.util.scan.mapping;
  * limitations under the License.
  */
 
-import junit.framework.TestCase;
-import org.codehaus.plexus.compiler.util.scan.InclusionScanException;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
+
 /**
  * @author jdcasey
  */
 public class SuffixMappingTest
-    extends TestCase
 {
+
+    @Test
     public void testShouldReturnSingleClassFileForSingleJavaFile()
-        throws InclusionScanException
     {
         String base = "path/to/file";
 
@@ -40,13 +44,13 @@ public class SuffixMappingTest
 
         Set<File> results = mapping.getTargetFiles( basedir, base + ".java" );
 
-        assertEquals( "Returned wrong number of target files.", 1, results.size() );
+        assertThat( "Returned wrong number of target files.", results.size(), is( 1 ) );
 
-        assertEquals( "Target file is wrong.", new File( basedir, base + ".class" ), results.iterator().next() );
+        assertThat( "Target file is wrong.", results.iterator().next(), is( new File( basedir, base + ".class" ) ) );
     }
 
+    @Test
     public void testShouldNotReturnClassFileWhenSourceFileHasWrongSuffix()
-        throws InclusionScanException
     {
         String base = "path/to/file";
 
@@ -56,11 +60,11 @@ public class SuffixMappingTest
 
         Set<File> results = mapping.getTargetFiles( basedir, base + ".xml" );
 
-        assertTrue( "Returned wrong number of target files.", results.isEmpty() );
+        assertThat( "Returned wrong number of target files.", results, empty() );
     }
 
+    @Test
     public void testShouldReturnOneClassFileAndOneXmlFileForSingleJavaFile()
-        throws InclusionScanException
     {
         String base = "path/to/file";
 
@@ -74,15 +78,15 @@ public class SuffixMappingTest
 
         Set<File> results = mapping.getTargetFiles( basedir, base + ".java" );
 
-        assertEquals( "Returned wrong number of target files.", 2, results.size() );
+        assertThat( "Returned wrong number of target files.", results.size(), is( 2 ) );
 
-        assertTrue( "Targets do not contain class target.", results.contains( new File( basedir, base + ".class" ) ) );
+        assertThat( "Targets do not contain class target.", results,
+                containsInAnyOrder( new File( basedir, base + ".class" ), new File( basedir, base + ".xml" ) ) );
 
-        assertTrue( "Targets do not contain class target.", results.contains( new File( basedir, base + ".xml" ) ) );
     }
 
+    @Test
     public void testShouldReturnNoTargetFilesWhenSourceFileHasWrongSuffix()
-        throws InclusionScanException
     {
         String base = "path/to/file";
 
@@ -96,11 +100,12 @@ public class SuffixMappingTest
 
         Set<File> results = mapping.getTargetFiles( basedir, base + ".apt" );
 
-        assertTrue( "Returned wrong number of target files.", results.isEmpty() );
+        assertThat( "Returned wrong number of target files.", results, empty() );
     }
 
+    @Test
     public void testSingleTargetMapper()
-        throws InclusionScanException
+            throws Exception
     {
         String base = "path/to/file";
 
@@ -110,10 +115,10 @@ public class SuffixMappingTest
 
         Set<File> results = mapping.getTargetFiles( basedir, base + ".apt" );
 
-        assertTrue( results.isEmpty() );
+        assertThat( results, empty() );
 
         results = mapping.getTargetFiles( basedir, base + ".cs" );
 
-        assertEquals( 1, results.size() );
+        assertThat( results.size(), is( 1 ) );
     }
 }
