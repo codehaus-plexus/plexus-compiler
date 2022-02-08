@@ -48,8 +48,6 @@ Plexus Compiler
 
     * {{{./plexus-compilers/plexus-compiler-javac-errorprone/}<<<plexus-compiler-javac-errorprone>>>}}: javac compiler with {{{https://errorprone.info}error-prone}} static analysis checks enabled,
 
-    * {{{./plexus-compilers/plexus-compiler-jikes/}<<<plexus-compiler-jikes>>>}}: jikes compiler,
-
     []
 
   * {{{./plexus-compiler-test/}<<<plexus-compiler-test>>>}}: a test harness.
