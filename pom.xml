@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.codehaus.plexus</groupId>
     <artifactId>plexus-components</artifactId>
-    <version>6.5</version>
+    <version>6.6</version>
   </parent>
 
   <artifactId>plexus-compiler</artifactId>
@@ -49,6 +49,7 @@
     <jupiter.version>5.8.2</jupiter.version>
     <aspectj.version>1.9.7.M3</aspectj.version>
     <errorprone.version>2.10.0</errorprone.version>
+    <trimStackTrace>false</trimStackTrace>
   </properties>
 
   <dependencyManagement>
@@ -88,6 +89,16 @@
         <artifactId>junit-jupiter-api</artifactId>
         <scope>test</scope>
         <version>${jupiter.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-testing</artifactId>
+        <version>1.1.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.hamcrest</groupId>
+        <artifactId>hamcrest</artifactId>
+        <version>2.2</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -192,16 +203,6 @@
 
     </plugins>
   </build>
-
-  <reporting>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>cobertura-maven-plugin</artifactId>
-        <version>2.7</version>
-      </plugin>
-    </plugins>
-  </reporting>
 
   <profiles>
     <profile>

@@ -29,7 +29,6 @@ public class JavacCompilerTest
 {
     @BeforeEach
     public void setUp()
-        throws Exception
     {
         super.setUp();
         setForceJavacCompilerUse( true );

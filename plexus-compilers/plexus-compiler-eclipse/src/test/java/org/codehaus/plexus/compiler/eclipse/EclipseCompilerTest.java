@@ -29,11 +29,14 @@ import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Arrays;
 import java.util.Collection;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.startsWith;
 
 /**
  * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>
@@ -44,7 +47,6 @@ public class EclipseCompilerTest
 
     @BeforeEach
     public void setUp()
-        throws Exception
     {
         setCompilerDebug( true );
         setCompilerDeprecationWarnings( true );
@@ -71,8 +73,8 @@ public class EclipseCompilerTest
     @Override
     protected Collection<String> expectedOutputFiles()
     {
-        return Arrays.asList( new String[] { "org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ExternalDeps.class",
-            "org/codehaus/foo/Person.class", "org/codehaus/foo/ReservedWord.class" } );
+        return Arrays.asList("org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ExternalDeps.class",
+                "org/codehaus/foo/Person.class", "org/codehaus/foo/ReservedWord.class");
     }
 
     // The test is fairly meaningless as we can not validate anything
@@ -89,7 +91,6 @@ public class EclipseCompilerTest
 
     @Test
     public void testInitializeWarningsForPropertiesArgument()
-        throws Exception
     {
         CompilerConfiguration compilerConfig = createMinimalCompilerConfig();
 
@@ -97,7 +98,7 @@ public class EclipseCompilerTest
 
         IllegalArgumentException e =
             assertThrows( IllegalArgumentException.class, () -> getCompiler().performCompile( compilerConfig ) );
-        assertThat( e.getMessage() ).as( "Message must start with 'Properties file'" ).startsWith( "Properties file" );
+        assertThat( "Message must start with 'Properties file'" , e.getMessage(), startsWith( "Properties file" ));
     }
 
     private CompilerConfiguration createMinimalCompilerConfig()

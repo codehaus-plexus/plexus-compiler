@@ -24,28 +24,25 @@ package org.codehaus.plexus.compiler.manager;
  * SOFTWARE.
  */
 
-import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.testing.PlexusTest;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import javax.inject.Inject;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  */
+@PlexusTest
 public class CompilerManagerTest
-    extends PlexusTestCase
 {
+    @Inject
+    private CompilerManager compilerManager;
+
+    @Test
     public void testBasic()
         throws Exception
     {
-        CompilerManager compilerManager = (CompilerManager) lookup( CompilerManager.ROLE );
-
-        try
-        {
-            compilerManager.getCompiler( "foo" );
-
-            fail( "Expected NoSuchCompilerException" );
-        }
-        catch ( NoSuchCompilerException e )
-        {
-            // ignored
-        }
+        Assertions.assertThrows(NoSuchCompilerException.class, () -> compilerManager.getCompiler( "foo" ));
     }
 }

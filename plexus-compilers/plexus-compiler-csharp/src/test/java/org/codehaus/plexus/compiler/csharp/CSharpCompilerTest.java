@@ -24,20 +24,26 @@ package org.codehaus.plexus.compiler.csharp;
  * SOFTWARE.
  */
 
-import junit.framework.TestCase;
 import org.codehaus.plexus.compiler.CompilerMessage;
+import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
+
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  */
 public class CSharpCompilerTest
-    extends TestCase
 {
+    @Test
     public void testParser()
         throws IOException
     {
@@ -49,32 +55,33 @@ public class CSharpCompilerTest
 
         error = DefaultCSharpCompilerParser.parseLine( "error CS2008: No files to compile were specified" );
 
-        assertNotNull( error );
+        assertThat(error, notNullValue());
 
-        assertEquals( "CS2008: No files to compile were specified", error.getMessage() );
+
+        assertThat( error.getMessage(), is("CS2008: No files to compile were specified"));
 
         error = DefaultCSharpCompilerParser.parseLine( "Compilation failed: 1 error(s), 0 warnings" );
 
-        assertNull( error );
+        assertThat( error, nullValue() );
 
         error = DefaultCSharpCompilerParser.parseLine( "Compilation succeeded - 2 warning(s)" );
 
-        assertNull( error );
+        assertThat( error, nullValue() );
 
         error = DefaultCSharpCompilerParser.parseLine(
             "/home/trygvis/dev/com.myrealbox/trunk/mcs/nunit20/core/./TestRunnerThread.cs(29) error CS0246: Cannot find type 'NameValueCollection'" );
 
-        assertNotNull( error );
+        assertThat( error, notNullValue() );
 
-        assertEquals( 29, error.getStartLine() );
+        assertThat( error.getStartLine(), is(29));
 
-        assertEquals( -1, error.getStartColumn() );
+        assertThat( error.getStartColumn(), is(-1) );
 
-        assertEquals( 29, error.getEndLine() );
+        assertThat( error.getEndLine(), is(29) );
 
-        assertEquals( -1, error.getEndColumn() );
+        assertThat( error.getEndColumn(), is(-1) );
 
-        assertEquals( "CS0246: Cannot find type 'NameValueCollection'", error.getMessage() );
+        assertThat( error.getMessage(), is( "CS0246: Cannot find type 'NameValueCollection'" ) );
 
         // ----------------------------------------------------------------------
         //
@@ -114,11 +121,12 @@ public class CSharpCompilerTest
         List<CompilerMessage> messages =
             CSharpCompiler.parseCompilerOutput( new BufferedReader( new StringReader( input ) ) );
 
-        assertNotNull( messages );
+        assertThat( messages, notNullValue() );
 
-        assertEquals( 14, messages.size() );
+        assertThat(  messages.size(), is(14) );
     }
 
+    @Test
     public void testParserCscWin()
         throws Exception
     {
@@ -175,17 +183,18 @@ public class CSharpCompilerTest
         List<CompilerMessage> messagesWinCsc =
             CSharpCompiler.parseCompilerOutput( new BufferedReader( new StringReader( cscWin ) ) );
 
-        assertNotNull( messagesWinCsc );
+        assertThat( messagesWinCsc, notNullValue() );
 
-        assertEquals( 24, messagesWinCsc.size() );
+        assertThat( messagesWinCsc.size(), is(24) );
 
-        assertTrue( "Check that the line number is not -1",
-                    ( (CompilerMessage) messagesWinCsc.get( 0 ) ).getStartLine() != -1 );
-        assertTrue( "Check that the column number is not -1",
-                    ( (CompilerMessage) messagesWinCsc.get( 0 ) ).getStartColumn() != -1 );
+        assertThat( "Check that the line number is not -1",
+                    messagesWinCsc.get( 0 ).getStartLine(), not(-1) );
+        assertThat( "Check that the column number is not -1",
+                    messagesWinCsc.get( 0 ).getStartColumn(), not(-1) );
 
     }
 
+    @Test
     public void testParserMonoWin()
         throws Exception
     {
@@ -206,14 +215,14 @@ public class CSharpCompilerTest
         List<CompilerMessage> messagesMonoWin =
             CSharpCompiler.parseCompilerOutput( new BufferedReader( new StringReader( monoWin ) ) );
 
-        assertNotNull( messagesMonoWin );
+        assertThat( messagesMonoWin, notNullValue() );
 
-        assertEquals( 5, messagesMonoWin.size() );
+        assertThat( messagesMonoWin.size(), is(5) );
 
-        assertTrue( "Check that the line number is not -1",
-                    ( (CompilerMessage) messagesMonoWin.get( 0 ) ).getStartLine() != -1 );
-        assertTrue( "Check that the column number is not -1",
-                    ( (CompilerMessage) messagesMonoWin.get( 0 ) ).getStartColumn() != -1 );
+        assertThat( "Check that the line number is not -1",
+                    messagesMonoWin.get( 0 ).getStartLine(), not(-1) );
+        assertThat( "Check that the column number is not -1",
+                    messagesMonoWin.get( 0 ).getStartColumn(), not(-1) );
 
     }
 

@@ -23,10 +23,13 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Set;
 
-import junit.framework.TestCase;
-
 import org.codehaus.plexus.compiler.util.scan.mapping.SuffixMapping;
-import org.codehaus.plexus.util.IOUtil;
+import org.junit.jupiter.api.Test;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.io.FileMatchers.anExistingFile;
 
 /**
  * Tests for all the implementations of <code>SourceInclusionScanner</code>
@@ -34,7 +37,6 @@ import org.codehaus.plexus.util.IOUtil;
  * @author <a href="mailto:carlos@apache.org">Carlos Sanchez</a>
  */
 public abstract class AbstractSourceInclusionScannerTest
-    extends TestCase
 {
 
     private static final String TESTFILE_DEST_MARKER_FILE =
@@ -42,6 +44,7 @@ public abstract class AbstractSourceInclusionScannerTest
 
     protected SourceInclusionScanner scanner;
 
+    @Test
     public void testGetIncludedSources()
         throws Exception
     {
@@ -59,11 +62,11 @@ public abstract class AbstractSourceInclusionScannerTest
 
         Set<File> includedSources = scanner.getIncludedSources( base, base );
 
-        assertTrue( "no sources were included", !includedSources.isEmpty() );
+        assertThat( "no sources were included", includedSources, not( empty() ) );
 
         for ( File file : includedSources )
         {
-            assertTrue( "file included does not exist", file.exists() );
+            assertThat( "file included does not exist", file, anExistingFile() );
         }
     }
 
@@ -100,24 +103,18 @@ public abstract class AbstractSourceInclusionScannerTest
     protected void writeFile( File file )
         throws IOException
     {
-        FileWriter fWriter = null;
-        try
+
+        File parent = file.getParentFile();
+        if ( !parent.exists() )
         {
-            File parent = file.getParentFile();
-            if ( !parent.exists() )
-            {
-                parent.mkdirs();
-            }
-
-            file.deleteOnExit();
-
-            fWriter = new FileWriter( file );
-
-            fWriter.write( "This is just a test file." );
+            parent.mkdirs();
         }
-        finally
+
+        file.deleteOnExit();
+
+        try (FileWriter fWriter = new FileWriter( file ))
         {
-            IOUtil.close( fWriter );
+            fWriter.write( "This is just a test file." );
         }
     }
 

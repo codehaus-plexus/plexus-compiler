@@ -24,27 +24,27 @@ package org.codehaus.plexus.compiler.j2objc;
  * SOFTWARE.
  */
 
-import org.junit.Assert;
-import junit.framework.TestCase;
+import org.hamcrest.io.FileMatchers;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
-import org.codehaus.plexus.compiler.CompilerException;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * j2objc must be in the PATH
  * @author lmaitre
  */
 public class J2ObjCCompilerTest
-    extends TestCase
 {
 
+    @Test
     public void testJ2ObjCCompiler()
-        throws IOException
+        throws Exception
     {
         J2ObjCCompiler comp = new J2ObjCCompiler();
         Map<String, String> customCompilerArguments = new HashMap<>();
@@ -57,18 +57,12 @@ public class J2ObjCCompilerTest
         cc.setFork( true );
         cc.setVerbose( true );
         cc.setCustomCompilerArgumentsAsMap( customCompilerArguments );
-        try
-        {
-            comp.performCompile( cc );
-            File f = new File( "target/generated/objective-c/de/test/App.h" );
-            Assert.assertTrue("file not exists:" + f, f.exists() );
-            f = new File( "target/generated/objective-c/de/test/App.m" );
-            Assert.assertTrue("file not exists:" + f, f.exists() );
-        }
-        catch ( CompilerException ce )
-        {
-            fail( "An exception has occured: " + ce.getMessage() );
-        }
+
+        comp.performCompile( cc );
+        File f = new File( "target/generated/objective-c/de/test/App.h" );
+        assertThat("file not exists:" + f, f, FileMatchers.anExistingFile());
+        f = new File( "target/generated/objective-c/de/test/App.m" );
+        assertThat("file not exists:" + f, f, FileMatchers.anExistingFile());
     }
 
 }

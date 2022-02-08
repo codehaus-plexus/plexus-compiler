@@ -1,39 +1,44 @@
 package org.codehaus.plexus.compiler;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import java.util.Iterator;
 import java.util.Map;
 
-import junit.framework.TestCase;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 public class CompilerConfigurationTest
-    extends TestCase
 {
     private CompilerConfiguration configuration;
     
-    @Override
+
+    @BeforeEach
     protected void setUp()
         throws Exception
     {
         configuration = new CompilerConfiguration();
     }
-    
+
+    @Test
     public void testCustomArguments() 
     {
         configuration.addCompilerCustomArgument( "--add-exports", "FROM-MOD/package1=OTHER-MOD" );
         configuration.addCompilerCustomArgument( "--add-exports", "FROM-MOD/package2=OTHER-MOD" );
         
-        assertEquals( 1, configuration.getCustomCompilerArgumentsAsMap().size() );
-        assertEquals( "FROM-MOD/package2=OTHER-MOD", configuration.getCustomCompilerArgumentsAsMap().get( "--add-exports" ) );
-        
-        assertEquals( 2, configuration.getCustomCompilerArgumentsEntries().size() );
+        assertThat(configuration.getCustomCompilerArgumentsAsMap().size(), is( 1 ));
+        assertThat( configuration.getCustomCompilerArgumentsAsMap().get( "--add-exports" ), is( "FROM-MOD/package2=OTHER-MOD" ) );
+
+        assertThat( configuration.getCustomCompilerArgumentsEntries().size(), is( 2 ) );
         Iterator<Map.Entry<String,String>> entries = configuration.getCustomCompilerArgumentsEntries().iterator();
         Map.Entry<String,String> entry;
         
         entry = entries.next();
-        assertEquals( "--add-exports", entry.getKey() );
-        assertEquals( "FROM-MOD/package1=OTHER-MOD", entry.getValue() );
+        assertThat( entry.getKey(), is( "--add-exports" ) );
+        assertThat( entry.getValue(), is( "FROM-MOD/package1=OTHER-MOD" ) );
         entry = entries.next();
-        assertEquals( "--add-exports", entry.getKey() );
-        assertEquals( "FROM-MOD/package2=OTHER-MOD", entry.getValue() );
+        assertThat( entry.getKey(), is( "--add-exports" ));
+        assertThat( entry.getValue(), is( "FROM-MOD/package2=OTHER-MOD") );
     }
 }

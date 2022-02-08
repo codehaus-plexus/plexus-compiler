@@ -24,25 +24,38 @@ package org.codehaus.plexus.compiler.eclipse;
  * SOFTWARE.
  */
 
-import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.compiler.Compiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
+import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.util.FileUtils;
-import org.junit.Assert;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.io.File;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
+
+
 /**
  * @author <a href="mailto:jal@etc.to">Frits Jalvingh</a>
  * Created on 22-4-18.
  */
-public class EclipseCompilerDashedArgumentsTest extends PlexusTestCase {
+@PlexusTest
+public class EclipseCompilerDashedArgumentsTest {
 
     public static final String BAD_DOUBLEDASH_OPTION = "--grubbelparkplace";
+
+    @Inject
+    @Named("eclipse")
+    Compiler compiler;
 
     private CompilerConfiguration getConfig() throws Exception {
         String sourceDir = getBasedir() + "/src/test-input/src/main";
@@ -80,21 +93,16 @@ public class EclipseCompilerDashedArgumentsTest extends PlexusTestCase {
      * This also tests that con-compile errors are shown properly, as the error caused by
      * the invalid option is not part of the error output but part of the data sent to stdout/stderr.
      */
+    @Test
     public void testDoubleDashOptionsArePassedWithTwoDashes() throws Exception
     {
-        Compiler compiler = (Compiler) lookup( Compiler.ROLE, "eclipse" );
         CompilerConfiguration config = getConfig();
         config.addCompilerCustomArgument(BAD_DOUBLEDASH_OPTION, "b0rk3d");
 
-        try
-        {
-            compiler.performCompile(config);
-            Assert.fail("Expected an exception to be thrown");
-        } catch(EcjFailureException x) {
-            String ecjOutput = x.getEcjOutput();
-            Assert.assertTrue("The output should report the failure with two dashes: " + ecjOutput
-                    , ecjOutput.contains(BAD_DOUBLEDASH_OPTION) && ! ecjOutput.contains("-" + BAD_DOUBLEDASH_OPTION)
-            );
-        }
+        EcjFailureException x = Assertions.assertThrows(EcjFailureException.class, () -> compiler.performCompile(config));
+
+        MatcherAssert.assertThat(x.getEcjOutput(), Matchers.containsString(BAD_DOUBLEDASH_OPTION));
+        MatcherAssert.assertThat(x.getEcjOutput(), Matchers.not(Matchers.containsString("-" + BAD_DOUBLEDASH_OPTION)));
+
     }
 }

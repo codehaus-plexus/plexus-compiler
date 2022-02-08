@@ -30,19 +30,25 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.util.Os;
+import org.junit.jupiter.api.Test;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.core.StringEndsWith.endsWith;
+import static org.hamcrest.core.StringStartsWith.startsWith;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  */
 public class ErrorMessageParserTest
-    extends TestCase
 {
     private static final String EOL = System.getProperty( "line.separator" );
 
+    @Test
     public void testDeprecationMessage()
         throws Exception
     {
@@ -54,21 +60,22 @@ public class ErrorMessageParserTest
 
         CompilerMessage compilerError = JavacCompiler.parseModernError( 0, error );
 
-        assertNotNull( compilerError );
+        assertThat( compilerError, notNullValue() );
 
-        assertFalse( compilerError.isError() );
+        assertThat( compilerError.isError(), is( false));
 
-        assertEquals( "Date(java.lang.String) in java.util.Date has been deprecated", compilerError.getMessage() );
+        assertThat( compilerError.getMessage(), is("Date(java.lang.String) in java.util.Date has been deprecated") );
 
-        assertEquals( 63, compilerError.getStartColumn() );
+        assertThat( compilerError.getStartColumn(), is( 63 ) );
 
-        assertEquals( 66, compilerError.getEndColumn() );
+        assertThat( compilerError.getEndColumn(), is( 66 ) );
 
-        assertEquals( 1, compilerError.getStartLine() );
+        assertThat( compilerError.getStartLine(), is( 1 ) );
 
-        assertEquals( 1, compilerError.getEndLine() );
+        assertThat( compilerError.getEndLine(), is (1 ) );
     }
 
+    @Test
     public void testWarningMessage()
     {
         String error =
@@ -78,21 +85,22 @@ public class ErrorMessageParserTest
 
         CompilerMessage compilerError = JavacCompiler.parseModernError( 0, error );
 
-        assertNotNull( compilerError );
+        assertThat( compilerError, notNullValue() );
 
-        assertFalse( compilerError.isError() );
+        assertThat( compilerError.isError(), is( false ) );
 
-        assertEquals( "finally clause cannot complete normally", compilerError.getMessage() );
+        assertThat( compilerError.getMessage(), is( "finally clause cannot complete normally" ) );
 
-        assertEquals( 26, compilerError.getStartColumn() );
+        assertThat( compilerError.getStartColumn(), is(26) );
 
-        assertEquals( 27, compilerError.getEndColumn() );
+        assertThat( compilerError.getEndColumn(), is(27) );
 
-        assertEquals( 8, compilerError.getStartLine() );
+        assertThat( compilerError.getStartLine(), is(8) );
 
-        assertEquals( 8, compilerError.getEndLine() );
+        assertThat( compilerError.getEndLine(), is(8) );
     }
 
+    @Test
     public void testErrorMessage()
     {
         String error = "Foo.java:7: not a statement" + EOL +
@@ -101,21 +109,22 @@ public class ErrorMessageParserTest
 
         CompilerMessage compilerError = JavacCompiler.parseModernError( 1, error );
 
-        assertNotNull( compilerError );
+        assertThat( compilerError, notNullValue() );
 
-        assertTrue( compilerError.isError() );
+        assertThat( compilerError.isError(), is( true ) );
 
-        assertEquals( "not a statement", compilerError.getMessage() );
+        assertThat( compilerError.getMessage(), is("not a statement") );
 
-        assertEquals( 9, compilerError.getStartColumn() );
+        assertThat( compilerError.getStartColumn(), is(9) );
 
-        assertEquals( 11, compilerError.getEndColumn() );
+        assertThat( compilerError.getEndColumn(), is(11) );
 
-        assertEquals( 7, compilerError.getStartLine() );
+        assertThat( compilerError.getStartLine(), is(7) );
 
-        assertEquals( 7, compilerError.getEndLine() );
+        assertThat( compilerError.getEndLine(), is(7) );
     }
 
+    @Test
     public void testUnknownSymbolError()
     {
         String error = "./org/codehaus/foo/UnknownSymbol.java:7: cannot find symbol" + EOL +
@@ -126,23 +135,24 @@ public class ErrorMessageParserTest
 
         CompilerMessage compilerError = JavacCompiler.parseModernError( 1, error );
 
-        assertNotNull( compilerError );
+        assertThat( compilerError, notNullValue() );
 
-        assertTrue( compilerError.isError() );
+        assertThat( compilerError.isError(), is( true ) );
 
-        assertEquals( "cannot find symbol" + EOL +
-                          "symbol  : method foo()" + EOL +
-                          "location: class org.codehaus.foo.UnknownSymbol", compilerError.getMessage() );
+        assertThat( compilerError.getMessage(), is("cannot find symbol" + EOL +
+                "symbol  : method foo()" + EOL +
+                "location: class org.codehaus.foo.UnknownSymbol") );
 
-        assertEquals( 8, compilerError.getStartColumn() );
+        assertThat( compilerError.getStartColumn(), is(8) );
 
-        assertEquals( 14, compilerError.getEndColumn() );
+        assertThat( compilerError.getEndColumn(), is(14) );
 
-        assertEquals( 7, compilerError.getStartLine() );
+        assertThat( compilerError.getStartLine(), is(7) );
 
-        assertEquals( 7, compilerError.getEndLine() );
+        assertThat( compilerError.getEndLine(), is(7) );
     }
 
+    @Test
     public void testTwoErrors()
         throws IOException
     {
@@ -159,9 +169,10 @@ public class ErrorMessageParserTest
         List<CompilerMessage> messages =
             JavacCompiler.parseModernStream( 1, new BufferedReader( new StringReader( errors ) ) );
 
-        assertEquals( 2, messages.size() );
+        assertThat( messages.size(), is(2) );
     }
 
+    @Test
     public void testAnotherTwoErrors()
         throws IOException
     {
@@ -178,9 +189,10 @@ public class ErrorMessageParserTest
         List<CompilerMessage> messages =
             JavacCompiler.parseModernStream( 1, new BufferedReader( new StringReader( errors ) ) );
 
-        assertEquals( 2, messages.size() );
+        assertThat( messages.size(), is(2) );
     }
 
+    @Test
     public void testAssertError()
         throws IOException
     {
@@ -195,9 +207,10 @@ public class ErrorMessageParserTest
         List<CompilerMessage> messages =
             JavacCompiler.parseModernStream( 1, new BufferedReader( new StringReader( errors ) ) );
 
-        assertEquals( 1, messages.size() );
+        assertThat( messages.size(), is(1) );
     }
 
+    @Test
     public void testLocalizedWarningNotTreatedAsError()
         throws IOException
     {
@@ -211,10 +224,11 @@ public class ErrorMessageParserTest
         List<CompilerMessage> messages =
             JavacCompiler.parseModernStream( 0, new BufferedReader( new StringReader( errors ) ) );
 
-        assertEquals( 1, messages.size() );
-        assertFalse( ( (CompilerMessage) messages.get( 0 ) ).isError() );
+        assertThat( messages.size(), is(1) );
+        assertThat( messages.get( 0 ).isError(), is(false) );
     }
 
+    @Test
     public void testUnixFileNames()
     {
         String error = "/my/prj/src/main/java/test/prj/App.java:11: not a statement" + EOL +
@@ -223,10 +237,10 @@ public class ErrorMessageParserTest
 
         CompilerMessage compilerError = JavacCompiler.parseModernError( 1, error );
 
-        assertEquals( "/my/prj/src/main/java/test/prj/App.java:[11,45] not a statement",
-                      String.valueOf( compilerError ) );
+        assertThat( String.valueOf( compilerError ), is("/my/prj/src/main/java/test/prj/App.java:[11,45] not a statement"));
     }
 
+    @Test
     public void testWindowsDriveLettersMCOMPILER140()
     {
         String error =
@@ -237,9 +251,8 @@ public class ErrorMessageParserTest
 
         CompilerMessage compilerError = JavacCompiler.parseModernError( 1, error );
 
-        assertEquals(
-            "c:\\Documents and Settings\\My Self\\Documents\\prj\\src\\main\\java\\test\\prj\\App.java:[11,45] not a statement",
-            String.valueOf( compilerError ) );
+        assertThat( String.valueOf( compilerError ),
+                is("c:\\Documents and Settings\\My Self\\Documents\\prj\\src\\main\\java\\test\\prj\\App.java:[11,45] not a statement") );
     }
 
     /**
@@ -247,6 +260,7 @@ public class ErrorMessageParserTest
      *
      * @throws Exception
      */
+    @Test
     public void testCRLF_windows()
         throws Exception
     {
@@ -623,7 +637,7 @@ public class ErrorMessageParserTest
             "4 warnings" + CRLF;
         List<CompilerMessage> compilerMessages =
             JavacCompiler.parseModernStream( 0, new BufferedReader( new StringReader( errors ) ) );
-        assertEquals( "count", 187, compilerMessages.size() );
+        assertThat( "count", compilerMessages.size(), is(187) );
         List<CompilerMessage> compilerErrors = new ArrayList<>( 3 );
         for ( CompilerMessage message : compilerMessages ) {
             if ( message.getKind() != CompilerMessage.Kind.OTHER ) {
@@ -634,34 +648,35 @@ public class ErrorMessageParserTest
         assertEquivalent(new CompilerMessage("[options] bootstrap class path not set in conjunction with -source " +
               "1.6", CompilerMessage.Kind.WARNING), compilerErrors.get(0));
         CompilerMessage error1 = compilerErrors.get( 1 );
-        assertEquals( "file",
-                      "C:\\commander\\pre\\ec\\ec-http\\src\\main\\java\\com\\electriccloud\\http\\HttpUtil.java",
-                      error1.getFile() );
-        assertEquals( "message",
-                      "[deprecation] ThreadSafeClientConnManager in org.apache.http.impl.conn.tsccm has been deprecated",
-                      error1.getMessage() );
-        assertEquals( "line", 31, error1.getStartLine() );
-        assertEquals( "column", 38, error1.getStartColumn() );
+        assertThat( "file",
+                      error1.getFile(),
+                is ("C:\\commander\\pre\\ec\\ec-http\\src\\main\\java\\com\\electriccloud\\http\\HttpUtil.java"));
+        assertThat( "message",
+                      error1.getMessage(),
+                is("[deprecation] ThreadSafeClientConnManager in org.apache.http.impl.conn.tsccm has been deprecated"));
+        assertThat( "line", error1.getStartLine(), is(31) );
+        assertThat( "column", error1.getStartColumn(), is(38) );
         CompilerMessage error2 = compilerErrors.get( 2 );
-        assertEquals( "file",
-                      "C:\\commander\\pre\\ec\\ec-http\\src\\main\\java\\com\\electriccloud\\http\\HttpUtil.java",
-                      error2.getFile() );
-        assertEquals( "message",
-                      "[deprecation] ThreadSafeClientConnManager in org.apache.http.impl.conn.tsccm has been deprecated",
-                      error2.getMessage() );
-        assertEquals( "line", 151, error2.getStartLine() );
-        assertEquals( "column", 8, error2.getStartColumn() );
+        assertThat( "file",
+                      error2.getFile(),
+                    is("C:\\commander\\pre\\ec\\ec-http\\src\\main\\java\\com\\electriccloud\\http\\HttpUtil.java"));
+        assertThat( "message",
+                      error2.getMessage(),
+                        is("[deprecation] ThreadSafeClientConnManager in org.apache.http.impl.conn.tsccm has been deprecated"));
+        assertThat( "line", error2.getStartLine(), is(151) );
+        assertThat( "column", error2.getStartColumn() , is(8));
         CompilerMessage error3 = compilerErrors.get( 3 );
-        assertEquals( "file",
-                      "C:\\commander\\pre\\ec\\ec-http\\src\\main\\java\\com\\electriccloud\\http\\HttpUtil.java",
-                      error3.getFile() );
-        assertEquals( "message",
-                      "[deprecation] ThreadSafeClientConnManager in org.apache.http.impl.conn.tsccm has been deprecated",
-                      error3.getMessage() );
-        assertEquals( "line", 152, error3.getStartLine() );
-        assertEquals( "column", 16, error3.getStartColumn() );
+        assertThat( "file",
+                      error3.getFile(),
+                        is("C:\\commander\\pre\\ec\\ec-http\\src\\main\\java\\com\\electriccloud\\http\\HttpUtil.java"));
+        assertThat( "message",
+                      error3.getMessage(),
+                is("[deprecation] ThreadSafeClientConnManager in org.apache.http.impl.conn.tsccm has been deprecated"));
+        assertThat( "line", error3.getStartLine(), is(152) );
+        assertThat( "column", error3.getStartColumn(), is(16) );
     }
 
+    @Test
     public void testJava6Error() throws Exception
     {
         String out = "Error.java:3: cannot find symbol" + EOL + 
@@ -678,41 +693,42 @@ public class ErrorMessageParserTest
 
         List<CompilerMessage> compilerErrors = JavacCompiler.parseModernStream( 1, new BufferedReader( new StringReader( out ) ));
 
-        assertNotNull( compilerErrors );
+        assertThat( compilerErrors, notNullValue() );
 
         CompilerMessage message1 = compilerErrors.get( 0 );
 
-        assertTrue( message1.isError() );
+        assertThat( message1.isError(), is(true) );
 
-        assertEquals( "cannot find symbol" + EOL +
-                      "symbol  : class Properties" + EOL + 
-                      "location: class Error", message1.getMessage() );
+        assertThat( message1.getMessage(), is ("cannot find symbol" + EOL +
+                "symbol  : class Properties" + EOL +
+                "location: class Error") );
 
-        assertEquals( 16, message1.getStartColumn() );
+        assertThat( message1.getStartColumn(), is(16) );
 
-        assertEquals( 26, message1.getEndColumn() );
+        assertThat( message1.getEndColumn(), is(26) );
 
-        assertEquals( 3, message1.getStartLine() );
+        assertThat( message1.getStartLine(), is(3) );
 
-        assertEquals( 3, message1.getEndLine() );
+        assertThat( message1.getEndLine(), is(3) );
         
         CompilerMessage message2 = compilerErrors.get( 1 );
 
-        assertTrue( message2.isError() );
+        assertThat( message2.isError(), is(true) );
 
-        assertEquals( "cannot find symbol" + EOL +
-                      "symbol  : class Properties" + EOL + 
-                      "location: class Error", message2.getMessage() );
+        assertThat( message2.getMessage(), is("cannot find symbol" + EOL +
+                "symbol  : class Properties" + EOL +
+                "location: class Error") );
 
-        assertEquals( 35, message2.getStartColumn() );
+        assertThat( message2.getStartColumn(), is(35) );
 
-        assertEquals( 48, message2.getEndColumn() );
+        assertThat( message2.getEndColumn(), is(48) );
 
-        assertEquals( 3, message2.getStartLine() );
+        assertThat( message2.getStartLine(), is(3) );
 
-        assertEquals( 3, message2.getEndLine() );
+        assertThat( message2.getEndLine(), is(3) );
     }
-    
+
+    @Test
     public void testJava7Error() throws Exception
     {
         String out = "Error.java:3: error: cannot find symbol" + EOL + 
@@ -729,41 +745,42 @@ public class ErrorMessageParserTest
         
         List<CompilerMessage> compilerErrors = JavacCompiler.parseModernStream( 1, new BufferedReader( new StringReader( out ) ));
         
-        assertNotNull( compilerErrors );
+        assertThat( compilerErrors, notNullValue() );
         
         CompilerMessage message1 = compilerErrors.get( 0 );
+
+        assertThat( message1.isError(), is(true) );
         
-        assertTrue( message1.isError() );
+        assertThat( message1.getMessage(), is("error: cannot find symbol" + EOL +
+                "  symbol:   class Properties" + EOL +
+                "  location: class Error") );
         
-        assertEquals( "error: cannot find symbol" + EOL +
-                      "  symbol:   class Properties" + EOL + 
-                      "  location: class Error", message1.getMessage() );
+        assertThat( message1.getStartColumn(), is(16) );
         
-        assertEquals( 16, message1.getStartColumn() );
+        assertThat( message1.getEndColumn(), is(26) );
         
-        assertEquals( 26, message1.getEndColumn() );
+        assertThat( message1.getStartLine(), is(3) );
         
-        assertEquals( 3, message1.getStartLine() );
-        
-        assertEquals( 3, message1.getEndLine() );
+        assertThat( message1.getEndLine(), is(3) );
         
         CompilerMessage message2 = compilerErrors.get( 1 );
         
-        assertTrue( message2.isError() );
+        assertThat( message2.isError(), is(true) );
         
-        assertEquals( "error: cannot find symbol" + EOL +
-                      "  symbol:   class Properties" + EOL + 
-                      "  location: class Error", message2.getMessage() );
+        assertThat( message2.getMessage(), is("error: cannot find symbol" + EOL +
+                "  symbol:   class Properties" + EOL +
+                "  location: class Error") );
         
-        assertEquals( 35, message2.getStartColumn() );
+        assertThat( message2.getStartColumn(), is(35) );
         
-        assertEquals( 48, message2.getEndColumn() );
+        assertThat( message2.getEndColumn(), is(48) );
         
-        assertEquals( 3, message2.getStartLine() );
+        assertThat( message2.getStartLine(), is(3) );
         
-        assertEquals( 3, message2.getEndLine() );
+        assertThat( message2.getEndLine(), is(3) );
     }
-    
+
+    @Test
     public void testBugParade() throws Exception
     {
         String out = "An exception has occurred in the compiler (1.7.0_80). "
@@ -773,12 +790,13 @@ public class ErrorMessageParserTest
         
         List<CompilerMessage> compilerErrors = JavacCompiler.parseModernStream( 4, new BufferedReader( new StringReader( out ) ));
 
-        assertNotNull( compilerErrors );
+        assertThat( compilerErrors, notNullValue() );
         
-        assertEquals( 1, compilerErrors.size() );
+        assertThat( compilerErrors.size(), is(1) );
     }
 
-    public final void testNonAnchoredWarning() throws IOException {
+    @Test
+    public void testNonAnchoredWarning() throws IOException {
         final String error =
               "warning: [options] bootstrap class path not set in conjunction with -source 1.6" + EOL +
                     "1 warning" + EOL;
@@ -787,15 +805,16 @@ public class ErrorMessageParserTest
               StringReader(
               error)));
 
-        assertNotNull(compilerErrors);
-        assertEquals(1, compilerErrors.size());
+        assertThat(compilerErrors, notNullValue());
+        assertThat(compilerErrors.size(), is(1));
         assertEquivalent(
               new CompilerMessage(
                     "[options] bootstrap class path not set in conjunction with -source 1.6", CompilerMessage.Kind.WARNING),
               compilerErrors.get(0));
     }
 
-    public final void testAnchoredWarning() throws IOException {
+    @Test
+    public void testAnchoredWarning() throws IOException {
         final String error =
               "C:\\repo\\src\\it\\includes-output-when-compiler-forked\\src\\main" +
                     "\\java\\MyClass.java:23: warning: [divzero] division by zero" + EOL +
@@ -806,15 +825,16 @@ public class ErrorMessageParserTest
         final List<CompilerMessage> compilerErrors =
               JavacCompiler.parseModernStream(0, new BufferedReader(new StringReader(error)));
 
-        assertNotNull(compilerErrors);
-        assertEquals(1, compilerErrors.size());
+        assertThat(compilerErrors, notNullValue());
+        assertThat(compilerErrors.size(), is(1));
         assertEquivalent(
               new CompilerMessage("C:\\repo\\src\\it\\includes-output-when-compiler-forked\\src\\main\\java\\MyClass" +
                     ".java", CompilerMessage.Kind.WARNING, 23, 27, 23, 30, "[divzero] division by zero"),
               compilerErrors.get(0));
     }
 
-    public final void testMixedWarnings() throws IOException {
+    @Test
+    public void testMixedWarnings() throws IOException {
         final String error =
               "warning: [options] bootstrap class path not set in conjunction with -source 1.6" + EOL +
                     "C:\\repo\\src\\it\\includes-output-when-compiler-forked\\src\\main\\java" +
@@ -826,8 +846,8 @@ public class ErrorMessageParserTest
         final List<CompilerMessage> compilerErrors =
               JavacCompiler.parseModernStream(0, new BufferedReader(new StringReader(error)));
 
-        assertNotNull(compilerErrors);
-        assertEquals(2, compilerErrors.size());
+        assertThat(compilerErrors, notNullValue());
+        assertThat(compilerErrors.size(), is(2));
         assertEquivalent(
               new CompilerMessage(
                     "[options] bootstrap class path not set in conjunction with -source 1.6", CompilerMessage.Kind.WARNING),
@@ -838,8 +858,9 @@ public class ErrorMessageParserTest
               compilerErrors.get(1));
     }
 
-    public final void testIssue37() throws IOException {
-        final String error =
+    @Test
+    public void testIssue37() throws IOException {
+        String error =
               "warning: [path] bad path element \"d:\\maven_repo\\.m2\\repository\\org\\ow2\\asm\\asm-xml\\5.0.3\\asm-5.0.3.jar\": no such file or directory" + EOL +
                     "warning: [path] bad path element \"d:\\maven_repo\\.m2\\repository\\org\\ow2\\asm\\asm-xml\\5.0.3\\asm-util-5.0.3.jar\": no such file or directory" + EOL +
                     "warning: [options] bootstrap class path not set in conjunction with -source 1.7" + EOL +
@@ -873,11 +894,11 @@ public class ErrorMessageParserTest
                     "\tat jdk.compiler/com.sun.tools.javac.Main.compile(Main.java:57)" + EOL +
                     "\tat jdk.compiler/com.sun.tools.javac.Main.main(Main.java:43)";
 
-        final List<CompilerMessage> compilerErrors =
+        List<CompilerMessage> compilerErrors =
               JavacCompiler.parseModernStream(0, new BufferedReader(new StringReader(error)));
 
-        assertNotNull( compilerErrors );
-        assertEquals(4, compilerErrors.size());
+        assertThat( compilerErrors, notNullValue());
+        assertThat(compilerErrors.size(), is(4));
 
         assertEquivalent(new CompilerMessage("[path] bad path element \"d:\\maven_repo\\" +
               ".m2\\repository\\org\\ow2\\asm\\asm-xml\\5.0.3\\asm-5.0.3.jar\": no such file or directory",
@@ -887,13 +908,14 @@ public class ErrorMessageParserTest
         assertEquivalent(new CompilerMessage("[options] bootstrap class path not set in conjunction with -source 1.7",
               CompilerMessage.Kind.WARNING), compilerErrors.get(2));
 
-        final CompilerMessage finalMessage = compilerErrors.get(3);
-        assertEquals(CompilerMessage.Kind.ERROR, finalMessage.getKind());
-        assertTrue("Starts correctly", finalMessage.getMessage().startsWith("An exception has occurred in the compiler"));
-        assertTrue("continues through end of output", finalMessage.getMessage().endsWith("\tat jdk.compiler/com.sun" +
+        CompilerMessage finalMessage = compilerErrors.get(3);
+        assertThat( finalMessage.getKind(), is(CompilerMessage.Kind.ERROR));
+        assertThat("Starts correctly", finalMessage.getMessage(), startsWith("An exception has occurred in the compiler"));
+        assertThat("continues through end of output", finalMessage.getMessage(), endsWith("\tat jdk.compiler/com.sun" +
               ".tools.javac.Main.main(Main.java:43)" + EOL));
     }
 
+    @Test
     public void testJvmError() throws Exception
     {
         String out = "Error occurred during initialization of boot layer" + EOL +
@@ -901,11 +923,12 @@ public class ErrorMessageParserTest
 
         List<CompilerMessage> compilerErrors = JavacCompiler.parseModernStream( 1, new BufferedReader( new StringReader( out ) ));
 
-        assertNotNull( compilerErrors );
+        assertThat( compilerErrors, notNullValue());
 
-        assertEquals( 1, compilerErrors.size() );
+        assertThat( compilerErrors.size(), is(1) );
     }
 
+    @Test
     public void testBadSourceFileError() throws Exception
     {
         String out = "/MTOOLCHAINS-19/src/main/java/ch/pecunifex/x/Cls1.java:12: error: cannot access Cls2\n" +
@@ -917,14 +940,15 @@ public class ErrorMessageParserTest
 
         List<CompilerMessage> compilerErrors = JavacCompiler.parseModernStream( 1, new BufferedReader( new StringReader( out ) ));
 
-        assertNotNull( compilerErrors );
+        assertThat( compilerErrors, notNullValue() );
 
-        assertEquals( 1, compilerErrors.size() );
+        assertThat( compilerErrors.size(), is(1));
 
-        final CompilerMessage message = compilerErrors.get( 0 );
+        CompilerMessage message = compilerErrors.get( 0 );
         validateBadSourceFile(message);
     }
 
+    @Test
     public void testWarningFollowedByBadSourceFileError() throws Exception
     {
         String out = "/MTOOLCHAINS-19/src/main/java/ch/pecunifex/x/Cls1.java:3: warning: FontDesignMetrics is internal proprietary API and may be removed in a future release\n" +
@@ -939,33 +963,37 @@ public class ErrorMessageParserTest
 
         List<CompilerMessage> compilerErrors = JavacCompiler.parseModernStream( 1, new BufferedReader( new StringReader( out ) ));
 
-        assertNotNull( compilerErrors );
+        assertThat( compilerErrors, notNullValue());
 
-        assertEquals( 2, compilerErrors.size() );
+        assertThat( compilerErrors, hasSize(2) );
 
-        final CompilerMessage firstMessage = compilerErrors.get( 0 );
-        assertEquals( "Is a Warning", CompilerMessage.Kind.WARNING, firstMessage.getKind() );
-        assertEquals( "On Correct File","/MTOOLCHAINS-19/src/main/java/ch/pecunifex/x/Cls1.java", firstMessage.getFile() );
-        assertEquals( "Internal API Warning", "FontDesignMetrics is internal proprietary API and may be removed in a future release", firstMessage.getMessage() );
+        CompilerMessage firstMessage = compilerErrors.get( 0 );
+        assertThat( "Is a Warning", firstMessage.getKind(),
+                is(CompilerMessage.Kind.WARNING) );
+        assertThat( "On Correct File",firstMessage.getFile(),
+                is("/MTOOLCHAINS-19/src/main/java/ch/pecunifex/x/Cls1.java") );
+        assertThat( "Internal API Warning",
+                firstMessage.getMessage(),
+                is("FontDesignMetrics is internal proprietary API and may be removed in a future release"));
 
-        final CompilerMessage secondMessage = compilerErrors.get( 1 );
+        CompilerMessage secondMessage = compilerErrors.get( 1 );
         validateBadSourceFile(secondMessage);
     }
 
     private void validateBadSourceFile(CompilerMessage message)
     {
-        assertEquals( "Is an Error", CompilerMessage.Kind.ERROR, message.getKind() );
-        assertEquals( "On Correct File","/MTOOLCHAINS-19/src/main/java/ch/pecunifex/x/Cls1.java", message.getFile() );
-        assertTrue( "Message starts with access Error", message.getMessage().startsWith("error: cannot access Cls2") );
+        assertThat( "Is an Error", message.getKind(), is(CompilerMessage.Kind.ERROR) );
+        assertThat( "On Correct File",message.getFile(), is("/MTOOLCHAINS-19/src/main/java/ch/pecunifex/x/Cls1.java") );
+        assertThat( "Message starts with access Error", message.getMessage(), startsWith("error: cannot access Cls2") );
     }
 
     private static void assertEquivalent(CompilerMessage expected, CompilerMessage actual){
-        assertEquals("Message did not match", expected.getMessage(), actual.getMessage());
-        assertEquals("Kind did not match", expected.getKind(), actual.getKind());
-        assertEquals("File did not match", expected.getFile(), actual.getFile());
-        assertEquals( "Start line did not match", expected.getStartLine(), actual.getStartLine());
-        assertEquals( "Start column did not match", expected.getStartColumn(), actual.getStartColumn());
-        assertEquals("End line did not match", expected.getEndLine(), actual.getEndLine());
-        assertEquals("End column did not match", expected.getEndColumn(), actual.getEndColumn());
+        assertThat("Message did not match",actual.getMessage(), is( expected.getMessage()));
+        assertThat("Kind did not match", actual.getKind(), is(expected.getKind()));
+        assertThat("File did not match", actual.getFile(), is(expected.getFile()));
+        assertThat( "Start line did not match", actual.getStartLine(), is(expected.getStartLine()));
+        assertThat( "Start column did not match", actual.getStartColumn(), is(expected.getStartColumn()));
+        assertThat("End line did not match", actual.getEndLine(), is(expected.getEndLine()));
+        assertThat("End column did not match", actual.getEndColumn(), is(expected.getEndColumn()));
     }
 }

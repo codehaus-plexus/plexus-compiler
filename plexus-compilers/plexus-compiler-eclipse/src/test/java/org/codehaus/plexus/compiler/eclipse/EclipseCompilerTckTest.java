@@ -34,6 +34,7 @@ public class EclipseCompilerTckTest
 {
     public EclipseCompilerTckTest()
     {
-        super( "eclipse" );
+        this.roleHint = "eclipse";
+
     }
 }

@@ -27,6 +27,7 @@ package org.codehaus.plexus.compiler.javac;
 import org.codehaus.plexus.compiler.AbstractCompilerTest;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.util.StringUtils;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -38,7 +39,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 /**
  * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>
@@ -50,11 +52,9 @@ public abstract class AbstractJavacCompilerTest
 
     @BeforeEach
     public void setUp()
-        throws Exception
     {
         setCompilerDebug( true );
         setCompilerDeprecationWarnings( true );
-
     }
 
     @Override
@@ -177,7 +177,7 @@ public abstract class AbstractJavacCompilerTest
             "org/codehaus/foo/Person.class", "org/codehaus/foo/ReservedWord.class" } );
     }
 
-    public void internalTest(CompilerConfiguration compilerConfiguration, List<String> expectedArguments) {
+    protected void internalTest(CompilerConfiguration compilerConfiguration, List<String> expectedArguments) {
         internalTest(compilerConfiguration, expectedArguments, new String[0]);
     }
 
@@ -185,11 +185,12 @@ public abstract class AbstractJavacCompilerTest
     {
         String[] actualArguments = JavacCompiler.buildCompilerArguments( compilerConfiguration, sources );
 
-        assertThat( actualArguments ).as( "The expected and actual argument list sizes differ." ).hasSize( expectedArguments.size() );
+        assertThat( "The expected and actual argument list sizes differ.",
+                actualArguments, Matchers.arrayWithSize(expectedArguments.size() ));
 
         for ( int i = 0; i < actualArguments.length; i++ )
         {
-            assertThat( actualArguments[i] ).as( "Unexpected argument").isEqualTo( expectedArguments.get( i ) );
+            assertThat( "Unexpected argument", actualArguments[i], is( expectedArguments.get( i ) ));
         }
     }
 
