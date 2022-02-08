@@ -9,7 +9,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -72,6 +73,6 @@ public class JavacCompilerTest
         List<CompilerMessage> compilerMessages = JavacCompiler.parseModernStream( 1,
                 new BufferedReader( new StringReader( input ) ) );
 
-        assertThat( compilerMessages ).hasSize( 1 );
+        assertThat( compilerMessages, hasSize( 1 ) );
     }
 }
