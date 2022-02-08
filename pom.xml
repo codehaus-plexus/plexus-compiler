@@ -28,7 +28,6 @@
     <connection>${scm.url}</connection>
     <developerConnection>${scm.url}</developerConnection>
     <url>http://github.com/codehaus-plexus/plexus-compiler/tree/${project.scm.tag}/</url>
-    <tag>master</tag>
   </scm>
   <issueManagement>
     <system>github</system>
