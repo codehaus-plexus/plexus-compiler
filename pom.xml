@@ -200,7 +200,7 @@
               <rules>
                 <requireJavaVersion>
                   <version>[11,)</version>
-                  <message>[ERROR] OLD JDK [${java.version}] in use. This projects requires JDK 8 or newer</message>
+                  <message>[ERROR] OLD JDK [${java.version}] in use. This projects requires JDK 11 or newer</message>
                 </requireJavaVersion>
               </rules>
             </configuration>
