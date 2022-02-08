@@ -17,7 +17,6 @@
     <module>plexus-compiler-aspectj</module>
     <module>plexus-compiler-csharp</module>
     <module>plexus-compiler-eclipse</module>
-    <module>plexus-compiler-jikes</module>
     <module>plexus-compiler-javac</module>
     <module>plexus-compiler-javac-errorprone</module>
     <module>plexus-compiler-j2objc</module>
