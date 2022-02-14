@@ -206,7 +206,11 @@ public class EclipseJavaCompiler
 
                 if ( processorPathEntries != null && processorPathEntries.size() > 0 )
                 {
-                    args.add( "-processorpath" );
+                    if (isReplaceProcessorPath(config)) {
+                        args.add( "--processor-module-path" );
+                    } else {
+                        args.add( "-processorpath" );
+                    }
                     args.add( getPathString( processorPathEntries ) );
                 }
 
@@ -476,6 +480,20 @@ public class EclipseJavaCompiler
         }
     }
 
+    private static final String OPT_REPLACE_PROCESSOR_PATH = "replaceProcessorPathWithProcessorModulePath";
+    private static final String OPT_REPLACE_PROCESSOR_PATH_ = "-" + OPT_REPLACE_PROCESSOR_PATH;
+
+    static boolean isReplaceProcessorPath( CompilerConfiguration config ) {
+        for (Entry<String, String> entry : config.getCustomCompilerArgumentsEntries()) {
+            String opt = entry.getKey();
+            if ( opt.equals(OPT_REPLACE_PROCESSOR_PATH) || opt.equals(OPT_REPLACE_PROCESSOR_PATH_) )
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     static boolean processCustomArguments( CompilerConfiguration config, List<String> args )
     {
         boolean result = false;
@@ -513,46 +531,49 @@ public class EclipseJavaCompiler
                 continue;
             }
 
-            /*
-            * The compiler mojo makes quite a mess of passing arguments, depending on exactly WHICH
-            * way is used to pass them. The method method using <compilerArguments> uses the tag names
-            * of its contents to denote option names, and so the compiler mojo happily adds a '-' to
-            * all of the names there and adds them to the "custom compiler arguments" map as a
-            * name, value pair where the name always contains a single '-'. The Eclipse compiler (and
-            * javac too, btw) has options with two dashes (like --add-modules for java 9). These cannot
-            * be passed using a <compilerArguments> tag.
-            *
-            * The other method is to use <compilerArgs>, where each SINGLE argument needs to be passed
-            * using an <arg>xxxx</arg> tag. In there the xxx is not manipulated by the compiler mojo, so
-            * if it starts with a dash or more dashes these are perfectly preserved. But of course these
-            * single <arg> entries are not a pair. So the compiler mojo adds them as pairs of (xxxx, null).
-            *
-            * We use that knowledge here: if a pair has a null value then do not mess up the key but
-            * render it as a single value. This should ensure that something like:
-            * <compilerArgs>
-            *     <arg>--add-modules</arg>
-            *     <arg>java.se.ee</arg>
-            * </compilerArgs>
-            *
-            * is actually added to the command like as such.
-            *
-            * (btw: the above example will still give an error when using ecj <= 4.8M6:
-            *      invalid module name: java.se.ee
-            * but that seems to be a bug in ecj).
-            */
-            if ( null == optionValue )
+            if ( !opt.equals(OPT_REPLACE_PROCESSOR_PATH) && !opt.equals(OPT_REPLACE_PROCESSOR_PATH_) )
             {
-                //-- We have an option from compilerArgs: use the key as-is as a single option value
-                args.add( opt );
-            }
-            else
-            {
-                if ( !opt.startsWith( "-" ) )
+                /*
+                 * The compiler mojo makes quite a mess of passing arguments, depending on exactly WHICH
+                 * way is used to pass them. The method method using <compilerArguments> uses the tag names
+                 * of its contents to denote option names, and so the compiler mojo happily adds a '-' to
+                 * all of the names there and adds them to the "custom compiler arguments" map as a
+                 * name, value pair where the name always contains a single '-'. The Eclipse compiler (and
+                 * javac too, btw) has options with two dashes (like --add-modules for java 9). These cannot
+                 * be passed using a <compilerArguments> tag.
+                 *
+                 * The other method is to use <compilerArgs>, where each SINGLE argument needs to be passed
+                 * using an <arg>xxxx</arg> tag. In there the xxx is not manipulated by the compiler mojo, so
+                 * if it starts with a dash or more dashes these are perfectly preserved. But of course these
+                 * single <arg> entries are not a pair. So the compiler mojo adds them as pairs of (xxxx, null).
+                 *
+                 * We use that knowledge here: if a pair has a null value then do not mess up the key but
+                 * render it as a single value. This should ensure that something like:
+                 * <compilerArgs>
+                 *     <arg>--add-modules</arg>
+                 *     <arg>java.se.ee</arg>
+                 * </compilerArgs>
+                 *
+                 * is actually added to the command like as such.
+                 *
+                 * (btw: the above example will still give an error when using ecj <= 4.8M6:
+                 *      invalid module name: java.se.ee
+                 * but that seems to be a bug in ecj).
+                 */
+                if ( null == optionValue )
                 {
-                    opt = "-" + opt;
+                    //-- We have an option from compilerArgs: use the key as-is as a single option value
+                    args.add( opt );
                 }
-                args.add( opt );
-                args.add( optionValue );
+                else
+                {
+                    if ( !opt.startsWith( "-" ) )
+                    {
+                        opt = "-" + opt;
+                    }
+                    args.add( opt );
+                    args.add( optionValue );
+                }
             }
         }
         return result;
