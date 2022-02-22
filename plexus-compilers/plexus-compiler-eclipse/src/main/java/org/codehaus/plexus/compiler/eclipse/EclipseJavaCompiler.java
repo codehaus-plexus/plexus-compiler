@@ -262,6 +262,8 @@ public class EclipseJavaCompiler
             return new CompilerResult( true, messageList );
         }
 
+        allSources = resortSourcesToPutModuleInfoFirst( allSources );
+
         // Compile
         try
         {
@@ -474,6 +476,29 @@ public class EclipseJavaCompiler
         {
             throw new RuntimeException( x ); // sigh
         }
+    }
+
+    static List<String> resortSourcesToPutModuleInfoFirst( List<String> allSources )
+    {
+        ArrayList<String> resorted = new ArrayList<>();
+
+        for ( String mi : allSources )
+        {
+            if ( mi.endsWith( "module-info.java" ) )
+            {
+                resorted.add( mi );
+            }
+        }
+
+        for ( String nmi : allSources )
+        {
+            if ( !nmi.endsWith( "module-info.java") )
+            {
+                resorted.add( nmi );
+            }
+        }
+
+        return resorted;
     }
 
     static boolean processCustomArguments( CompilerConfiguration config, List<String> args )
