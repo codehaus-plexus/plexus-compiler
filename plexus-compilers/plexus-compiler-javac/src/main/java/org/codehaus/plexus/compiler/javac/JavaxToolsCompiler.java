@@ -24,6 +24,7 @@ import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.compiler.CompilerException;
 import org.codehaus.plexus.compiler.CompilerResult;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 import javax.tools.Diagnostic;
 import javax.tools.DiagnosticCollector;
@@ -36,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -43,8 +45,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author <a href="mailto:david.lloyd@redhat.com">David M. Lloyd</a>
  * @since 2.0
  */
-@Component( role = Compiler.class )
-public class JavaxToolsCompiler implements InProcessCompiler
+@Component( role = InProcessCompiler.class )
+public class JavaxToolsCompiler extends AbstractLogEnabled implements InProcessCompiler
 {
     /**
      * is that thread safe ???
@@ -102,6 +104,7 @@ public class JavaxToolsCompiler implements InProcessCompiler
         throws CompilerException
     {
         JavaCompiler compiler = getJavaCompiler( config );
+        CompilerResult compilerResult;
         try
         {
             if ( compiler == null )
@@ -111,14 +114,15 @@ public class JavaxToolsCompiler implements InProcessCompiler
                                                                CompilerMessage.Kind.ERROR );
                 return new CompilerResult( false, Collections.singletonList( message ) );
             }
-            final String sourceEncoding = config.getSourceEncoding();
-            final Charset sourceCharset = sourceEncoding == null ? null : Charset.forName( sourceEncoding );
-            final DiagnosticCollector<JavaFileObject> collector = new DiagnosticCollector<>();
-            try ( final StandardJavaFileManager standardFileManager =
+            String sourceEncoding = config.getSourceEncoding();
+            Charset sourceCharset = sourceEncoding == null ? null : Charset.forName( sourceEncoding );
+            DiagnosticCollector<JavaFileObject> collector = new DiagnosticCollector<>();
+            ArrayList<CompilerMessage> compilerMsgs = new ArrayList<>();
+            try ( StandardJavaFileManager standardFileManager =
                 compiler.getStandardFileManager( collector, null, sourceCharset ) )
             {
 
-                final Iterable<? extends JavaFileObject> fileObjects =
+                Iterable<? extends JavaFileObject> fileObjects =
                     standardFileManager.getJavaFileObjectsFromStrings( Arrays.asList( sourceFiles ) );
 
                  /*(Writer out,
@@ -130,14 +134,26 @@ public class JavaxToolsCompiler implements InProcessCompiler
 
                 List<String> arguments = Arrays.asList( args );
 
-                final JavaCompiler.CompilationTask task =
+                JavaCompiler.CompilationTask task =
                     compiler.getTask( null, standardFileManager, collector, arguments, null, fileObjects );
-                final Boolean result = task.call();
-                final ArrayList<CompilerMessage> compilerMsgs = new ArrayList<>();
+                Boolean result = task.call();
+
                 for ( Diagnostic<? extends JavaFileObject> diagnostic : collector.getDiagnostics() )
                 {
-                    CompilerMessage.Kind kind = convertKind(diagnostic);
-                    String baseMessage = diagnostic.getMessage( null );
+                    CompilerMessage.Kind kind = convertKind( diagnostic );
+
+                    String baseMessage = null;
+                    try
+                    {
+                        baseMessage = diagnostic.getMessage( Locale.getDefault() );
+                    }
+                    catch ( AssertionError e )
+                    {
+                        // workaround for https://bugs.openjdk.java.net/browse/JDK-8210649
+                        getLogger().debug( "Ignore Issue get JavaCompiler Diagnostic message (see https://bugs.openjdk.java.net/browse/JDK-8210649):" + e.getMessage(), e );
+                        // in this case we try to replace the baseMessage with toString (hoping this does not throw a new exception..
+                        baseMessage = diagnostic.toString();
+                    }
                     if ( baseMessage == null )
                     {
                         continue;
@@ -175,10 +191,10 @@ public class JavaxToolsCompiler implements InProcessCompiler
                         new CompilerMessage( "An unknown compilation problem occurred", CompilerMessage.Kind.ERROR ) );
                 }
 
-                return new CompilerResult( result, compilerMsgs );
+                compilerResult = new CompilerResult( result, compilerMsgs );
             }
         }
-        catch ( Exception e )
+        catch ( Throwable e )
         {
             throw new CompilerException( e.getMessage(), e );
         }
@@ -187,6 +203,7 @@ public class JavaxToolsCompiler implements InProcessCompiler
             releaseJavaCompiler( compiler, config );
 
         }
+        return compilerResult;
     }
 
     private CompilerMessage.Kind convertKind(Diagnostic<? extends JavaFileObject> diagnostic) {

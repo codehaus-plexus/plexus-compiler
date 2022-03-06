@@ -55,7 +55,7 @@
           <compilerId>eclipse</compilerId>
         </configuration>
         <dependencies>
-            <dependency>
+          <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-compiler-api</artifactId>
             <version>@pom.version@</version>
