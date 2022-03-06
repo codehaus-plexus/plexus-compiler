@@ -18,7 +18,6 @@ package org.codehaus.plexus.compiler.javac;
  * under the License.
  */
 
-import org.codehaus.plexus.compiler.Compiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.compiler.CompilerException;
@@ -59,7 +58,7 @@ public class JavaxToolsCompiler extends AbstractLogEnabled implements InProcessC
 		return ToolProvider.getSystemJavaCompiler();
 	}
 
-    private List<JavaCompiler> JAVA_COMPILERS = new CopyOnWriteArrayList<>();
+    private final List<JavaCompiler> JAVA_COMPILERS = new CopyOnWriteArrayList<>();
 
     private JavaCompiler getJavaCompiler( CompilerConfiguration compilerConfiguration )
     {
@@ -104,7 +103,6 @@ public class JavaxToolsCompiler extends AbstractLogEnabled implements InProcessC
         throws CompilerException
     {
         JavaCompiler compiler = getJavaCompiler( config );
-        CompilerResult compilerResult;
         try
         {
             if ( compiler == null )
@@ -142,7 +140,7 @@ public class JavaxToolsCompiler extends AbstractLogEnabled implements InProcessC
                 {
                     CompilerMessage.Kind kind = convertKind( diagnostic );
 
-                    String baseMessage = null;
+                    String baseMessage;
                     try
                     {
                         baseMessage = diagnostic.getMessage( Locale.getDefault() );
