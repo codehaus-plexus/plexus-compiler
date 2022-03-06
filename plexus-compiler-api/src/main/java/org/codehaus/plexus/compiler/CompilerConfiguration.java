@@ -178,6 +178,11 @@ public class CompilerConfiguration
      */
     private String debugFileName;
 
+    /**
+     * configure <code>--enable-preview</code> of java compiler
+     */
+    private boolean enablePreview;
+
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
@@ -630,6 +635,16 @@ public class CompilerConfiguration
     public void setParameters(boolean parameters)
     {
         this.parameters = parameters;
+    }
+
+    public boolean isEnablePreview()
+    {
+        return enablePreview;
+    }
+
+    public void setEnablePreview(boolean enablePreview)
+    {
+        this.enablePreview = enablePreview;
     }
 
     public void setProc(String proc )
