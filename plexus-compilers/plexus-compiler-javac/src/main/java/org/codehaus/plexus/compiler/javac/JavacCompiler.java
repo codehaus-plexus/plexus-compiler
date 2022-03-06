@@ -105,7 +105,7 @@ public class JavacCompiler
 
     private static volatile Class<?> JAVAC_CLASS;
 
-    private List<Class<?>> javaccClasses = new CopyOnWriteArrayList<>();
+    private final List<Class<?>> javaccClasses = new CopyOnWriteArrayList<>();
 
     @Requirement
     private InProcessCompiler inProcessCompiler;
@@ -432,7 +432,7 @@ public class JavacCompiler
             args.add( value );
         }
 
-        return args.toArray( new String[args.size()] );
+        return args.toArray( new String[0] );
     }
 
     /**

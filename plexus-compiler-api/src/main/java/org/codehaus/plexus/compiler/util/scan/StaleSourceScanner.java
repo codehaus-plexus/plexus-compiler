@@ -42,12 +42,12 @@ public class StaleSourceScanner
 
     public StaleSourceScanner()
     {
-        this( 0, Collections.singleton( "**/*" ), Collections.<String>emptySet() );
+        this( 0, Collections.singleton( "**/*" ), Collections.emptySet() );
     }
 
     public StaleSourceScanner( long lastUpdatedWithinMsecs )
     {
-        this( lastUpdatedWithinMsecs, Collections.singleton( "**/*" ), Collections.<String>emptySet() );
+        this( lastUpdatedWithinMsecs, Collections.singleton( "**/*" ), Collections.emptySet() );
     }
 
     public StaleSourceScanner( long lastUpdatedWithinMsecs, Set<String> sourceIncludes, Set<String> sourceExcludes )

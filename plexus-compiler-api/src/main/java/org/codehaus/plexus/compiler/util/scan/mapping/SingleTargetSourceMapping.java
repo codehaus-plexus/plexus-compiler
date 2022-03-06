@@ -38,9 +38,9 @@ import java.io.File;
 public class SingleTargetSourceMapping
     implements SourceMapping
 {
-    private String sourceSuffix;
+    private final String sourceSuffix;
 
-    private String outputFile;
+    private final String outputFile;
 
     public SingleTargetSourceMapping( String sourceSuffix, String outputFile )
     {

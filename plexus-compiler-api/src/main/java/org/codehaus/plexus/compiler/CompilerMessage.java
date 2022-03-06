@@ -339,9 +339,9 @@ public class CompilerMessage
          */
         WARNING( "warning" );
 
-        private String type;
+        private final String type;
 
-        private Kind( final String type )
+        Kind( final String type )
         {
             this.type = type;
         }

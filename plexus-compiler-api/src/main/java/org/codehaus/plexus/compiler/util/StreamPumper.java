@@ -36,13 +36,13 @@ public class StreamPumper
 {
     private static final int BUFFER_SIZE = 512;
 
-    private BufferedInputStream stream;
+    private final BufferedInputStream stream;
 
     private boolean endOfStream = false;
 
     private int SLEEP_TIME = 5;
 
-    private OutputStream out;
+    private final OutputStream out;
 
     public StreamPumper( BufferedInputStream is, OutputStream out )
     {
