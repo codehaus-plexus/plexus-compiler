@@ -117,7 +117,6 @@ public class JavaxToolsCompiler extends AbstractLogEnabled implements InProcessC
             String sourceEncoding = config.getSourceEncoding();
             Charset sourceCharset = sourceEncoding == null ? null : Charset.forName( sourceEncoding );
             DiagnosticCollector<JavaFileObject> collector = new DiagnosticCollector<>();
-            ArrayList<CompilerMessage> compilerMsgs = new ArrayList<>();
             try ( StandardJavaFileManager standardFileManager =
                 compiler.getStandardFileManager( collector, null, sourceCharset ) )
             {
@@ -137,6 +136,7 @@ public class JavaxToolsCompiler extends AbstractLogEnabled implements InProcessC
                 JavaCompiler.CompilationTask task =
                     compiler.getTask( null, standardFileManager, collector, arguments, null, fileObjects );
                 Boolean result = task.call();
+                List<CompilerMessage> compilerMsgs = new ArrayList<>();
 
                 for ( Diagnostic<? extends JavaFileObject> diagnostic : collector.getDiagnostics() )
                 {
@@ -191,19 +191,17 @@ public class JavaxToolsCompiler extends AbstractLogEnabled implements InProcessC
                         new CompilerMessage( "An unknown compilation problem occurred", CompilerMessage.Kind.ERROR ) );
                 }
 
-                compilerResult = new CompilerResult( result, compilerMsgs );
+                return new CompilerResult( result, compilerMsgs );
             }
         }
-        catch ( Throwable e )
+        catch ( Exception e )
         {
             throw new CompilerException( e.getMessage(), e );
         }
         finally
         {
             releaseJavaCompiler( compiler, config );
-
         }
-        return compilerResult;
     }
 
     private CompilerMessage.Kind convertKind(Diagnostic<? extends JavaFileObject> diagnostic) {
