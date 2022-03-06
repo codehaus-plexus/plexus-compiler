@@ -193,9 +193,6 @@ public class JavacCompiler
 	protected InProcessCompiler inProcessCompiler()
 	{
         return inProcessCompiler;
-//        InProcessCompiler inProcessCompiler = new org.codehaus.plexus.compiler.javac.JavaxToolsCompiler();
-//        inProcessCompiler.enableLogging( getLogger() );
-//        return inProcessCompiler;
 	}
 
     protected static boolean isJava16()
