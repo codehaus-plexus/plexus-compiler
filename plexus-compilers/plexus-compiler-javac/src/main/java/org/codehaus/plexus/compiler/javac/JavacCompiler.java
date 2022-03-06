@@ -70,6 +70,7 @@ import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.compiler.CompilerOutputStyle;
 import org.codehaus.plexus.compiler.CompilerResult;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
@@ -105,6 +106,9 @@ public class JavacCompiler
     private static volatile Class<?> JAVAC_CLASS;
 
     private List<Class<?>> javaccClasses = new CopyOnWriteArrayList<>();
+
+    @Requirement
+    private InProcessCompiler inProcessCompiler;
 
     // ----------------------------------------------------------------------
     //
@@ -186,10 +190,10 @@ public class JavacCompiler
         return result;
     }
 
-	protected InProcessCompiler inProcessCompiler()
-	{
-		return new org.codehaus.plexus.compiler.javac.JavaxToolsCompiler();
-	}
+    protected InProcessCompiler inProcessCompiler()
+    {
+        return inProcessCompiler;
+    }
 
     protected static boolean isJava16()
     {
