@@ -191,9 +191,9 @@ public class JavacCompiler
     }
 
 	protected InProcessCompiler inProcessCompiler()
-	{
+    {
         return inProcessCompiler;
-	}
+    }
 
     protected static boolean isJava16()
     {
