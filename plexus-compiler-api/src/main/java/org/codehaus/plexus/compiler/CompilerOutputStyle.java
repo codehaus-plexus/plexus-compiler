@@ -57,7 +57,7 @@ public final class CompilerOutputStyle
 
     public boolean equals( Object other )
     {
-        if ( other == null || !( other instanceof CompilerOutputStyle ) )
+        if ( !( other instanceof CompilerOutputStyle ) )
         {
             return false;
         }
