@@ -189,8 +189,8 @@ public class JavacCompiler
 
         return result;
     }
-
-	protected InProcessCompiler inProcessCompiler()
+    
+    protected InProcessCompiler inProcessCompiler()
     {
         return inProcessCompiler;
     }
