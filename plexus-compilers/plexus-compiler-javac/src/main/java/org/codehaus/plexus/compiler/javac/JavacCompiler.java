@@ -332,6 +332,11 @@ public class JavacCompiler
             args.add( "-parameters" );
         }
 
+        if ( config.isEnablePreview() )
+        {
+            args.add( "--enable-preview" );
+        }
+
         if ( config.isShowDeprecation() )
         {
             args.add( "-deprecation" );
