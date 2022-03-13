@@ -183,6 +183,9 @@ public class CompilerConfiguration
      */
     private boolean enablePreview;
 
+    /** value of <code>-implicit:</code> of java compiler */
+    private String implicitOption;
+
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
@@ -798,5 +801,15 @@ public class CompilerConfiguration
     public void setForceJavacCompilerUse( boolean forceJavacCompilerUse )
     {
         this.forceJavacCompilerUse = forceJavacCompilerUse;
+    }
+
+    public String getImplicitOption()
+    {
+        return implicitOption;
+    }
+
+    public void setImplicitOption( String implicitOption )
+    {
+        this.implicitOption = implicitOption;
     }
 }

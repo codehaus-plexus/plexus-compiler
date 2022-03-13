@@ -337,6 +337,11 @@ public class JavacCompiler
             args.add( "--enable-preview" );
         }
 
+        if ( config.getImplicitOption() != null )
+        {
+            args.add( "-implicit:" + config.getImplicitOption() );
+        }
+
         if ( config.isShowDeprecation() )
         {
             args.add( "-deprecation" );
