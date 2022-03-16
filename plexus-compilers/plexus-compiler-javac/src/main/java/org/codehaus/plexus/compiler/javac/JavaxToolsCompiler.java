@@ -145,9 +145,10 @@ public class JavaxToolsCompiler extends AbstractLogEnabled implements InProcessC
                     {
                         baseMessage = diagnostic.getMessage( Locale.getDefault() );
                     }
-                    catch ( AssertionError e )
+                    catch ( Throwable e ) //ignore any possible error from jdk
                     {
                         // workaround for https://bugs.openjdk.java.net/browse/JDK-8210649
+                        // workaround for https://bugs.openjdk.java.net/browse/JDK-8216202
                         getLogger().debug( "Ignore Issue get JavaCompiler Diagnostic message (see https://bugs.openjdk.java.net/browse/JDK-8210649):" + e.getMessage(), e );
                         // in this case we try to replace the baseMessage with toString (hoping this does not throw a new exception..
                         baseMessage = diagnostic.toString();
