@@ -47,7 +47,7 @@
     <redirectTestOutputToFile>true</redirectTestOutputToFile>
     <project.build.outputTimestamp>2022-03-06T23:52:05Z</project.build.outputTimestamp>
     <jupiter.version>5.8.2</jupiter.version>
-    <aspectj.version>1.9.7.M3</aspectj.version>
+    <aspectj.version>1.9.9</aspectj.version>
     <errorprone.version>2.11.0</errorprone.version>
     <trimStackTrace>false</trimStackTrace>
     <preparationGoals>clean install</preparationGoals>
