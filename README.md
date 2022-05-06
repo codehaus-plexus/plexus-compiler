@@ -12,3 +12,7 @@ This component is an Compilation API used by Apache Maven Compiler plugin on the
 Please refer to [documentation](https://errorprone.info/docs/installation#maven) 
 
 Or the project [it test](plexus-compiler-its/src/main/it/error-prone-compiler/pom.xml)
+
+### J2ObjC OSX
+
+To compile this project on OSX, you need to have J2ObjC installed: [J2ObjC Requirements](https://developers.google.com/j2objc#requirements).
