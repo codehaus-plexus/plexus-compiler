@@ -16,11 +16,8 @@
 # under the License.
 
 name: GitHub CI
-
 on:
   push:
-    branches-ignore:
-      - dependabot/**
   pull_request:
 
 jobs:
