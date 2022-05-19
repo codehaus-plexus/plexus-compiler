@@ -28,7 +28,8 @@ jobs:
     with:
       jdk-fast-fail-build: '11'
       jdk-matrix: '["11", "17", "18", "19-ea"]'
-      jdk-distribution-matrix: '["zulu", "temurin", "microsoft", "liberica"]'
+      jdk-distribution-matrix: '[ "temurin", "zulu", "microsoft", "liberica", "adopt-openj9" ]'
       os-matrix: '["ubuntu-latest","windows-latest", "macOS-latest"]'
+      matrix-exclude: '[{ "jdk": "8", "distribution": "microsoft"}]'
       maven_args: 'install javadoc:javadoc -e -B -V -fae -Pno-tests-if-not-on-osx'
 
