@@ -27,8 +27,15 @@ jobs:
     uses: codehaus-plexus/.github/.github/workflows/maven.yml@master
     with:
       jdk-fast-fail-build: '11'
-      jdk-matrix: '["11", "17"]'
-      jdk-distribution-matrix: '["zulu", "temurin", "microsoft", "liberica"]'
+      jdk-matrix: '["11", "17", "18", "19-ea"]'
+      jdk-distribution-matrix: '["zulu", "temurin", "microsoft", "liberica","corretto"]'
       os-matrix: '["ubuntu-latest","windows-latest", "macOS-latest"]'
+      matrix-exclude: '[
+          { "jdk": "18",    "distribution": "microsoft" },
+          { "jdk": "19-ea", "distribution": "corretto"  },
+          { "jdk": "19-ea", "distribution": "liberica"  },
+          { "jdk": "19-ea", "distribution": "microsoft" },
+          { "jdk": "19-ea", "distribution": "temurin"   }
+         ]'
       maven_args: 'install javadoc:javadoc -e -B -V -fae -Pno-tests-if-not-on-osx'
 

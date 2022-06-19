@@ -68,8 +68,8 @@ public abstract class AbstractJavacCompilerTest
     {
         String javaVersion = getJavaVersion();
         if (javaVersion.contains("9.0")||javaVersion.contains("11")||javaVersion.contains("14")||
-            javaVersion.contains("15")||javaVersion.contains("16")||javaVersion.contains("17")){
-            // lots of new warnings about obsoletions for future releases
+            javaVersion.contains("15")||javaVersion.contains("16")||javaVersion.contains("17")||
+            javaVersion.contains("18")||javaVersion.contains("19")){
             return 5;
         }
         // javac output changed for misspelled modifiers starting in 1.6...they now generate 2 errors per occurrence, not one.
@@ -88,14 +88,10 @@ public abstract class AbstractJavacCompilerTest
     {
         String javaVersion = getJavaVersion();
         if (javaVersion.contains("9.0")||javaVersion.contains("11")||javaVersion.contains("14")||
-            javaVersion.contains("15")||javaVersion.contains("16")||javaVersion.contains("17")){
+            javaVersion.contains("15")||javaVersion.contains("16")||javaVersion.contains("17")||
+            javaVersion.contains("18")||javaVersion.contains("19")){
             return 1;
         }
-        if (javaVersion.contains("9.0")){
-            // lots of new warnings about obsoletions for future releases
-            return 8;
-        }
-
         if (javaVersion.contains("1.8")){
             // lots of new warnings about obsoletions for future releases
             return 30;
@@ -132,6 +128,12 @@ public abstract class AbstractJavacCompilerTest
         if (javaVersion.contains("17")){
             return "17";
         }
+        if (javaVersion.contains("18")){
+            return "18";
+        }
+        if (javaVersion.contains("19")){
+            return "19";
+        }
         return super.getTargetVersion();
     }
 
@@ -161,6 +163,12 @@ public abstract class AbstractJavacCompilerTest
         if (javaVersion.contains("17")){
             return "17";
         }
+        if (javaVersion.contains("18")){
+            return "18";
+        }
+        if (javaVersion.contains("19")){
+            return "19";
+        }
         return super.getTargetVersion();
     }
 
@@ -169,12 +177,14 @@ public abstract class AbstractJavacCompilerTest
     {
         String javaVersion = getJavaVersion();
         if (javaVersion.contains("9.0")||javaVersion.contains("11")||javaVersion.contains("14")||
-            javaVersion.contains("15")||javaVersion.contains("16")||javaVersion.contains("17")){
-            return Arrays.asList( new String[]{ "org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ExternalDeps.class",
-                "org/codehaus/foo/Person.class"} );
+            javaVersion.contains("15")||javaVersion.contains("16")||javaVersion.contains("17")||
+            javaVersion.contains("18")||javaVersion.contains("19")
+        ){
+            return Arrays.asList( "org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ExternalDeps.class",
+                    "org/codehaus/foo/Person.class" );
         }
-        return Arrays.asList( new String[]{ "org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ExternalDeps.class",
-            "org/codehaus/foo/Person.class", "org/codehaus/foo/ReservedWord.class" } );
+        return Arrays.asList( "org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ExternalDeps.class",
+                "org/codehaus/foo/Person.class", "org/codehaus/foo/ReservedWord.class" );
     }
 
     protected void internalTest(CompilerConfiguration compilerConfiguration, List<String> expectedArguments) {
