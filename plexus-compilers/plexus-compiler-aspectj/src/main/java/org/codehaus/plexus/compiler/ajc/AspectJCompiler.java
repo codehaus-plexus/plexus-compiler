@@ -340,7 +340,10 @@ public class AspectJCompiler
     private AjBuildConfig buildCompilerConfig( CompilerConfiguration config )
         throws CompilerException
     {
-        AjBuildConfig buildConfig = new AjBuildConfig(new BuildArgParser(new AspectJMessagePrinter(config.isVerbose())));
+        BuildArgParser buildArgParser = new BuildArgParser(new AspectJMessagePrinter(config.isVerbose()));
+        AjBuildConfig buildConfig = new AjBuildConfig(buildArgParser);
+        // Avoid NPE when AjBuildConfig.getCheckedClasspaths() is called later during compilation
+        buildArgParser.populateBuildConfig(buildConfig, new String[0], true, null);
         buildConfig.setIncrementalMode( false );
 
         String[] files = getSourceFiles( config );
