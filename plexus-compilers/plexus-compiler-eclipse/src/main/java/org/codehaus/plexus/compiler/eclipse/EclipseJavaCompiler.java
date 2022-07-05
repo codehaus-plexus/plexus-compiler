@@ -37,7 +37,9 @@ import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
@@ -245,7 +247,7 @@ public class EclipseJavaCompiler
         }
 
         // Collect sources
-        List<String> allSources = new ArrayList<>();
+        Set<String> allSources = new HashSet<>();
         for ( String source : config.getSourceLocations() )
         {
             File srcFile = new File( source );
@@ -502,9 +504,9 @@ public class EclipseJavaCompiler
         return false;
     }
 
-    static List<String> resortSourcesToPutModuleInfoFirst( List<String> allSources )
+    static Set<String> resortSourcesToPutModuleInfoFirst( Set<String> allSources )
     {
-        ArrayList<String> resorted = new ArrayList<>();
+        Set<String> resorted = new LinkedHashSet<>( allSources.size() );
 
         for ( String mi : allSources )
         {
@@ -652,7 +654,7 @@ public class EclipseJavaCompiler
         return null;
     }
 
-    private void addExtraSources( File dir, List<String> allSources )
+    private void addExtraSources( File dir, Set<String> allSources )
     {
         DirectoryScanner scanner = new DirectoryScanner();
         scanner.setBasedir( dir.getAbsolutePath() );
