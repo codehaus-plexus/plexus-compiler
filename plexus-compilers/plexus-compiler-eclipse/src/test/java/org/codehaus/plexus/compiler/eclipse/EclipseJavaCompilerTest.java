@@ -4,7 +4,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
@@ -14,42 +15,42 @@ class EclipseJavaCompilerTest
 {
     @ParameterizedTest
     @MethodSource( "sources" )
-    void testReorderedSources( List<String> expected, List<String> inputSources )
+    void testReorderedSources( Set<String> expected, Set<String> inputSources )
     {
-        List<String> resorted = EclipseJavaCompiler.resortSourcesToPutModuleInfoFirst( inputSources );
+        Set<String> resorted = EclipseJavaCompiler.resortSourcesToPutModuleInfoFirst( inputSources );
 
         assertEquals( expected, resorted );
     }
 
     static Stream<Arguments> sources()
     {
-        List<String> expectedOrder = asList(
+        Set<String> expectedOrder = new LinkedHashSet<>( asList(
                 "module-info.java",
                 "plexus/A.java",
                 "plexus/B.java",
                 "eclipse/A.java"
-        );
+        ) );
 
-        List<String> moduleInfoAlreadyFirst = asList(
+        Set<String> moduleInfoAlreadyFirst = new LinkedHashSet<>( asList(
                 "module-info.java",
                 "plexus/A.java",
                 "plexus/B.java",
                 "eclipse/A.java"
-        );
+        ) );
 
-        List<String> moduleInfoSomewhereInTheMiddle = asList(
+        Set<String> moduleInfoSomewhereInTheMiddle = new LinkedHashSet<>( asList(
                 "plexus/A.java",
                 "module-info.java",
                 "plexus/B.java",
                 "eclipse/A.java"
-        );
+        ) );
 
-        List<String> moduleInfoAsLast = asList(
+        Set<String> moduleInfoAsLast = new LinkedHashSet<>( asList(
                 "plexus/A.java",
                 "plexus/B.java",
                 "eclipse/A.java",
                 "module-info.java"
-        );
+        ) );
 
         return Stream.of(
                 Arguments.arguments( expectedOrder, moduleInfoAlreadyFirst ),
