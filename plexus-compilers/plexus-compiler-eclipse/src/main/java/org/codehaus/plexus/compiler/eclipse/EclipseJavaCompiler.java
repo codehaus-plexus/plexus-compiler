@@ -37,15 +37,12 @@ import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Arrays;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.ServiceLoader;
-import java.util.Set;
-
 import org.codehaus.plexus.compiler.AbstractCompiler;
 import org.codehaus.plexus.compiler.Compiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
@@ -54,7 +51,6 @@ import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.compiler.CompilerOutputStyle;
 import org.codehaus.plexus.compiler.CompilerResult;
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.jdt.core.compiler.CompilationProgress;
 import org.eclipse.jdt.core.compiler.batch.BatchCompiler;
@@ -169,14 +165,12 @@ public class EclipseJavaCompiler
         args.add( config.getOutputLocation() );
 
         // Annotation processors defined?
-        List<String> extraSourceDirs = new ArrayList<>();
         if ( !isPreJava1_6( config ) )
         {
             File generatedSourcesDir = config.getGeneratedSourcesDirectory();
             if ( generatedSourcesDir != null )
             {
                 generatedSourcesDir.mkdirs();
-                extraSourceDirs.add( generatedSourcesDir.getAbsolutePath() );
 
                 //-- option to specify where annotation processor is to generate its output
                 args.add( "-s" );
@@ -247,24 +241,7 @@ public class EclipseJavaCompiler
         }
 
         // Collect sources
-        Set<String> allSources = new HashSet<>();
-        for ( String source : config.getSourceLocations() )
-        {
-            File srcFile = new File( source );
-            if ( srcFile.exists() )
-            {
-                Set<String> ss = getSourceFilesForSourceRoot( config, source );
-                allSources.addAll( ss );
-            }
-        }
-        for ( String extraSrcDir : extraSourceDirs )
-        {
-            File extraDir = new File( extraSrcDir );
-            if ( extraDir.isDirectory() )
-            {
-                addExtraSources( extraDir, allSources );
-            }
-        }
+        List<String> allSources = Arrays.asList( getSourceFiles( config ) );
         List<CompilerMessage> messageList = new ArrayList<>();
         if ( allSources.isEmpty() )
         {
@@ -504,9 +481,9 @@ public class EclipseJavaCompiler
         return false;
     }
 
-    static Set<String> resortSourcesToPutModuleInfoFirst( Set<String> allSources )
+    static List<String> resortSourcesToPutModuleInfoFirst( List<String> allSources )
     {
-        Set<String> resorted = new LinkedHashSet<>( allSources.size() );
+        List<String> resorted = new ArrayList<>( allSources.size() );
 
         for ( String mi : allSources )
         {
@@ -652,18 +629,6 @@ public class EclipseJavaCompiler
         }
         getLogger().debug( "Cannot find org.eclipse.jdt.internal.compiler.tool.EclipseCompiler" );
         return null;
-    }
-
-    private void addExtraSources( File dir, Set<String> allSources )
-    {
-        DirectoryScanner scanner = new DirectoryScanner();
-        scanner.setBasedir( dir.getAbsolutePath() );
-        scanner.setIncludes( new String[]{ "**/*.java" } );
-        scanner.scan();
-        for ( String file : scanner.getIncludedFiles() )
-        {
-            allSources.add( new File( dir, file ).getAbsolutePath() );
-        }
     }
 
     private CompilerMessage.Kind convert( Diagnostic.Kind kind )
