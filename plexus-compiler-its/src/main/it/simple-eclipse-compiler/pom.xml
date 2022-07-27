@@ -34,6 +34,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
+    <plexus.compiler.version>@pom.version@</plexus.compiler.version>
   </properties>
 
   <dependencies>
@@ -58,12 +59,12 @@
           <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-compiler-api</artifactId>
-            <version>@pom.version@</version>
+            <version>${plexus.compiler.version}</version>
           </dependency>
           <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-compiler-eclipse</artifactId>
-            <version>@pom.version@</version>
+            <version>${plexus.compiler.version}</version>
           </dependency>
         </dependencies>
       </plugin>

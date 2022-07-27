@@ -54,6 +54,7 @@
     <errorprone.version>2.14.0</errorprone.version>
     <trimStackTrace>false</trimStackTrace>
     <preparationGoals>clean install</preparationGoals>
+    <maven.compiler.version>3.10.1</maven.compiler.version>
   </properties>
 
   <dependencyManagement>
@@ -129,6 +130,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
+          <version>${maven.compiler.version}</version>
           <configuration>
             <release>8</release>
           </configuration>

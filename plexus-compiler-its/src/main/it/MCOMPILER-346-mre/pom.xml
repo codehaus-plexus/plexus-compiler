@@ -29,6 +29,7 @@
   <url>https://github.com/basil/MCOMPILER-346-mre</url>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <plexus.compiler.version>@pom.version@</plexus.compiler.version>
   </properties>
   <dependencies>
     <dependency>
@@ -61,12 +62,12 @@
           <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-compiler-api</artifactId>
-            <version>@pom.version@</version>
+            <version>${plexus.compiler.version}</version>
           </dependency>
           <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-compiler-javac</artifactId>
-            <version>@pom.version@</version>
+            <version>${plexus.compiler.version}</version>
           </dependency>
         </dependencies>
       </plugin>
