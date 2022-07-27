@@ -32,6 +32,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <javac.version>9+181-r4173-1</javac.version>
+    <plexus.compiler.version>@pom.version@</plexus.compiler.version>
   </properties>
 
   <dependencies>
@@ -48,7 +49,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
+        <version>@maven.compiler.version@</version>
         <configuration>
           <target>8</target>
           <source>8</source>

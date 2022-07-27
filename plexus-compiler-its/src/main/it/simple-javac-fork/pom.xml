@@ -34,6 +34,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
+    <plexus.compiler.version>@pom.version@</plexus.compiler.version>
   </properties>
 
   <dependencies>
@@ -50,7 +51,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
+        <version>@maven.compiler.version@</version>
         <configuration>
           <fork>true</fork>
           <compilerArgs>
@@ -61,12 +62,12 @@
             <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-compiler-api</artifactId>
-            <version>@pom.version@</version>
+            <version>${plexus.compiler.version}</version>
           </dependency>
           <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-compiler-javac</artifactId>
-            <version>@pom.version@</version>
+            <version>${plexus.compiler.version}</version>
           </dependency>
         </dependencies>
       </plugin>

@@ -34,7 +34,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-
+    <plexus.compiler.version>@pom.version@</plexus.compiler.version>
     <org.mapstruct.version>1.5.2.Final</org.mapstruct.version>
   </properties>
 
@@ -51,7 +51,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.10.1</version>
+        <version>@maven.compiler.version@</version>
         <configuration>
           <compilerId>eclipse</compilerId>
         </configuration>
@@ -59,12 +59,12 @@
           <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-compiler-api</artifactId>
-            <version>@pom.version@</version>
+            <version>${plexus.compiler.version}</version>
           </dependency>
           <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-compiler-eclipse</artifactId>
-            <version>@pom.version@</version>
+            <version>${plexus.compiler.version}</version>
           </dependency>
           <dependency>
             <groupId>org.mapstruct</groupId>
