@@ -26,7 +26,9 @@ package org.codehaus.plexus.compiler.javac;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -679,16 +681,16 @@ public class ErrorMessageParserTest
     @Test
     public void testJava6Error() throws Exception
     {
-        String out = "Error.java:3: cannot find symbol" + EOL + 
-            "symbol  : class Properties" + EOL + 
-            "location: class Error" + EOL + 
-            "                Properties p = new Properties();" + EOL + 
-            "                ^" + EOL + 
-            "Error.java:3: cannot find symbol" + EOL + 
-            "symbol  : class Properties" + EOL + 
-            "location: class Error" + EOL + 
-            "                Properties p = new Properties();" + EOL + 
-            "                                   ^" + EOL + 
+        String out = "Error.java:3: cannot find symbol" + EOL +
+            "symbol  : class Properties" + EOL +
+            "location: class Error" + EOL +
+            "                Properties p = new Properties();" + EOL +
+            "                ^" + EOL +
+            "Error.java:3: cannot find symbol" + EOL +
+            "symbol  : class Properties" + EOL +
+            "location: class Error" + EOL +
+            "                Properties p = new Properties();" + EOL +
+            "                                   ^" + EOL +
             "2 errors";
 
         List<CompilerMessage> compilerErrors = JavacCompiler.parseModernStream( 1, new BufferedReader( new StringReader( out ) ));
@@ -710,7 +712,7 @@ public class ErrorMessageParserTest
         assertThat( message1.getStartLine(), is(3) );
 
         assertThat( message1.getEndLine(), is(3) );
-        
+
         CompilerMessage message2 = compilerErrors.get( 1 );
 
         assertThat( message2.isError(), is(true) );
@@ -731,52 +733,52 @@ public class ErrorMessageParserTest
     @Test
     public void testJava7Error() throws Exception
     {
-        String out = "Error.java:3: error: cannot find symbol" + EOL + 
-                        "                Properties p = new Properties();" + EOL + 
-                        "                ^" + EOL + 
-                        "  symbol:   class Properties" + EOL + 
-                        "  location: class Error" + EOL + 
-                        "Error.java:3: error: cannot find symbol" + EOL + 
-                        "                Properties p = new Properties();" + EOL + 
-                        "                                   ^" + EOL + 
-                        "  symbol:   class Properties" + EOL + 
-                        "  location: class Error" + EOL + 
+        String out = "Error.java:3: error: cannot find symbol" + EOL +
+                        "                Properties p = new Properties();" + EOL +
+                        "                ^" + EOL +
+                        "  symbol:   class Properties" + EOL +
+                        "  location: class Error" + EOL +
+                        "Error.java:3: error: cannot find symbol" + EOL +
+                        "                Properties p = new Properties();" + EOL +
+                        "                                   ^" + EOL +
+                        "  symbol:   class Properties" + EOL +
+                        "  location: class Error" + EOL +
                         "2 errors";
-        
+
         List<CompilerMessage> compilerErrors = JavacCompiler.parseModernStream( 1, new BufferedReader( new StringReader( out ) ));
-        
+
         assertThat( compilerErrors, notNullValue() );
-        
+
         CompilerMessage message1 = compilerErrors.get( 0 );
 
         assertThat( message1.isError(), is(true) );
-        
+
         assertThat( message1.getMessage(), is("error: cannot find symbol" + EOL +
                 "  symbol:   class Properties" + EOL +
                 "  location: class Error") );
-        
+
         assertThat( message1.getStartColumn(), is(16) );
-        
+
         assertThat( message1.getEndColumn(), is(26) );
-        
+
         assertThat( message1.getStartLine(), is(3) );
-        
+
         assertThat( message1.getEndLine(), is(3) );
-        
+
         CompilerMessage message2 = compilerErrors.get( 1 );
-        
+
         assertThat( message2.isError(), is(true) );
-        
+
         assertThat( message2.getMessage(), is("error: cannot find symbol" + EOL +
                 "  symbol:   class Properties" + EOL +
                 "  location: class Error") );
-        
+
         assertThat( message2.getStartColumn(), is(35) );
-        
+
         assertThat( message2.getEndColumn(), is(48) );
-        
+
         assertThat( message2.getStartLine(), is(3) );
-        
+
         assertThat( message2.getEndLine(), is(3) );
     }
 
@@ -785,13 +787,13 @@ public class ErrorMessageParserTest
     {
         String out = "An exception has occurred in the compiler (1.7.0_80). "
             + "Please file a bug at the Java Developer Connection (http://java.sun.com/webapps/bugreport)  after checking the Bug Parade for duplicates. "
-            + "Include your program and the following diagnostic in your report.  Thank you." + EOL + 
+            + "Include your program and the following diagnostic in your report.  Thank you." + EOL +
             "com.sun.tools.javac.code.Symbol$CompletionFailure: class file for java.util.Optional not found";
-        
+
         List<CompilerMessage> compilerErrors = JavacCompiler.parseModernStream( 4, new BufferedReader( new StringReader( out ) ));
 
         assertThat( compilerErrors, notNullValue() );
-        
+
         assertThat( compilerErrors.size(), is(1) );
     }
 
@@ -919,7 +921,7 @@ public class ErrorMessageParserTest
     public void testJvmError() throws Exception
     {
         String out = "Error occurred during initialization of boot layer" + EOL +
-        		"java.lang.module.FindException: Module java.xml.bind not found";
+                "java.lang.module.FindException: Module java.xml.bind not found";
 
         List<CompilerMessage> compilerErrors = JavacCompiler.parseModernStream( 1, new BufferedReader( new StringReader( out ) ));
 
@@ -978,6 +980,23 @@ public class ErrorMessageParserTest
 
         CompilerMessage secondMessage = compilerErrors.get( 1 );
         validateBadSourceFile(secondMessage);
+    }
+
+    @Test
+    public void testMCOMPILER509() throws Exception
+    {
+        List<CompilerMessage> compilerMessages = JavacCompiler.parseModernStream( 0,
+            new BufferedReader( new InputStreamReader(
+                    getClass().getResourceAsStream( "/MCOMPILER-509.txt" ), StandardCharsets.UTF_8 ) ) );
+
+        int i = 1;
+        for ( CompilerMessage message : compilerMessages )
+        {
+            System.out.println( i + ":========================================:" + i );
+            System.out.println( message );
+            System.out.println( i + ":========================================:" + i );
+            i++;
+        }
     }
 
     private void validateBadSourceFile(CompilerMessage message)
