@@ -44,6 +44,12 @@ import java.net.URLClassLoader;
 public class JavacCompilerWithErrorProne
     extends JavacCompiler
 {
+    @Override
+    public String getCompilerId()
+    {
+        return "javac-with-errorprone";
+    }
+
     private static class NonDelegatingClassLoader
         extends URLClassLoader
     {

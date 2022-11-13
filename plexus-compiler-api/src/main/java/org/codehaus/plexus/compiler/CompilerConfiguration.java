@@ -24,6 +24,8 @@ package org.codehaus.plexus.compiler;
  * SOFTWARE.
  */
 
+import org.codehaus.plexus.util.StringUtils;
+
 import java.io.File;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -811,5 +813,55 @@ public class CompilerConfiguration
     public void setImplicitOption( String implicitOption )
     {
         this.implicitOption = implicitOption;
+    }
+
+    public String describe()
+    {
+        List<String> params = new ArrayList<>();
+
+        if ( isFork() )
+        {
+            params.add( "forked" );
+        }
+
+        // base options: debug, optimize, verbose, deprecation
+        if ( isDebug() )
+        {
+            if ( StringUtils.isNotEmpty( getDebugLevel() ) )
+            {
+                params.add( "debug:" + getDebugLevel() );
+            }
+            else
+            {
+                params.add( "debug" );
+            }
+        }
+        if ( isOptimize() )
+        {
+            params.add( "optimize" );
+        }
+        if ( isVerbose() )
+        {
+            params.add( "verbose" );
+        }
+        if ( isShowDeprecation() )
+        {
+            params.add( "deprecation" );
+        }
+
+        // target bytecode options: release or target, module-path
+        if ( !StringUtils.isEmpty( getReleaseVersion() ) )
+        {
+            params.add( "release " + getReleaseVersion() );
+        }
+        else if ( !StringUtils.isEmpty( getTargetVersion() ) )
+        {
+            params.add( "target " + getTargetVersion() );
+        }
+        if ( getModulepathEntries() != null && !getModulepathEntries().isEmpty() )
+        {
+            params.add( "module-path" );
+        }
+        return String.join( " ", params );
     }
 }

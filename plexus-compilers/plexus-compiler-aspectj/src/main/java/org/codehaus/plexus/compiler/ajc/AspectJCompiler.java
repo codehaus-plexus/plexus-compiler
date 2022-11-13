@@ -303,6 +303,12 @@ public class AspectJCompiler
         super( CompilerOutputStyle.ONE_OUTPUT_FILE_PER_INPUT_FILE, "", ".class", null );
     }
 
+    @Override
+    public String getCompilerId()
+    {
+        return "aspectj";
+    }
+
     public CompilerResult performCompile( CompilerConfiguration config )
         throws CompilerException
     {

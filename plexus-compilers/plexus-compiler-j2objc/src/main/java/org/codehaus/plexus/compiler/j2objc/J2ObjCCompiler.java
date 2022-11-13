@@ -51,7 +51,7 @@ import java.util.Map;
  *         Ma&icirc;tre</a>
  *
  */
-@Component( role = Compiler.class, hint = "j2objc ")
+@Component( role = Compiler.class, hint = "j2objc")
 public class J2ObjCCompiler
     extends AbstractCompiler
 {
@@ -97,6 +97,12 @@ public class J2ObjCCompiler
     // ----------------------------------------------------------------------
     // Compiler Implementation
     // ----------------------------------------------------------------------
+
+    @Override
+    public String getCompilerId()
+    {
+        return "j2objc";
+    }
 
     public boolean canUpdateTarget( CompilerConfiguration configuration )
         throws CompilerException

@@ -84,6 +84,12 @@ public class CSharpCompiler
     // Compiler Implementation
     // ----------------------------------------------------------------------
 
+    @Override
+    public String getCompilerId()
+    {
+        return "csharp";
+    }
+
     public boolean canUpdateTarget( CompilerConfiguration configuration )
         throws CompilerException
     {
