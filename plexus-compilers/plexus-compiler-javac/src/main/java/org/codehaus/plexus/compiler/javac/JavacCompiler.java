@@ -124,6 +124,12 @@ public class JavacCompiler
     // ----------------------------------------------------------------------
 
     @Override
+    public String getCompilerId()
+    {
+        return "javac";
+    }
+
+    @Override
     public CompilerResult performCompile( CompilerConfiguration config )
         throws CompilerException
     {

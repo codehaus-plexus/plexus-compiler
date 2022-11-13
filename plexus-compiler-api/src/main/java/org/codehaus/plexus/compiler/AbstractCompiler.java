@@ -74,6 +74,8 @@ public abstract class AbstractCompiler
     //
     // ----------------------------------------------------------------------
 
+    public abstract String getCompilerId();
+
     public CompilerResult performCompile(CompilerConfiguration configuration)
             throws CompilerException 
     {
@@ -308,7 +310,8 @@ public abstract class AbstractCompiler
                 config.getWorkingDirectory().toPath().relativize( new File( config.getOutputLocation() ).toPath() ).toString();
             getLogger().info( "Compiling " +
                                   ( sourceFiles == null ? "" : ( sourceFiles.length + " source file" + ( sourceFiles.length == 1 ? " " : "s " ) ) ) +
-                                  "to " + to );
+                                  "with " + getCompilerId() + " [" + config.describe() + "]" +
+                                  " to " + to );
         }
   }
 }

@@ -24,16 +24,15 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.codehaus.plexus.compiler.it</groupId>
-  <artifactId>simple-javac</artifactId>
+  <artifactId>simple-javac-forked</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>Test for default configuration</name>
+  <name>Test for default configuration with forked=true</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <maven.compiler.source>11</maven.compiler.source>
-    <maven.compiler.target>11</maven.compiler.target>
+    <maven.compiler.release>11</maven.compiler.release>
     <plexus.compiler.version>@pom.version@</plexus.compiler.version>
   </properties>
 
