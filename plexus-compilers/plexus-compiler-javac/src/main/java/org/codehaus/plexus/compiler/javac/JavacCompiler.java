@@ -141,14 +141,7 @@ public class JavacCompiler
             return new CompilerResult();
         }
 
-        if ( ( getLogger() != null ) && getLogger().isInfoEnabled() )
-        {
-            String to = ( config.getWorkingDirectory() == null ) ? config.getOutputLocation() :
-                config.getWorkingDirectory().toPath().relativize( destinationDir.toPath() ).toString();
-            getLogger().info( "Compiling " + sourceFiles.length + " " +
-                                  "source file" + ( sourceFiles.length == 1 ? "" : "s" ) +
-                                  " to " + to );
-        }
+        logCompiling( sourceFiles, config );
 
         String[] args = buildCompilerArguments( config, sourceFiles );
 

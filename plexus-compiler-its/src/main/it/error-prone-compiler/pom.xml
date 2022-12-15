@@ -65,6 +65,23 @@
             </path>
           </annotationProcessorPaths>
         </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-compiler-api</artifactId>
+            <version>${plexus.compiler.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-compiler-javac-errorprone</artifactId>
+            <version>${plexus.compiler.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-compiler-javac</artifactId>
+            <version>${plexus.compiler.version}</version>
+          </dependency>
+        </dependencies>
       </plugin>
     </plugins>
   </build>

@@ -251,6 +251,8 @@ public class EclipseJavaCompiler
 
         allSources = resortSourcesToPutModuleInfoFirst( allSources );
 
+        logCompiling( null, config );
+
         // Compile
         try
         {
