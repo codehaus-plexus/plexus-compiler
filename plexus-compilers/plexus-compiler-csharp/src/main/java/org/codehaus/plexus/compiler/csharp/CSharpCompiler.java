@@ -115,8 +115,7 @@ public class CSharpCompiler
             return new CompilerResult().success( true );
         }
 
-        System.out.println( "Compiling " + sourceFiles.length + " " + "source file" +
-                                ( sourceFiles.length == 1 ? "" : "s" ) + " to " + destinationDir.getAbsolutePath() );
+        logCompiling( sourceFiles, config );
 
         String[] args = buildCompilerArguments( config, sourceFiles );
 

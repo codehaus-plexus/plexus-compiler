@@ -299,4 +299,16 @@ public abstract class AbstractCompiler
 
         return args;
     }
+
+    protected void logCompiling( String[] sourceFiles, CompilerConfiguration config )
+    {
+        if ( ( getLogger() != null ) && getLogger().isInfoEnabled() )
+        {
+            String to = ( config.getWorkingDirectory() == null ) ? config.getOutputLocation() :
+                config.getWorkingDirectory().toPath().relativize( new File( config.getOutputLocation() ).toPath() ).toString();
+            getLogger().info( "Compiling " +
+                                  ( sourceFiles == null ? "" : ( sourceFiles.length + " source file" + ( sourceFiles.length == 1 ? " " : "s " ) ) ) +
+                                  "to " + to );
+        }
+  }
 }

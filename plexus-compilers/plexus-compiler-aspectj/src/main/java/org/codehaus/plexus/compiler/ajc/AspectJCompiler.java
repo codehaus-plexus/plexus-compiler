@@ -320,9 +320,7 @@ public class AspectJCompiler
             return new CompilerResult();
         }
 
-        System.out.println(
-            "Compiling " + sourceFiles.length + " " + "source file" + ( sourceFiles.length == 1 ? "" : "s" ) + " to "
-                + destinationDir.getAbsolutePath() );
+        logCompiling( sourceFiles, config );
 
         //        String[] args = buildCompilerArguments( config, sourceFiles );
         AjBuildConfig buildConfig = buildCompilerConfig( config );
