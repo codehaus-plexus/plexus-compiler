@@ -645,18 +645,6 @@ Options can be of the form -option or /option
         return result;
     }
 
-    /**
-     * This method is just here to maintain the public api. This is now handled in the parse
-     * compiler output function.
-     *
-     * @author Chris Stevenson
-     * @deprecated
-     */
-    public static CompilerMessage parseLine( String line )
-    {
-        return DefaultCSharpCompilerParser.parseLine( line );
-    }
-
     protected static Set<String> getSourceFilesForSourceRoot( CompilerConfiguration config, String sourceLocation )
     {
         DirectoryScanner scanner = new DirectoryScanner();

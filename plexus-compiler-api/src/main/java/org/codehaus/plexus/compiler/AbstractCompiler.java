@@ -82,13 +82,6 @@ public abstract class AbstractCompiler
         throw new CompilerNotImplementedException("The performCompile method has not been implemented.");
     }
 
-    @Deprecated
-    public List<CompilerError> compile(CompilerConfiguration configuration)
-            throws CompilerException
-    {
-        throw new CompilerNotImplementedException("The compile method has not been implemented.");
-    }
-
     public CompilerOutputStyle getCompilerOutputStyle()
     {
         return compilerOutputStyle;
@@ -283,23 +276,6 @@ public abstract class AbstractCompiler
             throw new CompilerException(
                 "Error while getting the canonical path of '" + origFile.getAbsolutePath() + "'.", e );
         }
-    }
-
-    /**
-     * @deprecated use (String[]) arguments.toArray( new String[ arguments.size() ] ); instead
-     */
-    protected static String[] toStringArray( List<String> arguments )
-    {
-        String[] args = new String[arguments.size()];
-
-        int argLength = arguments.size();
-
-        for ( int i = 0; i < argLength; i++ )
-        {
-            args[i] = arguments.get( i );
-        }
-
-        return args;
     }
 
     protected void logCompiling( String[] sourceFiles, CompilerConfiguration config )
