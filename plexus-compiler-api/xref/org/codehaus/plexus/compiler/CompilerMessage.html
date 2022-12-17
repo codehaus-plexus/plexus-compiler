@@ -40,7 +40,7 @@
 <a class="jxr_linenumber" name="L32" href="#L32">32</a>  <em class="jxr_javadoccomment"> *  you may not use this file except in compliance with the License.</em>
 <a class="jxr_linenumber" name="L33" href="#L33">33</a>  <em class="jxr_javadoccomment"> *  You may obtain a copy of the License at</em>
 <a class="jxr_linenumber" name="L34" href="#L34">34</a>  <em class="jxr_javadoccomment"> *</em>
-<a class="jxr_linenumber" name="L35" href="#L35">35</a>  <em class="jxr_javadoccomment"> *     <a href="http://www.apache.org/licenses/LICENSE-2." target="alexandria_uri">http://www.apache.org/licenses/LICENSE-2.</a>0</em>
+<a class="jxr_linenumber" name="L35" href="#L35">35</a>  <em class="jxr_javadoccomment"> *     <a href="http://www.apache.org/licenses/LICENSE-2.0" target="alexandria_uri">http://www.apache.org/licenses/LICENSE-2.0</a></em>
 <a class="jxr_linenumber" name="L36" href="#L36">36</a>  <em class="jxr_javadoccomment"> *</em>
 <a class="jxr_linenumber" name="L37" href="#L37">37</a>  <em class="jxr_javadoccomment"> *  Unless required by applicable law or agreed to in writing, software</em>
 <a class="jxr_linenumber" name="L38" href="#L38">38</a>  <em class="jxr_javadoccomment"> *  distributed under the License is distributed on an "AS IS" BASIS,</em>
@@ -56,7 +56,7 @@
 <a class="jxr_linenumber" name="L48" href="#L48">48</a>  <em class="jxr_javadoccomment"> * @author &lt;a href="<a href="mailto:stefano@apache.org" target="alexandria_uri">mailto:stefano@apache.org</a>"&gt;Stefano Mazzocchi&lt;/a&gt;</em>
 <a class="jxr_linenumber" name="L49" href="#L49">49</a>  <em class="jxr_javadoccomment"> * @since 2.0</em>
 <a class="jxr_linenumber" name="L50" href="#L50">50</a>  <em class="jxr_javadoccomment"> */</em>
-<a class="jxr_linenumber" name="L51" href="#L51">51</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../org/codehaus/plexus/compiler/CompilerMessage.html">CompilerMessage</a>
+<a class="jxr_linenumber" name="L51" href="#L51">51</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a name="CompilerMessage" href="../../../../org/codehaus/plexus/compiler/CompilerMessage.html#CompilerMessage">CompilerMessage</a>
 <a class="jxr_linenumber" name="L52" href="#L52">52</a>  {
 <a class="jxr_linenumber" name="L53" href="#L53">53</a>      <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> String JDK_6_NOTE_PREFIX = <span class="jxr_string">"note: "</span>;
 <a class="jxr_linenumber" name="L54" href="#L54">54</a>  
@@ -65,7 +65,7 @@
 <a class="jxr_linenumber" name="L57" href="#L57">57</a>      <em class="jxr_javadoccomment">/**</em>
 <a class="jxr_linenumber" name="L58" href="#L58">58</a>  <em class="jxr_javadoccomment">     * The kind of message.</em>
 <a class="jxr_linenumber" name="L59" href="#L59">59</a>  <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L60" href="#L60">60</a>      <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> <a href="../../../../org/codehaus/plexus/compiler/CompilerMessage.html">Kind</a> kind;
+<a class="jxr_linenumber" name="L60" href="#L60">60</a>      <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> Kind kind;
 <a class="jxr_linenumber" name="L61" href="#L61">61</a>  
 <a class="jxr_linenumber" name="L62" href="#L62">62</a>      <em class="jxr_javadoccomment">/**</em>
 <a class="jxr_linenumber" name="L63" href="#L63">63</a>  <em class="jxr_javadoccomment">     * The start line number of the offending program text</em>
@@ -112,7 +112,7 @@
 <a class="jxr_linenumber" name="L104" href="#L104">104</a> <em class="jxr_javadoccomment">     * @deprecated Use {@link #CompilerMessage(String, Kind, int, int, int, int, String)} instead</em>
 <a class="jxr_linenumber" name="L105" href="#L105">105</a> <em class="jxr_javadoccomment">     */</em>
 <a class="jxr_linenumber" name="L106" href="#L106">106</a>     @Deprecated
-<a class="jxr_linenumber" name="L107" href="#L107">107</a>     <strong class="jxr_keyword">public</strong> <a href="../../../../org/codehaus/plexus/compiler/CompilerMessage.html">CompilerMessage</a>( <strong class="jxr_keyword">final</strong> String file, <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">boolean</strong> error, <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">int</strong> startline, <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">int</strong> startcolumn, <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">int</strong> endline, <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">int</strong> endcolumn,
+<a class="jxr_linenumber" name="L107" href="#L107">107</a>     <strong class="jxr_keyword">public</strong> <a name="CompilerMessage" href="../../../../org/codehaus/plexus/compiler/CompilerMessage.html#CompilerMessage">CompilerMessage</a>( <strong class="jxr_keyword">final</strong> String file, <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">boolean</strong> error, <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">int</strong> startline, <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">int</strong> startcolumn, <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">int</strong> endline, <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">int</strong> endcolumn,
 <a class="jxr_linenumber" name="L108" href="#L108">108</a>                             <strong class="jxr_keyword">final</strong> String message )
 <a class="jxr_linenumber" name="L109" href="#L109">109</a>     {
 <a class="jxr_linenumber" name="L110" href="#L110">110</a>         <strong class="jxr_keyword">this</strong>.file = file;
@@ -136,7 +136,7 @@
 <a class="jxr_linenumber" name="L128" href="#L128">128</a> <em class="jxr_javadoccomment">     * @param endcolumn   The end column number of the offending program text</em>
 <a class="jxr_linenumber" name="L129" href="#L129">129</a> <em class="jxr_javadoccomment">     * @param message     The actual message text produced by the language processor</em>
 <a class="jxr_linenumber" name="L130" href="#L130">130</a> <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L131" href="#L131">131</a>     <strong class="jxr_keyword">public</strong> <a href="../../../../org/codehaus/plexus/compiler/CompilerMessage.html">CompilerMessage</a>( <strong class="jxr_keyword">final</strong> String file, <strong class="jxr_keyword">final</strong> Kind kind, <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">int</strong> startline, <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">int</strong> startcolumn, <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">int</strong> endline, <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">int</strong> endcolumn,
+<a class="jxr_linenumber" name="L131" href="#L131">131</a>     <strong class="jxr_keyword">public</strong> <a name="CompilerMessage" href="../../../../org/codehaus/plexus/compiler/CompilerMessage.html#CompilerMessage">CompilerMessage</a>( <strong class="jxr_keyword">final</strong> String file, <strong class="jxr_keyword">final</strong> Kind kind, <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">int</strong> startline, <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">int</strong> startcolumn, <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">int</strong> endline, <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">int</strong> endcolumn,
 <a class="jxr_linenumber" name="L132" href="#L132">132</a>                             <strong class="jxr_keyword">final</strong> String message )
 <a class="jxr_linenumber" name="L133" href="#L133">133</a>     {
 <a class="jxr_linenumber" name="L134" href="#L134">134</a>         <strong class="jxr_keyword">this</strong>.file = file;
@@ -155,7 +155,7 @@
 <a class="jxr_linenumber" name="L147" href="#L147">147</a> <em class="jxr_javadoccomment">     * @deprecated Use {@link #CompilerMessage(String, Kind)} instead</em>
 <a class="jxr_linenumber" name="L148" href="#L148">148</a> <em class="jxr_javadoccomment">     */</em>
 <a class="jxr_linenumber" name="L149" href="#L149">149</a>     @Deprecated
-<a class="jxr_linenumber" name="L150" href="#L150">150</a>     <strong class="jxr_keyword">public</strong> <a href="../../../../org/codehaus/plexus/compiler/CompilerMessage.html">CompilerMessage</a>( <strong class="jxr_keyword">final</strong> String message )
+<a class="jxr_linenumber" name="L150" href="#L150">150</a>     <strong class="jxr_keyword">public</strong> <a name="CompilerMessage" href="../../../../org/codehaus/plexus/compiler/CompilerMessage.html#CompilerMessage">CompilerMessage</a>( <strong class="jxr_keyword">final</strong> String message )
 <a class="jxr_linenumber" name="L151" href="#L151">151</a>     {
 <a class="jxr_linenumber" name="L152" href="#L152">152</a>         <strong class="jxr_keyword">this</strong>.kind = Kind.WARNING;
 <a class="jxr_linenumber" name="L153" href="#L153">153</a>         <strong class="jxr_keyword">this</strong>.message = cleanupMessage( message );
@@ -170,7 +170,7 @@
 <a class="jxr_linenumber" name="L162" href="#L162">162</a> <em class="jxr_javadoccomment">     * @deprecated Use {@link #CompilerMessage(String, Kind)} instead</em>
 <a class="jxr_linenumber" name="L163" href="#L163">163</a> <em class="jxr_javadoccomment">     */</em>
 <a class="jxr_linenumber" name="L164" href="#L164">164</a>     @Deprecated
-<a class="jxr_linenumber" name="L165" href="#L165">165</a>     <strong class="jxr_keyword">public</strong> <a href="../../../../org/codehaus/plexus/compiler/CompilerMessage.html">CompilerMessage</a>( <strong class="jxr_keyword">final</strong> String message, <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">boolean</strong> error )
+<a class="jxr_linenumber" name="L165" href="#L165">165</a>     <strong class="jxr_keyword">public</strong> <a name="CompilerMessage" href="../../../../org/codehaus/plexus/compiler/CompilerMessage.html#CompilerMessage">CompilerMessage</a>( <strong class="jxr_keyword">final</strong> String message, <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">boolean</strong> error )
 <a class="jxr_linenumber" name="L166" href="#L166">166</a>     {
 <a class="jxr_linenumber" name="L167" href="#L167">167</a>         <strong class="jxr_keyword">this</strong>.kind = error ? Kind.ERROR : Kind.WARNING;
 <a class="jxr_linenumber" name="L168" href="#L168">168</a>         <strong class="jxr_keyword">this</strong>.message = cleanupMessage( message );
@@ -183,7 +183,7 @@
 <a class="jxr_linenumber" name="L175" href="#L175">175</a> <em class="jxr_javadoccomment">     * @param kind    The kind of message</em>
 <a class="jxr_linenumber" name="L176" href="#L176">176</a> <em class="jxr_javadoccomment">     * @since 2.0</em>
 <a class="jxr_linenumber" name="L177" href="#L177">177</a> <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L178" href="#L178">178</a>     <strong class="jxr_keyword">public</strong> <a href="../../../../org/codehaus/plexus/compiler/CompilerMessage.html">CompilerMessage</a>( <strong class="jxr_keyword">final</strong> String message, <strong class="jxr_keyword">final</strong> Kind kind )
+<a class="jxr_linenumber" name="L178" href="#L178">178</a>     <strong class="jxr_keyword">public</strong> <a name="CompilerMessage" href="../../../../org/codehaus/plexus/compiler/CompilerMessage.html#CompilerMessage">CompilerMessage</a>( <strong class="jxr_keyword">final</strong> String message, <strong class="jxr_keyword">final</strong> Kind kind )
 <a class="jxr_linenumber" name="L179" href="#L179">179</a>     {
 <a class="jxr_linenumber" name="L180" href="#L180">180</a>         <strong class="jxr_keyword">this</strong>.kind = kind;
 <a class="jxr_linenumber" name="L181" href="#L181">181</a>         <strong class="jxr_keyword">this</strong>.message = cleanupMessage( message );
@@ -271,7 +271,7 @@
 <a class="jxr_linenumber" name="L263" href="#L263">263</a> <em class="jxr_javadoccomment">     * @return the kind of the message</em>
 <a class="jxr_linenumber" name="L264" href="#L264">264</a> <em class="jxr_javadoccomment">     * @since 2.0</em>
 <a class="jxr_linenumber" name="L265" href="#L265">265</a> <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L266" href="#L266">266</a>     <strong class="jxr_keyword">public</strong> <a href="../../../../org/codehaus/plexus/compiler/CompilerMessage.html">Kind</a> getKind()
+<a class="jxr_linenumber" name="L266" href="#L266">266</a>     <strong class="jxr_keyword">public</strong> Kind getKind()
 <a class="jxr_linenumber" name="L267" href="#L267">267</a>     {
 <a class="jxr_linenumber" name="L268" href="#L268">268</a>         <strong class="jxr_keyword">return</strong> kind;
 <a class="jxr_linenumber" name="L269" href="#L269">269</a>     }
@@ -324,7 +324,7 @@
 <a class="jxr_linenumber" name="L316" href="#L316">316</a> <em class="jxr_javadoccomment">     *</em>
 <a class="jxr_linenumber" name="L317" href="#L317">317</a> <em class="jxr_javadoccomment">     * @since 2.0</em>
 <a class="jxr_linenumber" name="L318" href="#L318">318</a> <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L319" href="#L319">319</a>     <strong class="jxr_keyword">public</strong> enum <a href="../../../../org/codehaus/plexus/compiler/CompilerMessage.html">Kind</a>
+<a class="jxr_linenumber" name="L319" href="#L319">319</a>     <strong class="jxr_keyword">public</strong> enum Kind
 <a class="jxr_linenumber" name="L320" href="#L320">320</a>     {
 <a class="jxr_linenumber" name="L321" href="#L321">321</a>         <em class="jxr_javadoccomment">/**</em>
 <a class="jxr_linenumber" name="L322" href="#L322">322</a> <em class="jxr_javadoccomment">         * Problem which prevents the tool's normal completion.</em>
@@ -347,16 +347,13 @@
 <a class="jxr_linenumber" name="L339" href="#L339">339</a> <em class="jxr_javadoccomment">         */</em>
 <a class="jxr_linenumber" name="L340" href="#L340">340</a>         WARNING( <span class="jxr_string">"warning"</span> );
 <a class="jxr_linenumber" name="L341" href="#L341">341</a> 
-<a class="jxr_linenumber" name="L342" href="#L342">342</a>         <strong class="jxr_keyword">private</strong> String type;
-<a class="jxr_linenumber" name="L343" href="#L343">343</a> 
-<a class="jxr_linenumber" name="L344" href="#L344">344</a>         <strong class="jxr_keyword">private</strong> <a href="../../../../org/codehaus/plexus/compiler/CompilerMessage.html">Kind</a>( <strong class="jxr_keyword">final</strong> String type )
-<a class="jxr_linenumber" name="L345" href="#L345">345</a>         {
-<a class="jxr_linenumber" name="L346" href="#L346">346</a>             <strong class="jxr_keyword">this</strong>.type = type;
-<a class="jxr_linenumber" name="L347" href="#L347">347</a>         }
-<a class="jxr_linenumber" name="L348" href="#L348">348</a>     }
-<a class="jxr_linenumber" name="L349" href="#L349">349</a> }
+<a class="jxr_linenumber" name="L342" href="#L342">342</a>         Kind( String type )
+<a class="jxr_linenumber" name="L343" href="#L343">343</a>         {
+<a class="jxr_linenumber" name="L344" href="#L344">344</a>         }
+<a class="jxr_linenumber" name="L345" href="#L345">345</a>     }
+<a class="jxr_linenumber" name="L346" href="#L346">346</a> }
 </pre>
 <hr/>
-<div id="footer">Copyright &#169; 2001&#x2013;2018 <a href="http://codehaus-plexus.github.io/">Codehaus Plexus</a>. All rights reserved.</div>
+<div id="footer">Copyright &#169; 2001&#x2013;2022 <a href="https://codehaus-plexus.github.io/">Codehaus Plexus</a>. All rights reserved.</div>
 </body>
 </html>

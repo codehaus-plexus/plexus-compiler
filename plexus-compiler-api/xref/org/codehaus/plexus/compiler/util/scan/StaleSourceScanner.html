@@ -15,7 +15,7 @@
 <a class="jxr_linenumber" name="L7" href="#L7">7</a>   <em class="jxr_comment"> * you may not use this file except in compliance with the License.</em>
 <a class="jxr_linenumber" name="L8" href="#L8">8</a>   <em class="jxr_comment"> * You may obtain a copy of the License at</em>
 <a class="jxr_linenumber" name="L9" href="#L9">9</a>   <em class="jxr_comment"> *</em>
-<a class="jxr_linenumber" name="L10" href="#L10">10</a>  <em class="jxr_comment"> *      <a href="http://www.apache.org/licenses/LICENSE-2." target="alexandria_uri">http://www.apache.org/licenses/LICENSE-2.</a>0</em>
+<a class="jxr_linenumber" name="L10" href="#L10">10</a>  <em class="jxr_comment"> *      <a href="http://www.apache.org/licenses/LICENSE-2.0" target="alexandria_uri">http://www.apache.org/licenses/LICENSE-2.0</a></em>
 <a class="jxr_linenumber" name="L11" href="#L11">11</a>  <em class="jxr_comment"> *</em>
 <a class="jxr_linenumber" name="L12" href="#L12">12</a>  <em class="jxr_comment"> * Unless required by applicable law or agreed to in writing, software</em>
 <a class="jxr_linenumber" name="L13" href="#L13">13</a>  <em class="jxr_comment"> * distributed under the License is distributed on an "AS IS" BASIS,</em>
@@ -35,8 +35,8 @@
 <a class="jxr_linenumber" name="L27" href="#L27">27</a>  <em class="jxr_javadoccomment">/**</em>
 <a class="jxr_linenumber" name="L28" href="#L28">28</a>  <em class="jxr_javadoccomment"> * @author jdcasey</em>
 <a class="jxr_linenumber" name="L29" href="#L29">29</a>  <em class="jxr_javadoccomment"> */</em>
-<a class="jxr_linenumber" name="L30" href="#L30">30</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../org/codehaus/plexus/compiler/util/scan/StaleSourceScanner.html">StaleSourceScanner</a>
-<a class="jxr_linenumber" name="L31" href="#L31">31</a>      <strong class="jxr_keyword">extends</strong> <a href="../../../../../../org/codehaus/plexus/compiler/util/scan/AbstractSourceInclusionScanner.html">AbstractSourceInclusionScanner</a>
+<a class="jxr_linenumber" name="L30" href="#L30">30</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a name="StaleSourceScanner" href="../../../../../../org/codehaus/plexus/compiler/util/scan/StaleSourceScanner.html#StaleSourceScanner">StaleSourceScanner</a>
+<a class="jxr_linenumber" name="L31" href="#L31">31</a>      <strong class="jxr_keyword">extends</strong> <a name="AbstractSourceInclusionScanner" href="../../../../../../org/codehaus/plexus/compiler/util/scan/AbstractSourceInclusionScanner.html#AbstractSourceInclusionScanner">AbstractSourceInclusionScanner</a>
 <a class="jxr_linenumber" name="L32" href="#L32">32</a>  {
 <a class="jxr_linenumber" name="L33" href="#L33">33</a>      <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">long</strong> lastUpdatedWithinMsecs;
 <a class="jxr_linenumber" name="L34" href="#L34">34</a>  
@@ -48,17 +48,17 @@
 <a class="jxr_linenumber" name="L40" href="#L40">40</a>      <em class="jxr_comment">//</em>
 <a class="jxr_linenumber" name="L41" href="#L41">41</a>      <em class="jxr_comment">// ----------------------------------------------------------------------</em>
 <a class="jxr_linenumber" name="L42" href="#L42">42</a>  
-<a class="jxr_linenumber" name="L43" href="#L43">43</a>      <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/codehaus/plexus/compiler/util/scan/StaleSourceScanner.html">StaleSourceScanner</a>()
+<a class="jxr_linenumber" name="L43" href="#L43">43</a>      <strong class="jxr_keyword">public</strong> <a name="StaleSourceScanner" href="../../../../../../org/codehaus/plexus/compiler/util/scan/StaleSourceScanner.html#StaleSourceScanner">StaleSourceScanner</a>()
 <a class="jxr_linenumber" name="L44" href="#L44">44</a>      {
-<a class="jxr_linenumber" name="L45" href="#L45">45</a>          <strong class="jxr_keyword">this</strong>( 0, Collections.singleton( <span class="jxr_string">"**/*"</span> ), Collections.&lt;String&gt;emptySet() );
+<a class="jxr_linenumber" name="L45" href="#L45">45</a>          <strong class="jxr_keyword">this</strong>( 0, Collections.singleton( <span class="jxr_string">"**/*"</span> ), Collections.emptySet() );
 <a class="jxr_linenumber" name="L46" href="#L46">46</a>      }
 <a class="jxr_linenumber" name="L47" href="#L47">47</a>  
-<a class="jxr_linenumber" name="L48" href="#L48">48</a>      <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/codehaus/plexus/compiler/util/scan/StaleSourceScanner.html">StaleSourceScanner</a>( <strong class="jxr_keyword">long</strong> lastUpdatedWithinMsecs )
+<a class="jxr_linenumber" name="L48" href="#L48">48</a>      <strong class="jxr_keyword">public</strong> <a name="StaleSourceScanner" href="../../../../../../org/codehaus/plexus/compiler/util/scan/StaleSourceScanner.html#StaleSourceScanner">StaleSourceScanner</a>( <strong class="jxr_keyword">long</strong> lastUpdatedWithinMsecs )
 <a class="jxr_linenumber" name="L49" href="#L49">49</a>      {
-<a class="jxr_linenumber" name="L50" href="#L50">50</a>          <strong class="jxr_keyword">this</strong>( lastUpdatedWithinMsecs, Collections.singleton( <span class="jxr_string">"**/*"</span> ), Collections.&lt;String&gt;emptySet() );
+<a class="jxr_linenumber" name="L50" href="#L50">50</a>          <strong class="jxr_keyword">this</strong>( lastUpdatedWithinMsecs, Collections.singleton( <span class="jxr_string">"**/*"</span> ), Collections.emptySet() );
 <a class="jxr_linenumber" name="L51" href="#L51">51</a>      }
 <a class="jxr_linenumber" name="L52" href="#L52">52</a>  
-<a class="jxr_linenumber" name="L53" href="#L53">53</a>      <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/codehaus/plexus/compiler/util/scan/StaleSourceScanner.html">StaleSourceScanner</a>( <strong class="jxr_keyword">long</strong> lastUpdatedWithinMsecs, Set&lt;String&gt; sourceIncludes, Set&lt;String&gt; sourceExcludes )
+<a class="jxr_linenumber" name="L53" href="#L53">53</a>      <strong class="jxr_keyword">public</strong> <a name="StaleSourceScanner" href="../../../../../../org/codehaus/plexus/compiler/util/scan/StaleSourceScanner.html#StaleSourceScanner">StaleSourceScanner</a>( <strong class="jxr_keyword">long</strong> lastUpdatedWithinMsecs, Set&lt;String&gt; sourceIncludes, Set&lt;String&gt; sourceExcludes )
 <a class="jxr_linenumber" name="L54" href="#L54">54</a>      {
 <a class="jxr_linenumber" name="L55" href="#L55">55</a>          <strong class="jxr_keyword">this</strong>.lastUpdatedWithinMsecs = lastUpdatedWithinMsecs;
 <a class="jxr_linenumber" name="L56" href="#L56">56</a>  
@@ -72,7 +72,7 @@
 <a class="jxr_linenumber" name="L64" href="#L64">64</a>      <em class="jxr_comment">// ----------------------------------------------------------------------</em>
 <a class="jxr_linenumber" name="L65" href="#L65">65</a>  
 <a class="jxr_linenumber" name="L66" href="#L66">66</a>      <strong class="jxr_keyword">public</strong> Set&lt;File&gt; getIncludedSources( File sourceDir, File targetDir )
-<a class="jxr_linenumber" name="L67" href="#L67">67</a>          <strong class="jxr_keyword">throws</strong> <a href="../../../../../../org/codehaus/plexus/compiler/util/scan/InclusionScanException.html">InclusionScanException</a>
+<a class="jxr_linenumber" name="L67" href="#L67">67</a>          <strong class="jxr_keyword">throws</strong> <a name="InclusionScanException" href="../../../../../../org/codehaus/plexus/compiler/util/scan/InclusionScanException.html#InclusionScanException">InclusionScanException</a>
 <a class="jxr_linenumber" name="L68" href="#L68">68</a>      {
 <a class="jxr_linenumber" name="L69" href="#L69">69</a>          List&lt;SourceMapping&gt; srcMappings = getSourceMappings();
 <a class="jxr_linenumber" name="L70" href="#L70">70</a>  
@@ -90,7 +90,7 @@
 <a class="jxr_linenumber" name="L82" href="#L82">82</a>              File sourceFile = <strong class="jxr_keyword">new</strong> File( sourceDir, path );
 <a class="jxr_linenumber" name="L83" href="#L83">83</a>  
 <a class="jxr_linenumber" name="L84" href="#L84">84</a>              staleSourceFileTesting:
-<a class="jxr_linenumber" name="L85" href="#L85">85</a>              <strong class="jxr_keyword">for</strong> ( SourceMapping mapping : srcMappings )
+<a class="jxr_linenumber" name="L85" href="#L85">85</a>              <strong class="jxr_keyword">for</strong> ( <a name="SourceMapping" href="../../../../../../org/codehaus/plexus/compiler/util/scan/mapping/SourceMapping.html#SourceMapping">SourceMapping</a> mapping : srcMappings )
 <a class="jxr_linenumber" name="L86" href="#L86">86</a>              {
 <a class="jxr_linenumber" name="L87" href="#L87">87</a>                  Set&lt;File&gt; targetFiles = mapping.getTargetFiles( targetDir, path );
 <a class="jxr_linenumber" name="L88" href="#L88">88</a>  
@@ -114,6 +114,6 @@
 <a class="jxr_linenumber" name="L106" href="#L106">106</a> }
 </pre>
 <hr/>
-<div id="footer">Copyright &#169; 2001&#x2013;2018 <a href="http://codehaus-plexus.github.io/">Codehaus Plexus</a>. All rights reserved.</div>
+<div id="footer">Copyright &#169; 2001&#x2013;2022 <a href="https://codehaus-plexus.github.io/">Codehaus Plexus</a>. All rights reserved.</div>
 </body>
 </html>

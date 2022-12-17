@@ -20,19 +20,19 @@ under the License.
 <rss version="0.91">
   <channel>
     <title>Plexus Javac+error-prone Component - Checkstyle report</title>
-    <link>http://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compilers/plexus-compiler-javac-errorprone/</link>
+    <link>https://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compilers/plexus-compiler-javac-errorprone/</link>
     <description>Plexus Javac+error-prone Component - Checkstyle report</description>
     <language>en-us</language>
-    <copyright>&#169;2001 - 2018 Codehaus Plexus</copyright>
+    <copyright>&#169;2001 - 2022 Codehaus Plexus</copyright>
     <item>
       <title>File: 1,
-             Errors: 1,
-             Warnings: 3,
+             Errors: 12,
+             Warnings: 0,
              Infos: 0
       </title>
-            <link>http://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compilers/plexus-compiler-javac-errorprone//checkstyle.html</link>
+            <link>https://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compilers/plexus-compiler-javac-errorprone//checkstyle.html</link>
       <description>
-        <p>Click <a href="http://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compilers/plexus-compiler-javac-errorprone//checkstyle.html">here</a> for the full Checkstyle report.</p>
+        <p>Click <a href="https://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compilers/plexus-compiler-javac-errorprone//checkstyle.html">here</a> for the full Checkstyle report.</p>
 
         <table summary="Files" boder="1">
           <thead>
@@ -46,16 +46,16 @@ under the License.
           <tbody>
                           <tr>
                 <td>
-                  <a href="http://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compilers/plexus-compiler-javac-errorprone//checkstyle.html#org.codehaus.plexus.compiler.javac.errorprone.JavacCompilerWithErrorProne.java">org/codehaus/plexus/compiler/javac/errorprone/JavacCompilerWithErrorProne.java</a>
+                  <a href="https://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compilers/plexus-compiler-javac-errorprone//checkstyle.html#org.codehaus.plexus.compiler.javac.errorprone.JavacCompilerWithErrorProne.java">org/codehaus/plexus/compiler/javac/errorprone/JavacCompilerWithErrorProne.java</a>
                 </td>
                 <td>
                   0
                 </td>
                 <td>
-                  3
+                  0
                 </td>
                 <td>
-                  1
+                  12
                 </td>
               </tr>
                       </tbody>

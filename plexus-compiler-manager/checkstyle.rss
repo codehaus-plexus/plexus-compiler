@@ -20,19 +20,19 @@ under the License.
 <rss version="0.91">
   <channel>
     <title>Plexus Compiler Manager - Checkstyle report</title>
-    <link>http://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compiler-manager/</link>
+    <link>https://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compiler-manager/</link>
     <description>Plexus Compiler Manager - Checkstyle report</description>
     <language>en-us</language>
-    <copyright>&#169;2001 - 2018 Codehaus Plexus</copyright>
+    <copyright>&#169;2001 - 2022 Codehaus Plexus</copyright>
     <item>
       <title>File: 3,
              Errors: 3,
-             Warnings: 4,
+             Warnings: 0,
              Infos: 1
       </title>
-            <link>http://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compiler-manager//checkstyle.html</link>
+            <link>https://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compiler-manager//checkstyle.html</link>
       <description>
-        <p>Click <a href="http://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compiler-manager//checkstyle.html">here</a> for the full Checkstyle report.</p>
+        <p>Click <a href="https://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compiler-manager//checkstyle.html">here</a> for the full Checkstyle report.</p>
 
         <table summary="Files" boder="1">
           <thead>
@@ -46,13 +46,13 @@ under the License.
           <tbody>
                           <tr>
                 <td>
-                  <a href="http://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compiler-manager//checkstyle.html#org.codehaus.plexus.compiler.manager.CompilerManager.java">org/codehaus/plexus/compiler/manager/CompilerManager.java</a>
+                  <a href="https://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compiler-manager//checkstyle.html#org.codehaus.plexus.compiler.manager.NoSuchCompilerException.java">org/codehaus/plexus/compiler/manager/NoSuchCompilerException.java</a>
                 </td>
                 <td>
-                  1
+                  0
                 </td>
                 <td>
-                  1
+                  0
                 </td>
                 <td>
                   1
@@ -60,13 +60,13 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compiler-manager//checkstyle.html#org.codehaus.plexus.compiler.manager.NoSuchCompilerException.java">org/codehaus/plexus/compiler/manager/NoSuchCompilerException.java</a>
+                  <a href="https://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compiler-manager//checkstyle.html#org.codehaus.plexus.compiler.manager.CompilerManager.java">org/codehaus/plexus/compiler/manager/CompilerManager.java</a>
+                </td>
+                <td>
+                  1
                 </td>
                 <td>
                   0
-                </td>
-                <td>
-                  2
                 </td>
                 <td>
                   1
@@ -74,13 +74,13 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compiler-manager//checkstyle.html#org.codehaus.plexus.compiler.manager.DefaultCompilerManager.java">org/codehaus/plexus/compiler/manager/DefaultCompilerManager.java</a>
+                  <a href="https://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compiler-manager//checkstyle.html#org.codehaus.plexus.compiler.manager.DefaultCompilerManager.java">org/codehaus/plexus/compiler/manager/DefaultCompilerManager.java</a>
                 </td>
                 <td>
                   0
                 </td>
                 <td>
-                  1
+                  0
                 </td>
                 <td>
                   1

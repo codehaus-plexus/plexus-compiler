@@ -20,19 +20,19 @@ under the License.
 <rss version="0.91">
   <channel>
     <title>Plexus AspectJ Compiler - Checkstyle report</title>
-    <link>http://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compilers/plexus-compiler-aspectj/</link>
+    <link>https://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compilers/plexus-compiler-aspectj/</link>
     <description>Plexus AspectJ Compiler - Checkstyle report</description>
     <language>en-us</language>
-    <copyright>&#169;2001 - 2018 Codehaus Plexus</copyright>
+    <copyright>&#169;2001 - 2022 Codehaus Plexus</copyright>
     <item>
       <title>File: 2,
-             Errors: 9,
-             Warnings: 22,
+             Errors: 18,
+             Warnings: 5,
              Infos: 0
       </title>
-            <link>http://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compilers/plexus-compiler-aspectj//checkstyle.html</link>
+            <link>https://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compilers/plexus-compiler-aspectj//checkstyle.html</link>
       <description>
-        <p>Click <a href="http://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compilers/plexus-compiler-aspectj//checkstyle.html">here</a> for the full Checkstyle report.</p>
+        <p>Click <a href="https://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compilers/plexus-compiler-aspectj//checkstyle.html">here</a> for the full Checkstyle report.</p>
 
         <table summary="Files" boder="1">
           <thead>
@@ -46,27 +46,27 @@ under the License.
           <tbody>
                           <tr>
                 <td>
-                  <a href="http://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compilers/plexus-compiler-aspectj//checkstyle.html#org.codehaus.plexus.compiler.ajc.AspectJCompiler.java">org/codehaus/plexus/compiler/ajc/AspectJCompiler.java</a>
+                  <a href="https://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compilers/plexus-compiler-aspectj//checkstyle.html#org.codehaus.plexus.compiler.ajc.AspectJCompiler.java">org/codehaus/plexus/compiler/ajc/AspectJCompiler.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
+                </td>
+                <td>
+                  17
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compilers/plexus-compiler-aspectj//checkstyle.html#org.codehaus.plexus.compiler.ajc.AspectJCompilerConfiguration.java">org/codehaus/plexus/compiler/ajc/AspectJCompilerConfiguration.java</a>
                 </td>
                 <td>
                   0
                 </td>
                 <td>
                   4
-                </td>
-                <td>
-                  8
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compilers/plexus-compiler-aspectj//checkstyle.html#org.codehaus.plexus.compiler.ajc.AspectJCompilerConfiguration.java">org/codehaus/plexus/compiler/ajc/AspectJCompilerConfiguration.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  18
                 </td>
                 <td>
                   1

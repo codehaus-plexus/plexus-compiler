@@ -20,19 +20,19 @@ under the License.
 <rss version="0.91">
   <channel>
     <title>Plexus Compiler Test Harness - Checkstyle report</title>
-    <link>http://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compiler-test/</link>
+    <link>https://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compiler-test/</link>
     <description>Plexus Compiler Test Harness - Checkstyle report</description>
     <language>en-us</language>
-    <copyright>&#169;2001 - 2018 Codehaus Plexus</copyright>
+    <copyright>&#169;2001 - 2022 Codehaus Plexus</copyright>
     <item>
       <title>File: 2,
-             Errors: 25,
-             Warnings: 21,
-             Infos: 0
+             Errors: 41,
+             Warnings: 1,
+             Infos: 1
       </title>
-            <link>http://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compiler-test//checkstyle.html</link>
+            <link>https://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compiler-test//checkstyle.html</link>
       <description>
-        <p>Click <a href="http://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compiler-test//checkstyle.html">here</a> for the full Checkstyle report.</p>
+        <p>Click <a href="https://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compiler-test//checkstyle.html">here</a> for the full Checkstyle report.</p>
 
         <table summary="Files" boder="1">
           <thead>
@@ -46,30 +46,30 @@ under the License.
           <tbody>
                           <tr>
                 <td>
-                  <a href="http://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compiler-test//checkstyle.html#org.codehaus.plexus.compiler.AbstractCompilerTest.java">org/codehaus/plexus/compiler/AbstractCompilerTest.java</a>
+                  <a href="https://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compiler-test//checkstyle.html#org.codehaus.plexus.compiler.AbstractCompilerTest.java">org/codehaus/plexus/compiler/AbstractCompilerTest.java</a>
                 </td>
                 <td>
                   0
                 </td>
                 <td>
-                  15
+                  0
                 </td>
                 <td>
-                  6
+                  20
                 </td>
               </tr>
                           <tr>
                 <td>
-                  <a href="http://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compiler-test//checkstyle.html#org.codehaus.plexus.compiler.AbstractCompilerTckTest.java">org/codehaus/plexus/compiler/AbstractCompilerTckTest.java</a>
+                  <a href="https://codehaus-plexus.github.io/plexus-components/plexus-compiler/plexus-compiler-test//checkstyle.html#org.codehaus.plexus.compiler.AbstractCompilerTckTest.java">org/codehaus/plexus/compiler/AbstractCompilerTckTest.java</a>
                 </td>
                 <td>
-                  0
+                  1
                 </td>
                 <td>
-                  6
+                  1
                 </td>
                 <td>
-                  19
+                  21
                 </td>
               </tr>
                       </tbody>
