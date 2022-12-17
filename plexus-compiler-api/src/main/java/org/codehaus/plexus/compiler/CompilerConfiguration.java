@@ -473,6 +473,31 @@ public class CompilerConfiguration
     }
 
     /**
+     * @deprecated will be removed in 2.X use #getCustomCompilerArgumentsAsMap
+     * @return
+     */
+    @Deprecated
+    public LinkedHashMap<String, String> getCustomCompilerArguments()
+    {
+        LinkedHashMap<String, String> arguments = new LinkedHashMap<>( customCompilerArguments.size() );
+        for ( Map.Entry<String, String> entry : customCompilerArguments )
+        {
+            arguments.put( entry.getKey(), entry.getValue() );
+        }
+        return arguments;
+    }
+
+    /**
+     * @deprecated will be removed in 2.X use #setCustomCompilerArgumentsAsMap
+     * @param customCompilerArguments
+     */
+    @Deprecated
+    public void setCustomCompilerArguments( LinkedHashMap<String, String> customCompilerArguments )
+    {
+        setCustomCompilerArgumentsAsMap( customCompilerArguments );
+    }
+
+    /**
      * Get all unique argument keys and their value. In case of duplicate keys, last one added wins.
      *
      * @return

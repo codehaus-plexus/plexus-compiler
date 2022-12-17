@@ -64,6 +64,19 @@ public interface Compiler
         throws CompilerException;
 
     /**
+     * This method is provided for backwards compatibility only. Clients should
+     * use {@link #performCompile(CompilerConfiguration)} instead.
+     * 
+     * @param configuration   the configuration description of the compilation
+     *   to perform
+     * @return the result of the compilation returned by the language processor
+     * @throws CompilerException
+     */
+    @Deprecated
+    List<CompilerError> compile( CompilerConfiguration configuration )
+            throws CompilerException;
+    
+    /**
      * Create the command line that would be executed using this configuration.
      * If this particular compiler has no concept of a command line then returns
      * null.
