@@ -377,10 +377,6 @@ public class EclipseJavaCompiler
                     args.add( errorF.toString() );
                     args.addAll( allSources );
 
-                    String to = ( config.getWorkingDirectory() == null ) ? config.getOutputLocation() :
-                        config.getWorkingDirectory().toPath().relativize( new File( config.getOutputLocation() ).toPath() ).toString();
-                    getLogger().info( "Compiling with " + config.describe( "eclipse" ) +
-                            " to " + to );
                     getLogger().debug( "ecj command line: " + args );
 
                     success = BatchCompiler.compile( args.toArray( new String[args.size()] ), devNull, devNull,
