@@ -15,6 +15,7 @@
   
   <properties>
     <junit.version>4.13.2</junit.version>
+    <groovy.version>3.0.14</groovy.version>
     <maven.deploy.skip>true</maven.deploy.skip>
   </properties>
 
@@ -70,18 +71,18 @@
           <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy</artifactId>
-            <version>3.0.13</version>
+            <version>${groovy.version}</version>
             <scope>runtime</scope>
           </dependency>
           <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-json</artifactId>
-            <version>3.0.13</version>
+            <version>${groovy.version}</version>
           </dependency>
           <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-xml</artifactId>
-            <version>3.0.13</version>
+            <version>${groovy.version}</version>
           </dependency>
         </dependencies>
       </plugin>
