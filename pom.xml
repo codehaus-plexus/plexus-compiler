@@ -54,7 +54,7 @@
     <errorprone.version>2.18.0</errorprone.version>
     <trimStackTrace>false</trimStackTrace>
     <preparationGoals>clean install</preparationGoals>
-    <maven.compiler.version>3.10.1</maven.compiler.version>
+    <maven.compiler.version>3.11.0</maven.compiler.version>
   </properties>
 
   <dependencyManagement>
