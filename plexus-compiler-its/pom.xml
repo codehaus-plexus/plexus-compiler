@@ -15,7 +15,7 @@
   
   <properties>
     <junit.version>4.13.2</junit.version>
-    <groovy.version>3.0.14</groovy.version>
+    <groovy.version>3.0.16</groovy.version>
     <maven.deploy.skip>true</maven.deploy.skip>
   </properties>
 
