@@ -13,6 +13,11 @@
   <name>Plexus Eclipse Compiler</name>
   <description>Eclipse Compiler support for Plexus Compiler component.</description>
 
+  <properties>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
@@ -25,7 +30,7 @@
     <dependency>
       <groupId>org.eclipse.jdt</groupId>
       <artifactId>ecj</artifactId>
-      <version>3.32.0</version>
+      <version>3.33.0</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
@@ -53,26 +58,4 @@
     </dependency>
   </dependencies>
 
-  <profiles>
-    <profile>
-      <id>1.7</id>
-      <activation>
-        <jdk>1.7</jdk>
-      </activation>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-surefire-plugin</artifactId>
-              <configuration>
-                <skipExec>true</skipExec>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-
-  </profiles>
 </project>

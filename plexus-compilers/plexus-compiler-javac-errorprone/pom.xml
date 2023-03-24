@@ -13,8 +13,13 @@
   <name>Plexus Javac+error-prone Component</name>
   <description>Javac Compiler support for Plexus Compiler component,
     with error-prone static analysis checks enabled.
-    See http://errorprone.info
+    See https://errorprone.info
   </description>
+
+  <properties>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
+  </properties>
 
   <dependencies>
     <dependency>
@@ -37,30 +42,26 @@
     </dependency>
   </dependencies>
 
-  <profiles>
-    <profile>
-      <id>16+</id>
-      <activation>
-        <jdk>[16,)</jdk>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <skip>true</skip>
-<!--              <argLine>-->
-<!--                &#45;&#45;add-modules java.se-->
-<!--                &#45;&#45;add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED-->
-<!--                &#45;&#45;add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED-->
-<!--                &#45;&#45;add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED-->
-<!--              </argLine>-->
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
-
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <argLine>
+            --add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED
+            --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED
+            --add-exports jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED
+            --add-exports jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED
+            --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED
+            --add-exports jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED
+            --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED
+            --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED
+            --add-opens jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED
+            --add-opens jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED
+          </argLine>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
