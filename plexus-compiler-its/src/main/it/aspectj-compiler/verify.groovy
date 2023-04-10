@@ -20,6 +20,8 @@ def logFile = new File( basedir, 'build.log' )
 assert logFile.exists()
 content = logFile.text.normalize()
 
+assert content.contains( "Tests run: 2, Failures: 0, Errors: 0, Skipped: 0" )
+
 def junitLog = """Running org.acme.ApplicationTest
 call(String org.acme.Application.greet(String))
 execution(String org.acme.Application.greet(String))
@@ -28,7 +30,6 @@ call(void org.acme.Application.main(String[]))
 execution(void org.acme.Application.main(String[]))
 Running application
 execution(String org.acme.Application.greet(String))
-call(void org.junit.Assert.assertTrue(boolean))
-Tests run: 2, Failures: 0, Errors: 0, Skipped: 0""".normalize()
+call(void org.junit.Assert.assertTrue(boolean))""".normalize()
 
 assert content.contains( junitLog )
