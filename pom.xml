@@ -49,7 +49,7 @@
     <project.build.outputTimestamp>2022-12-17T17:23:49Z</project.build.outputTimestamp>
     <jupiter.version>5.9.3</jupiter.version>
     <aspectj.version>1.9.19</aspectj.version>
-    <maven.version>3.2.5</maven.version>
+    <maven.version>3.5.4</maven.version>
     <errorprone.version>2.18.0</errorprone.version>
     <trimStackTrace>false</trimStackTrace>
     <preparationGoals>clean install</preparationGoals>
