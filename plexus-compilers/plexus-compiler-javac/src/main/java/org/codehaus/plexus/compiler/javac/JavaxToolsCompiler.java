@@ -23,7 +23,8 @@ import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.compiler.CompilerException;
 import org.codehaus.plexus.compiler.CompilerResult;
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.tools.Diagnostic;
 import javax.tools.DiagnosticCollector;
@@ -45,8 +46,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @since 2.0
  */
 @Component( role = InProcessCompiler.class )
-public class JavaxToolsCompiler extends AbstractLogEnabled implements InProcessCompiler
+public class JavaxToolsCompiler implements InProcessCompiler
 {
+    private final Logger log = LoggerFactory.getLogger( getClass() );
     /**
      * is that thread safe ???
      */
@@ -149,7 +151,7 @@ public class JavaxToolsCompiler extends AbstractLogEnabled implements InProcessC
                     {
                         // workaround for https://bugs.openjdk.java.net/browse/JDK-8210649
                         // workaround for https://bugs.openjdk.java.net/browse/JDK-8216202
-                        getLogger().debug( "Ignore Issue get JavaCompiler Diagnostic message (see https://bugs.openjdk.java.net/browse/JDK-8210649):" + e.getMessage(), e );
+                        log.debug( "Ignore Issue get JavaCompiler Diagnostic message (see https://bugs.openjdk.java.net/browse/JDK-8210649):" + e.getMessage(), e );
                         // in this case we try to replace the baseMessage with toString (hoping this does not throw a new exception..
                         baseMessage = diagnostic.toString();
                     }
