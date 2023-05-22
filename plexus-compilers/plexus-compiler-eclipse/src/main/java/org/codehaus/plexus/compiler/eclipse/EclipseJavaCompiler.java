@@ -268,13 +268,13 @@ public class EclipseJavaCompiler
             boolean success = false;
             if ( compiler != null )
             {
-                getLogger().debug( "Using JSR-199 EclipseCompiler" );
+                log.debug( "Using JSR-199 EclipseCompiler" );
                 // ECJ JSR-199 compiles against the latest Java version it supports if no source
                 // version is given explicitly. BatchCompiler uses 1.3 as default. So check
                 // whether a source version is specified, and if not supply 1.3 explicitly.
                 if ( !haveSourceOrReleaseArgument( args ) )
                 {
-                    getLogger().debug( "ecj: no source level nor release specified, defaulting to Java 1.3" );
+                    log.debug( "ecj: no source level nor release specified, defaulting to Java 1.3" );
                     args.add( "-source" );
                     args.add( "1.3" );
                 }
@@ -336,7 +336,7 @@ public class EclipseJavaCompiler
                     }
                     catch ( IllegalCharsetNameException | UnsupportedCharsetException e )
                     {
-                        getLogger().warn(
+                        log.warn(
                             "ecj: invalid or unsupported character set '" + encoding + "', using default" );
                         // charset remains null
                     }
@@ -345,11 +345,11 @@ public class EclipseJavaCompiler
                 {
                     charset = Charset.defaultCharset();
                 }
-                if ( getLogger().isDebugEnabled() )
+                if ( log.isDebugEnabled() )
                 {
-                    getLogger().debug( "ecj: using character set " + charset.displayName() );
-                    getLogger().debug( "ecj command line: " + args );
-                    getLogger().debug( "ecj input source files: " + allSources );
+                    log.debug( "ecj: using character set " + charset.displayName() );
+                    log.debug( "ecj command line: " + args );
+                    log.debug( "ecj input source files: " + allSources );
                 }
 
                 try ( StandardJavaFileManager manager =
@@ -362,7 +362,7 @@ public class EclipseJavaCompiler
                 {
                     throw new EcjFailureException( e.getLocalizedMessage() );
                 }
-                getLogger().debug( sw.toString() );
+                log.debug( sw.toString() );
             }
             else
             {
@@ -371,13 +371,13 @@ public class EclipseJavaCompiler
                 try
                 {
                     errorF = File.createTempFile( "ecjerr-", ".xml" );
-                    getLogger().debug( "Using legacy BatchCompiler; error file " + errorF );
+                    log.debug( "Using legacy BatchCompiler; error file " + errorF );
 
                     args.add( "-log" );
                     args.add( errorF.toString() );
                     args.addAll( allSources );
 
-                    getLogger().debug( "ecj command line: " + args );
+                    log.debug( "ecj command line: " + args );
 
                     success = BatchCompiler.compile( args.toArray( new String[args.size()] ), devNull, devNull,
                                                      new CompilationProgress()
@@ -408,7 +408,7 @@ public class EclipseJavaCompiler
                                                          {
                                                          }
                                                      } );
-                    getLogger().debug( sw.toString() );
+                    log.debug( sw.toString() );
 
                     if ( errorF.length() < 80 )
                     {
@@ -635,7 +635,7 @@ public class EclipseJavaCompiler
                 }
             }
         }
-        getLogger().debug( "Cannot find org.eclipse.jdt.internal.compiler.tool.EclipseCompiler" );
+        log.debug( "Cannot find org.eclipse.jdt.internal.compiler.tool.EclipseCompiler" );
         return null;
     }
 
@@ -743,7 +743,7 @@ public class EclipseJavaCompiler
 
         if ( versionSpec.equals( "1.9" ) )
         {
-            getLogger().warn( "Version 9 should be specified as 9, not 1.9" );
+            log.warn( "Version 9 should be specified as 9, not 1.9" );
             return "9";
         }
         return versionSpec;
