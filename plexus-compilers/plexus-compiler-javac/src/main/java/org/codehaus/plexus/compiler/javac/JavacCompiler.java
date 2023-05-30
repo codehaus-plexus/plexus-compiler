@@ -798,7 +798,7 @@ public class JavacCompiler
             }
             else if ( ( buffer.length() == 0 ) && isNote( line ) )
             {
-                // skip, JDK 1.5 telling us deprecated APIs are used but -Xlint:deprecation isn't set
+                errors.add( new CompilerMessage( line, CompilerMessage.Kind.NOTE ) );
             }
             else if ( ( buffer.length() == 0 ) && isMisc( line ) )
             {

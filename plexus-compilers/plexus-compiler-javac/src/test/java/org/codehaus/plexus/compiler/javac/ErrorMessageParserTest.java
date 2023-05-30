@@ -125,6 +125,16 @@ public class ErrorMessageParserTest
     }
 
     @Test
+    public void testNoteMessage() throws IOException
+    {
+        String error = "Note: My fancy annotation processor info" + EOL;
+        List<CompilerMessage> messages = JavacCompiler.parseModernStream(0, new BufferedReader(new StringReader(error)));
+        assertThat(messages.size(), is(1));
+        assertThat(messages.get(0).isError(), is(false));
+        assertThat(messages.get(0).getMessage(), is("My fancy annotation processor info"));
+    }
+
+    @Test
     public void testUnknownSymbolError()
     {
         String error = "./org/codehaus/foo/UnknownSymbol.java:7: cannot find symbol" + EOL +
