@@ -56,8 +56,13 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -562,6 +567,13 @@ public class JavacCompiler extends AbstractCompiler {
 
         try {
             returnCode = CommandLineUtils.executeCommandLine(cli, out, out);
+            Path logsDir = config.getBuildDirectory().toPath().resolve("compiler-logs");
+            if (!Files.exists(logsDir)) {
+                Files.createDirectories(logsDir);
+            }
+            SimpleDateFormat dateFormat = new SimpleDateFormat("'javac'_yyyy-MM-dd'T'HH_mm_ss.'log'");
+            String logFileName = dateFormat.format(new Date());
+            Files.write(logsDir.resolve(logFileName), out.getOutput().getBytes(StandardCharsets.UTF_8));
 
             messages = parseModernStream(returnCode, new BufferedReader(new StringReader(out.getOutput())));
         } catch (CommandLineException | IOException e) {
