@@ -564,7 +564,7 @@ public class JavacCompiler extends AbstractCompiler {
             returnCode = CommandLineUtils.executeCommandLine(cli, out, out);
 
             if (log.isDebugEnabled()) {
-                log.debug("Compiler output:\n{}", out.getOutput());
+                log.debug("Compiler output:{}{}", EOL, out.getOutput());
             }
 
             messages = parseModernStream(returnCode, new BufferedReader(new StringReader(out.getOutput())));
@@ -622,7 +622,7 @@ public class JavacCompiler extends AbstractCompiler {
             ok = (Integer) compile.invoke(null, new Object[] {args, new PrintWriter(out)});
 
             if (log.isDebugEnabled()) {
-                log.debug("Compiler output:\n{}", out.toString());
+                log.debug("Compiler output:{}{}", EOL, out.toString());
             }
 
             messages = parseModernStream(ok, new BufferedReader(new StringReader(out.toString())));
