@@ -85,7 +85,7 @@ import org.codehaus.plexus.util.cli.Commandline;
  * @author Others
  *
  */
-@Component( role = Compiler.class, hint = "javac ")
+@Component( role = Compiler.class, hint = "javac" )
 public class JavacCompiler
     extends AbstractCompiler
 {
