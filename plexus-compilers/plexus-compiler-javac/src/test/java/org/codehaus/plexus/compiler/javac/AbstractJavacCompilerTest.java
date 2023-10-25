@@ -69,7 +69,8 @@ public abstract class AbstractJavacCompilerTest
         String javaVersion = getJavaVersion();
         if (javaVersion.contains("9.0")||javaVersion.contains("11")||javaVersion.contains("14")||
             javaVersion.contains("15")||javaVersion.contains("16")||javaVersion.contains("17")||
-            javaVersion.contains("18")||javaVersion.contains("19")||javaVersion.contains("20")){
+            javaVersion.contains("18")||javaVersion.contains("19")||javaVersion.contains("20")||
+            javaVersion.contains("21")){
             return 5;
         }
         // javac output changed for misspelled modifiers starting in 1.6...they now generate 2 errors per occurrence, not one.
@@ -89,7 +90,8 @@ public abstract class AbstractJavacCompilerTest
         String javaVersion = getJavaVersion();
         if (javaVersion.contains("9.0")||javaVersion.contains("11")||javaVersion.contains("14")||
             javaVersion.contains("15")||javaVersion.contains("16")||javaVersion.contains("17")||
-            javaVersion.contains("18")||javaVersion.contains("19")||javaVersion.contains("20")){
+            javaVersion.contains("18")||javaVersion.contains("19")||javaVersion.contains("20")||
+            javaVersion.contains("21")){
             return 1;
         }
         if (javaVersion.contains("1.8")){
@@ -137,6 +139,9 @@ public abstract class AbstractJavacCompilerTest
         if (javaVersion.contains("20")){
             return "20";
         }
+        if (javaVersion.contains("21")){
+            return "21";
+        }
         return super.getTargetVersion();
     }
 
@@ -175,6 +180,9 @@ public abstract class AbstractJavacCompilerTest
         if (javaVersion.contains("20")){
             return "20";
         }
+        if (javaVersion.contains("21")){
+            return "21";
+        }
         return super.getTargetVersion();
     }
 
@@ -184,7 +192,8 @@ public abstract class AbstractJavacCompilerTest
         String javaVersion = getJavaVersion();
         if (javaVersion.contains("9.0")||javaVersion.contains("11")||javaVersion.contains("14")||
             javaVersion.contains("15")||javaVersion.contains("16")||javaVersion.contains("17")||
-            javaVersion.contains("18")||javaVersion.contains("19")||javaVersion.contains("20")
+            javaVersion.contains("18")||javaVersion.contains("19")||javaVersion.contains("20")||
+            javaVersion.contains("21")
         ){
             return Arrays.asList( "org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ExternalDeps.class",
                     "org/codehaus/foo/Person.class" );

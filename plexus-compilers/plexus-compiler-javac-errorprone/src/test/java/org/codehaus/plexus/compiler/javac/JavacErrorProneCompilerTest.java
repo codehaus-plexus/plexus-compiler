@@ -21,12 +21,12 @@ public class JavacErrorProneCompilerTest
         String javaVersion = getJavaVersion();
         if (javaVersion.startsWith("1.8")) {
             return 1;
-        } else {
-            if (javaVersion.contains("18") || javaVersion.contains("19") || javaVersion.contains("20")) {
-                return 5;
-            }
-            return 2;
+        } else if (javaVersion.contains("18") || javaVersion.contains("19") || javaVersion.contains("20")) {
+            return 5;
+        } else if (javaVersion.contains("21")) {
+            return 6;
         }
+        return 2;
     }
 
     @Override
