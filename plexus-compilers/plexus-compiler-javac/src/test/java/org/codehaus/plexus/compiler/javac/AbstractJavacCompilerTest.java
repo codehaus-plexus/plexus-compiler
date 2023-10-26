@@ -326,6 +326,9 @@ public abstract class AbstractJavacCompilerTest
         expectedArguments.add( "-source" );
         expectedArguments.add( "1.3" );
 
+        // unshared table
+        expectedArguments.add( "-XDuseUnsharedTable=true" );
+
         // customCompilerArguments
         Map<String, String> customCompilerArguments = new LinkedHashMap<>();
         customCompilerArguments.put( "-J-Duser.language=en_us", null );
@@ -367,6 +370,9 @@ public abstract class AbstractJavacCompilerTest
         expectedArguments.add( "--release" );
         expectedArguments.add( "9" );
 
+        // unshared table
+        expectedArguments.add( "-XDuseUnsharedTable=true" );
+
         internalTest( compilerConfiguration, expectedArguments, source);
     }
 
@@ -395,6 +401,9 @@ public abstract class AbstractJavacCompilerTest
         expectedArguments.add( "-source" );
         expectedArguments.add( "1.3" );
 
+        // unshared table
+        expectedArguments.add( "-XDuseUnsharedTable=true" );
+
         internalTest( compilerConfiguration, expectedArguments );
     }
 
@@ -421,6 +430,9 @@ public abstract class AbstractJavacCompilerTest
         expectedArguments.add( "--module-version" );
         expectedArguments.add( "1.2.0-SNAPSHOT" );
 
+        // unshared table
+        expectedArguments.add( "-XDuseUnsharedTable=true" );
+
         internalTest( compilerConfiguration, expectedArguments );
     }
 
@@ -440,7 +452,10 @@ public abstract class AbstractJavacCompilerTest
         compilerConfiguration.setReleaseVersion( "6" );
         expectedArguments.add( "--release" );
         expectedArguments.add( "6" );
-        
+
+        // unshared table
+        expectedArguments.add( "-XDuseUnsharedTable=true" );
+
         internalTest( compilerConfiguration, expectedArguments );
     }
 
@@ -465,7 +480,10 @@ public abstract class AbstractJavacCompilerTest
         expectedArguments.add( "1.1" );
         expectedArguments.add( "-source" );
         expectedArguments.add( "1.3" );
-        
+
+        // unshared table
+        expectedArguments.add( "-XDuseUnsharedTable=true" );
+
         internalTest( compilerConfiguration, expectedArguments );
     }
 
@@ -494,7 +512,10 @@ public abstract class AbstractJavacCompilerTest
         compilerConfiguration.addCompilerCustomArgument( "--add-exports", "FROM-MOD/package2=OTHER-MOD" );
         expectedArguments.add( "--add-exports" );
         expectedArguments.add( "FROM-MOD/package2=OTHER-MOD" );
-        
+
+        // unshared table
+        expectedArguments.add( "-XDuseUnsharedTable=true" );
+
         internalTest( compilerConfiguration, expectedArguments );
     }
 
@@ -639,5 +660,7 @@ public abstract class AbstractJavacCompilerTest
         expectedArguments.add( "foo" );
 
         expectedArguments.add( "bar" );
+
+        expectedArguments.add( "-XDuseUnsharedTable=true" );
     }
 }

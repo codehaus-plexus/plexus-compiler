@@ -443,6 +443,11 @@ public class JavacCompiler
             args.add( value );
         }
 
+        if ( !config.isFork() )
+        {
+            args.add( "-XDuseUnsharedTable=true" );
+        }
+
         return args.toArray( new String[0] );
     }
 
