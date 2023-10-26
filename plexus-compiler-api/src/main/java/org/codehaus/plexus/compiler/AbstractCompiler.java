@@ -24,8 +24,9 @@ package org.codehaus.plexus.compiler;
  * SOFTWARE.
  */
 
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.DirectoryScanner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,9 +40,9 @@ import java.util.Set;
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  */
 public abstract class AbstractCompiler
-    extends AbstractLogEnabled
     implements Compiler
 {
+    protected Logger log = LoggerFactory.getLogger ( getClass() );
     protected static final String EOL = System.lineSeparator();
 
     protected static final String PS = System.getProperty( "path.separator" );
@@ -280,11 +281,11 @@ public abstract class AbstractCompiler
 
     protected void logCompiling( String[] sourceFiles, CompilerConfiguration config )
     {
-        if ( ( getLogger() != null ) && getLogger().isInfoEnabled() )
+        if ( log.isInfoEnabled() )
         {
             String to = ( config.getWorkingDirectory() == null ) ? config.getOutputLocation() :
                 config.getWorkingDirectory().toPath().relativize( new File( config.getOutputLocation() ).toPath() ).toString();
-            getLogger().info( "Compiling " +
+            log.info( "Compiling " +
                                   ( sourceFiles == null ? "" : ( sourceFiles.length + " source file" + ( sourceFiles.length == 1 ? " " : "s " ) ) ) +
                                   "with " + getCompilerId() + " [" + config.describe() + "]" +
                                   " to " + to );

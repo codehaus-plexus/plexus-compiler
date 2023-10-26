@@ -285,7 +285,7 @@ Options can be of the form -option or /option
                     {
                         dllDir.mkdir();
                     }
-                    JarUtil.extract(dllDir, new File(element));
+                    JarUtil.extract(dllDir.toPath(), new File(element));
                     for (String tmpfile : dllDir.list()) 
                     {
                         if ( tmpfile.endsWith(DLL_SUFFIX) )

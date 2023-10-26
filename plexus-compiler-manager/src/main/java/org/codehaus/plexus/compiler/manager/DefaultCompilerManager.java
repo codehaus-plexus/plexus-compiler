@@ -27,7 +27,6 @@ package org.codehaus.plexus.compiler.manager;
 import org.codehaus.plexus.compiler.Compiler;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 import java.util.Map;
 
@@ -36,7 +35,6 @@ import java.util.Map;
  */
 @Component( role = CompilerManager.class )
 public class DefaultCompilerManager
-    extends AbstractLogEnabled
     implements CompilerManager
 {
     @Requirement

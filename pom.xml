@@ -47,10 +47,10 @@
     <maven.compiler.release>8</maven.compiler.release>
     <redirectTestOutputToFile>true</redirectTestOutputToFile>
     <project.build.outputTimestamp>2022-12-17T17:23:49Z</project.build.outputTimestamp>
-    <jupiter.version>5.9.3</jupiter.version>
+    <jupiter.version>5.10.0</jupiter.version>
     <aspectj.version>1.9.19</aspectj.version>
     <maven.version>3.5.4</maven.version>
-    <errorprone.version>2.19.1</errorprone.version>
+    <errorprone.version>2.23.0</errorprone.version>
     <trimStackTrace>false</trimStackTrace>
     <preparationGoals>clean install</preparationGoals>
     <maven.compiler.version>3.11.0</maven.compiler.version>
@@ -107,13 +107,6 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-  <dependencies>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-container-default</artifactId>
-      <scope>provided</scope>
-    </dependency>
-  </dependencies>
 
   <build>
     <pluginManagement>
@@ -121,7 +114,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>3.1.0</version>
+          <version>3.2.1</version>
           <configuration>
             <redirectTestOutputToFile>${redirectTestOutputToFile}</redirectTestOutputToFile>
           </configuration>
@@ -172,12 +165,12 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>3.3.0</version>
+        <version>3.4.1</version>
         <dependencies>
           <dependency>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>extra-enforcer-rules</artifactId>
-            <version>1.6.2</version>
+            <version>1.7.0</version>
           </dependency>
         </dependencies>
         <executions>

@@ -69,7 +69,8 @@ public abstract class AbstractJavacCompilerTest
         String javaVersion = getJavaVersion();
         if (javaVersion.contains("9.0")||javaVersion.contains("11")||javaVersion.contains("14")||
             javaVersion.contains("15")||javaVersion.contains("16")||javaVersion.contains("17")||
-            javaVersion.contains("18")||javaVersion.contains("19")||javaVersion.contains("20")){
+            javaVersion.contains("18")||javaVersion.contains("19")||javaVersion.contains("20")||
+            javaVersion.contains("21")){
             return 5;
         }
         // javac output changed for misspelled modifiers starting in 1.6...they now generate 2 errors per occurrence, not one.
@@ -89,7 +90,8 @@ public abstract class AbstractJavacCompilerTest
         String javaVersion = getJavaVersion();
         if (javaVersion.contains("9.0")||javaVersion.contains("11")||javaVersion.contains("14")||
             javaVersion.contains("15")||javaVersion.contains("16")||javaVersion.contains("17")||
-            javaVersion.contains("18")||javaVersion.contains("19")||javaVersion.contains("20")){
+            javaVersion.contains("18")||javaVersion.contains("19")||javaVersion.contains("20")||
+            javaVersion.contains("21")){
             return 1;
         }
         if (javaVersion.contains("1.8")){
@@ -137,6 +139,9 @@ public abstract class AbstractJavacCompilerTest
         if (javaVersion.contains("20")){
             return "20";
         }
+        if (javaVersion.contains("21")){
+            return "21";
+        }
         return super.getTargetVersion();
     }
 
@@ -175,6 +180,9 @@ public abstract class AbstractJavacCompilerTest
         if (javaVersion.contains("20")){
             return "20";
         }
+        if (javaVersion.contains("21")){
+            return "21";
+        }
         return super.getTargetVersion();
     }
 
@@ -184,7 +192,8 @@ public abstract class AbstractJavacCompilerTest
         String javaVersion = getJavaVersion();
         if (javaVersion.contains("9.0")||javaVersion.contains("11")||javaVersion.contains("14")||
             javaVersion.contains("15")||javaVersion.contains("16")||javaVersion.contains("17")||
-            javaVersion.contains("18")||javaVersion.contains("19")||javaVersion.contains("20")
+            javaVersion.contains("18")||javaVersion.contains("19")||javaVersion.contains("20")||
+            javaVersion.contains("21")
         ){
             return Arrays.asList( "org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ExternalDeps.class",
                     "org/codehaus/foo/Person.class" );
@@ -317,6 +326,9 @@ public abstract class AbstractJavacCompilerTest
         expectedArguments.add( "-source" );
         expectedArguments.add( "1.3" );
 
+        // unshared table
+        expectedArguments.add( "-XDuseUnsharedTable=true" );
+
         // customCompilerArguments
         Map<String, String> customCompilerArguments = new LinkedHashMap<>();
         customCompilerArguments.put( "-J-Duser.language=en_us", null );
@@ -358,6 +370,9 @@ public abstract class AbstractJavacCompilerTest
         expectedArguments.add( "--release" );
         expectedArguments.add( "9" );
 
+        // unshared table
+        expectedArguments.add( "-XDuseUnsharedTable=true" );
+
         internalTest( compilerConfiguration, expectedArguments, source);
     }
 
@@ -386,6 +401,9 @@ public abstract class AbstractJavacCompilerTest
         expectedArguments.add( "-source" );
         expectedArguments.add( "1.3" );
 
+        // unshared table
+        expectedArguments.add( "-XDuseUnsharedTable=true" );
+
         internalTest( compilerConfiguration, expectedArguments );
     }
 
@@ -412,6 +430,9 @@ public abstract class AbstractJavacCompilerTest
         expectedArguments.add( "--module-version" );
         expectedArguments.add( "1.2.0-SNAPSHOT" );
 
+        // unshared table
+        expectedArguments.add( "-XDuseUnsharedTable=true" );
+
         internalTest( compilerConfiguration, expectedArguments );
     }
 
@@ -431,7 +452,10 @@ public abstract class AbstractJavacCompilerTest
         compilerConfiguration.setReleaseVersion( "6" );
         expectedArguments.add( "--release" );
         expectedArguments.add( "6" );
-        
+
+        // unshared table
+        expectedArguments.add( "-XDuseUnsharedTable=true" );
+
         internalTest( compilerConfiguration, expectedArguments );
     }
 
@@ -456,7 +480,10 @@ public abstract class AbstractJavacCompilerTest
         expectedArguments.add( "1.1" );
         expectedArguments.add( "-source" );
         expectedArguments.add( "1.3" );
-        
+
+        // unshared table
+        expectedArguments.add( "-XDuseUnsharedTable=true" );
+
         internalTest( compilerConfiguration, expectedArguments );
     }
 
@@ -485,7 +512,10 @@ public abstract class AbstractJavacCompilerTest
         compilerConfiguration.addCompilerCustomArgument( "--add-exports", "FROM-MOD/package2=OTHER-MOD" );
         expectedArguments.add( "--add-exports" );
         expectedArguments.add( "FROM-MOD/package2=OTHER-MOD" );
-        
+
+        // unshared table
+        expectedArguments.add( "-XDuseUnsharedTable=true" );
+
         internalTest( compilerConfiguration, expectedArguments );
     }
 
@@ -630,5 +660,7 @@ public abstract class AbstractJavacCompilerTest
         expectedArguments.add( "foo" );
 
         expectedArguments.add( "bar" );
+
+        expectedArguments.add( "-XDuseUnsharedTable=true" );
     }
 }

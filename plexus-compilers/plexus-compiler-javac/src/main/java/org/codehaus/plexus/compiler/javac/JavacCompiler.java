@@ -85,7 +85,7 @@ import org.codehaus.plexus.util.cli.Commandline;
  * @author Others
  *
  */
-@Component( role = Compiler.class, hint = "javac ")
+@Component( role = Compiler.class, hint = "javac" )
 public class JavacCompiler
     extends AbstractCompiler
 {
@@ -165,8 +165,8 @@ public class JavacCompiler
                 }
                 catch ( IOException e )
                 {
-                    if ( (getLogger() != null ) && getLogger().isWarnEnabled()) {
-                        getLogger().warn( "Unable to autodetect 'javac' path, using 'javac' from the environment." );
+                    if ( log.isWarnEnabled()) {
+                        log.warn( "Unable to autodetect 'javac' path, using 'javac' from the environment." );
                     }
                     executable = "javac";
                 }
@@ -443,6 +443,11 @@ public class JavacCompiler
             args.add( value );
         }
 
+        if ( !config.isFork() )
+        {
+            args.add( "-XDuseUnsharedTable=true" );
+        }
+
         return args.toArray( new String[0] );
     }
 
@@ -607,7 +612,7 @@ public class JavacCompiler
 
         List<CompilerMessage> messages;
 
-        if ( ( getLogger() != null ) && getLogger().isDebugEnabled() )
+        if ( log.isDebugEnabled() )
         {
             String debugFileName = StringUtils.isEmpty(config.getDebugFileName()) ? "javac" : config.getDebugFileName();
 
@@ -624,9 +629,9 @@ public class JavacCompiler
             }
             catch ( IOException e )
             {
-                if ( ( getLogger() != null ) && getLogger().isWarnEnabled() )
+                if ( log.isWarnEnabled() )
                 {
-                    getLogger().warn( "Unable to write '" + commandLineFile.getName() + "' debug script file", e );
+                    log.warn( "Unable to write '" + commandLineFile.getName() + "' debug script file", e );
                 }
             }
         }
@@ -662,8 +667,8 @@ public class JavacCompiler
         final Thread thread = Thread.currentThread();
         final ClassLoader contextClassLoader = thread.getContextClassLoader();
         thread.setContextClassLoader( javacClass.getClassLoader() );
-        if ( (getLogger() != null ) && getLogger().isDebugEnabled()) {
-            getLogger().debug("ttcl changed run compileInProcessWithProperClassloader");
+        if ( log.isDebugEnabled()) {
+            log.debug("ttcl changed run compileInProcessWithProperClassloader");
         }
         try
         {
@@ -1024,7 +1029,7 @@ public class JavacCompiler
         try
         {
             File tempFile;
-            if ( ( getLogger() != null ) && getLogger().isDebugEnabled() )
+            if ( log.isDebugEnabled() )
             {
                 tempFile =
                     File.createTempFile( JavacCompiler.class.getName(), "arguments", new File( outputDirectory ) );
