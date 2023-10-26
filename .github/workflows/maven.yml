@@ -26,7 +26,7 @@ jobs:
     name: Build it
     uses: codehaus-plexus/.github/.github/workflows/maven.yml@master
     with:
-      jdk-fast-fail-build: '11'
+      jdk-fast-fail-build: '21'
       jdk-matrix: '["11", "17", "21"]'
       jdk-distribution-matrix: '["zulu", "temurin", "microsoft", "liberica", "corretto"]'
       os-matrix: '["ubuntu-latest","windows-latest", "macOS-latest"]'
