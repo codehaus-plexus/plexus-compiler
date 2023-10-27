@@ -5,8 +5,8 @@
 
   <parent>
     <groupId>org.codehaus.plexus</groupId>
-    <artifactId>plexus-components</artifactId>
-    <version>10.0</version>
+    <artifactId>plexus</artifactId>
+    <version>15</version>
   </parent>
 
   <artifactId>plexus-compiler</artifactId>
@@ -120,6 +120,16 @@
         <artifactId>hamcrest</artifactId>
         <version>2.2</version>
       </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-utils</artifactId>
+        <version>4.0.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-xml</artifactId>
+        <version>4.0.1</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -168,25 +178,6 @@
         </configuration>
       </plugin>
       <plugin>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-metadata</artifactId>
-        <executions>
-          <execution>
-            <id>process-classes</id>
-            <phase>none</phase>
-          </execution>
-          <execution>
-            <id>process-test-classes</id>
-            <phase>none</phase>
-          </execution>
-          <execution>
-            <id>default</id>
-            <phase>none</phase>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
         <version>3.4.1</version>
@@ -232,16 +223,6 @@
       <plugin>
         <groupId>org.eclipse.sisu</groupId>
         <artifactId>sisu-maven-plugin</artifactId>
-        <version>0.9.0.M2</version>
-        <executions>
-          <execution>
-            <id>index-project</id>
-            <goals>
-              <goal>main-index</goal>
-              <goal>test-index</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
 
     </plugins>
