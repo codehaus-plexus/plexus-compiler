@@ -18,7 +18,6 @@ package org.codehaus.plexus.compiler.javac.errorprone;
 
 import com.google.errorprone.ErrorProneJavaCompiler;
 
-import org.codehaus.plexus.compiler.Compiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerException;
 import org.codehaus.plexus.compiler.CompilerMessage;
@@ -26,8 +25,8 @@ import org.codehaus.plexus.compiler.CompilerResult;
 import org.codehaus.plexus.compiler.javac.InProcessCompiler;
 import org.codehaus.plexus.compiler.javac.JavacCompiler;
 import org.codehaus.plexus.compiler.javac.JavaxToolsCompiler;
-import org.codehaus.plexus.component.annotations.Component;
 
+import javax.inject.Named;
 import javax.tools.JavaCompiler;
 
 import java.net.MalformedURLException;
@@ -40,7 +39,7 @@ import java.net.URLClassLoader;
  *
  * @author <a href="mailto:alexeagle@google.com">Alex Eagle</a>
  */
-@Component( role = Compiler.class, hint = "javac-with-errorprone")
+@Named("javac-with-errorprone")
 public class JavacCompilerWithErrorProne
     extends JavacCompiler
 {

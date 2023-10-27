@@ -24,6 +24,8 @@ package org.codehaus.plexus.compiler.eclipse;
  * SOFTWARE.
  */
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.tools.Diagnostic;
 import javax.tools.DiagnosticListener;
 import javax.tools.JavaCompiler;
@@ -44,13 +46,11 @@ import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.ServiceLoader;
 import org.codehaus.plexus.compiler.AbstractCompiler;
-import org.codehaus.plexus.compiler.Compiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerException;
 import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.compiler.CompilerOutputStyle;
 import org.codehaus.plexus.compiler.CompilerResult;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.jdt.core.compiler.CompilationProgress;
 import org.eclipse.jdt.core.compiler.batch.BatchCompiler;
@@ -58,7 +58,8 @@ import org.eclipse.jdt.core.compiler.batch.BatchCompiler;
 /**
  *
  */
-@Component( role = Compiler.class, hint = "eclipse" )
+@Named( "eclipse" )
+@Singleton
 public class EclipseJavaCompiler
     extends AbstractCompiler
 {

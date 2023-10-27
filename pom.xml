@@ -89,6 +89,11 @@
         <version>2.1.1</version>
       </dependency>
       <dependency>
+        <groupId>javax.inject</groupId>
+        <artifactId>javax.inject</artifactId>
+        <version>1</version>
+      </dependency>
+      <dependency>
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
         <type>pom</type>
@@ -99,6 +104,16 @@
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-testing</artifactId>
         <version>1.1.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.sisu</groupId>
+        <artifactId>org.eclipse.sisu.plexus</artifactId>
+        <version>0.9.0.M2</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.sisu</groupId>
+        <artifactId>org.eclipse.sisu.inject</artifactId>
+        <version>0.9.0.M2</version>
       </dependency>
       <dependency>
         <groupId>org.hamcrest</groupId>
@@ -123,6 +138,9 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
           <version>${maven.compiler.version}</version>
+          <configuration>
+            <proc>none</proc>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -154,10 +172,16 @@
         <artifactId>plexus-component-metadata</artifactId>
         <executions>
           <execution>
-            <goals>
-              <goal>generate-metadata</goal>
-              <goal>merge-metadata</goal>
-            </goals>
+            <id>process-classes</id>
+            <phase>none</phase>
+          </execution>
+          <execution>
+            <id>process-test-classes</id>
+            <phase>none</phase>
+          </execution>
+          <execution>
+            <id>default</id>
+            <phase>none</phase>
           </execution>
         </executions>
       </plugin>
@@ -201,6 +225,21 @@
               </rules>
               <fail>true</fail>
             </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.eclipse.sisu</groupId>
+        <artifactId>sisu-maven-plugin</artifactId>
+        <version>0.9.0.M2</version>
+        <executions>
+          <execution>
+            <id>index-project</id>
+            <goals>
+              <goal>main-index</goal>
+              <goal>test-index</goal>
+            </goals>
           </execution>
         </executions>
       </plugin>
