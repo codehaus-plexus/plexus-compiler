@@ -25,19 +25,19 @@ package org.codehaus.plexus.compiler.manager;
  */
 
 import org.codehaus.plexus.compiler.Compiler;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.Map;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  */
-@Component( role = CompilerManager.class )
+@Named
 public class DefaultCompilerManager
     implements CompilerManager
 {
-    @Requirement
+    @Inject
     private Map<String, Compiler> compilers;
 
     // ----------------------------------------------------------------------

@@ -17,13 +17,11 @@ package org.codehaus.plexus.compiler.csharp;
  */
 
 import org.codehaus.plexus.compiler.AbstractCompiler;
-import org.codehaus.plexus.compiler.Compiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerException;
 import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.compiler.CompilerOutputStyle;
 import org.codehaus.plexus.compiler.CompilerResult;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.Os;
@@ -34,6 +32,7 @@ import org.codehaus.plexus.util.cli.Commandline;
 import org.codehaus.plexus.util.cli.StreamConsumer;
 import org.codehaus.plexus.util.cli.WriterStreamConsumer;
 
+import javax.inject.Named;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
@@ -57,7 +56,7 @@ import java.util.Set;
  * @author <a href="mailto:matthew.pocock@ncl.ac.uk">Matthew Pocock</a>
  * @author <a href="mailto:chris.stevenson@gmail.com">Chris Stevenson</a>
  */
-@Component( role = Compiler.class, hint = "csharp" )
+@Named( "csharp" )
 public class CSharpCompiler
     extends AbstractCompiler
 {

@@ -22,10 +22,10 @@ import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.compiler.CompilerException;
 import org.codehaus.plexus.compiler.CompilerResult;
-import org.codehaus.plexus.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Named;
 import javax.tools.Diagnostic;
 import javax.tools.DiagnosticCollector;
 import javax.tools.JavaCompiler;
@@ -45,7 +45,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author <a href="mailto:david.lloyd@redhat.com">David M. Lloyd</a>
  * @since 2.0
  */
-@Component( role = InProcessCompiler.class )
+@Named
 public class JavaxToolsCompiler implements InProcessCompiler
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
