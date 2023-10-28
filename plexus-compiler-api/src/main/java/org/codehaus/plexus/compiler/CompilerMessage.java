@@ -48,8 +48,7 @@ package org.codehaus.plexus.compiler;
  * @author <a href="mailto:stefano@apache.org">Stefano Mazzocchi</a>
  * @since 2.0
  */
-public class CompilerMessage
-{
+public class CompilerMessage {
     private static final String JDK_6_NOTE_PREFIX = "note: ";
 
     private static final String JDK_6_WARNING_PREFIX = "warning: ";
@@ -89,7 +88,6 @@ public class CompilerMessage
      */
     private final String message;
 
-
     /**
      * Constructs a compiler message.
      *
@@ -104,9 +102,14 @@ public class CompilerMessage
      * @deprecated Use {@link #CompilerMessage(String, Kind, int, int, int, int, String)} instead
      */
     @Deprecated
-    public CompilerMessage( final String file, final boolean error, final int startline, final int startcolumn, final int endline, final int endcolumn,
-                            final String message )
-    {
+    public CompilerMessage(
+            final String file,
+            final boolean error,
+            final int startline,
+            final int startcolumn,
+            final int endline,
+            final int endcolumn,
+            final String message) {
         this.file = file;
         this.kind = error ? Kind.ERROR : Kind.WARNING;
         this.startline = startline;
@@ -114,7 +117,7 @@ public class CompilerMessage
         this.endline = endline;
         this.endcolumn = endcolumn;
 
-        this.message = cleanupMessage( message );
+        this.message = cleanupMessage(message);
     }
 
     /**
@@ -128,16 +131,21 @@ public class CompilerMessage
      * @param endcolumn   The end column number of the offending program text
      * @param message     The actual message text produced by the language processor
      */
-    public CompilerMessage( final String file, final Kind kind, final int startline, final int startcolumn, final int endline, final int endcolumn,
-                            final String message )
-    {
+    public CompilerMessage(
+            final String file,
+            final Kind kind,
+            final int startline,
+            final int startcolumn,
+            final int endline,
+            final int endcolumn,
+            final String message) {
         this.file = file;
         this.kind = kind;
         this.startline = startline;
         this.startcolumn = startcolumn;
         this.endline = endline;
         this.endcolumn = endcolumn;
-        this.message = cleanupMessage( message );
+        this.message = cleanupMessage(message);
     }
 
     /**
@@ -147,10 +155,9 @@ public class CompilerMessage
      * @deprecated Use {@link #CompilerMessage(String, Kind)} instead
      */
     @Deprecated
-    public CompilerMessage( final String message )
-    {
+    public CompilerMessage(final String message) {
         this.kind = Kind.WARNING;
-        this.message = cleanupMessage( message );
+        this.message = cleanupMessage(message);
     }
 
     /**
@@ -162,10 +169,9 @@ public class CompilerMessage
      * @deprecated Use {@link #CompilerMessage(String, Kind)} instead
      */
     @Deprecated
-    public CompilerMessage( final String message, final boolean error )
-    {
+    public CompilerMessage(final String message, final boolean error) {
         this.kind = error ? Kind.ERROR : Kind.WARNING;
-        this.message = cleanupMessage( message );
+        this.message = cleanupMessage(message);
     }
 
     /**
@@ -175,10 +181,9 @@ public class CompilerMessage
      * @param kind    The kind of message
      * @since 2.0
      */
-    public CompilerMessage( final String message, final Kind kind )
-    {
+    public CompilerMessage(final String message, final Kind kind) {
         this.kind = kind;
-        this.message = cleanupMessage( message );
+        this.message = cleanupMessage(message);
     }
 
     /**
@@ -186,8 +191,7 @@ public class CompilerMessage
      *
      * @return The filename associated with this compiler message
      */
-    public String getFile()
-    {
+    public String getFile() {
         return file;
     }
 
@@ -196,8 +200,7 @@ public class CompilerMessage
      *
      * @return Whether the message is an error message
      */
-    public boolean isError()
-    {
+    public boolean isError() {
         return kind == Kind.ERROR;
     }
 
@@ -207,8 +210,7 @@ public class CompilerMessage
      *
      * @return The starting line number of the program text originating this message
      */
-    public int getStartLine()
-    {
+    public int getStartLine() {
         return startline;
     }
 
@@ -219,8 +221,7 @@ public class CompilerMessage
      * @return The starting column number of the program text originating this
      *         message
      */
-    public int getStartColumn()
-    {
+    public int getStartColumn() {
         return startcolumn;
     }
 
@@ -230,8 +231,7 @@ public class CompilerMessage
      *
      * @return The ending line number of the program text originating this message
      */
-    public int getEndLine()
-    {
+    public int getEndLine() {
         return endline;
     }
 
@@ -242,8 +242,7 @@ public class CompilerMessage
      * @return The ending column number of the program text originating this
      *         message
      */
-    public int getEndColumn()
-    {
+    public int getEndColumn() {
         return endcolumn;
     }
 
@@ -252,8 +251,7 @@ public class CompilerMessage
      *
      * @return The message produced by the language processor
      */
-    public String getMessage()
-    {
+    public String getMessage() {
         return message;
     }
 
@@ -263,49 +261,33 @@ public class CompilerMessage
      * @return the kind of the message
      * @since 2.0
      */
-    public Kind getKind()
-    {
+    public Kind getKind() {
         return kind;
     }
 
     @Override
-    public String toString()
-    {
-        if ( file != null )
-        {
-            if ( startline != 0 )
-            {
-                if ( startcolumn != 0 )
-                {
+    public String toString() {
+        if (file != null) {
+            if (startline != 0) {
+                if (startcolumn != 0) {
                     return file + ":" + "[" + startline + "," + startcolumn + "] " + message;
-                }
-                else
-                {
+                } else {
                     return file + ":" + "[" + startline + "] " + message;
                 }
-            }
-            else
-            {
+            } else {
                 return file + ": " + message;
             }
-        }
-        else
-        {
+        } else {
             return message;
         }
     }
 
-    private String cleanupMessage( String msg )
-    {
-        if ( kind == Kind.NOTE && msg.toLowerCase()
-                                     .startsWith( JDK_6_NOTE_PREFIX ) )
-        {
-            msg = msg.substring( JDK_6_NOTE_PREFIX.length() );
-        }
-        else if ( ( kind == Kind.WARNING || kind == Kind.MANDATORY_WARNING ) && msg.toLowerCase()
-                                                                                   .startsWith( JDK_6_WARNING_PREFIX ) )
-        {
-            msg = msg.substring( JDK_6_WARNING_PREFIX.length() );
+    private String cleanupMessage(String msg) {
+        if (kind == Kind.NOTE && msg.toLowerCase().startsWith(JDK_6_NOTE_PREFIX)) {
+            msg = msg.substring(JDK_6_NOTE_PREFIX.length());
+        } else if ((kind == Kind.WARNING || kind == Kind.MANDATORY_WARNING)
+                && msg.toLowerCase().startsWith(JDK_6_WARNING_PREFIX)) {
+            msg = msg.substring(JDK_6_WARNING_PREFIX.length());
         }
 
         return msg;
@@ -316,31 +298,28 @@ public class CompilerMessage
      *
      * @since 2.0
      */
-    public enum Kind
-    {
+    public enum Kind {
         /**
          * Problem which prevents the tool's normal completion.
          */
-        ERROR( "error" ),
+        ERROR("error"),
         /**
          * Problem similar to a warning, but is mandated by the tool's specification.
          */
-        MANDATORY_WARNING( "mandatory_warning" ),
+        MANDATORY_WARNING("mandatory_warning"),
         /**
          * Informative message from the tool.
          */
-        NOTE( "note" ),
+        NOTE("note"),
         /**
          * Diagnostic which does not fit within the other kinds.
          */
-        OTHER( "other" ),
+        OTHER("other"),
         /**
          * Problem which does not usually prevent the tool from completing normally.
          */
-        WARNING( "warning" );
+        WARNING("warning");
 
-        Kind( String type )
-        {
-        }
+        Kind(String type) {}
     }
 }

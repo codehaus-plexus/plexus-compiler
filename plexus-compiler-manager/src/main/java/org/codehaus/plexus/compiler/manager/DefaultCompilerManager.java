@@ -23,20 +23,18 @@ package org.codehaus.plexus.compiler.manager;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-import org.codehaus.plexus.compiler.Compiler;
-
 import javax.inject.Inject;
 import javax.inject.Named;
+
 import java.util.Map;
+
+import org.codehaus.plexus.compiler.Compiler;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  */
 @Named
-public class DefaultCompilerManager
-    implements CompilerManager
-{
+public class DefaultCompilerManager implements CompilerManager {
     @Inject
     private Map<String, Compiler> compilers;
 
@@ -44,14 +42,11 @@ public class DefaultCompilerManager
     // CompilerManager Implementation
     // ----------------------------------------------------------------------
 
-    public Compiler getCompiler( String compilerId )
-        throws NoSuchCompilerException
-    {
-        Compiler compiler = compilers.get( compilerId );
+    public Compiler getCompiler(String compilerId) throws NoSuchCompilerException {
+        Compiler compiler = compilers.get(compilerId);
 
-        if ( compiler == null )
-        {
-            throw new NoSuchCompilerException( compilerId );
+        if (compiler == null) {
+            throw new NoSuchCompilerException(compilerId);
         }
 
         return compiler;

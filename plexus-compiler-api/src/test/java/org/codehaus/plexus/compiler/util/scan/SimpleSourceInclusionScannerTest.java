@@ -16,31 +16,25 @@ package org.codehaus.plexus.compiler.util.scan;
  * limitations under the License.
  */
 
-import org.junit.jupiter.api.BeforeEach;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.junit.jupiter.api.BeforeEach;
 
 /**
  * Test for
  *
  * @author <a href="mailto:carlos@apache.org">Carlos Sanchez</a>
  */
-public class SimpleSourceInclusionScannerTest
-    extends AbstractSourceInclusionScannerTest
-{
+public class SimpleSourceInclusionScannerTest extends AbstractSourceInclusionScannerTest {
 
     private Set<String> includes, excludes;
 
     @BeforeEach
-    public void setUp()
-        throws Exception
-    {
-        includes = Collections.singleton( "*.java" );
+    public void setUp() throws Exception {
+        includes = Collections.singleton("*.java");
         excludes = new HashSet<>();
-        scanner = new SimpleSourceInclusionScanner( includes, excludes );
+        scanner = new SimpleSourceInclusionScanner(includes, excludes);
     }
-
 }

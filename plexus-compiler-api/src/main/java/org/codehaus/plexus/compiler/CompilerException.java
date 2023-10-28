@@ -27,16 +27,12 @@ package org.codehaus.plexus.compiler;
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  */
-public class CompilerException
-    extends Exception
-{
-    public CompilerException( String message )
-    {
-        super( message );
+public class CompilerException extends Exception {
+    public CompilerException(String message) {
+        super(message);
     }
 
-    public CompilerException( String message, Throwable cause )
-    {
-        super( message, cause );
+    public CompilerException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

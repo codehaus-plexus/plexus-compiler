@@ -23,6 +23,16 @@ package org.codehaus.plexus.compiler;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import javax.inject.Inject;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
@@ -37,22 +47,9 @@ import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.Matchers;
 import org.hamcrest.io.FileMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import javax.inject.Inject;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -62,311 +59,277 @@ import static org.hamcrest.Matchers.is;
  *
  */
 @PlexusTest
-public abstract class AbstractCompilerTest
-{
+public abstract class AbstractCompilerTest {
     private boolean compilerDebug = false;
 
     private boolean compilerDeprecationWarnings = false;
 
     private boolean forceJavacCompilerUse = false;
-    
+
     @Inject
     private Map<String, Compiler> compilers;
 
     @Inject
     private ArtifactRepositoryLayout repositoryLayout;
-    
+
     private ArtifactRepository localRepository;
-    
+
     protected abstract String getRoleHint();
 
     @BeforeEach
-    final void setUpLocalRepo()
-        throws Exception
-    {
-        String localRepo = System.getProperty( "maven.repo.local" );
+    final void setUpLocalRepo() throws Exception {
+        String localRepo = System.getProperty("maven.repo.local");
 
-        if ( localRepo == null )
-        {
-            File settingsFile = new File( System.getProperty( "user.home" ), ".m2/settings.xml" );
-            if ( settingsFile.exists() )
-            {
-                Settings settings = new SettingsXpp3Reader().read( ReaderFactory.newXmlReader( settingsFile ) );
+        if (localRepo == null) {
+            File settingsFile = new File(System.getProperty("user.home"), ".m2/settings.xml");
+            if (settingsFile.exists()) {
+                Settings settings = new SettingsXpp3Reader().read(ReaderFactory.newXmlReader(settingsFile));
                 localRepo = settings.getLocalRepository();
             }
         }
-        if ( localRepo == null )
-        {
-            localRepo = System.getProperty( "user.home" ) + "/.m2/repository";
+        if (localRepo == null) {
+            localRepo = System.getProperty("user.home") + "/.m2/repository";
         }
 
-        localRepository = new DefaultArtifactRepository( "local", "file://" + localRepo, repositoryLayout );
+        localRepository = new DefaultArtifactRepository("local", "file://" + localRepo, repositoryLayout);
     }
 
-    protected void setCompilerDebug( boolean flag )
-    {
+    protected void setCompilerDebug(boolean flag) {
         compilerDebug = flag;
     }
 
-    protected void setCompilerDeprecationWarnings( boolean flag )
-    {
+    protected void setCompilerDeprecationWarnings(boolean flag) {
         compilerDeprecationWarnings = flag;
     }
 
-    public void setForceJavacCompilerUse( boolean forceJavacCompilerUse )
-    {
+    public void setForceJavacCompilerUse(boolean forceJavacCompilerUse) {
         this.forceJavacCompilerUse = forceJavacCompilerUse;
     }
-    
-    protected final Compiler getCompiler()
-    {
-        return compilers.get( getRoleHint() );
+
+    protected final Compiler getCompiler() {
+        return compilers.get(getRoleHint());
     }
 
-    protected List<String> getClasspath()
-        throws Exception
-    {
+    protected List<String> getClasspath() throws Exception {
         List<String> cp = new ArrayList<>();
 
-        File file = getLocalArtifactPath( "commons-lang", "commons-lang", "2.0", "jar" );
+        File file = getLocalArtifactPath("commons-lang", "commons-lang", "2.0", "jar");
 
-        assertThat("test prerequisite: commons-lang library must be available in local repository, expected ",
-                file, FileMatchers.aReadableFile());
+        assertThat(
+                "test prerequisite: commons-lang library must be available in local repository, expected ",
+                file,
+                FileMatchers.aReadableFile());
 
-        cp.add( file.getAbsolutePath() );
+        cp.add(file.getAbsolutePath());
 
         return cp;
     }
 
-    protected void configureCompilerConfig( CompilerConfiguration compilerConfig )
-    {
-
-    }
+    protected void configureCompilerConfig(CompilerConfiguration compilerConfig) {}
 
     @Test
-    public void testCompilingSources()
-        throws Exception
-    {
+    public void testCompilingSources() throws Exception {
         List<CompilerMessage> messages = new ArrayList<>();
         Collection<String> files = new ArrayList<>();
 
-        for ( CompilerConfiguration compilerConfig : getCompilerConfigurations() )
-        {
-            File outputDir = new File( compilerConfig.getOutputLocation() );
+        for (CompilerConfiguration compilerConfig : getCompilerConfigurations()) {
+            File outputDir = new File(compilerConfig.getOutputLocation());
 
-            messages.addAll( getCompiler().performCompile( compilerConfig ).getCompilerMessages() );
+            messages.addAll(getCompiler().performCompile(compilerConfig).getCompilerMessages());
 
-            if ( outputDir.isDirectory() )
-            {
-                files.addAll( normalizePaths( FileUtils.getFileNames( outputDir, null, null, false ) ) );
+            if (outputDir.isDirectory()) {
+                files.addAll(normalizePaths(FileUtils.getFileNames(outputDir, null, null, false)));
             }
         }
 
-        int numCompilerErrors = compilerErrorCount( messages );
+        int numCompilerErrors = compilerErrorCount(messages);
 
         int numCompilerWarnings = messages.size() - numCompilerErrors;
 
         int expectedErrors = expectedErrors();
 
-        if ( expectedErrors != numCompilerErrors )
-        {
-            System.out.println( numCompilerErrors + " error(s) found:" );
+        if (expectedErrors != numCompilerErrors) {
+            System.out.println(numCompilerErrors + " error(s) found:");
             List<String> errors = new ArrayList<>();
-            for ( CompilerMessage error : messages )
-            {
-                if ( !error.isError() )
-                {
+            for (CompilerMessage error : messages) {
+                if (!error.isError()) {
                     continue;
                 }
 
-                System.out.println( "----" );
-                System.out.println( error.getFile() );
-                System.out.println( error.getMessage() );
-                System.out.println( "----" );
-                errors.add( error.getMessage() );
+                System.out.println("----");
+                System.out.println(error.getFile());
+                System.out.println(error.getMessage());
+                System.out.println("----");
+                errors.add(error.getMessage());
             }
 
-            assertThat("Wrong number of compilation errors (" + numCompilerErrors + "/" + expectedErrors //
-                            + ") : " + displayLines( errors ),
-                    numCompilerErrors, is( expectedErrors ) );
+            assertThat(
+                    "Wrong number of compilation errors (" + numCompilerErrors + "/" + expectedErrors //
+                            + ") : " + displayLines(errors),
+                    numCompilerErrors,
+                    is(expectedErrors));
         }
 
         int expectedWarnings = expectedWarnings();
-        if ( expectedWarnings != numCompilerWarnings )
-        {
+        if (expectedWarnings != numCompilerWarnings) {
             List<String> warnings = new ArrayList<>();
-            System.out.println( numCompilerWarnings + " warning(s) found:" );
-            for ( CompilerMessage error : messages )
-            {
-                if ( error.isError() )
-                {
+            System.out.println(numCompilerWarnings + " warning(s) found:");
+            for (CompilerMessage error : messages) {
+                if (error.isError()) {
                     continue;
                 }
 
-                System.out.println( "----" );
-                System.out.println( error.getFile() );
-                System.out.println( error.getMessage() );
-                System.out.println( "----" );
-                warnings.add( error.getMessage() );
+                System.out.println("----");
+                System.out.println(error.getFile());
+                System.out.println(error.getMessage());
+                System.out.println("----");
+                warnings.add(error.getMessage());
             }
 
-            assertThat( "Wrong number ("
-                + numCompilerWarnings + "/" + expectedWarnings + ") of compilation warnings: "
-                + displayLines( warnings ), numCompilerWarnings, is( expectedWarnings ) );
+            assertThat(
+                    "Wrong number ("
+                            + numCompilerWarnings + "/" + expectedWarnings + ") of compilation warnings: "
+                            + displayLines(warnings),
+                    numCompilerWarnings,
+                    is(expectedWarnings));
         }
 
-        assertThat( files, containsInAnyOrder(normalizePaths(expectedOutputFiles()).toArray(new String[0])));
+        assertThat(
+                files, containsInAnyOrder(normalizePaths(expectedOutputFiles()).toArray(new String[0])));
     }
 
-    protected String displayLines( List<String> warnings)
-    {
+    protected String displayLines(List<String> warnings) {
         // with java8 could be as simple as String.join(System.lineSeparator(), warnings)
-        StringBuilder sb = new StringBuilder( System.lineSeparator() );
-        for ( String warning : warnings )
-        {
-            sb.append( '-' ).append( warning ).append( System.lineSeparator() );
+        StringBuilder sb = new StringBuilder(System.lineSeparator());
+        for (String warning : warnings) {
+            sb.append('-').append(warning).append(System.lineSeparator());
         }
         return sb.toString();
     }
 
-    private List<CompilerConfiguration> getCompilerConfigurations()
-        throws Exception
-    {
+    private List<CompilerConfiguration> getCompilerConfigurations() throws Exception {
         String sourceDir = "src/test-input/src/main";
 
-        List<String> filenames =
-            FileUtils.getFileNames( new File( sourceDir ), "**/*.java", null, false, true );
-        Collections.sort( filenames );
+        List<String> filenames = FileUtils.getFileNames(new File(sourceDir), "**/*.java", null, false, true);
+        Collections.sort(filenames);
 
         List<CompilerConfiguration> compilerConfigurations = new ArrayList<>();
 
         int index = 0;
-        for ( Iterator<String> it = filenames.iterator(); it.hasNext(); index++ )
-        {
+        for (Iterator<String> it = filenames.iterator(); it.hasNext(); index++) {
             String filename = it.next();
 
             CompilerConfiguration compilerConfig = new CompilerConfiguration();
 
-            compilerConfig.setDebug( compilerDebug );
+            compilerConfig.setDebug(compilerDebug);
 
-            compilerConfig.setShowDeprecation( compilerDeprecationWarnings );
+            compilerConfig.setShowDeprecation(compilerDeprecationWarnings);
 
-            compilerConfig.setClasspathEntries( getClasspath() );
+            compilerConfig.setClasspathEntries(getClasspath());
 
-            compilerConfig.addSourceLocation( sourceDir );
+            compilerConfig.addSourceLocation(sourceDir);
 
-            compilerConfig.setOutputLocation( "target/" + getRoleHint() + "/classes-" + index );
+            compilerConfig.setOutputLocation("target/" + getRoleHint() + "/classes-" + index);
 
-            FileUtils.deleteDirectory( compilerConfig.getOutputLocation() );
+            FileUtils.deleteDirectory(compilerConfig.getOutputLocation());
 
-            compilerConfig.addInclude( filename );
+            compilerConfig.addInclude(filename);
 
-            compilerConfig.setForceJavacCompilerUse( this.forceJavacCompilerUse );
+            compilerConfig.setForceJavacCompilerUse(this.forceJavacCompilerUse);
 
-            configureCompilerConfig( compilerConfig );
+            configureCompilerConfig(compilerConfig);
 
             String target = getTargetVersion();
-            if( StringUtils.isNotEmpty( target) )
-            {
-                compilerConfig.setTargetVersion( target );
+            if (StringUtils.isNotEmpty(target)) {
+                compilerConfig.setTargetVersion(target);
             }
 
             String source = getSourceVersion();
-            if( StringUtils.isNotEmpty( source) )
-            {
-                compilerConfig.setSourceVersion( source );
+            if (StringUtils.isNotEmpty(source)) {
+                compilerConfig.setSourceVersion(source);
             }
 
-            compilerConfigurations.add( compilerConfig );
-
+            compilerConfigurations.add(compilerConfig);
         }
 
         return compilerConfigurations;
     }
 
-    public String getTargetVersion()
-    {
+    public String getTargetVersion() {
         return null;
     }
 
-    public String getSourceVersion()
-    {
+    public String getSourceVersion() {
         return null;
     }
 
-
-    private List<String> normalizePaths( Collection<String> relativePaths )
-    {
+    private List<String> normalizePaths(Collection<String> relativePaths) {
         return relativePaths.stream()
-                .map( s -> s.replace( File.separatorChar, '/' ) )
+                .map(s -> s.replace(File.separatorChar, '/'))
                 .collect(Collectors.toList());
     }
 
-    protected int compilerErrorCount( List<CompilerMessage> messages )
-    {
+    protected int compilerErrorCount(List<CompilerMessage> messages) {
         int count = 0;
 
-        for ( CompilerMessage message : messages )
-        {
+        for (CompilerMessage message : messages) {
             count += message.isError() ? 1 : 0;
         }
 
         return count;
     }
 
-    protected int expectedErrors()
-    {
+    protected int expectedErrors() {
         return 1;
     }
 
-    protected int expectedWarnings()
-    {
+    protected int expectedWarnings() {
         return 0;
     }
 
-    protected Collection<String> expectedOutputFiles()
-    {
+    protected Collection<String> expectedOutputFiles() {
         return Collections.emptyList();
     }
 
-    protected File getLocalArtifactPath( String groupId, String artifactId, String version, String type )
-    {
-        VersionRange versionRange = VersionRange.createFromVersion( version );
+    protected File getLocalArtifactPath(String groupId, String artifactId, String version, String type) {
+        VersionRange versionRange = VersionRange.createFromVersion(version);
 
-        Artifact artifact = new DefaultArtifact( groupId, artifactId, versionRange, Artifact.SCOPE_COMPILE, type, null,
-                                                 new DefaultArtifactHandler( type ) );
+        Artifact artifact = new DefaultArtifact(
+                groupId,
+                artifactId,
+                versionRange,
+                Artifact.SCOPE_COMPILE,
+                type,
+                null,
+                new DefaultArtifactHandler(type));
 
-        return getLocalArtifactPath( artifact );
+        return getLocalArtifactPath(artifact);
     }
 
-    protected String getJavaVersion()
-    {
+    protected String getJavaVersion() {
 
-        String javaVersion = System.getProperty( "java.version" );
+        String javaVersion = System.getProperty("java.version");
         String realJavaVersion = javaVersion;
 
-        int dotIdx = javaVersion.indexOf( "." );
-        if ( dotIdx > -1 )
-        {
+        int dotIdx = javaVersion.indexOf(".");
+        if (dotIdx > -1) {
             int lastDot = dotIdx;
 
             // find the next dot, so we can trim up to this point.
-            dotIdx = javaVersion.indexOf( ".", lastDot + 1 );
-            if ( dotIdx > lastDot )
-            {
-                javaVersion = javaVersion.substring( 0, dotIdx );
+            dotIdx = javaVersion.indexOf(".", lastDot + 1);
+            if (dotIdx > lastDot) {
+                javaVersion = javaVersion.substring(0, dotIdx);
             }
         }
 
-        System.out.println( "java.version is: " + realJavaVersion + "\ntrimmed java version is: " + javaVersion
-                                + "\ncomparison: \"1.5\".compareTo( \"" + javaVersion + "\" ) == " + ( "1.5".compareTo(
-            javaVersion ) ) + "\n" );
+        System.out.println("java.version is: " + realJavaVersion + "\ntrimmed java version is: " + javaVersion
+                + "\ncomparison: \"1.5\".compareTo( \"" + javaVersion + "\" ) == " + ("1.5".compareTo(javaVersion))
+                + "\n");
 
         return javaVersion;
     }
 
-    protected File getLocalArtifactPath( Artifact artifact )
-    {
-        return new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
+    protected File getLocalArtifactPath(Artifact artifact) {
+        return new File(localRepository.getBasedir(), localRepository.pathOf(artifact));
     }
 }

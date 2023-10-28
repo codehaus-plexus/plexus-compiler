@@ -27,16 +27,12 @@ package org.codehaus.plexus.compiler;
 /**
  * @author <a href="mailto:andrew@eisenberg.as">Andrew Eisenberg</a>
  */
-public class CompilerNotImplementedException
-    extends CompilerException
-{
-    public CompilerNotImplementedException( String message )
-    {
-        super( message );
+public class CompilerNotImplementedException extends CompilerException {
+    public CompilerNotImplementedException(String message) {
+        super(message);
     }
 
-    public CompilerNotImplementedException( String message, Throwable cause )
-    {
-        super( message, cause );
+    public CompilerNotImplementedException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

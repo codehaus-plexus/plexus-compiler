@@ -23,7 +23,6 @@ package org.codehaus.plexus.compiler.util;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -31,9 +30,7 @@ import java.io.OutputStream;
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  */
-public class StreamPumper
-    extends Thread
-{
+public class StreamPumper extends Thread {
     private static final int BUFFER_SIZE = 512;
 
     private final BufferedInputStream stream;
@@ -44,43 +41,31 @@ public class StreamPumper
 
     private final OutputStream out;
 
-    public StreamPumper( BufferedInputStream is, OutputStream out )
-    {
+    public StreamPumper(BufferedInputStream is, OutputStream out) {
         this.stream = is;
         this.out = out;
     }
 
-    public void pumpStream()
-        throws IOException
-    {
+    public void pumpStream() throws IOException {
         byte[] buf = new byte[BUFFER_SIZE];
-        if ( !endOfStream )
-        {
-            int bytesRead = stream.read( buf, 0, BUFFER_SIZE );
+        if (!endOfStream) {
+            int bytesRead = stream.read(buf, 0, BUFFER_SIZE);
 
-            if ( bytesRead > 0 )
-            {
-                out.write( buf, 0, bytesRead );
-            }
-            else if ( bytesRead == -1 )
-            {
+            if (bytesRead > 0) {
+                out.write(buf, 0, bytesRead);
+            } else if (bytesRead == -1) {
                 endOfStream = true;
             }
         }
     }
 
-    public void run()
-    {
-        try
-        {
-            while ( !endOfStream )
-            {
+    public void run() {
+        try {
+            while (!endOfStream) {
                 pumpStream();
-                sleep( SLEEP_TIME );
+                sleep(SLEEP_TIME);
             }
-        }
-        catch ( Exception e )
-        {
+        } catch (Exception e) {
             // getLogger().warn("Jikes.run()", e);
         }
     }

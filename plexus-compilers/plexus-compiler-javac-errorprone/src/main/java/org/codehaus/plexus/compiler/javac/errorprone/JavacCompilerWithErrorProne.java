@@ -16,8 +16,14 @@
 
 package org.codehaus.plexus.compiler.javac.errorprone;
 
-import com.google.errorprone.ErrorProneJavaCompiler;
+import javax.inject.Named;
+import javax.tools.JavaCompiler;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+
+import com.google.errorprone.ErrorProneJavaCompiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerException;
 import org.codehaus.plexus.compiler.CompilerMessage;
@@ -26,13 +32,6 @@ import org.codehaus.plexus.compiler.javac.InProcessCompiler;
 import org.codehaus.plexus.compiler.javac.JavacCompiler;
 import org.codehaus.plexus.compiler.javac.JavaxToolsCompiler;
 
-import javax.inject.Named;
-import javax.tools.JavaCompiler;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
-
 /**
  * This class overrides JavacCompiler with modifications to use the error-prone
  * entry point into Javac.
@@ -40,78 +39,59 @@ import java.net.URLClassLoader;
  * @author <a href="mailto:alexeagle@google.com">Alex Eagle</a>
  */
 @Named("javac-with-errorprone")
-public class JavacCompilerWithErrorProne
-    extends JavacCompiler
-{
+public class JavacCompilerWithErrorProne extends JavacCompiler {
     @Override
-    public String getCompilerId()
-    {
+    public String getCompilerId() {
         return "javac-with-errorprone";
     }
 
-    private static class NonDelegatingClassLoader
-        extends URLClassLoader
-    {
+    private static class NonDelegatingClassLoader extends URLClassLoader {
         ClassLoader original;
 
-        public NonDelegatingClassLoader( URL[] urls, ClassLoader original )
-            throws MalformedURLException
-        {
-            super( urls, null );
+        public NonDelegatingClassLoader(URL[] urls, ClassLoader original) throws MalformedURLException {
+            super(urls, null);
             this.original = original;
         }
 
         @Override
-        public Class<?> loadClass( String name, boolean complete )
-            throws ClassNotFoundException
-        {
+        public Class<?> loadClass(String name, boolean complete) throws ClassNotFoundException {
             // Classes loaded inside CompilerInvoker that need to reach back to the caller
-            if ( name.contentEquals( CompilerResult.class.getName() )
-                || name.contentEquals( InProcessCompiler.class.getName() )
-                || name.contentEquals( CompilerConfiguration.class.getName() )
-                || name.contentEquals( CompilerConfiguration.CompilerReuseStrategy.class.getName() )
-                || name.contentEquals( CompilerException.class.getName() )
-                || name.contentEquals( CompilerMessage.class.getName() )
-                || name.contentEquals( CompilerMessage.Kind.class.getName() ) )
-            {
-                return original.loadClass( name );
+            if (name.contentEquals(CompilerResult.class.getName())
+                    || name.contentEquals(InProcessCompiler.class.getName())
+                    || name.contentEquals(CompilerConfiguration.class.getName())
+                    || name.contentEquals(CompilerConfiguration.CompilerReuseStrategy.class.getName())
+                    || name.contentEquals(CompilerException.class.getName())
+                    || name.contentEquals(CompilerMessage.class.getName())
+                    || name.contentEquals(CompilerMessage.Kind.class.getName())) {
+                return original.loadClass(name);
             }
 
-            try
-            {
-                synchronized ( getClassLoadingLock( name ) )
-                {
-                    Class c = findLoadedClass( name );
-                    if ( c != null )
-                    {
+            try {
+                synchronized (getClassLoadingLock(name)) {
+                    Class c = findLoadedClass(name);
+                    if (c != null) {
                         return c;
                     }
-                    return findClass( name );
+                    return findClass(name);
                 }
-            }
-            catch ( ClassNotFoundException e )
-            {
-                return super.loadClass( name, complete );
+            } catch (ClassNotFoundException e) {
+                return super.loadClass(name, complete);
             }
         }
     }
 
-    protected InProcessCompiler inProcessCompiler()
-    {
-        if ( Thread.currentThread().getContextClassLoader().getResource("java/lang/module/ModuleReference.class") == null )
-        {
+    protected InProcessCompiler inProcessCompiler() {
+        if (Thread.currentThread().getContextClassLoader().getResource("java/lang/module/ModuleReference.class")
+                == null) {
             ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-            URL[] urls = ( (URLClassLoader) contextClassLoader ).getURLs();
+            URL[] urls = ((URLClassLoader) contextClassLoader).getURLs();
             ClassLoader loader;
-            try
-            {
-                loader = new NonDelegatingClassLoader( urls, contextClassLoader );
-                Class<?> clazz = Class.forName( CompilerInvoker.class.getName(), true, loader );
-                return ( InProcessCompiler ) clazz.newInstance();
-            }
-            catch ( Exception e )
-            {
-                throw new IllegalStateException( e );
+            try {
+                loader = new NonDelegatingClassLoader(urls, contextClassLoader);
+                Class<?> clazz = Class.forName(CompilerInvoker.class.getName(), true, loader);
+                return (InProcessCompiler) clazz.newInstance();
+            } catch (Exception e) {
+                throw new IllegalStateException(e);
             }
         }
         return new CompilerInvoker();
@@ -122,13 +102,10 @@ public class JavacCompilerWithErrorProne
      * non-delegating classloader ensures that error-prone's javac loads javax.tools.* classes from
      * javac.jar instead of from the bootclasspath.
      */
-    public static class CompilerInvoker
-    	extends JavaxToolsCompiler
-    {
-    	@Override
-    	protected JavaCompiler newJavaCompiler()
-    	{
-    		return new ErrorProneJavaCompiler();
-    	}
+    public static class CompilerInvoker extends JavaxToolsCompiler {
+        @Override
+        protected JavaCompiler newJavaCompiler() {
+            return new ErrorProneJavaCompiler();
+        }
     }
 }

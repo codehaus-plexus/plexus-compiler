@@ -23,9 +23,6 @@ package org.codehaus.plexus.compiler;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-import org.codehaus.plexus.util.StringUtils;
-
 import java.io.File;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -38,11 +35,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.codehaus.plexus.util.StringUtils;
+
 /**
  * @author jdcasey
  */
-public class CompilerConfiguration
-{
+public class CompilerConfiguration {
     private String outputLocation;
 
     private List<String> classpathEntries = new LinkedList<>();
@@ -72,7 +70,7 @@ public class CompilerConfiguration
     private boolean showWarnings = true;
 
     private String warnings;
-    
+
     private boolean showLint;
 
     /**
@@ -98,7 +96,7 @@ public class CompilerConfiguration
      */
     private String moduleVersion;
 
-    private Collection<Map.Entry<String,String>> customCompilerArguments = new ArrayList<>();
+    private Collection<Map.Entry<String, String>> customCompilerArguments = new ArrayList<>();
 
     private boolean fork;
 
@@ -172,7 +170,7 @@ public class CompilerConfiguration
      * force usage of old JavacCompiler even if javax.tools is detected
      * @since 2.0
      */
-    private boolean forceJavacCompilerUse=false;
+    private boolean forceJavacCompilerUse = false;
 
     /**
      * force a different of the debug file containing the forked command run (such javac.sh)
@@ -192,13 +190,11 @@ public class CompilerConfiguration
     //
     // ----------------------------------------------------------------------
 
-    public void setOutputLocation( String outputLocation )
-    {
+    public void setOutputLocation(String outputLocation) {
         this.outputLocation = outputLocation;
     }
 
-    public String getOutputLocation()
-    {
+    public String getOutputLocation() {
         return outputLocation;
     }
 
@@ -206,270 +202,208 @@ public class CompilerConfiguration
     // Class path
     // ----------------------------------------------------------------------
 
-    public void addClasspathEntry( String classpathEntry )
-    {
-        classpathEntries.add( classpathEntry );
+    public void addClasspathEntry(String classpathEntry) {
+        classpathEntries.add(classpathEntry);
     }
 
-    public void setClasspathEntries( List<String> classpathEntries )
-    {
-        if ( classpathEntries == null )
-        {
+    public void setClasspathEntries(List<String> classpathEntries) {
+        if (classpathEntries == null) {
             this.classpathEntries = Collections.emptyList();
-        }
-        else
-        {
-            this.classpathEntries = new LinkedList<>( classpathEntries );
+        } else {
+            this.classpathEntries = new LinkedList<>(classpathEntries);
         }
     }
 
-    public List<String> getClasspathEntries()
-    {
-        return Collections.unmodifiableList( classpathEntries );
+    public List<String> getClasspathEntries() {
+        return Collections.unmodifiableList(classpathEntries);
     }
 
     // ----------------------------------------------------------------------
     // Module path
     // ----------------------------------------------------------------------
 
-    public void addModulepathEntry( String modulepathEntry )
-    {
-        modulepathEntries.add( modulepathEntry );
+    public void addModulepathEntry(String modulepathEntry) {
+        modulepathEntries.add(modulepathEntry);
     }
 
-    public void setModulepathEntries( List<String> modulepathEntries )
-    {
-        if ( modulepathEntries == null )
-        {
+    public void setModulepathEntries(List<String> modulepathEntries) {
+        if (modulepathEntries == null) {
             this.modulepathEntries = Collections.emptyList();
-        }
-        else
-        {
-            this.modulepathEntries = new LinkedList<>( modulepathEntries );
+        } else {
+            this.modulepathEntries = new LinkedList<>(modulepathEntries);
         }
     }
 
-    public List<String> getModulepathEntries()
-    {
-        return Collections.unmodifiableList( modulepathEntries );
+    public List<String> getModulepathEntries() {
+        return Collections.unmodifiableList(modulepathEntries);
     }
 
     // ----------------------------------------------------------------------
     // Source files
     // ----------------------------------------------------------------------
 
-    public void setSourceFiles( Set<File> sourceFiles )
-    {
-        if ( sourceFiles == null )
-        {
+    public void setSourceFiles(Set<File> sourceFiles) {
+        if (sourceFiles == null) {
             this.sourceFiles = Collections.emptySet();
-        }
-        else
-        {
-            this.sourceFiles = new HashSet<>( sourceFiles );
+        } else {
+            this.sourceFiles = new HashSet<>(sourceFiles);
         }
     }
 
-    public Set<File> getSourceFiles()
-    {
+    public Set<File> getSourceFiles() {
         return sourceFiles;
     }
 
-    public void addSourceLocation( String sourceLocation )
-    {
-        sourceLocations.add( sourceLocation );
+    public void addSourceLocation(String sourceLocation) {
+        sourceLocations.add(sourceLocation);
     }
 
-    public void setSourceLocations( List<String> sourceLocations )
-    {
-        if ( sourceLocations == null )
-        {
+    public void setSourceLocations(List<String> sourceLocations) {
+        if (sourceLocations == null) {
             this.sourceLocations = Collections.emptyList();
-        }
-        else
-        {
-            this.sourceLocations = new LinkedList<>( sourceLocations );
+        } else {
+            this.sourceLocations = new LinkedList<>(sourceLocations);
         }
     }
 
-    public List<String> getSourceLocations()
-    {
-        return Collections.unmodifiableList( sourceLocations );
+    public List<String> getSourceLocations() {
+        return Collections.unmodifiableList(sourceLocations);
     }
 
-    public void addInclude( String include )
-    {
-        includes.add( include );
+    public void addInclude(String include) {
+        includes.add(include);
     }
 
-    public void setIncludes( Set<String> includes )
-    {
-        if ( includes == null )
-        {
+    public void setIncludes(Set<String> includes) {
+        if (includes == null) {
             this.includes = Collections.emptySet();
-        }
-        else
-        {
-            this.includes = new HashSet<>( includes );
+        } else {
+            this.includes = new HashSet<>(includes);
         }
     }
 
-    public Set<String> getIncludes()
-    {
-        return Collections.unmodifiableSet( includes );
+    public Set<String> getIncludes() {
+        return Collections.unmodifiableSet(includes);
     }
 
-    public void addExclude( String exclude )
-    {
-        excludes.add( exclude );
+    public void addExclude(String exclude) {
+        excludes.add(exclude);
     }
 
-    public void setExcludes( Set<String> excludes )
-    {
-        if ( excludes == null )
-        {
+    public void setExcludes(Set<String> excludes) {
+        if (excludes == null) {
             this.excludes = Collections.emptySet();
-        }
-        else
-        {
-            this.excludes = new HashSet<>( excludes );
+        } else {
+            this.excludes = new HashSet<>(excludes);
         }
     }
 
-    public Set<String> getExcludes()
-    {
-        return Collections.unmodifiableSet( excludes );
+    public Set<String> getExcludes() {
+        return Collections.unmodifiableSet(excludes);
     }
 
     // ----------------------------------------------------------------------
     // Compiler Settings
     // ----------------------------------------------------------------------
 
-    public void setDebug( boolean debug )
-    {
+    public void setDebug(boolean debug) {
         this.debug = debug;
     }
 
-    public boolean isDebug()
-    {
+    public boolean isDebug() {
         return debug;
     }
 
-    public void setDebugLevel( String debugLevel )
-    {
+    public void setDebugLevel(String debugLevel) {
         this.debugLevel = debugLevel;
     }
 
-    public String getDebugLevel()
-    {
+    public String getDebugLevel() {
         return debugLevel;
     }
 
-    public void setWarnings( String warnings )
-    {
+    public void setWarnings(String warnings) {
         this.warnings = warnings;
     }
 
-    public boolean isShowWarnings()
-    {
+    public boolean isShowWarnings() {
         return showWarnings;
     }
 
-    public void setShowWarnings( boolean showWarnings )
-    {
+    public void setShowWarnings(boolean showWarnings) {
         this.showWarnings = showWarnings;
     }
 
-    public boolean isShowDeprecation()
-    {
+    public boolean isShowDeprecation() {
         return showDeprecation;
     }
 
-    public String getWarnings()
-    {
+    public String getWarnings() {
         return warnings;
     }
 
-
-
-    public void setShowLint( boolean showLint )
-    {
+    public void setShowLint(boolean showLint) {
         this.showLint = showLint;
     }
 
-    public boolean isShowLint()
-    {
+    public boolean isShowLint() {
         return this.showLint;
     }
 
-    public void setShowDeprecation( boolean showDeprecation )
-    {
+    public void setShowDeprecation(boolean showDeprecation) {
         this.showDeprecation = showDeprecation;
     }
 
-    public boolean isFailOnWarning()
-    {
+    public boolean isFailOnWarning() {
         return failOnWarning;
     }
 
-    public void setFailOnWarning( boolean failOnWarnings )
-    {
+    public void setFailOnWarning(boolean failOnWarnings) {
         this.failOnWarning = failOnWarnings;
     }
 
-    public String getSourceVersion()
-    {
+    public String getSourceVersion() {
         return sourceVersion;
     }
 
-    public void setSourceVersion( String sourceVersion )
-    {
+    public void setSourceVersion(String sourceVersion) {
         this.sourceVersion = sourceVersion;
     }
 
-    public String getTargetVersion()
-    {
+    public String getTargetVersion() {
         return targetVersion;
     }
 
-    public void setTargetVersion( String targetVersion )
-    {
+    public void setTargetVersion(String targetVersion) {
         this.targetVersion = targetVersion;
     }
 
-    public String getReleaseVersion()
-    {
+    public String getReleaseVersion() {
         return releaseVersion;
     }
 
-    public void setReleaseVersion( String releaseVersion )
-    {
+    public void setReleaseVersion(String releaseVersion) {
         this.releaseVersion = releaseVersion;
     }
 
-    public String getSourceEncoding()
-    {
+    public String getSourceEncoding() {
         return sourceEncoding;
     }
 
-    public void setSourceEncoding( String sourceEncoding )
-    {
+    public void setSourceEncoding(String sourceEncoding) {
         this.sourceEncoding = sourceEncoding;
     }
 
-    public String getModuleVersion()
-    {
+    public String getModuleVersion() {
         return moduleVersion;
     }
 
-    public void setModuleVersion( String moduleVersion )
-    {
+    public void setModuleVersion(String moduleVersion) {
         this.moduleVersion = moduleVersion;
     }
 
-    public void addCompilerCustomArgument( String customArgument, String value )
-    {
-        customCompilerArguments.add( new AbstractMap.SimpleImmutableEntry<>( customArgument, value ) );
+    public void addCompilerCustomArgument(String customArgument, String value) {
+        customCompilerArguments.add(new AbstractMap.SimpleImmutableEntry<>(customArgument, value));
     }
 
     /**
@@ -478,22 +412,18 @@ public class CompilerConfiguration
      * @return
      * @see CompilerConfiguration#getCustomCompilerArgumentsEntries()
      */
-    public Map<String, String> getCustomCompilerArgumentsAsMap()
-    {
-        LinkedHashMap<String, String> arguments = new LinkedHashMap<>( customCompilerArguments.size() );
-        for ( Map.Entry<String, String> entry : customCompilerArguments )
-        {
-            arguments.put( entry.getKey(), entry.getValue() );
+    public Map<String, String> getCustomCompilerArgumentsAsMap() {
+        LinkedHashMap<String, String> arguments = new LinkedHashMap<>(customCompilerArguments.size());
+        for (Map.Entry<String, String> entry : customCompilerArguments) {
+            arguments.put(entry.getKey(), entry.getValue());
         }
         return arguments;
     }
 
-    public void setCustomCompilerArgumentsAsMap( Map<String, String> customCompilerArguments )
-    {
+    public void setCustomCompilerArgumentsAsMap(Map<String, String> customCompilerArguments) {
         this.customCompilerArguments = new ArrayList<>();
-        if ( customCompilerArguments != null )
-        {
-            this.customCompilerArguments.addAll( customCompilerArguments.entrySet() );
+        if (customCompilerArguments != null) {
+            this.customCompilerArguments.addAll(customCompilerArguments.entrySet());
         }
     }
 
@@ -502,158 +432,127 @@ public class CompilerConfiguration
      *
      * @return
      */
-    public Collection<Map.Entry<String,String>> getCustomCompilerArgumentsEntries()
-    {
+    public Collection<Map.Entry<String, String>> getCustomCompilerArgumentsEntries() {
         return customCompilerArguments;
     }
 
-    public boolean isFork()
-    {
+    public boolean isFork() {
         return fork;
     }
 
-    public void setFork( boolean fork )
-    {
+    public void setFork(boolean fork) {
         this.fork = fork;
     }
 
-    public String getMeminitial()
-    {
+    public String getMeminitial() {
         return meminitial;
     }
 
-    public void setMeminitial( String meminitial )
-    {
+    public void setMeminitial(String meminitial) {
         this.meminitial = meminitial;
     }
 
-    public String getMaxmem()
-    {
+    public String getMaxmem() {
         return maxmem;
     }
 
-    public void setMaxmem( String maxmem )
-    {
+    public void setMaxmem(String maxmem) {
         this.maxmem = maxmem;
     }
 
-    public String getExecutable()
-    {
+    public String getExecutable() {
         return executable;
     }
 
-    public void setExecutable( String executable )
-    {
+    public void setExecutable(String executable) {
         this.executable = executable;
     }
 
-    public File getWorkingDirectory()
-    {
+    public File getWorkingDirectory() {
         return workingDirectory;
     }
 
-    public void setWorkingDirectory( File workingDirectory )
-    {
+    public void setWorkingDirectory(File workingDirectory) {
         this.workingDirectory = workingDirectory;
     }
 
-    public File getBuildDirectory()
-    {
+    public File getBuildDirectory() {
         return buildDirectory;
     }
 
-    public void setBuildDirectory( File buildDirectory )
-    {
+    public void setBuildDirectory(File buildDirectory) {
         this.buildDirectory = buildDirectory;
     }
 
-    public String getOutputFileName()
-    {
+    public String getOutputFileName() {
         return outputFileName;
     }
 
-    public void setOutputFileName( String outputFileName )
-    {
+    public void setOutputFileName(String outputFileName) {
         this.outputFileName = outputFileName;
     }
 
-    public boolean isOptimize()
-    {
+    public boolean isOptimize() {
         return optimize;
     }
 
-    public void setOptimize( boolean optimize )
-    {
+    public void setOptimize(boolean optimize) {
         this.optimize = optimize;
     }
 
-    public String getCompilerVersion()
-    {
+    public String getCompilerVersion() {
         return compilerVersion;
     }
 
-    public void setCompilerVersion( String compilerVersion )
-    {
+    public void setCompilerVersion(String compilerVersion) {
         this.compilerVersion = compilerVersion;
     }
 
-    public boolean isVerbose()
-    {
+    public boolean isVerbose() {
         return verbose;
     }
 
-    public void setVerbose( boolean verbose )
-    {
+    public void setVerbose(boolean verbose) {
         this.verbose = verbose;
     }
 
-    public boolean isParameters()
-    {
+    public boolean isParameters() {
         return parameters;
     }
 
-    public void setParameters(boolean parameters)
-    {
+    public void setParameters(boolean parameters) {
         this.parameters = parameters;
     }
 
-    public boolean isEnablePreview()
-    {
+    public boolean isEnablePreview() {
         return enablePreview;
     }
 
-    public void setEnablePreview(boolean enablePreview)
-    {
+    public void setEnablePreview(boolean enablePreview) {
         this.enablePreview = enablePreview;
     }
 
-    public void setProc(String proc )
-    {
+    public void setProc(String proc) {
         this.proc = proc;
     }
 
-    public void setGeneratedSourcesDirectory( File generatedSourcesDirectory )
-    {
+    public void setGeneratedSourcesDirectory(File generatedSourcesDirectory) {
         this.generatedSourcesDirectory = generatedSourcesDirectory;
     }
 
-    public File getGeneratedSourcesDirectory()
-    {
+    public File getGeneratedSourcesDirectory() {
         return generatedSourcesDirectory;
     }
 
-    public String getProc()
-    {
+    public String getProc() {
         return proc;
     }
 
-    public void setAnnotationProcessors( String[] annotationProcessors )
-    {
+    public void setAnnotationProcessors(String[] annotationProcessors) {
         this.annotationProcessors = annotationProcessors;
     }
 
-    public String[] getAnnotationProcessors()
-    {
+    public String[] getAnnotationProcessors() {
         return annotationProcessors;
     }
 
@@ -664,11 +563,11 @@ public class CompilerConfiguration
      * @param entry processor path entry to add
      */
     public void addProcessorPathEntry(String entry) {
-        if ( processorPathEntries == null ) {
+        if (processorPathEntries == null) {
             processorPathEntries = new LinkedList<>();
         }
 
-        processorPathEntries.add( entry );
+        processorPathEntries.add(entry);
     }
 
     /**
@@ -691,152 +590,123 @@ public class CompilerConfiguration
         this.processorPathEntries = processorPathEntries;
     }
 
-    
     public void addProcessorModulePathEntry(String entry) {
-        if ( processorModulePathEntries == null ) {
+        if (processorModulePathEntries == null) {
             processorModulePathEntries = new LinkedList<>();
         }
 
-        processorModulePathEntries.add( entry );
+        processorModulePathEntries.add(entry);
     }
-    
-    public List<String> getProcessorModulePathEntries()
-    {
+
+    public List<String> getProcessorModulePathEntries() {
         return processorModulePathEntries;
     }
-    
-    public void setProcessorModulePathEntries( List<String> processorModulePathEntries )
-    {
+
+    public void setProcessorModulePathEntries(List<String> processorModulePathEntries) {
         this.processorModulePathEntries = processorModulePathEntries;
     }
-    
-    
-    public CompilerReuseStrategy getCompilerReuseStrategy()
-    {
+
+    public CompilerReuseStrategy getCompilerReuseStrategy() {
         return compilerReuseStrategy;
     }
 
-    public void setCompilerReuseStrategy( CompilerReuseStrategy compilerReuseStrategy )
-    {
+    public void setCompilerReuseStrategy(CompilerReuseStrategy compilerReuseStrategy) {
         this.compilerReuseStrategy = compilerReuseStrategy;
     }
 
-    public String getDebugFileName()
-    {
+    public String getDebugFileName() {
         return debugFileName;
     }
 
-    public void setDebugFileName(String debugFileName)
-    {
+    public void setDebugFileName(String debugFileName) {
         this.debugFileName = debugFileName;
     }
 
     /**
      * Re-use strategy of the compiler (implement for java only).
      */
-    public enum CompilerReuseStrategy
-    {
+    public enum CompilerReuseStrategy {
         /**
          * Always reuse the same.
          * <b>Default strategy.</b>
          */
-        ReuseSame( "reuseSame" ),
+        ReuseSame("reuseSame"),
         /**
          * Re-create a new compiler for each use.
          */
-        AlwaysNew( "alwaysNew" ),
+        AlwaysNew("alwaysNew"),
         /**
          * Re-use already created compiler, create new one if non already exists.
          * <b>Will mimic a kind of pool to prevent different threads use the same.</b>
          */
-        ReuseCreated( "reuseCreated" );
+        ReuseCreated("reuseCreated");
 
         private String strategy;
 
-        CompilerReuseStrategy( String strategy )
-        {
+        CompilerReuseStrategy(String strategy) {
             this.strategy = strategy;
         }
 
-        public String getStrategy()
-        {
+        public String getStrategy() {
             return strategy;
         }
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             return "CompilerReuseStrategy:" + this.strategy;
         }
     }
 
-    public boolean isForceJavacCompilerUse()
-    {
+    public boolean isForceJavacCompilerUse() {
         return forceJavacCompilerUse;
     }
 
-    public void setForceJavacCompilerUse( boolean forceJavacCompilerUse )
-    {
+    public void setForceJavacCompilerUse(boolean forceJavacCompilerUse) {
         this.forceJavacCompilerUse = forceJavacCompilerUse;
     }
 
-    public String getImplicitOption()
-    {
+    public String getImplicitOption() {
         return implicitOption;
     }
 
-    public void setImplicitOption( String implicitOption )
-    {
+    public void setImplicitOption(String implicitOption) {
         this.implicitOption = implicitOption;
     }
 
-    public String describe()
-    {
+    public String describe() {
         List<String> params = new ArrayList<>();
 
-        if ( isFork() )
-        {
-            params.add( "forked" );
+        if (isFork()) {
+            params.add("forked");
         }
 
         // base options: debug, optimize, verbose, deprecation
-        if ( isDebug() )
-        {
-            if ( StringUtils.isNotEmpty( getDebugLevel() ) )
-            {
-                params.add( "debug:" + getDebugLevel() );
-            }
-            else
-            {
-                params.add( "debug" );
+        if (isDebug()) {
+            if (StringUtils.isNotEmpty(getDebugLevel())) {
+                params.add("debug:" + getDebugLevel());
+            } else {
+                params.add("debug");
             }
         }
-        if ( isOptimize() )
-        {
-            params.add( "optimize" );
+        if (isOptimize()) {
+            params.add("optimize");
         }
-        if ( isVerbose() )
-        {
-            params.add( "verbose" );
+        if (isVerbose()) {
+            params.add("verbose");
         }
-        if ( isShowDeprecation() )
-        {
-            params.add( "deprecation" );
+        if (isShowDeprecation()) {
+            params.add("deprecation");
         }
 
         // target bytecode options: release or target, module-path
-        if ( !StringUtils.isEmpty( getReleaseVersion() ) )
-        {
-            params.add( "release " + getReleaseVersion() );
+        if (!StringUtils.isEmpty(getReleaseVersion())) {
+            params.add("release " + getReleaseVersion());
+        } else if (!StringUtils.isEmpty(getTargetVersion())) {
+            params.add("target " + getTargetVersion());
         }
-        else if ( !StringUtils.isEmpty( getTargetVersion() ) )
-        {
-            params.add( "target " + getTargetVersion() );
+        if (getModulepathEntries() != null && !getModulepathEntries().isEmpty()) {
+            params.add("module-path");
         }
-        if ( getModulepathEntries() != null && !getModulepathEntries().isEmpty() )
-        {
-            params.add( "module-path" );
-        }
-        return String.join( " ", params );
+        return String.join(" ", params);
     }
 }

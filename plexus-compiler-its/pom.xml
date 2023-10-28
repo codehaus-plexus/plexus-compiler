@@ -42,12 +42,12 @@
         <executions>
           <execution>
             <id>integration-tests</id>
-            <phase>verify</phase>
             <goals>
               <goal>install</goal>
               <goal>run</goal>
               <goal>verify</goal>
             </goals>
+            <phase>verify</phase>
             <configuration>
               <debug>false</debug>
               <streamLogsOnFailures>true</streamLogsOnFailures>

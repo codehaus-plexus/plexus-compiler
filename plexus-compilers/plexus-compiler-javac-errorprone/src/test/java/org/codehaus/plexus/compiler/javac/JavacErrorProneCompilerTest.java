@@ -5,19 +5,15 @@ import org.codehaus.plexus.compiler.AbstractCompilerTest;
 /**
  * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>
  */
-public class JavacErrorProneCompilerTest
-    extends AbstractCompilerTest
-{
+public class JavacErrorProneCompilerTest extends AbstractCompilerTest {
 
     @Override
-    protected String getRoleHint()
-    {
+    protected String getRoleHint() {
         return "javac-with-errorprone";
     }
 
     @Override
-    protected int expectedWarnings()
-    {
+    protected int expectedWarnings() {
         String javaVersion = getJavaVersion();
         if (javaVersion.startsWith("1.8")) {
             return 1;
@@ -30,20 +26,17 @@ public class JavacErrorProneCompilerTest
     }
 
     @Override
-    protected int expectedErrors()
-    {
+    protected int expectedErrors() {
         return 1;
     }
 
     @Override
-    public String getSourceVersion()
-    {
+    public String getSourceVersion() {
         return "1.8";
     }
 
     @Override
-    public String getTargetVersion()
-    {
+    public String getTargetVersion() {
         return "1.8";
     }
 }

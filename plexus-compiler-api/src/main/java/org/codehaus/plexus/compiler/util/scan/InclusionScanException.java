@@ -19,16 +19,12 @@ package org.codehaus.plexus.compiler.util.scan;
 /**
  * @author jdcasey
  */
-public class InclusionScanException
-    extends Exception
-{
-    public InclusionScanException( String message )
-    {
-        super( message );
+public class InclusionScanException extends Exception {
+    public InclusionScanException(String message) {
+        super(message);
     }
 
-    public InclusionScanException( String message, Throwable cause )
-    {
-        super( message, cause );
+    public InclusionScanException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

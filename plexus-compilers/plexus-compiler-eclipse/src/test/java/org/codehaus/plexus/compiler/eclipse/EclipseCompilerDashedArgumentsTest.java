@@ -23,6 +23,14 @@ package org.codehaus.plexus.compiler.eclipse;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import java.io.File;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.codehaus.plexus.compiler.Compiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
@@ -33,16 +41,7 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.io.File;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
-
 
 /**
  * @author <a href="mailto:jal@etc.to">Frits Jalvingh</a>
@@ -60,11 +59,10 @@ public class EclipseCompilerDashedArgumentsTest {
     private CompilerConfiguration getConfig() throws Exception {
         String sourceDir = getBasedir() + "/src/test-input/src/main";
 
-        List<String> filenames = FileUtils.getFileNames( new File( sourceDir ), "**/*.java", null, false, true );
-        Collections.sort( filenames );
+        List<String> filenames = FileUtils.getFileNames(new File(sourceDir), "**/*.java", null, false, true);
+        Collections.sort(filenames);
         Set<File> files = new HashSet<>();
-        for(String filename : filenames)
-        {
+        for (String filename : filenames) {
             files.add(new File(filename));
         }
 
@@ -72,11 +70,11 @@ public class EclipseCompilerDashedArgumentsTest {
         compilerConfig.setDebug(false);
         compilerConfig.setShowDeprecation(false);
 
-//            compilerConfig.setClasspathEntries( getClasspath() );
-        compilerConfig.addSourceLocation( sourceDir );
-        compilerConfig.setOutputLocation( getBasedir() + "/target/eclipse/classes");
-        FileUtils.deleteDirectory( compilerConfig.getOutputLocation() );
-//        compilerConfig.addInclude( filename );
+        //            compilerConfig.setClasspathEntries( getClasspath() );
+        compilerConfig.addSourceLocation(sourceDir);
+        compilerConfig.setOutputLocation(getBasedir() + "/target/eclipse/classes");
+        FileUtils.deleteDirectory(compilerConfig.getOutputLocation());
+        //        compilerConfig.addInclude( filename );
         compilerConfig.setForceJavacCompilerUse(false);
         compilerConfig.setSourceFiles(files);
 
@@ -94,15 +92,14 @@ public class EclipseCompilerDashedArgumentsTest {
      * the invalid option is not part of the error output but part of the data sent to stdout/stderr.
      */
     @Test
-    public void testDoubleDashOptionsArePassedWithTwoDashes() throws Exception
-    {
+    public void testDoubleDashOptionsArePassedWithTwoDashes() throws Exception {
         CompilerConfiguration config = getConfig();
         config.addCompilerCustomArgument(BAD_DOUBLEDASH_OPTION, "b0rk3d");
 
-        EcjFailureException x = Assertions.assertThrows(EcjFailureException.class, () -> compiler.performCompile(config));
+        EcjFailureException x =
+                Assertions.assertThrows(EcjFailureException.class, () -> compiler.performCompile(config));
 
         MatcherAssert.assertThat(x.getEcjOutput(), Matchers.containsString(BAD_DOUBLEDASH_OPTION));
         MatcherAssert.assertThat(x.getEcjOutput(), Matchers.not(Matchers.containsString("-" + BAD_DOUBLEDASH_OPTION)));
-
     }
 }

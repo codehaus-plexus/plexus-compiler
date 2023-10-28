@@ -21,9 +21,7 @@ package org.codehaus.plexus.compiler.javac;
 /**
  * @author Olivier Lamy
  */
-public class JavaxToolsCompilerTest
-    extends AbstractJavacCompilerTest
-{
+public class JavaxToolsCompilerTest extends AbstractJavacCompilerTest {
     // no op default is to javax.tools if available
 
     @Override
@@ -35,5 +33,4 @@ public class JavaxToolsCompilerTest
             return super.expectedWarnings();
         }
     }
-
 }

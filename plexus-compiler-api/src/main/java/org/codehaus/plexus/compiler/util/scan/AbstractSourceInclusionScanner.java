@@ -16,62 +16,51 @@ package org.codehaus.plexus.compiler.util.scan;
  * limitations under the License.
  */
 
-import org.codehaus.plexus.compiler.util.scan.mapping.SourceMapping;
-import org.codehaus.plexus.util.DirectoryScanner;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import org.codehaus.plexus.compiler.util.scan.mapping.SourceMapping;
+import org.codehaus.plexus.util.DirectoryScanner;
+
 /**
  * @author jdcasey
  */
-public abstract class AbstractSourceInclusionScanner
-    implements SourceInclusionScanner
-{
+public abstract class AbstractSourceInclusionScanner implements SourceInclusionScanner {
     private final List<SourceMapping> sourceMappings = new ArrayList<>();
 
-    public final void addSourceMapping( SourceMapping sourceMapping )
-    {
-        sourceMappings.add( sourceMapping );
+    public final void addSourceMapping(SourceMapping sourceMapping) {
+        sourceMappings.add(sourceMapping);
     }
 
-    protected final List<SourceMapping> getSourceMappings()
-    {
-        return Collections.unmodifiableList( sourceMappings );
+    protected final List<SourceMapping> getSourceMappings() {
+        return Collections.unmodifiableList(sourceMappings);
     }
 
-    protected String[] scanForSources( File sourceDir, Set<String> sourceIncludes, Set<String> sourceExcludes )
-    {
+    protected String[] scanForSources(File sourceDir, Set<String> sourceIncludes, Set<String> sourceExcludes) {
         DirectoryScanner ds = new DirectoryScanner();
-        ds.setFollowSymlinks( true );
-        ds.setBasedir( sourceDir );
+        ds.setFollowSymlinks(true);
+        ds.setBasedir(sourceDir);
 
         String[] includes;
-        if ( sourceIncludes.isEmpty() )
-        {
+        if (sourceIncludes.isEmpty()) {
             includes = new String[0];
-        }
-        else
-        {
-            includes = sourceIncludes.toArray( new String[0] );
+        } else {
+            includes = sourceIncludes.toArray(new String[0]);
         }
 
-        ds.setIncludes( includes );
+        ds.setIncludes(includes);
 
         String[] excludes;
-        if ( sourceExcludes.isEmpty() )
-        {
+        if (sourceExcludes.isEmpty()) {
             excludes = new String[0];
-        }
-        else
-        {
-            excludes = sourceExcludes.toArray( new String[0] );
+        } else {
+            excludes = sourceExcludes.toArray(new String[0]);
         }
 
-        ds.setExcludes( excludes );
+        ds.setExcludes(excludes);
         ds.addDefaultExcludes();
 
         ds.scan();

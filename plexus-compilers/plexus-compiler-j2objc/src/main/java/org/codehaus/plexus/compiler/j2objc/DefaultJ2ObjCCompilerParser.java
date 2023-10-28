@@ -8,8 +8,7 @@ import org.codehaus.plexus.compiler.CompilerMessage.Kind;
  *
  * @author lmaitre
  */
-public class DefaultJ2ObjCCompilerParser
-{
+public class DefaultJ2ObjCCompilerParser {
 
     private static String ERROR_PREFIX = "error: ";
 
@@ -24,8 +23,7 @@ public class DefaultJ2ObjCCompilerParser
      * @return The compiler message for this line or null if there is no need of
      * a message.
      */
-    public static CompilerMessage parseLine( String line )
-    {
+    public static CompilerMessage parseLine(String line) {
         String file = null;
         boolean error = false;
         int startline = -1;
@@ -34,29 +32,20 @@ public class DefaultJ2ObjCCompilerParser
         int endcolumn = -1;
         String message;
 
-        if ( line.startsWith( ERROR_PREFIX ) )
-        {
-            message = line.substring( ERROR_PREFIX.length() );
+        if (line.startsWith(ERROR_PREFIX)) {
+            message = line.substring(ERROR_PREFIX.length());
             error = true;
-        }
-        else if ( line.startsWith( CONVERT_PREFIX ) )
-        {
+        } else if (line.startsWith(CONVERT_PREFIX)) {
             message = line;
-        }
-        else if ( line.startsWith( TRANSLATION_PREFIX ) )
-        {
+        } else if (line.startsWith(TRANSLATION_PREFIX)) {
             message = line;
-        }
-        else
-        {
-            System.err.println( "Unknown output: " + line );
+        } else {
+            System.err.println("Unknown output: " + line);
 
             return null;
         }
 
-        return new CompilerMessage( file, error ? Kind.ERROR : Kind.NOTE, startline, startcolumn, endline, endcolumn,
-                                    message );
-
+        return new CompilerMessage(
+                file, error ? Kind.ERROR : Kind.NOTE, startline, startcolumn, endline, endcolumn, message);
     }
-
 }

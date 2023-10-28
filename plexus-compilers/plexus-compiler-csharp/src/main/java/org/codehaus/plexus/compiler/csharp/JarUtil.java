@@ -26,7 +26,7 @@ public class JarUtil {
                     continue;
                 }
                 try (InputStream is = jar.getInputStream(file);
-                     OutputStream fos = Files.newOutputStream(f)) {
+                        OutputStream fos = Files.newOutputStream(f)) {
                     while (is.available() > 0) {
                         fos.write(is.read());
                     }

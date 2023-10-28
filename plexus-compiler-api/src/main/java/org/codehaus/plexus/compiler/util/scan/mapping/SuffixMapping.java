@@ -24,38 +24,31 @@ import java.util.Set;
 /**
  * @author jdcasey
  */
-public final class SuffixMapping
-    implements SourceMapping
-{
+public final class SuffixMapping implements SourceMapping {
     private final String sourceSuffix;
 
     private final Set<String> targetSuffixes;
 
-    public SuffixMapping( String sourceSuffix, String targetSuffix )
-    {
+    public SuffixMapping(String sourceSuffix, String targetSuffix) {
         this.sourceSuffix = sourceSuffix;
 
-        this.targetSuffixes = Collections.singleton( targetSuffix );
+        this.targetSuffixes = Collections.singleton(targetSuffix);
     }
 
-    public SuffixMapping( String sourceSuffix, Set<String> targetSuffixes )
-    {
+    public SuffixMapping(String sourceSuffix, Set<String> targetSuffixes) {
         this.sourceSuffix = sourceSuffix;
 
-        this.targetSuffixes = Collections.unmodifiableSet( targetSuffixes );
+        this.targetSuffixes = Collections.unmodifiableSet(targetSuffixes);
     }
 
-    public Set<File> getTargetFiles( File targetDir, String source )
-    {
+    public Set<File> getTargetFiles(File targetDir, String source) {
         Set<File> targetFiles = new HashSet<>();
 
-        if ( source.endsWith( sourceSuffix ) )
-        {
-            String base = source.substring( 0, source.length() - sourceSuffix.length() );
+        if (source.endsWith(sourceSuffix)) {
+            String base = source.substring(0, source.length() - sourceSuffix.length());
 
-            for ( String suffix : targetSuffixes )
-            {
-                targetFiles.add( new File( targetDir, base + suffix ) );
+            for (String suffix : targetSuffixes) {
+                targetFiles.add(new File(targetDir, base + suffix));
             }
         }
 

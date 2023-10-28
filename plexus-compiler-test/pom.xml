@@ -20,7 +20,8 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
-      <scope>compile</scope> <!-- override default test scope -->
+      <scope>compile</scope>
+      <!-- override default test scope -->
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
@@ -55,6 +56,10 @@
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-xml</artifactId>
     </dependency>
     <!-- This just needs to be present in the local repository for tests to pass. It would be preferable for the tests to resolve it directly -->
     <dependency>

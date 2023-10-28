@@ -24,44 +24,36 @@ package org.codehaus.plexus.compiler;
  * SOFTWARE.
  */
 
-import java.util.List;
-
 /**
  * The interface of an compiling language processor (aka compiler).
- * 
+ *
  * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  * @author <a href="mailto:matthew.pocock@ncl.ac.uk">Matthew Pocock</a>
  */
-public interface Compiler
-{
+public interface Compiler {
     String ROLE = Compiler.class.getName();
 
     CompilerOutputStyle getCompilerOutputStyle();
 
-    String getInputFileEnding( CompilerConfiguration configuration )
-        throws CompilerException;
+    String getInputFileEnding(CompilerConfiguration configuration) throws CompilerException;
 
-    String getOutputFileEnding( CompilerConfiguration configuration )
-        throws CompilerException;
+    String getOutputFileEnding(CompilerConfiguration configuration) throws CompilerException;
 
-    String getOutputFile( CompilerConfiguration configuration )
-        throws CompilerException;
+    String getOutputFile(CompilerConfiguration configuration) throws CompilerException;
 
-    boolean canUpdateTarget( CompilerConfiguration configuration )
-        throws CompilerException;
+    boolean canUpdateTarget(CompilerConfiguration configuration) throws CompilerException;
 
     /**
      * Performs the compilation of the project. Clients must implement this
      * method.
-     * 
+     *
      * @param configuration   the configuration description of the compilation
      *   to perform
      * @return the result of the compilation returned by the language processor
      * @throws CompilerException
      */
-    CompilerResult performCompile( CompilerConfiguration configuration )
-        throws CompilerException;
+    CompilerResult performCompile(CompilerConfiguration configuration) throws CompilerException;
 
     /**
      * Create the command line that would be executed using this configuration.
@@ -74,15 +66,13 @@ public interface Compiler
      * @throws CompilerException  if there was an error generating the command
      *   line
      */
-    String[] createCommandLine( CompilerConfiguration config )
-        throws CompilerException;
-    
+    String[] createCommandLine(CompilerConfiguration config) throws CompilerException;
 
     /**
      * Based on this flag the caller can decide the strategy how to compile. E.g. is incrementCompilation is not supported,
      * it could decide to clear to outputDirectory to enforce a complete recompilation.
-     * 
-     * @return {@code true} if incrementalCompilation is supported, otherwise {@code false} 
+     *
+     * @return {@code true} if incrementalCompilation is supported, otherwise {@code false}
      */
     default boolean supportsIncrementalCompilation() {
         return false;

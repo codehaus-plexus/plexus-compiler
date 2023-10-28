@@ -13,9 +13,7 @@ import org.codehaus.plexus.compiler.CompilerConfiguration;
 /**
  * @author jdcasey
  */
-public class AspectJCompilerConfiguration
-    extends CompilerConfiguration
-{
+public class AspectJCompilerConfiguration extends CompilerConfiguration {
 
     private List<String> aspectPath = new LinkedList<>();
 
@@ -29,92 +27,75 @@ public class AspectJCompilerConfiguration
 
     private Map<String, File> sourcePathResources;
 
-    public void setAspectPath( List<String> aspectPath )
-    {
-        this.aspectPath = new LinkedList<>( aspectPath );
+    public void setAspectPath(List<String> aspectPath) {
+        this.aspectPath = new LinkedList<>(aspectPath);
     }
 
-    public void addAspectPath( String aspectPath )
-    {
-        this.aspectPath.add( aspectPath );
+    public void addAspectPath(String aspectPath) {
+        this.aspectPath.add(aspectPath);
     }
 
-    public List<String> getAspectPath()
-    {
-        return Collections.unmodifiableList( aspectPath );
+    public List<String> getAspectPath() {
+        return Collections.unmodifiableList(aspectPath);
     }
 
-    public void setInJars( List<String> inJars )
-    {
-        this.inJars = new LinkedList<>( inJars );
+    public void setInJars(List<String> inJars) {
+        this.inJars = new LinkedList<>(inJars);
     }
 
-    public void addInJar( String inJar )
-    {
-        this.inJars.add( inJar );
+    public void addInJar(String inJar) {
+        this.inJars.add(inJar);
     }
 
-    public List<String> getInJars()
-    {
-        return Collections.unmodifiableList( inJars );
+    public List<String> getInJars() {
+        return Collections.unmodifiableList(inJars);
     }
 
-    public void setInPath( List<String> inPath )
-    {
-        this.inPath = new LinkedList<>( inPath );
+    public void setInPath(List<String> inPath) {
+        this.inPath = new LinkedList<>(inPath);
     }
 
-    public void addInPath( String inPath )
-    {
-        this.inPath.add( inPath );
+    public void addInPath(String inPath) {
+        this.inPath.add(inPath);
     }
 
-    public List<String> getInPath()
-    {
-        return Collections.unmodifiableList( inPath );
+    public List<String> getInPath() {
+        return Collections.unmodifiableList(inPath);
     }
 
-    public void setOutputJar( String outputJar )
-    {
+    public void setOutputJar(String outputJar) {
         this.outputJar = outputJar;
     }
 
-    public String getOutputJar()
-    {
+    public String getOutputJar() {
         return outputJar;
     }
 
     /**
      * Ignored, not supported yet
      */
-    public void setAJOptions( Map<String, String> ajOptions )
-    {
-        //TODO
-        //this.ajOptions = new TreeMap( ajOptions );
+    public void setAJOptions(Map<String, String> ajOptions) {
+        // TODO
+        // this.ajOptions = new TreeMap( ajOptions );
     }
 
-    public void setAJOption( String optionName, String optionValue )
-    {
-        this.ajOptions.put( optionName, optionValue );
+    public void setAJOption(String optionName, String optionValue) {
+        this.ajOptions.put(optionName, optionValue);
     }
 
     /**
      * Ignored, not supported yet
      * @return empty Map
      */
-    public Map<String, String> getAJOptions()
-    {
-        return Collections.unmodifiableMap( ajOptions );
+    public Map<String, String> getAJOptions() {
+        return Collections.unmodifiableMap(ajOptions);
     }
 
-    public void setSourcePathResources( Map<String, File> sourcePathResources )
-    {
-        this.sourcePathResources = new TreeMap<>( sourcePathResources );
+    public void setSourcePathResources(Map<String, File> sourcePathResources) {
+        this.sourcePathResources = new TreeMap<>(sourcePathResources);
     }
 
-    public Map<String, File> getSourcePathResources()
-    {
+    public Map<String, File> getSourcePathResources() {
         return sourcePathResources;
     }
-
 }
