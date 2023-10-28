@@ -36,37 +36,33 @@ import static org.hamcrest.io.FileMatchers.anExistingFile;
  *
  * @author <a href="mailto:carlos@apache.org">Carlos Sanchez</a>
  */
-public abstract class AbstractSourceInclusionScannerTest
-{
+public abstract class AbstractSourceInclusionScannerTest {
 
     private static final String TESTFILE_DEST_MARKER_FILE =
-        SourceInclusionScanner.class.getName().replace( '.', '/' ) + "-testMarker.txt";
+            SourceInclusionScanner.class.getName().replace('.', '/') + "-testMarker.txt";
 
     protected SourceInclusionScanner scanner;
 
     @Test
-    public void testGetIncludedSources()
-        throws Exception
-    {
-        File base = new File( getTestBaseDir(), "testGetIncludedSources" );
+    public void testGetIncludedSources() throws Exception {
+        File base = new File(getTestBaseDir(), "testGetIncludedSources");
 
-        File sourceFile = new File( base, "file.java" );
+        File sourceFile = new File(base, "file.java");
 
-        writeFile( sourceFile );
+        writeFile(sourceFile);
 
-        sourceFile.setLastModified( System.currentTimeMillis() );
+        sourceFile.setLastModified(System.currentTimeMillis());
 
-        SuffixMapping mapping = new SuffixMapping( ".java", ".xml" );
+        SuffixMapping mapping = new SuffixMapping(".java", ".xml");
 
-        scanner.addSourceMapping( mapping );
+        scanner.addSourceMapping(mapping);
 
-        Set<File> includedSources = scanner.getIncludedSources( base, base );
+        Set<File> includedSources = scanner.getIncludedSources(base, base);
 
-        assertThat( "no sources were included", includedSources, not( empty() ) );
+        assertThat("no sources were included", includedSources, not(empty()));
 
-        for ( File file : includedSources )
-        {
-            assertThat( "file included does not exist", file, anExistingFile() );
+        for (File file : includedSources) {
+            assertThat("file included does not exist", file, anExistingFile());
         }
     }
 
@@ -74,48 +70,38 @@ public abstract class AbstractSourceInclusionScannerTest
     // Utilities
     // ----------------------------------------------------------------------
 
-    protected File getTestBaseDir()
-        throws URISyntaxException
-    {
+    protected File getTestBaseDir() throws URISyntaxException {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        URL markerResource = cl.getResource( TESTFILE_DEST_MARKER_FILE );
+        URL markerResource = cl.getResource(TESTFILE_DEST_MARKER_FILE);
 
         File basedir;
 
-        if ( markerResource != null )
-        {
-            File marker = new File( markerResource.toURI() );
+        if (markerResource != null) {
+            File marker = new File(markerResource.toURI());
 
             basedir = marker.getParentFile().getAbsoluteFile();
-        }
-        else
-        {
+        } else {
             // punt.
-            System.out.println( "Cannot find marker file: \'" + TESTFILE_DEST_MARKER_FILE + "\' in classpath. " +
-                                    "Using '.' for basedir." );
+            System.out.println("Cannot find marker file: \'" + TESTFILE_DEST_MARKER_FILE + "\' in classpath. "
+                    + "Using '.' for basedir.");
 
-            basedir = new File( "." ).getAbsoluteFile();
+            basedir = new File(".").getAbsoluteFile();
         }
 
         return basedir;
     }
 
-    protected void writeFile( File file )
-        throws IOException
-    {
+    protected void writeFile(File file) throws IOException {
 
         File parent = file.getParentFile();
-        if ( !parent.exists() )
-        {
+        if (!parent.exists()) {
             parent.mkdirs();
         }
 
         file.deleteOnExit();
 
-        try (FileWriter fWriter = new FileWriter( file ))
-        {
-            fWriter.write( "This is just a test file." );
+        try (FileWriter fWriter = new FileWriter(file)) {
+            fWriter.write("This is just a test file.");
         }
     }
-
 }

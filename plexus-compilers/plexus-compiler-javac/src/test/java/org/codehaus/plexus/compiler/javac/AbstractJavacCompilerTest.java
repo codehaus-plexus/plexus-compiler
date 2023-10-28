@@ -23,14 +23,6 @@ package org.codehaus.plexus.compiler.javac;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-import org.codehaus.plexus.compiler.AbstractCompilerTest;
-import org.codehaus.plexus.compiler.CompilerConfiguration;
-import org.codehaus.plexus.util.StringUtils;
-import org.hamcrest.Matchers;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,68 +31,78 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.plexus.compiler.AbstractCompilerTest;
+import org.codehaus.plexus.compiler.CompilerConfiguration;
+import org.codehaus.plexus.util.StringUtils;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 /**
  * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>
  */
-public abstract class AbstractJavacCompilerTest
-    extends AbstractCompilerTest
-{
+public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
     private static final String PS = File.pathSeparator;
 
     @BeforeEach
-    public void setUp()
-    {
-        setCompilerDebug( true );
-        setCompilerDeprecationWarnings( true );
+    public void setUp() {
+        setCompilerDebug(true);
+        setCompilerDeprecationWarnings(true);
     }
 
     @Override
-    protected String getRoleHint()
-    {
+    protected String getRoleHint() {
         return "javac";
     }
 
     @Override
-    protected int expectedErrors()
-    {
+    protected int expectedErrors() {
         String javaVersion = getJavaVersion();
-        if (javaVersion.contains("9.0")||javaVersion.contains("11")||javaVersion.contains("14")||
-            javaVersion.contains("15")||javaVersion.contains("16")||javaVersion.contains("17")||
-            javaVersion.contains("18")||javaVersion.contains("19")||javaVersion.contains("20")||
-            javaVersion.contains("21")){
+        if (javaVersion.contains("9.0")
+                || javaVersion.contains("11")
+                || javaVersion.contains("14")
+                || javaVersion.contains("15")
+                || javaVersion.contains("16")
+                || javaVersion.contains("17")
+                || javaVersion.contains("18")
+                || javaVersion.contains("19")
+                || javaVersion.contains("20")
+                || javaVersion.contains("21")) {
             return 5;
         }
-        // javac output changed for misspelled modifiers starting in 1.6...they now generate 2 errors per occurrence, not one.
-        if ( "1.5".compareTo( javaVersion ) < 0 )
-        {
+        // javac output changed for misspelled modifiers starting in 1.6...they now generate 2 errors per occurrence,
+        // not one.
+        if ("1.5".compareTo(javaVersion) < 0) {
             return 4;
-        }
-        else
-        {
+        } else {
             return 3;
         }
     }
 
     @Override
-    protected int expectedWarnings()
-    {
+    protected int expectedWarnings() {
         String javaVersion = getJavaVersion();
-        if (javaVersion.contains("9.0")||javaVersion.contains("11")||javaVersion.contains("14")||
-            javaVersion.contains("15")||javaVersion.contains("16")||javaVersion.contains("17")||
-            javaVersion.contains("18")||javaVersion.contains("19")||javaVersion.contains("20")||
-            javaVersion.contains("21")){
+        if (javaVersion.contains("9.0")
+                || javaVersion.contains("11")
+                || javaVersion.contains("14")
+                || javaVersion.contains("15")
+                || javaVersion.contains("16")
+                || javaVersion.contains("17")
+                || javaVersion.contains("18")
+                || javaVersion.contains("19")
+                || javaVersion.contains("20")
+                || javaVersion.contains("21")) {
             return 1;
         }
-        if (javaVersion.contains("1.8")){
+        if (javaVersion.contains("1.8")) {
             // lots of new warnings about obsoletions for future releases
             return 30;
         }
 
-        if ( "1.6".compareTo( javaVersion ) < 0 )
-        {
+        if ("1.6".compareTo(javaVersion) < 0) {
             // with 1.7 some warning with bootstrap class path not set in conjunction with -source 1.3
             return 9;
         }
@@ -109,238 +111,234 @@ public abstract class AbstractJavacCompilerTest
     }
 
     @Override
-    public String getTargetVersion()
-    {
+    public String getTargetVersion() {
         String javaVersion = getJavaVersion();
-        if (javaVersion.contains("9.0")){
+        if (javaVersion.contains("9.0")) {
             return "1.7";
         }
-        if (javaVersion.contains("11")){
+        if (javaVersion.contains("11")) {
             return "11";
         }
-        if (javaVersion.contains("14")){
+        if (javaVersion.contains("14")) {
             return "14";
         }
-        if (javaVersion.contains("15")){
+        if (javaVersion.contains("15")) {
             return "15";
         }
-        if (javaVersion.contains("16")){
+        if (javaVersion.contains("16")) {
             return "16";
         }
-        if (javaVersion.contains("17")){
+        if (javaVersion.contains("17")) {
             return "17";
         }
-        if (javaVersion.contains("18")){
+        if (javaVersion.contains("18")) {
             return "18";
         }
-        if (javaVersion.contains("19")){
+        if (javaVersion.contains("19")) {
             return "19";
         }
-        if (javaVersion.contains("20")){
+        if (javaVersion.contains("20")) {
             return "20";
         }
-        if (javaVersion.contains("21")){
+        if (javaVersion.contains("21")) {
             return "21";
         }
         return super.getTargetVersion();
     }
 
     @Override
-    public String getSourceVersion()
-    {
+    public String getSourceVersion() {
         String javaVersion = getJavaVersion();
-        if (javaVersion.contains("9.0"))
-        {
+        if (javaVersion.contains("9.0")) {
             return "1.7";
         }
-        if (javaVersion.contains("11"))
-        {
+        if (javaVersion.contains("11")) {
             return "11";
         }
-        if (javaVersion.contains("14"))
-        {
+        if (javaVersion.contains("14")) {
             return "14";
         }
-        if (javaVersion.contains("15"))
-        {
+        if (javaVersion.contains("15")) {
             return "15";
         }
-        if (javaVersion.contains("16")){
+        if (javaVersion.contains("16")) {
             return "16";
         }
-        if (javaVersion.contains("17")){
+        if (javaVersion.contains("17")) {
             return "17";
         }
-        if (javaVersion.contains("18")){
+        if (javaVersion.contains("18")) {
             return "18";
         }
-        if (javaVersion.contains("19")){
+        if (javaVersion.contains("19")) {
             return "19";
         }
-        if (javaVersion.contains("20")){
+        if (javaVersion.contains("20")) {
             return "20";
         }
-        if (javaVersion.contains("21")){
+        if (javaVersion.contains("21")) {
             return "21";
         }
         return super.getTargetVersion();
     }
 
     @Override
-    protected Collection<String> expectedOutputFiles()
-    {
+    protected Collection<String> expectedOutputFiles() {
         String javaVersion = getJavaVersion();
-        if (javaVersion.contains("9.0")||javaVersion.contains("11")||javaVersion.contains("14")||
-            javaVersion.contains("15")||javaVersion.contains("16")||javaVersion.contains("17")||
-            javaVersion.contains("18")||javaVersion.contains("19")||javaVersion.contains("20")||
-            javaVersion.contains("21")
-        ){
-            return Arrays.asList( "org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ExternalDeps.class",
-                    "org/codehaus/foo/Person.class" );
+        if (javaVersion.contains("9.0")
+                || javaVersion.contains("11")
+                || javaVersion.contains("14")
+                || javaVersion.contains("15")
+                || javaVersion.contains("16")
+                || javaVersion.contains("17")
+                || javaVersion.contains("18")
+                || javaVersion.contains("19")
+                || javaVersion.contains("20")
+                || javaVersion.contains("21")) {
+            return Arrays.asList(
+                    "org/codehaus/foo/Deprecation.class",
+                    "org/codehaus/foo/ExternalDeps.class",
+                    "org/codehaus/foo/Person.class");
         }
-        return Arrays.asList( "org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ExternalDeps.class",
-                "org/codehaus/foo/Person.class", "org/codehaus/foo/ReservedWord.class" );
+        return Arrays.asList(
+                "org/codehaus/foo/Deprecation.class",
+                "org/codehaus/foo/ExternalDeps.class",
+                "org/codehaus/foo/Person.class",
+                "org/codehaus/foo/ReservedWord.class");
     }
 
     protected void internalTest(CompilerConfiguration compilerConfiguration, List<String> expectedArguments) {
         internalTest(compilerConfiguration, expectedArguments, new String[0]);
     }
 
-    public void internalTest(CompilerConfiguration compilerConfiguration, List<String> expectedArguments, String[] sources)
-    {
-        String[] actualArguments = JavacCompiler.buildCompilerArguments( compilerConfiguration, sources );
+    public void internalTest(
+            CompilerConfiguration compilerConfiguration, List<String> expectedArguments, String[] sources) {
+        String[] actualArguments = JavacCompiler.buildCompilerArguments(compilerConfiguration, sources);
 
-        assertThat( "The expected and actual argument list sizes differ.",
-                actualArguments, Matchers.arrayWithSize(expectedArguments.size() ));
+        assertThat(
+                "The expected and actual argument list sizes differ.",
+                actualArguments,
+                Matchers.arrayWithSize(expectedArguments.size()));
 
-        for ( int i = 0; i < actualArguments.length; i++ )
-        {
-            assertThat( "Unexpected argument", actualArguments[i], is( expectedArguments.get( i ) ));
+        for (int i = 0; i < actualArguments.length; i++) {
+            assertThat("Unexpected argument", actualArguments[i], is(expectedArguments.get(i)));
         }
     }
 
     @Test
-    public void testBuildCompilerArgs13()
-    {
+    public void testBuildCompilerArgs13() {
         List<String> expectedArguments = new ArrayList<>();
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
-        compilerConfiguration.setCompilerVersion( "1.3" );
+        compilerConfiguration.setCompilerVersion("1.3");
 
-        populateArguments( compilerConfiguration, expectedArguments, true, true, false );
+        populateArguments(compilerConfiguration, expectedArguments, true, true, false);
 
-        internalTest( compilerConfiguration, expectedArguments );
+        internalTest(compilerConfiguration, expectedArguments);
     }
 
     @Test
-    public void testBuildCompilerArgs14()
-    {
+    public void testBuildCompilerArgs14() {
         List<String> expectedArguments = new ArrayList<>();
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
-        compilerConfiguration.setCompilerVersion( "1.4" );
+        compilerConfiguration.setCompilerVersion("1.4");
 
-        populateArguments( compilerConfiguration, expectedArguments, false, false, false );
+        populateArguments(compilerConfiguration, expectedArguments, false, false, false);
 
-        internalTest( compilerConfiguration, expectedArguments );
+        internalTest(compilerConfiguration, expectedArguments);
     }
 
     @Test
-    public void testBuildCompilerArgs15()
-    {
+    public void testBuildCompilerArgs15() {
         List<String> expectedArguments = new ArrayList<>();
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
-        compilerConfiguration.setCompilerVersion( "1.5" );
+        compilerConfiguration.setCompilerVersion("1.5");
 
-        populateArguments( compilerConfiguration, expectedArguments, false, false, false );
+        populateArguments(compilerConfiguration, expectedArguments, false, false, false);
 
-        internalTest( compilerConfiguration, expectedArguments );
+        internalTest(compilerConfiguration, expectedArguments);
     }
 
     @Test
-    public void testBuildCompilerArgs18()
-    {
+    public void testBuildCompilerArgs18() {
         List<String> expectedArguments = new ArrayList<>();
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
-        compilerConfiguration.setCompilerVersion( "1.8" );
+        compilerConfiguration.setCompilerVersion("1.8");
 
-        populateArguments( compilerConfiguration, expectedArguments, false, false, true );
+        populateArguments(compilerConfiguration, expectedArguments, false, false, true);
 
-        internalTest( compilerConfiguration, expectedArguments );
+        internalTest(compilerConfiguration, expectedArguments);
     }
 
     @Test
-    public void testBuildCompilerArgsUnspecifiedVersion()
-    {
+    public void testBuildCompilerArgsUnspecifiedVersion() {
         List<String> expectedArguments = new ArrayList<>();
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
-        populateArguments( compilerConfiguration, expectedArguments, false, false, false );
+        populateArguments(compilerConfiguration, expectedArguments, false, false, false);
 
-        internalTest( compilerConfiguration, expectedArguments );
+        internalTest(compilerConfiguration, expectedArguments);
     }
 
     @Test
-    public void testBuildCompilerDebugLevel()
-    {
+    public void testBuildCompilerDebugLevel() {
         List<String> expectedArguments = new ArrayList<>();
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
-        compilerConfiguration.setDebug( true );
+        compilerConfiguration.setDebug(true);
 
-        compilerConfiguration.setDebugLevel( "none" );
+        compilerConfiguration.setDebugLevel("none");
 
-        populateArguments( compilerConfiguration, expectedArguments, false, false, false );
+        populateArguments(compilerConfiguration, expectedArguments, false, false, false);
 
-        internalTest( compilerConfiguration, expectedArguments );
+        internalTest(compilerConfiguration, expectedArguments);
     }
 
     // PLXCOMP-190
     @Test
-    public void testJRuntimeArguments()
-    {
+    public void testJRuntimeArguments() {
         List<String> expectedArguments = new ArrayList<>();
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
         // outputLocation
-        compilerConfiguration.setOutputLocation( "/output" );
-        expectedArguments.add( "-d" );
-        expectedArguments.add( new File( "/output" ).getAbsolutePath() );
+        compilerConfiguration.setOutputLocation("/output");
+        expectedArguments.add("-d");
+        expectedArguments.add(new File("/output").getAbsolutePath());
 
         // targetVersion
-        compilerConfiguration.setTargetVersion( "1.3" );
-        expectedArguments.add( "-target" );
-        expectedArguments.add( "1.3" );
+        compilerConfiguration.setTargetVersion("1.3");
+        expectedArguments.add("-target");
+        expectedArguments.add("1.3");
 
         // sourceVersion
-        compilerConfiguration.setSourceVersion( "1.3" );
-        expectedArguments.add( "-source" );
-        expectedArguments.add( "1.3" );
+        compilerConfiguration.setSourceVersion("1.3");
+        expectedArguments.add("-source");
+        expectedArguments.add("1.3");
 
         // unshared table
-        expectedArguments.add( "-XDuseUnsharedTable=true" );
+        expectedArguments.add("-XDuseUnsharedTable=true");
 
         // customCompilerArguments
         Map<String, String> customCompilerArguments = new LinkedHashMap<>();
-        customCompilerArguments.put( "-J-Duser.language=en_us", null );
-        compilerConfiguration.setCustomCompilerArgumentsAsMap( customCompilerArguments );
+        customCompilerArguments.put("-J-Duser.language=en_us", null);
+        compilerConfiguration.setCustomCompilerArgumentsAsMap(customCompilerArguments);
         // don't expect this argument!!
 
-        internalTest( compilerConfiguration, expectedArguments );
+        internalTest(compilerConfiguration, expectedArguments);
     }
 
     @Test
-    public void testModulePathAnnotations() throws Exception
-    {
+    public void testModulePathAnnotations() throws Exception {
         List<String> expectedArguments = new ArrayList<>();
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
@@ -348,175 +346,168 @@ public abstract class AbstractJavacCompilerTest
         final String[] source = {"module-info.java"};
 
         // outputLocation
-        compilerConfiguration.setOutputLocation( "/output" );
-        expectedArguments.add( "-d" );
-        expectedArguments.add( new File( "/output" ).getAbsolutePath() );
+        compilerConfiguration.setOutputLocation("/output");
+        expectedArguments.add("-d");
+        expectedArguments.add(new File("/output").getAbsolutePath());
 
         // failOnWarning
-        compilerConfiguration.setModulepathEntries( Arrays.asList( "/repo/a/b/1.0/b-1.0.jar",
-                "/repo/c/d/1.0/d-1.0.jar" ) );
-        expectedArguments.add( "--module-path" );
-        expectedArguments.add( "/repo/a/b/1.0/b-1.0.jar" + File.pathSeparator +
-                "/repo/c/d/1.0/d-1.0.jar" + File.pathSeparator );
+        compilerConfiguration.setModulepathEntries(Arrays.asList("/repo/a/b/1.0/b-1.0.jar", "/repo/c/d/1.0/d-1.0.jar"));
+        expectedArguments.add("--module-path");
+        expectedArguments.add(
+                "/repo/a/b/1.0/b-1.0.jar" + File.pathSeparator + "/repo/c/d/1.0/d-1.0.jar" + File.pathSeparator);
 
-        compilerConfiguration.setProcessorModulePathEntries(Arrays.asList("/repo/a/b/1.0/annotations-1.0.jar",
-                "/repo/f/a/1.0/annotations-4.0.jar"));
-        expectedArguments.add( "--processor-module-path" );
-        expectedArguments.add("/repo/a/b/1.0/annotations-1.0.jar" + File.pathSeparator +
-                "/repo/f/a/1.0/annotations-4.0.jar" + File.pathSeparator );
+        compilerConfiguration.setProcessorModulePathEntries(
+                Arrays.asList("/repo/a/b/1.0/annotations-1.0.jar", "/repo/f/a/1.0/annotations-4.0.jar"));
+        expectedArguments.add("--processor-module-path");
+        expectedArguments.add("/repo/a/b/1.0/annotations-1.0.jar" + File.pathSeparator
+                + "/repo/f/a/1.0/annotations-4.0.jar" + File.pathSeparator);
 
         // releaseVersion
-        compilerConfiguration.setReleaseVersion( "9" );
-        expectedArguments.add( "--release" );
-        expectedArguments.add( "9" );
+        compilerConfiguration.setReleaseVersion("9");
+        expectedArguments.add("--release");
+        expectedArguments.add("9");
 
         // unshared table
-        expectedArguments.add( "-XDuseUnsharedTable=true" );
+        expectedArguments.add("-XDuseUnsharedTable=true");
 
-        internalTest( compilerConfiguration, expectedArguments, source);
+        internalTest(compilerConfiguration, expectedArguments, source);
     }
 
     @Test
-    public void testModulePath() throws Exception
-    {
+    public void testModulePath() throws Exception {
         List<String> expectedArguments = new ArrayList<>();
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
         // outputLocation
-        compilerConfiguration.setOutputLocation( "/output" );
-        expectedArguments.add( "-d" );
-        expectedArguments.add( new File( "/output" ).getAbsolutePath() );
+        compilerConfiguration.setOutputLocation("/output");
+        expectedArguments.add("-d");
+        expectedArguments.add(new File("/output").getAbsolutePath());
 
         // failOnWarning
-        compilerConfiguration.setModulepathEntries( Arrays.asList( "/repo/a/b/1.0/b-1.0.jar",
-                                                                   "/repo/c/d/1.0/d-1.0.jar" ) );
-        expectedArguments.add( "--module-path" );
-        expectedArguments.add( "/repo/a/b/1.0/b-1.0.jar" + File.pathSeparator + 
-                               "/repo/c/d/1.0/d-1.0.jar" + File.pathSeparator );
+        compilerConfiguration.setModulepathEntries(Arrays.asList("/repo/a/b/1.0/b-1.0.jar", "/repo/c/d/1.0/d-1.0.jar"));
+        expectedArguments.add("--module-path");
+        expectedArguments.add(
+                "/repo/a/b/1.0/b-1.0.jar" + File.pathSeparator + "/repo/c/d/1.0/d-1.0.jar" + File.pathSeparator);
 
         // default source + target
-        expectedArguments.add( "-target" );
-        expectedArguments.add( "1.1" );
-        expectedArguments.add( "-source" );
-        expectedArguments.add( "1.3" );
+        expectedArguments.add("-target");
+        expectedArguments.add("1.1");
+        expectedArguments.add("-source");
+        expectedArguments.add("1.3");
 
         // unshared table
-        expectedArguments.add( "-XDuseUnsharedTable=true" );
+        expectedArguments.add("-XDuseUnsharedTable=true");
 
-        internalTest( compilerConfiguration, expectedArguments );
+        internalTest(compilerConfiguration, expectedArguments);
     }
 
     @Test
-    public void testModuleVersion()
-    {
+    public void testModuleVersion() {
         List<String> expectedArguments = new ArrayList<>();
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
         // outputLocation
-        compilerConfiguration.setOutputLocation( "/output" );
-        expectedArguments.add( "-d" );
-        expectedArguments.add( new File( "/output" ).getAbsolutePath() );
+        compilerConfiguration.setOutputLocation("/output");
+        expectedArguments.add("-d");
+        expectedArguments.add(new File("/output").getAbsolutePath());
 
         // default source + target
-        expectedArguments.add( "-target" );
-        expectedArguments.add( "1.1" );
-        expectedArguments.add( "-source" );
-        expectedArguments.add( "1.3" );
+        expectedArguments.add("-target");
+        expectedArguments.add("1.1");
+        expectedArguments.add("-source");
+        expectedArguments.add("1.3");
 
         // module version
-        compilerConfiguration.setModuleVersion( "1.2.0-SNAPSHOT" );
-        expectedArguments.add( "--module-version" );
-        expectedArguments.add( "1.2.0-SNAPSHOT" );
+        compilerConfiguration.setModuleVersion("1.2.0-SNAPSHOT");
+        expectedArguments.add("--module-version");
+        expectedArguments.add("1.2.0-SNAPSHOT");
 
         // unshared table
-        expectedArguments.add( "-XDuseUnsharedTable=true" );
+        expectedArguments.add("-XDuseUnsharedTable=true");
 
-        internalTest( compilerConfiguration, expectedArguments );
+        internalTest(compilerConfiguration, expectedArguments);
     }
 
     @Test
-    public void testReleaseVersion()
-    {
+    public void testReleaseVersion() {
         List<String> expectedArguments = new ArrayList<>();
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
         // outputLocation
-        compilerConfiguration.setOutputLocation( "/output" );
-        expectedArguments.add( "-d" );
-        expectedArguments.add( new File( "/output" ).getAbsolutePath() );
+        compilerConfiguration.setOutputLocation("/output");
+        expectedArguments.add("-d");
+        expectedArguments.add(new File("/output").getAbsolutePath());
 
         // releaseVersion
-        compilerConfiguration.setReleaseVersion( "6" );
-        expectedArguments.add( "--release" );
-        expectedArguments.add( "6" );
+        compilerConfiguration.setReleaseVersion("6");
+        expectedArguments.add("--release");
+        expectedArguments.add("6");
 
         // unshared table
-        expectedArguments.add( "-XDuseUnsharedTable=true" );
+        expectedArguments.add("-XDuseUnsharedTable=true");
 
-        internalTest( compilerConfiguration, expectedArguments );
+        internalTest(compilerConfiguration, expectedArguments);
     }
 
     @Test
-    public void testFailOnWarning()
-    {
+    public void testFailOnWarning() {
         List<String> expectedArguments = new ArrayList<>();
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
         // outputLocation
-        compilerConfiguration.setOutputLocation( "/output" );
-        expectedArguments.add( "-d" );
-        expectedArguments.add( new File( "/output" ).getAbsolutePath() );
+        compilerConfiguration.setOutputLocation("/output");
+        expectedArguments.add("-d");
+        expectedArguments.add(new File("/output").getAbsolutePath());
 
         // failOnWarning
-        compilerConfiguration.setFailOnWarning( true );
-        expectedArguments.add( "-Werror" );
-        
+        compilerConfiguration.setFailOnWarning(true);
+        expectedArguments.add("-Werror");
+
         // default source + target
-        expectedArguments.add( "-target" );
-        expectedArguments.add( "1.1" );
-        expectedArguments.add( "-source" );
-        expectedArguments.add( "1.3" );
+        expectedArguments.add("-target");
+        expectedArguments.add("1.1");
+        expectedArguments.add("-source");
+        expectedArguments.add("1.3");
 
         // unshared table
-        expectedArguments.add( "-XDuseUnsharedTable=true" );
+        expectedArguments.add("-XDuseUnsharedTable=true");
 
-        internalTest( compilerConfiguration, expectedArguments );
+        internalTest(compilerConfiguration, expectedArguments);
     }
 
     @Test
-    public void testMultipleAddExports()
-    {
+    public void testMultipleAddExports() {
         List<String> expectedArguments = new ArrayList<>();
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
         // outputLocation
-        compilerConfiguration.setOutputLocation( "/output" );
-        expectedArguments.add( "-d" );
-        expectedArguments.add( new File( "/output" ).getAbsolutePath() );
+        compilerConfiguration.setOutputLocation("/output");
+        expectedArguments.add("-d");
+        expectedArguments.add(new File("/output").getAbsolutePath());
 
         // default source + target
-        expectedArguments.add( "-target" );
-        expectedArguments.add( "1.1" );
-        expectedArguments.add( "-source" );
-        expectedArguments.add( "1.3" );
+        expectedArguments.add("-target");
+        expectedArguments.add("1.1");
+        expectedArguments.add("-source");
+        expectedArguments.add("1.3");
 
         // add multiple --add-exports
-        compilerConfiguration.addCompilerCustomArgument( "--add-exports", "FROM-MOD/package1=OTHER-MOD" );
-        expectedArguments.add( "--add-exports" );
-        expectedArguments.add( "FROM-MOD/package1=OTHER-MOD" );
-        compilerConfiguration.addCompilerCustomArgument( "--add-exports", "FROM-MOD/package2=OTHER-MOD" );
-        expectedArguments.add( "--add-exports" );
-        expectedArguments.add( "FROM-MOD/package2=OTHER-MOD" );
+        compilerConfiguration.addCompilerCustomArgument("--add-exports", "FROM-MOD/package1=OTHER-MOD");
+        expectedArguments.add("--add-exports");
+        expectedArguments.add("FROM-MOD/package1=OTHER-MOD");
+        compilerConfiguration.addCompilerCustomArgument("--add-exports", "FROM-MOD/package2=OTHER-MOD");
+        expectedArguments.add("--add-exports");
+        expectedArguments.add("FROM-MOD/package2=OTHER-MOD");
 
         // unshared table
-        expectedArguments.add( "-XDuseUnsharedTable=true" );
+        expectedArguments.add("-XDuseUnsharedTable=true");
 
-        internalTest( compilerConfiguration, expectedArguments );
+        internalTest(compilerConfiguration, expectedArguments);
     }
 
     /* This test fails on Java 1.4. The multiple parameters of the same source file cause an error, as it is interpreted as a DuplicateClass
@@ -548,119 +539,116 @@ public abstract class AbstractJavacCompilerTest
     }
     */
 
-    private void populateArguments( CompilerConfiguration compilerConfiguration, List<String> expectedArguments,
-                                    boolean suppressSourceVersion, boolean suppressEncoding, boolean parameters )
-    {
+    private void populateArguments(
+            CompilerConfiguration compilerConfiguration,
+            List<String> expectedArguments,
+            boolean suppressSourceVersion,
+            boolean suppressEncoding,
+            boolean parameters) {
         // outputLocation
 
-        compilerConfiguration.setOutputLocation( "/output" );
+        compilerConfiguration.setOutputLocation("/output");
 
-        expectedArguments.add( "-d" );
+        expectedArguments.add("-d");
 
-        expectedArguments.add( new File( "/output" ).getAbsolutePath() );
+        expectedArguments.add(new File("/output").getAbsolutePath());
 
         // classpathEntires
 
         List<String> classpathEntries = new ArrayList<>();
 
-        classpathEntries.add( "/myjar1.jar" );
+        classpathEntries.add("/myjar1.jar");
 
-        classpathEntries.add( "/myjar2.jar" );
+        classpathEntries.add("/myjar2.jar");
 
-        compilerConfiguration.setClasspathEntries( classpathEntries );
+        compilerConfiguration.setClasspathEntries(classpathEntries);
 
-        expectedArguments.add( "-classpath" );
+        expectedArguments.add("-classpath");
 
-        expectedArguments.add( "/myjar1.jar" + PS + "/myjar2.jar" + PS );
+        expectedArguments.add("/myjar1.jar" + PS + "/myjar2.jar" + PS);
 
         // sourceRoots
 
         List<String> compileSourceRoots = new ArrayList<>();
 
-        compileSourceRoots.add( "/src/main/one" );
+        compileSourceRoots.add("/src/main/one");
 
-        compileSourceRoots.add( "/src/main/two" );
+        compileSourceRoots.add("/src/main/two");
 
-        compilerConfiguration.setSourceLocations( compileSourceRoots );
+        compilerConfiguration.setSourceLocations(compileSourceRoots);
 
-        expectedArguments.add( "-sourcepath" );
+        expectedArguments.add("-sourcepath");
 
-        expectedArguments.add( "/src/main/one" + PS + "/src/main/two" + PS );
+        expectedArguments.add("/src/main/one" + PS + "/src/main/two" + PS);
 
         // debug
 
-        compilerConfiguration.setDebug( true );
+        compilerConfiguration.setDebug(true);
 
-        if ( StringUtils.isNotEmpty( compilerConfiguration.getDebugLevel() ) )
-        {
-            expectedArguments.add( "-g:" + compilerConfiguration.getDebugLevel() );
-        }
-        else
-        {
-            expectedArguments.add( "-g" );
+        if (StringUtils.isNotEmpty(compilerConfiguration.getDebugLevel())) {
+            expectedArguments.add("-g:" + compilerConfiguration.getDebugLevel());
+        } else {
+            expectedArguments.add("-g");
         }
 
         // parameters
 
-        compilerConfiguration.setParameters( true );
+        compilerConfiguration.setParameters(true);
 
-        if (parameters)
-        {
-            expectedArguments.add( "-parameters" );
+        if (parameters) {
+            expectedArguments.add("-parameters");
         }
-        
+
         // showDeprecation
 
-        compilerConfiguration.setShowDeprecation( true );
+        compilerConfiguration.setShowDeprecation(true);
 
-        expectedArguments.add( "-deprecation" );
+        expectedArguments.add("-deprecation");
 
         // targetVersion
 
-        compilerConfiguration.setTargetVersion( "1.3" );
+        compilerConfiguration.setTargetVersion("1.3");
 
-        expectedArguments.add( "-target" );
+        expectedArguments.add("-target");
 
-        expectedArguments.add( "1.3" );
+        expectedArguments.add("1.3");
 
         // sourceVersion
 
-        compilerConfiguration.setSourceVersion( "1.3" );
+        compilerConfiguration.setSourceVersion("1.3");
 
-        if ( !suppressSourceVersion )
-        {
-            expectedArguments.add( "-source" );
+        if (!suppressSourceVersion) {
+            expectedArguments.add("-source");
 
-            expectedArguments.add( "1.3" );
+            expectedArguments.add("1.3");
         }
 
         // sourceEncoding
 
-        compilerConfiguration.setSourceEncoding( "iso-8859-1" );
+        compilerConfiguration.setSourceEncoding("iso-8859-1");
 
-        if ( !suppressEncoding )
-        {
-            expectedArguments.add( "-encoding" );
+        if (!suppressEncoding) {
+            expectedArguments.add("-encoding");
 
-            expectedArguments.add( "iso-8859-1" );
+            expectedArguments.add("iso-8859-1");
         }
 
         // customerCompilerArguments
 
         Map<String, String> customerCompilerArguments = new LinkedHashMap<>();
 
-        customerCompilerArguments.put( "arg1", null );
+        customerCompilerArguments.put("arg1", null);
 
-        customerCompilerArguments.put( "foo", "bar" );
+        customerCompilerArguments.put("foo", "bar");
 
-        compilerConfiguration.setCustomCompilerArgumentsAsMap( customerCompilerArguments );
+        compilerConfiguration.setCustomCompilerArgumentsAsMap(customerCompilerArguments);
 
-        expectedArguments.add( "arg1" );
+        expectedArguments.add("arg1");
 
-        expectedArguments.add( "foo" );
+        expectedArguments.add("foo");
 
-        expectedArguments.add( "bar" );
+        expectedArguments.add("bar");
 
-        expectedArguments.add( "-XDuseUnsharedTable=true" );
+        expectedArguments.add("-XDuseUnsharedTable=true");
     }
 }

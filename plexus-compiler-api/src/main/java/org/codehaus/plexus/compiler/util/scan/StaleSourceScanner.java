@@ -16,20 +16,18 @@ package org.codehaus.plexus.compiler.util.scan;
  * limitations under the License.
  */
 
-import org.codehaus.plexus.compiler.util.scan.mapping.SourceMapping;
-
 import java.io.File;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.codehaus.plexus.compiler.util.scan.mapping.SourceMapping;
+
 /**
  * @author jdcasey
  */
-public class StaleSourceScanner
-    extends AbstractSourceInclusionScanner
-{
+public class StaleSourceScanner extends AbstractSourceInclusionScanner {
     private final long lastUpdatedWithinMsecs;
 
     private final Set<String> sourceIncludes;
@@ -40,18 +38,15 @@ public class StaleSourceScanner
     //
     // ----------------------------------------------------------------------
 
-    public StaleSourceScanner()
-    {
-        this( 0, Collections.singleton( "**/*" ), Collections.emptySet() );
+    public StaleSourceScanner() {
+        this(0, Collections.singleton("**/*"), Collections.emptySet());
     }
 
-    public StaleSourceScanner( long lastUpdatedWithinMsecs )
-    {
-        this( lastUpdatedWithinMsecs, Collections.singleton( "**/*" ), Collections.emptySet() );
+    public StaleSourceScanner(long lastUpdatedWithinMsecs) {
+        this(lastUpdatedWithinMsecs, Collections.singleton("**/*"), Collections.emptySet());
     }
 
-    public StaleSourceScanner( long lastUpdatedWithinMsecs, Set<String> sourceIncludes, Set<String> sourceExcludes )
-    {
+    public StaleSourceScanner(long lastUpdatedWithinMsecs, Set<String> sourceIncludes, Set<String> sourceExcludes) {
         this.lastUpdatedWithinMsecs = lastUpdatedWithinMsecs;
 
         this.sourceIncludes = sourceIncludes;
@@ -63,38 +58,31 @@ public class StaleSourceScanner
     // SourceInclusionScanner Implementation
     // ----------------------------------------------------------------------
 
-    public Set<File> getIncludedSources( File sourceDir, File targetDir )
-        throws InclusionScanException
-    {
+    public Set<File> getIncludedSources(File sourceDir, File targetDir) throws InclusionScanException {
         List<SourceMapping> srcMappings = getSourceMappings();
 
-        if ( srcMappings.isEmpty() )
-        {
+        if (srcMappings.isEmpty()) {
             return Collections.emptySet();
         }
 
-        String[] potentialIncludes = scanForSources( sourceDir, sourceIncludes, sourceExcludes );
+        String[] potentialIncludes = scanForSources(sourceDir, sourceIncludes, sourceExcludes);
 
         Set<File> matchingSources = new HashSet<>();
 
-        for ( String path : potentialIncludes )
-        {
-            File sourceFile = new File( sourceDir, path );
+        for (String path : potentialIncludes) {
+            File sourceFile = new File(sourceDir, path);
 
             staleSourceFileTesting:
-            for ( SourceMapping mapping : srcMappings )
-            {
-                Set<File> targetFiles = mapping.getTargetFiles( targetDir, path );
+            for (SourceMapping mapping : srcMappings) {
+                Set<File> targetFiles = mapping.getTargetFiles(targetDir, path);
 
                 // never include files that don't have corresponding target mappings.
                 // the targets don't have to exist on the filesystem, but the
                 // mappers must tell us to look for them.
-                for ( File targetFile : targetFiles )
-                {
-                    if ( !targetFile.exists() || ( targetFile.lastModified() + lastUpdatedWithinMsecs
-                        < sourceFile.lastModified() ) )
-                    {
-                        matchingSources.add( sourceFile );
+                for (File targetFile : targetFiles) {
+                    if (!targetFile.exists()
+                            || (targetFile.lastModified() + lastUpdatedWithinMsecs < sourceFile.lastModified())) {
+                        matchingSources.add(sourceFile);
                         break staleSourceFileTesting;
                     }
                 }

@@ -23,40 +23,33 @@ package org.codehaus.plexus.compiler.util.scan.mapping;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import java.io.File;
+import java.util.Collections;
+import java.util.Set;
 
 import org.codehaus.plexus.compiler.util.scan.InclusionScanException;
-
-import java.util.Set;
-import java.util.Collections;
-import java.io.File;
 
 /**
  * Maps a set of input files to a single output file.
  *
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  */
-public class SingleTargetSourceMapping
-    implements SourceMapping
-{
+public class SingleTargetSourceMapping implements SourceMapping {
     private final String sourceSuffix;
 
     private final String outputFile;
 
-    public SingleTargetSourceMapping( String sourceSuffix, String outputFile )
-    {
+    public SingleTargetSourceMapping(String sourceSuffix, String outputFile) {
         this.sourceSuffix = sourceSuffix;
 
         this.outputFile = outputFile;
     }
 
-    public Set<File> getTargetFiles( File targetDir, String source )
-        throws InclusionScanException
-    {
-        if ( !source.endsWith( sourceSuffix ) )
-        {
+    public Set<File> getTargetFiles(File targetDir, String source) throws InclusionScanException {
+        if (!source.endsWith(sourceSuffix)) {
             return Collections.emptySet();
         }
 
-        return Collections.singleton( new File( targetDir, outputFile ) );
+        return Collections.singleton(new File(targetDir, outputFile));
     }
 }

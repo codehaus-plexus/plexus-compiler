@@ -23,7 +23,6 @@ package org.codehaus.plexus.compiler.eclipse;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
@@ -32,47 +31,41 @@ import java.util.Map;
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  */
-public class SourceCodeLocator
-{
+public class SourceCodeLocator {
     private List<String> sourceRoots;
 
     private Map<String, File> cache;
 
-    public SourceCodeLocator( List<String> sourceRoots )
-    {
+    public SourceCodeLocator(List<String> sourceRoots) {
         this.sourceRoots = sourceRoots;
 
         cache = new HashMap<>();
     }
 
-    public File findSourceCodeForClass( String className )
-    {
-        File f = cache.get( className );
+    public File findSourceCodeForClass(String className) {
+        File f = cache.get(className);
 
-        if ( f != null )
-        {
+        if (f != null) {
             return f;
         }
 
-        String sourceName = className.replace( '.', System.getProperty( "file.separator" ).charAt( 0 ) );
+        String sourceName =
+                className.replace('.', System.getProperty("file.separator").charAt(0));
 
         sourceName += ".java";
 
-        f = findInRoots( sourceName );
+        f = findInRoots(sourceName);
 
-        cache.put( className, f );
+        cache.put(className, f);
 
         return f;
     }
 
-    private File findInRoots( String s )
-    {
-        for ( String root : sourceRoots )
-        {
-            File f = new File( root, s );
+    private File findInRoots(String s) {
+        for (String root : sourceRoots) {
+            File f = new File(root, s);
 
-            if ( f.exists() )
-            {
+            if (f.exists()) {
                 return f;
             }
         }

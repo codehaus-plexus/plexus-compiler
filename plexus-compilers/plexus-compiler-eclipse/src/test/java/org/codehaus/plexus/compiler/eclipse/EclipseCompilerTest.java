@@ -23,89 +23,77 @@ package org.codehaus.plexus.compiler.eclipse;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.codehaus.plexus.compiler.AbstractCompilerTest;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
-import java.util.Arrays;
-import java.util.Collection;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.startsWith;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>
  */
-public class EclipseCompilerTest
-    extends AbstractCompilerTest
-{
+public class EclipseCompilerTest extends AbstractCompilerTest {
 
     @BeforeEach
-    public void setUp()
-    {
-        setCompilerDebug( true );
-        setCompilerDeprecationWarnings( true );
+    public void setUp() {
+        setCompilerDebug(true);
+        setCompilerDeprecationWarnings(true);
     }
 
     @Override
-    protected String getRoleHint()
-    {
+    protected String getRoleHint() {
         return "eclipse";
     }
 
     @Override
-    protected int expectedErrors()
-    {
+    protected int expectedErrors() {
         return 4;
     }
 
     @Override
-    protected int expectedWarnings()
-    {
+    protected int expectedWarnings() {
         return 2;
     }
 
     @Override
-    protected Collection<String> expectedOutputFiles()
-    {
-        return Arrays.asList("org/codehaus/foo/Deprecation.class", "org/codehaus/foo/ExternalDeps.class",
-                "org/codehaus/foo/Person.class", "org/codehaus/foo/ReservedWord.class");
+    protected Collection<String> expectedOutputFiles() {
+        return Arrays.asList(
+                "org/codehaus/foo/Deprecation.class",
+                "org/codehaus/foo/ExternalDeps.class",
+                "org/codehaus/foo/Person.class",
+                "org/codehaus/foo/ReservedWord.class");
     }
 
     // The test is fairly meaningless as we can not validate anything
     @Test
-    public void testCustomArgument()
-        throws Exception
-    {
+    public void testCustomArgument() throws Exception {
         CompilerConfiguration compilerConfig = createMinimalCompilerConfig();
 
-        compilerConfig.addCompilerCustomArgument( "-key", "value" );
+        compilerConfig.addCompilerCustomArgument("-key", "value");
 
-        getCompiler().performCompile( compilerConfig );
+        getCompiler().performCompile(compilerConfig);
     }
 
     @Test
-    public void testInitializeWarningsForPropertiesArgument()
-    {
+    public void testInitializeWarningsForPropertiesArgument() {
         CompilerConfiguration compilerConfig = createMinimalCompilerConfig();
 
-        compilerConfig.addCompilerCustomArgument( "-properties", "file_does_not_exist" );
+        compilerConfig.addCompilerCustomArgument("-properties", "file_does_not_exist");
 
         IllegalArgumentException e =
-            assertThrows( IllegalArgumentException.class, () -> getCompiler().performCompile( compilerConfig ) );
-        assertThat( "Message must start with 'Properties file'" , e.getMessage(), startsWith( "Properties file" ));
+                assertThrows(IllegalArgumentException.class, () -> getCompiler().performCompile(compilerConfig));
+        assertThat("Message must start with 'Properties file'", e.getMessage(), startsWith("Properties file"));
     }
 
-    private CompilerConfiguration createMinimalCompilerConfig()
-    {
+    private CompilerConfiguration createMinimalCompilerConfig() {
         CompilerConfiguration compilerConfig = new CompilerConfiguration();
-        compilerConfig.setOutputLocation( "target/" + getRoleHint() + "/classes-CustomArgument" );
+        compilerConfig.setOutputLocation("target/" + getRoleHint() + "/classes-CustomArgument");
         return compilerConfig;
     }
-
 }

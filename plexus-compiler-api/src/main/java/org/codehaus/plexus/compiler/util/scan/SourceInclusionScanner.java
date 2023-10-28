@@ -14,17 +14,16 @@ package org.codehaus.plexus.compiler.util.scan;
  * the License.
  */
 
-import org.codehaus.plexus.compiler.util.scan.mapping.SourceMapping;
-
 import java.io.File;
 import java.util.Set;
+
+import org.codehaus.plexus.compiler.util.scan.mapping.SourceMapping;
 
 /**
  * @author jdcasey
  */
-public interface SourceInclusionScanner
-{
-    void addSourceMapping( SourceMapping sourceMapping );
+public interface SourceInclusionScanner {
+    void addSourceMapping(SourceMapping sourceMapping);
 
     /**
      * @param sourceDir
@@ -32,6 +31,5 @@ public interface SourceInclusionScanner
      * @return <code>Set</code> of <code>File</code> objects
      * @throws InclusionScanException
      */
-    Set<File> getIncludedSources( File sourceDir, File targetDir )
-        throws InclusionScanException;
+    Set<File> getIncludedSources(File sourceDir, File targetDir) throws InclusionScanException;
 }

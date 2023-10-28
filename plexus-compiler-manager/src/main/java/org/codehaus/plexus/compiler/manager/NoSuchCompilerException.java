@@ -27,20 +27,16 @@ package org.codehaus.plexus.compiler.manager;
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  */
-public class NoSuchCompilerException
-    extends Exception
-{
+public class NoSuchCompilerException extends Exception {
     private final String compilerId;
 
-    public NoSuchCompilerException( String compilerId )
-    {
-        super( "No such compiler '" + compilerId + "'." );
+    public NoSuchCompilerException(String compilerId) {
+        super("No such compiler '" + compilerId + "'.");
 
         this.compilerId = compilerId;
     }
 
-    public String getCompilerId()
-    {
+    public String getCompilerId() {
         return compilerId;
     }
 }

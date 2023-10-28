@@ -23,26 +23,22 @@ package org.codehaus.plexus.compiler.manager;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import javax.inject.Inject;
 
 import org.codehaus.plexus.testing.PlexusTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import javax.inject.Inject;
-
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  */
 @PlexusTest
-public class CompilerManagerTest
-{
+public class CompilerManagerTest {
     @Inject
     private CompilerManager compilerManager;
 
     @Test
-    public void testBasic()
-        throws Exception
-    {
-        Assertions.assertThrows(NoSuchCompilerException.class, () -> compilerManager.getCompiler( "foo" ));
+    public void testBasic() throws Exception {
+        Assertions.assertThrows(NoSuchCompilerException.class, () -> compilerManager.getCompiler("foo"));
     }
 }

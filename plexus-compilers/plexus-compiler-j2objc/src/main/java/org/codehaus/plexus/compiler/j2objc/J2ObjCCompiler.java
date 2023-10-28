@@ -16,6 +16,19 @@ package org.codehaus.plexus.compiler.j2objc;
  * limitations under the License.
  */
 
+import javax.inject.Named;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 import org.codehaus.plexus.compiler.AbstractCompiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerException;
@@ -30,18 +43,6 @@ import org.codehaus.plexus.util.cli.Commandline;
 import org.codehaus.plexus.util.cli.StreamConsumer;
 import org.codehaus.plexus.util.cli.WriterStreamConsumer;
 
-import javax.inject.Named;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
 /**
  * A plexus compiler which use J2ObjC . It is derived from the CSharpCompiler to
  * compile with J2ObjC.
@@ -50,10 +51,8 @@ import java.util.Map;
  *         Ma&icirc;tre</a>
  *
  */
-@Named( "j2objc" )
-public class J2ObjCCompiler
-    extends AbstractCompiler
-{
+@Named("j2objc")
+public class J2ObjCCompiler extends AbstractCompiler {
 
     private static final String X_BOOTCLASSPATH = "Xbootclasspath";
 
@@ -73,24 +72,54 @@ public class J2ObjCCompiler
      * Put the arguments of j2objc who takes one dash inside an array, in order
      * the check the command line.
      */
-    private static final List<String> ONE_DASH_ARGS = Arrays.asList(
-        new String[]{ "-pluginpath", "-pluginoptions", "-t", "-Xno-jsni-warnings", "-sourcepath", "-classpath", "-d",
-            "-encoding", "-g", "-q", "-v", "-Werror", "-h", "-use-arc", "-use-reference-counting", "-x" } );
+    private static final List<String> ONE_DASH_ARGS = Arrays.asList(new String[] {
+        "-pluginpath",
+        "-pluginoptions",
+        "-t",
+        "-Xno-jsni-warnings",
+        "-sourcepath",
+        "-classpath",
+        "-d",
+        "-encoding",
+        "-g",
+        "-q",
+        "-v",
+        "-Werror",
+        "-h",
+        "-use-arc",
+        "-use-reference-counting",
+        "-x"
+    });
 
     /**
      * Put the command line arguments with 2 dashes inside an array, in order
      * the check the command line and build it.
      */
-    private static final List<String> TWO_DASH_ARGS = Arrays.asList(
-        new String[]{ "--build-closure", "--dead-code-report", "--doc-comments", "--no-extract-unsequenced",
-            "--generate-deprecated", "--mapping", "--no-class-methods", "--no-final-methods-functions",
-            "--no-hide-private-members", "--no-package-directories", "--prefix", "--prefixes", "--preserve-full-paths",
-            "--strip-gwt-incompatible", "--strip-reflection", "--segmented-headers", "--timing-info", "--quiet",
-            "--verbose", "--help" } );
+    private static final List<String> TWO_DASH_ARGS = Arrays.asList(new String[] {
+        "--build-closure",
+        "--dead-code-report",
+        "--doc-comments",
+        "--no-extract-unsequenced",
+        "--generate-deprecated",
+        "--mapping",
+        "--no-class-methods",
+        "--no-final-methods-functions",
+        "--no-hide-private-members",
+        "--no-package-directories",
+        "--prefix",
+        "--prefixes",
+        "--preserve-full-paths",
+        "--strip-gwt-incompatible",
+        "--strip-reflection",
+        "--segmented-headers",
+        "--timing-info",
+        "--quiet",
+        "--verbose",
+        "--help"
+    });
 
-    public J2ObjCCompiler()
-    {
-        super( CompilerOutputStyle.ONE_OUTPUT_FILE_PER_INPUT_FILE, ".java", null, null );
+    public J2ObjCCompiler() {
+        super(CompilerOutputStyle.ONE_OUTPUT_FILE_PER_INPUT_FILE, ".java", null, null);
     }
 
     // ----------------------------------------------------------------------
@@ -98,59 +127,46 @@ public class J2ObjCCompiler
     // ----------------------------------------------------------------------
 
     @Override
-    public String getCompilerId()
-    {
+    public String getCompilerId() {
         return "j2objc";
     }
 
-    public boolean canUpdateTarget( CompilerConfiguration configuration )
-        throws CompilerException
-    {
+    public boolean canUpdateTarget(CompilerConfiguration configuration) throws CompilerException {
         return false;
     }
 
-    public CompilerResult performCompile( CompilerConfiguration config )
-        throws CompilerException
-    {
-        File destinationDir = new File( config.getOutputLocation() );
-        if ( !destinationDir.exists() )
-        {
+    public CompilerResult performCompile(CompilerConfiguration config) throws CompilerException {
+        File destinationDir = new File(config.getOutputLocation());
+        if (!destinationDir.exists()) {
             destinationDir.mkdirs();
         }
 
-        config.setSourceFiles( null );
+        config.setSourceFiles(null);
 
-        String[] sourceFiles = J2ObjCCompiler.getSourceFiles( config );
+        String[] sourceFiles = J2ObjCCompiler.getSourceFiles(config);
 
-        if ( sourceFiles.length == 0 )
-        {
-            return new CompilerResult().success( true );
+        if (sourceFiles.length == 0) {
+            return new CompilerResult().success(true);
         }
 
-        logCompiling( sourceFiles, config );
+        logCompiling(sourceFiles, config);
 
-        String[] args = buildCompilerArguments( config, sourceFiles );
+        String[] args = buildCompilerArguments(config, sourceFiles);
 
         List<CompilerMessage> messages;
 
-        if ( config.isFork() )
-        {
-            messages =
-                compileOutOfProcess( config.getWorkingDirectory(), config.getBuildDirectory(), findExecutable( config ),
-                                     args );
-        }
-        else
-        {
-            throw new CompilerException( "This compiler doesn't support in-process compilation." );
+        if (config.isFork()) {
+            messages = compileOutOfProcess(
+                    config.getWorkingDirectory(), config.getBuildDirectory(), findExecutable(config), args);
+        } else {
+            throw new CompilerException("This compiler doesn't support in-process compilation.");
         }
 
-        return new CompilerResult().compilerMessages( messages );
+        return new CompilerResult().compilerMessages(messages);
     }
 
-    public String[] createCommandLine( CompilerConfiguration config )
-        throws CompilerException
-    {
-        return buildCompilerArguments( config, J2ObjCCompiler.getSourceFiles( config ) );
+    public String[] createCommandLine(CompilerConfiguration config) throws CompilerException {
+        return buildCompilerArguments(config, J2ObjCCompiler.getSourceFiles(config));
     }
 
     /**
@@ -160,12 +176,10 @@ public class J2ObjCCompiler
      * @param config
      * @return the List<String> of args
      */
-    private String findExecutable( CompilerConfiguration config )
-    {
+    private String findExecutable(CompilerConfiguration config) {
         String executable = config.getExecutable();
 
-        if ( !StringUtils.isEmpty( executable ) )
-        {
+        if (!StringUtils.isEmpty(executable)) {
             return executable;
         }
 
@@ -184,152 +198,121 @@ public class J2ObjCCompiler
      * @return The List<String> to give to the command line tool
      * @throws CompilerException
      */
-    private String[] buildCompilerArguments( CompilerConfiguration config, String[] sourceFiles )
-        throws CompilerException
-    {
+    private String[] buildCompilerArguments(CompilerConfiguration config, String[] sourceFiles)
+            throws CompilerException {
         /*
-		 * j2objc --help Usage: j2objc <options> <source files>
-		 */
+         * j2objc --help Usage: j2objc <options> <source files>
+         */
         List<String> args = new ArrayList<>();
         Map<String, String> compilerArguments = config.getCustomCompilerArgumentsAsMap();
 
         // Verbose
-        if ( config.isVerbose() )
-        {
-            args.add( "-v" );
+        if (config.isVerbose()) {
+            args.add("-v");
         }
 
         // Destination/output directory
-        args.add( "-d" );
-        args.add( config.getOutputLocation() );
+        args.add("-d");
+        args.add(config.getOutputLocation());
 
-        if ( !config.getClasspathEntries().isEmpty() )
-        {
+        if (!config.getClasspathEntries().isEmpty()) {
             List<String> classpath = new ArrayList<>();
-            for ( String element : config.getClasspathEntries() )
-            {
-                File f = new File( element );
-                classpath.add( f.getAbsolutePath() );
+            for (String element : config.getClasspathEntries()) {
+                File f = new File(element);
+                classpath.add(f.getAbsolutePath());
 
-                classpath.add( element );
+                classpath.add(element);
             }
-            args.add( "-classpath" );
-            args.add( StringUtils.join( classpath.toArray(), File.pathSeparator ) );
+            args.add("-classpath");
+            args.add(StringUtils.join(classpath.toArray(), File.pathSeparator));
         }
 
-        if ( config.isVerbose() )
-        {
-            System.out.println( "Args: " );
+        if (config.isVerbose()) {
+            System.out.println("Args: ");
         }
 
-        for ( String k : compilerArguments.keySet() )
-        {
-            if ( config.isVerbose() )
-            {
-                System.out.println( k + "=" + compilerArguments.get( k ) );
+        for (String k : compilerArguments.keySet()) {
+            if (config.isVerbose()) {
+                System.out.println(k + "=" + compilerArguments.get(k));
             }
-            String v = compilerArguments.get( k );
-            if ( J_FLAG.equals( k ) )
-            {
-                args.add( J_FLAG + v );
-            }
-            else if ( X_BOOTCLASSPATH.equals( k ) )
-            {
-                args.add( X_BOOTCLASSPATH + ":" + v );
-            }
-            else if ( BATCH_SIZE.equals( k ) )
-            {
-                args.add( "-" + BATCH_SIZE + "=" + v );
-            }
-            else
-            {
-                if ( TWO_DASH_ARGS.contains( k ) )
-                {
-                    args.add( "-" + k );
+            String v = compilerArguments.get(k);
+            if (J_FLAG.equals(k)) {
+                args.add(J_FLAG + v);
+            } else if (X_BOOTCLASSPATH.equals(k)) {
+                args.add(X_BOOTCLASSPATH + ":" + v);
+            } else if (BATCH_SIZE.equals(k)) {
+                args.add("-" + BATCH_SIZE + "=" + v);
+            } else {
+                if (TWO_DASH_ARGS.contains(k)) {
+                    args.add("-" + k);
+                } else if (ONE_DASH_ARGS.contains(k)) {
+                    args.add(k);
+                } else {
+                    throw new IllegalArgumentException("The argument " + k + " isnt't a flag recognized by J2ObjC.");
                 }
-                else if ( ONE_DASH_ARGS.contains( k ) )
-                {
-                    args.add( k );
-                }
-                else
-                {
-                    throw new IllegalArgumentException( "The argument " + k + " isnt't a flag recognized by J2ObjC." );
-                }
-                if ( v != null )
-                {
-                    args.add( v );
+                if (v != null) {
+                    args.add(v);
                 }
             }
         }
 
-        for ( String sourceFile : sourceFiles )
-        {
-            args.add( sourceFile );
+        for (String sourceFile : sourceFiles) {
+            args.add(sourceFile);
         }
 
-        return args.toArray( new String[args.size()] );
+        return args.toArray(new String[args.size()]);
     }
 
-    private List<CompilerMessage> compileOutOfProcess( File workingDirectory, File target, String executable,
-                                                       String[] args )
-        throws CompilerException
-    {
+    private List<CompilerMessage> compileOutOfProcess(
+            File workingDirectory, File target, String executable, String[] args) throws CompilerException {
 
         Commandline cli = new Commandline();
 
-        cli.setWorkingDirectory( workingDirectory.getAbsolutePath() );
+        cli.setWorkingDirectory(workingDirectory.getAbsolutePath());
 
-        cli.setExecutable( executable );
+        cli.setExecutable(executable);
 
-        cli.addArguments( args );
+        cli.addArguments(args);
 
         Writer stringWriter = new StringWriter();
 
-        StreamConsumer out = new WriterStreamConsumer( stringWriter );
+        StreamConsumer out = new WriterStreamConsumer(stringWriter);
 
-        StreamConsumer err = new WriterStreamConsumer( stringWriter );
+        StreamConsumer err = new WriterStreamConsumer(stringWriter);
 
         int returnCode;
 
         List<CompilerMessage> messages;
 
-        try
-        {
-            returnCode = CommandLineUtils.executeCommandLine( cli, out, err );
+        try {
+            returnCode = CommandLineUtils.executeCommandLine(cli, out, err);
 
-            messages = parseCompilerOutput( new BufferedReader( new StringReader( stringWriter.toString() ) ) );
-        }
-        catch ( CommandLineException | IOException e )
-        {
-            throw new CompilerException( "Error while executing the external compiler.", e );
+            messages = parseCompilerOutput(new BufferedReader(new StringReader(stringWriter.toString())));
+        } catch (CommandLineException | IOException e) {
+            throw new CompilerException("Error while executing the external compiler.", e);
         }
 
-        if ( returnCode != 0 && messages.isEmpty() )
-        {
+        if (returnCode != 0 && messages.isEmpty()) {
             // TODO: exception?
-            messages.add( new CompilerMessage(
-                "Failure executing the compiler, but could not parse the error:" + EOL + stringWriter.toString(),
-                Kind.ERROR ) );
+            messages.add(new CompilerMessage(
+                    "Failure executing the compiler, but could not parse the error:" + EOL + stringWriter.toString(),
+                    Kind.ERROR));
         }
 
         return messages;
     }
 
-    public static List<CompilerMessage> parseCompilerOutput( BufferedReader bufferedReader )
-        throws IOException
-    {
+    public static List<CompilerMessage> parseCompilerOutput(BufferedReader bufferedReader) throws IOException {
         List<CompilerMessage> messages = new ArrayList<>();
 
         String line = bufferedReader.readLine();
         System.out.println("start output");
-        while ( line != null )
-        {
+        while (line != null) {
             System.out.println(line);
-            CompilerMessage compilerError = DefaultJ2ObjCCompilerParser.parseLine( line );
+            CompilerMessage compilerError = DefaultJ2ObjCCompilerParser.parseLine(line);
 
-            if ( compilerError != null )
-            {
-                messages.add( compilerError );
+            if (compilerError != null) {
+                messages.add(compilerError);
             }
 
             line = bufferedReader.readLine();
@@ -337,5 +320,4 @@ public class J2ObjCCompiler
         System.out.println("end output");
         return messages;
     }
-
 }

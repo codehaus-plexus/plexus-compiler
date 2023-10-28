@@ -23,14 +23,13 @@ package org.codehaus.plexus.compiler;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import javax.inject.Inject;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
-
-import javax.inject.Inject;
 
 import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.util.FileUtils;
@@ -47,30 +46,26 @@ import static org.hamcrest.Matchers.notNullValue;
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  */
 @PlexusTest
-public abstract class AbstractCompilerTckTest
-{
+public abstract class AbstractCompilerTckTest {
     private static final String EOL = System.lineSeparator();
 
     protected String roleHint;
-    
+
     private TestInfo testInfo;
-    
+
     @Inject
     private Map<String, Compiler> compilers;
 
     @BeforeEach
-    final void setup( TestInfo testInfo )
-    {
+    final void setup(TestInfo testInfo) {
         this.testInfo = testInfo;
     }
 
     @Test
-    public void testDeprecation()
-        throws Exception
-    {
-        File foo = new File( getSrc(), "Foo.java" );
+    public void testDeprecation() throws Exception {
+        File foo = new File(getSrc(), "Foo.java");
 
-        writeFileWithDeprecatedApi( foo, "Foo" );
+        writeFileWithDeprecatedApi(foo, "Foo");
 
         // ----------------------------------------------------------------------
         //
@@ -78,34 +73,32 @@ public abstract class AbstractCompilerTckTest
 
         CompilerConfiguration configuration = new CompilerConfiguration();
 
-        configuration.setShowDeprecation( true );
+        configuration.setShowDeprecation(true);
 
-        configuration.addSourceLocation( getSrc().getAbsolutePath() );
+        configuration.addSourceLocation(getSrc().getAbsolutePath());
 
-        List<CompilerMessage> result = compile( configuration );
+        List<CompilerMessage> result = compile(configuration);
 
         // ----------------------------------------------------------------------
         //
         // ----------------------------------------------------------------------
 
-        assertThat( result.size(), is( 1 ) );
+        assertThat(result.size(), is(1));
 
-        CompilerMessage error = result.get( 0 );
+        CompilerMessage error = result.get(0);
 
-        assertThat( error.isError(), is( false ) );
+        assertThat(error.isError(), is(false));
 
-        assertThat( error.getMessage(), containsString( "Date" ) );
+        assertThat(error.getMessage(), containsString("Date"));
 
-        assertThat( error.getMessage(), containsString( "deprecated" ) );
+        assertThat(error.getMessage(), containsString("deprecated"));
     }
 
     @Test
-    public void testWarning()
-        throws Exception
-    {
-        File foo = new File( getSrc(), "Foo.java" );
+    public void testWarning() throws Exception {
+        File foo = new File(getSrc(), "Foo.java");
 
-        writeFileWithWarning( foo, "Foo" );
+        writeFileWithWarning(foo, "Foo");
 
         // ----------------------------------------------------------------------
         //
@@ -113,111 +106,101 @@ public abstract class AbstractCompilerTckTest
 
         CompilerConfiguration configuration = new CompilerConfiguration();
 
-        configuration.setShowWarnings( true );
+        configuration.setShowWarnings(true);
 
-        configuration.addSourceLocation( getSrc().getAbsolutePath() );
+        configuration.addSourceLocation(getSrc().getAbsolutePath());
 
-        List<CompilerMessage> result = compile( configuration );
+        List<CompilerMessage> result = compile(configuration);
 
         // ----------------------------------------------------------------------
         //
         // ----------------------------------------------------------------------
 
-        assertThat( result.size(), is( 1 ) );
+        assertThat(result.size(), is(1));
 
-        CompilerMessage error = result.get( 0 );
+        CompilerMessage error = result.get(0);
 
-        assertThat( error.isError(), is( false ) );
+        assertThat(error.isError(), is(false));
 
-        assertThat( error.getMessage(), containsString( "finally block does not complete normally" ) );
+        assertThat(error.getMessage(), containsString("finally block does not complete normally"));
     }
-    
-    protected List<CompilerMessage> compile( CompilerConfiguration configuration )
-        throws Exception
-    {
+
+    protected List<CompilerMessage> compile(CompilerConfiguration configuration) throws Exception {
         // ----------------------------------------------------------------------
         // Set up configuration
         // ----------------------------------------------------------------------
 
         File compilerOutput = getCompilerOutput();
 
-        if ( compilerOutput.exists() )
-        {
-            FileUtils.deleteDirectory( compilerOutput );
+        if (compilerOutput.exists()) {
+            FileUtils.deleteDirectory(compilerOutput);
         }
 
-        configuration.setOutputLocation( compilerOutput.getAbsolutePath() );
+        configuration.setOutputLocation(compilerOutput.getAbsolutePath());
 
         // ----------------------------------------------------------------------
         // Compile!
         // ----------------------------------------------------------------------
 
-        List<CompilerMessage> result = getCompiler().performCompile( configuration ).getCompilerMessages();
+        List<CompilerMessage> result =
+                getCompiler().performCompile(configuration).getCompilerMessages();
 
-        assertThat( result, notNullValue() );
+        assertThat(result, notNullValue());
 
         return result;
     }
 
     private Compiler getCompiler() {
-        return compilers.get( roleHint );
-    }
-    
-    private File getCompilerOutput()
-    {
-        return new File( "target/compiler-output/" + testInfo.getTestMethod().map( Method::getName ).orElseThrow( null ) );
+        return compilers.get(roleHint);
     }
 
-    private File getSrc()
-    {
-        return new File( "target/compiler-src/" + testInfo.getTestMethod().map( Method::getName ).orElseThrow( null ) );
+    private File getCompilerOutput() {
+        return new File("target/compiler-output/"
+                + testInfo.getTestMethod().map(Method::getName).orElseThrow(null));
     }
 
-    protected void writeFileWithDeprecatedApi( File path, String className )
-        throws IOException
-    {
+    private File getSrc() {
+        return new File("target/compiler-src/"
+                + testInfo.getTestMethod().map(Method::getName).orElseThrow(null));
+    }
+
+    protected void writeFileWithDeprecatedApi(File path, String className) throws IOException {
         File parent = path.getParentFile();
 
-        if ( !parent.exists() )
-        {
-            assertThat( parent.mkdirs(), is( true ) );
+        if (!parent.exists()) {
+            assertThat(parent.mkdirs(), is(true));
         }
 
-        String source = "import java.util.Date;" + EOL +
-            "" + EOL +
-            "public class " + className + "" + EOL +
-            "{" + EOL +
-            "    private static Date date = new Date( \"foo\" );" + EOL +
-            "    static " + EOL +
-            "    { " + EOL +
-            "        Date date = " + className + ".date; " + EOL +
-            "        Date date2 = date; " + EOL +
-            "        date = date2; " + EOL +
-            "    }" + EOL +
-            "}";
+        String source = "import java.util.Date;" + EOL + ""
+                + EOL + "public class "
+                + className + "" + EOL + "{"
+                + EOL + "    private static Date date = new Date( \"foo\" );"
+                + EOL + "    static "
+                + EOL + "    { "
+                + EOL + "        Date date = "
+                + className + ".date; " + EOL + "        Date date2 = date; "
+                + EOL + "        date = date2; "
+                + EOL + "    }"
+                + EOL + "}";
 
-        FileUtils.fileWrite( path.getAbsolutePath(), source );
+        FileUtils.fileWrite(path.getAbsolutePath(), source);
     }
 
-    protected void writeFileWithWarning( File path, String className )
-        throws IOException
-    {
+    protected void writeFileWithWarning(File path, String className) throws IOException {
         File parent = path.getParentFile();
 
-        if ( !parent.exists() )
-        {
-            assertThat( parent.mkdirs(), is( true ) );
+        if (!parent.exists()) {
+            assertThat(parent.mkdirs(), is(true));
         }
 
-        String source = "public class " + className + "" + EOL +
-            "{" + EOL +
-            "    public void foo()" + EOL +
-            "    {" + EOL +
-            "        try{ throw new java.io.IOException(); }" + EOL +
-            "        finally { return; }" + EOL +
-            "    }" + EOL +
-            "}";
+        String source = "public class " + className + "" + EOL + "{"
+                + EOL + "    public void foo()"
+                + EOL + "    {"
+                + EOL + "        try{ throw new java.io.IOException(); }"
+                + EOL + "        finally { return; }"
+                + EOL + "    }"
+                + EOL + "}";
 
-        FileUtils.fileWrite( path.getAbsolutePath(), source );
+        FileUtils.fileWrite(path.getAbsolutePath(), source);
     }
 }

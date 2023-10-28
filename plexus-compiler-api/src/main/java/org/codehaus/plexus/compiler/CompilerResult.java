@@ -24,12 +24,11 @@ import java.util.List;
 /**
  * The result returned from a compiling language processor (aka compiler), possibly including
  * some messages.
- * 
+ *
  * @author Olivier Lamy
  * @since 2.0
  */
-public class CompilerResult
-{
+public class CompilerResult {
     private boolean success;
 
     private List<CompilerMessage> compilerMessages;
@@ -37,56 +36,47 @@ public class CompilerResult
     /**
      * Constructs a successful compiler result with no messages.
      */
-    public CompilerResult()
-    {
+    public CompilerResult() {
         this.success = true;
     }
 
     /**
      * Constructs a compiler result.
-     * 
+     *
      * @param success if the compiler process was successful or not
      * @param compilerMessages a list of messages from the compiler process
      */
-    public CompilerResult( boolean success, List<CompilerMessage> compilerMessages )
-    {
+    public CompilerResult(boolean success, List<CompilerMessage> compilerMessages) {
         this.success = success;
         this.compilerMessages = compilerMessages;
     }
 
-    public boolean isSuccess()
-    {
+    public boolean isSuccess() {
         return success;
     }
 
-    public void setSuccess( boolean success )
-    {
+    public void setSuccess(boolean success) {
         this.success = success;
     }
 
-    public CompilerResult success( boolean success )
-    {
-        this.setSuccess( success );
+    public CompilerResult success(boolean success) {
+        this.setSuccess(success);
         return this;
     }
 
-    public List<CompilerMessage> getCompilerMessages()
-    {
-        if ( compilerMessages == null )
-        {
+    public List<CompilerMessage> getCompilerMessages() {
+        if (compilerMessages == null) {
             this.compilerMessages = new ArrayList<>();
         }
         return compilerMessages;
     }
 
-    public void setCompilerMessages( List<CompilerMessage> compilerMessages )
-    {
+    public void setCompilerMessages(List<CompilerMessage> compilerMessages) {
         this.compilerMessages = compilerMessages;
     }
 
-    public CompilerResult compilerMessages( List<CompilerMessage> compilerMessages )
-    {
-        this.setCompilerMessages( compilerMessages );
+    public CompilerResult compilerMessages(List<CompilerMessage> compilerMessages) {
+        this.setCompilerMessages(compilerMessages);
         return this;
     }
 }

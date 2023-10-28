@@ -23,16 +23,13 @@ package org.codehaus.plexus.compiler.manager;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 import org.codehaus.plexus.compiler.Compiler;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  */
-public interface CompilerManager
-{
+public interface CompilerManager {
     String ROLE = CompilerManager.class.getName();
 
-    Compiler getCompiler( String compilerId )
-        throws NoSuchCompilerException;
+    Compiler getCompiler(String compilerId) throws NoSuchCompilerException;
 }

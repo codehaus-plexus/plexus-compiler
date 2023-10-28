@@ -23,51 +23,42 @@ package org.codehaus.plexus.compiler.util.scan;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-import org.codehaus.plexus.compiler.util.scan.mapping.SourceMapping;
-
 import java.io.File;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.codehaus.plexus.compiler.util.scan.mapping.SourceMapping;
+
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  */
-public class SimpleSourceInclusionScanner
-    extends AbstractSourceInclusionScanner
-{
+public class SimpleSourceInclusionScanner extends AbstractSourceInclusionScanner {
     private final Set<String> sourceIncludes;
 
     private final Set<String> sourceExcludes;
 
-    public SimpleSourceInclusionScanner( Set<String> sourceIncludes, Set<String> sourceExcludes )
-    {
+    public SimpleSourceInclusionScanner(Set<String> sourceIncludes, Set<String> sourceExcludes) {
         this.sourceIncludes = sourceIncludes;
 
         this.sourceExcludes = sourceExcludes;
     }
 
-    public Set<File> getIncludedSources( File sourceDir, File targetDir )
-        throws InclusionScanException
-    {
+    public Set<File> getIncludedSources(File sourceDir, File targetDir) throws InclusionScanException {
         List<SourceMapping> srcMappings = getSourceMappings();
 
-        if ( srcMappings.isEmpty() )
-        {
+        if (srcMappings.isEmpty()) {
             return Collections.emptySet();
         }
 
-        String[] potentialSources = scanForSources( sourceDir, sourceIncludes, sourceExcludes );
+        String[] potentialSources = scanForSources(sourceDir, sourceIncludes, sourceExcludes);
 
-        Set<File> matchingSources = new HashSet<>( potentialSources != null ? potentialSources.length : 0 );
+        Set<File> matchingSources = new HashSet<>(potentialSources != null ? potentialSources.length : 0);
 
-        if ( potentialSources != null )
-        {
-            for ( String potentialSource : potentialSources )
-            {
-                matchingSources.add( new File( sourceDir, potentialSource ) );
+        if (potentialSources != null) {
+            for (String potentialSource : potentialSources) {
+                matchingSources.add(new File(sourceDir, potentialSource));
             }
         }
 

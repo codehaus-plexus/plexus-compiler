@@ -23,15 +23,14 @@ package org.codehaus.plexus.compiler.j2objc;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-import org.hamcrest.io.FileMatchers;
-import org.codehaus.plexus.compiler.CompilerConfiguration;
-import org.junit.jupiter.api.Test;
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.codehaus.plexus.compiler.CompilerConfiguration;
+import org.hamcrest.io.FileMatchers;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -39,30 +38,26 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * j2objc must be in the PATH
  * @author lmaitre
  */
-public class J2ObjCCompilerTest
-{
+public class J2ObjCCompilerTest {
 
     @Test
-    public void testJ2ObjCCompiler()
-        throws Exception
-    {
+    public void testJ2ObjCCompiler() throws Exception {
         J2ObjCCompiler comp = new J2ObjCCompiler();
         Map<String, String> customCompilerArguments = new HashMap<>();
-        customCompilerArguments.put( "-use-arc", null );
-        customCompilerArguments.put( "-sourcepath", "src/test/resources" );
+        customCompilerArguments.put("-use-arc", null);
+        customCompilerArguments.put("-sourcepath", "src/test/resources");
         CompilerConfiguration cc = new CompilerConfiguration();
-        cc.setOutputLocation( "target/generated/objective-c" );
-        cc.setSourceLocations( Arrays.asList( new String[]{ "src/test/resources" } ) );
-        cc.setWorkingDirectory( new File( "." ) );
-        cc.setFork( true );
-        cc.setVerbose( true );
-        cc.setCustomCompilerArgumentsAsMap( customCompilerArguments );
+        cc.setOutputLocation("target/generated/objective-c");
+        cc.setSourceLocations(Arrays.asList(new String[] {"src/test/resources"}));
+        cc.setWorkingDirectory(new File("."));
+        cc.setFork(true);
+        cc.setVerbose(true);
+        cc.setCustomCompilerArgumentsAsMap(customCompilerArguments);
 
-        comp.performCompile( cc );
-        File f = new File( "target/generated/objective-c/de/test/App.h" );
+        comp.performCompile(cc);
+        File f = new File("target/generated/objective-c/de/test/App.h");
         assertThat("file not exists:" + f, f, FileMatchers.anExistingFile());
-        f = new File( "target/generated/objective-c/de/test/App.m" );
+        f = new File("target/generated/objective-c/de/test/App.m");
         assertThat("file not exists:" + f, f, FileMatchers.anExistingFile());
     }
-
 }

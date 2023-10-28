@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,8 +26,8 @@
   <scm>
     <connection>${scm.url}</connection>
     <developerConnection>${scm.url}</developerConnection>
-    <url>http://github.com/codehaus-plexus/plexus-compiler/tree/${project.scm.tag}/</url>
     <tag>HEAD</tag>
+    <url>http://github.com/codehaus-plexus/plexus-compiler/tree/${project.scm.tag}/</url>
   </scm>
   <issueManagement>
     <system>github</system>
@@ -96,9 +95,9 @@
       <dependency>
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
+        <version>${jupiter.version}</version>
         <type>pom</type>
         <scope>import</scope>
-        <version>${jupiter.version}</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>

@@ -40,7 +40,7 @@
       <activation>
         <os>
           <family>!mac</family>
-        </os>	
+        </os>
       </activation>
       <build>
         <plugins>
