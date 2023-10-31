@@ -30,5 +30,5 @@ jobs:
       jdk-matrix: '["11", "17", "21"]'
       jdk-distribution-matrix: '["zulu", "temurin", "microsoft", "liberica", "corretto"]'
       os-matrix: '["ubuntu-latest","windows-latest", "macOS-latest"]'
-      maven_args: 'install javadoc:javadoc -e -B -V -fae -Pno-tests-if-not-on-osx'
+      maven_args: 'verify javadoc:javadoc -e -B -V -fae -Pno-tests-if-not-on-osx'
 
