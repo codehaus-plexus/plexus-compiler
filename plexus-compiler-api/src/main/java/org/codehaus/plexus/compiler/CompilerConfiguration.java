@@ -688,14 +688,17 @@ public class CompilerConfiguration {
                 params.add("debug");
             }
         }
-        if (isOptimize()) {
-            params.add("optimize");
-        }
         if (isVerbose()) {
             params.add("verbose");
         }
         if (isShowDeprecation()) {
             params.add("deprecation");
+        }
+        if (isParameters()) {
+            params.add("parameters");
+        }
+        if (isEnablePreview()) {
+            params.add("preview");
         }
 
         // target bytecode options: release or target, module-path
