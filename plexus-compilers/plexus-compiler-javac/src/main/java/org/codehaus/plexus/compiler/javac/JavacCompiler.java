@@ -58,12 +58,13 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.StringTokenizer;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.codehaus.plexus.compiler.AbstractCompiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
@@ -102,9 +103,9 @@ public class JavacCompiler extends AbstractCompiler {
 
     private static final String JAVAC_CLASSNAME = "com.sun.tools.javac.Main";
 
-    private static volatile Class<?> JAVAC_CLASS;
+    private volatile Class<?> javacClass;
 
-    private final List<Class<?>> javaccClasses = new CopyOnWriteArrayList<>();
+    private final Deque<Class<?>> javacClasses = new ConcurrentLinkedDeque<>();
 
     @Inject
     private InProcessCompiler inProcessCompiler;
@@ -955,7 +956,7 @@ public class JavacCompiler extends AbstractCompiler {
     private void releaseJavaccClass(Class<?> javaccClass, CompilerConfiguration compilerConfiguration) {
         if (compilerConfiguration.getCompilerReuseStrategy()
                 == CompilerConfiguration.CompilerReuseStrategy.ReuseCreated) {
-            javaccClasses.add(javaccClass);
+            javacClasses.add(javaccClass);
         }
     }
 
@@ -966,32 +967,28 @@ public class JavacCompiler extends AbstractCompiler {
      * @throws CompilerException if the class has not been found.
      */
     private Class<?> getJavacClass(CompilerConfiguration compilerConfiguration) throws CompilerException {
-        Class<?> c = null;
+        Class<?> c;
         switch (compilerConfiguration.getCompilerReuseStrategy()) {
             case AlwaysNew:
                 return createJavacClass();
             case ReuseCreated:
-                synchronized (javaccClasses) {
-                    if (javaccClasses.size() > 0) {
-                        c = javaccClasses.get(0);
-                        javaccClasses.remove(c);
-                        return c;
-                    }
+                c = javacClasses.poll();
+                if (c == null) {
+                    c = createJavacClass();
                 }
-                c = createJavacClass();
                 return c;
             case ReuseSame:
             default:
-                c = JavacCompiler.JAVAC_CLASS;
-                if (c != null) {
-                    return c;
-                }
-                synchronized (JavacCompiler.LOCK) {
-                    if (c == null) {
-                        JavacCompiler.JAVAC_CLASS = c = createJavacClass();
+                c = javacClass;
+                if (c == null) {
+                    synchronized (this) {
+                        c = javacClass;
+                        if (c == null) {
+                            javacClass = c = createJavacClass();
+                        }
                     }
-                    return c;
                 }
+                return c;
         }
     }
 
