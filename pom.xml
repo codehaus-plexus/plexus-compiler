@@ -45,9 +45,9 @@
     <javaVersion>8</javaVersion>
     <redirectTestOutputToFile>true</redirectTestOutputToFile>
     <project.build.outputTimestamp>2023-12-20T20:25:35Z</project.build.outputTimestamp>
-    <jupiter.version>5.10.1</jupiter.version>
     <aspectj.version>1.9.21</aspectj.version>
-    <maven.version>3.5.4</maven.version>
+    <mavenVersion>3.6.3</mavenVersion>
+    <minimalMavenBuildVersion>${mavenVersion}</minimalMavenBuildVersion>
     <errorprone.version>2.24.1</errorprone.version>
     <trimStackTrace>false</trimStackTrace>
     <preparationGoals>clean install</preparationGoals>
@@ -99,7 +99,7 @@
       <dependency>
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
-        <version>${jupiter.version}</version>
+        <version>${junit5Version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -136,7 +136,7 @@
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-xml</artifactId>
-        <version>4.0.1</version>
+        <version>3.0.0</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
