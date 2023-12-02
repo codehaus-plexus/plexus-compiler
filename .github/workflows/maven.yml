@@ -16,19 +16,20 @@
 # under the License.
 
 name: GitHub CI
-on:
-  push:
-  pull_request:
+
+on: [push, pull_request]
 
 jobs:
-
   build:
     name: Build it
     uses: codehaus-plexus/.github/.github/workflows/maven.yml@master
     with:
-      jdk-fast-fail-build: '21'
-      jdk-matrix: '["11", "17", "21"]'
+      matrix-exclude: '[  {"jdk": "8"} ]'
       jdk-distribution-matrix: '["zulu", "temurin", "microsoft", "liberica", "corretto"]'
-      os-matrix: '["ubuntu-latest","windows-latest", "macOS-latest"]'
       maven_args: 'verify javadoc:javadoc -e -B -V -fae'
 
+  deploy:
+    name: Deploy
+    needs: build
+    uses: codehaus-plexus/.github/.github/workflows/maven-deploy.yml@master
+    secrets: inherit
