@@ -42,8 +42,7 @@
 
   <properties>
     <scm.url>scm:git:git@github.com:codehaus-plexus/plexus-compiler.git</scm.url>
-    <javaVersion>11</javaVersion>
-    <maven.compiler.release>8</maven.compiler.release>
+    <javaVersion>8</javaVersion>
     <redirectTestOutputToFile>true</redirectTestOutputToFile>
     <project.build.outputTimestamp>2022-12-17T17:23:49Z</project.build.outputTimestamp>
     <jupiter.version>5.10.1</jupiter.version>
@@ -190,13 +189,6 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
         <version>3.4.1</version>
-        <dependencies>
-          <dependency>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>extra-enforcer-rules</artifactId>
-            <version>1.7.0</version>
-          </dependency>
-        </dependencies>
         <executions>
           <execution>
             <id>enforce-java</id>
@@ -206,24 +198,10 @@
             <configuration>
               <rules>
                 <requireJavaVersion>
-                  <version>[11,)</version>
-                  <message>[ERROR] OLD JDK [${java.version}] in use. This projects requires JDK 11 or newer</message>
+                  <version>[17,)</version>
+                  <message>[ERROR] OLD JDK [${java.version}] in use. This projects requires JDK 17 or newer</message>
                 </requireJavaVersion>
               </rules>
-            </configuration>
-          </execution>
-          <execution>
-            <id>enforce-bytecode-version</id>
-            <goals>
-              <goal>enforce</goal>
-            </goals>
-            <configuration>
-              <rules>
-                <enforceBytecodeVersion>
-                  <maxJdkVersion>${maven.compiler.release}</maxJdkVersion>
-                </enforceBytecodeVersion>
-              </rules>
-              <fail>true</fail>
             </configuration>
           </execution>
         </executions>

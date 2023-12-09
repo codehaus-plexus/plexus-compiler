@@ -15,7 +15,7 @@
 
   <properties>
     <junit.version>4.13.2</junit.version>
-    <maven.compiler.release>11</maven.compiler.release>
+    <javaVersion>17</javaVersion>
     <maven.deploy.skip>true</maven.deploy.skip>
   </properties>
 
