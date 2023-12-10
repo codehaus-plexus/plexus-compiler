@@ -14,7 +14,7 @@
   <description>Eclipse Compiler support for Plexus Compiler component.</description>
 
   <properties>
-    <maven.compiler.release>11</maven.compiler.release>
+    <javaVersion>17</javaVersion>
   </properties>
 
   <dependencies>

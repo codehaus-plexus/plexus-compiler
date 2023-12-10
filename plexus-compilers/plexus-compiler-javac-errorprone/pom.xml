@@ -16,7 +16,7 @@
     See https://errorprone.info</description>
 
   <properties>
-    <maven.compiler.release>11</maven.compiler.release>
+    <javaVersion>11</javaVersion>
   </properties>
 
   <dependencies>
