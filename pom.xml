@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>plexus-compiler</artifactId>
-  <version>2.13.1-SNAPSHOT</version>
+  <version>2.14.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Plexus Compiler</name>
@@ -44,7 +44,7 @@
     <scm.url>scm:git:git@github.com:codehaus-plexus/plexus-compiler.git</scm.url>
     <javaVersion>8</javaVersion>
     <redirectTestOutputToFile>true</redirectTestOutputToFile>
-    <project.build.outputTimestamp>2022-12-17T17:23:49Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2023-12-11T10:09:57Z</project.build.outputTimestamp>
     <jupiter.version>5.10.1</jupiter.version>
     <aspectj.version>1.9.21</aspectj.version>
     <maven.version>3.5.4</maven.version>
