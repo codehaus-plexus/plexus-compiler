@@ -1,1 +1,0 @@
-typeSearchIndex = [{"l":"All Classes","url":"allclasses-index.html"},{"p":"org.codehaus.plexus.compiler.j2objc","l":"DefaultJ2ObjCCompilerParser"},{"p":"org.codehaus.plexus.compiler.j2objc","l":"J2ObjCCompiler"}]

@@ -1,1 +1,1 @@
-typeSearchIndex = [{"l":"All Classes","url":"allclasses-index.html"},{"p":"org.codehaus.plexus.compiler.csharp","l":"CSharpCompiler"},{"p":"org.codehaus.plexus.compiler.csharp","l":"DefaultCSharpCompilerParser"},{"p":"org.codehaus.plexus.compiler.csharp","l":"JarUtil"}]
+typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"org.codehaus.plexus.compiler.csharp","l":"CSharpCompiler"},{"p":"org.codehaus.plexus.compiler.csharp","l":"DefaultCSharpCompilerParser"},{"p":"org.codehaus.plexus.compiler.csharp","l":"JarUtil"}];updateSearchResults();

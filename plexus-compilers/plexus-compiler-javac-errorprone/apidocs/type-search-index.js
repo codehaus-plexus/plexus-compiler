@@ -1,1 +1,1 @@
-typeSearchIndex = [{"l":"All Classes","url":"allclasses-index.html"},{"p":"org.codehaus.plexus.compiler.javac.errorprone","l":"JavacCompilerWithErrorProne.CompilerInvoker"},{"p":"org.codehaus.plexus.compiler.javac.errorprone","l":"JavacCompilerWithErrorProne"}]
+typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"org.codehaus.plexus.compiler.javac.errorprone","l":"JavacCompilerWithErrorProne.CompilerInvoker"},{"p":"org.codehaus.plexus.compiler.javac.errorprone","l":"JavacCompilerWithErrorProne"}];updateSearchResults();
