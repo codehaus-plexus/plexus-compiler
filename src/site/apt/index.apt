@@ -38,7 +38,7 @@ Plexus Compiler
 
   * {{{./plexus-compilers/}<<<plexus-compilers>>>}}: different compilers
 
-    * {{{./plexus-compilers/plexus-compiler-aspectj/}<<<plexus-compiler-aspectj>>>}}: AspectJ compiler, <<requires>> <<<JDK 11+>>>
+    * {{{./plexus-compilers/plexus-compiler-aspectj/}<<<plexus-compiler-aspectj>>>}}: AspectJ compiler, <<requires>> <<<JDK 17+>>> and <<<Maven 3.9.6+>>>
 
     * {{{./plexus-compilers/plexus-compiler-csharp/}<<<plexus-compiler-csharp>>>}}: C#/Mono compiler, <<requires>> <<<JDK 8+>>>
 
