@@ -46,7 +46,7 @@
     <redirectTestOutputToFile>true</redirectTestOutputToFile>
     <project.build.outputTimestamp>2022-12-17T17:23:49Z</project.build.outputTimestamp>
     <jupiter.version>5.10.1</jupiter.version>
-    <aspectj.version>1.9.19</aspectj.version>
+    <aspectj.version>1.9.21</aspectj.version>
     <maven.version>3.5.4</maven.version>
     <errorprone.version>2.23.0</errorprone.version>
     <trimStackTrace>false</trimStackTrace>
