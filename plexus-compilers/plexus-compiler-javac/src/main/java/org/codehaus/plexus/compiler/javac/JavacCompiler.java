@@ -154,8 +154,8 @@ public class JavacCompiler extends AbstractCompiler {
                 try {
                     executable = getJavacExecutable();
                 } catch (IOException e) {
-                    if (log.isWarnEnabled()) {
-                        log.warn("Unable to autodetect 'javac' path, using 'javac' from the environment.");
+                    if (getLog().isWarnEnabled()) {
+                        getLog().warn("Unable to autodetect 'javac' path, using 'javac' from the environment.");
                     }
                     executable = "javac";
                 }
@@ -541,7 +541,7 @@ public class JavacCompiler extends AbstractCompiler {
 
         List<CompilerMessage> messages;
 
-        if (log.isDebugEnabled()) {
+        if (getLog().isDebugEnabled()) {
             String debugFileName = StringUtils.isEmpty(config.getDebugFileName()) ? "javac" : config.getDebugFileName();
 
             File commandLineFile = new File(
@@ -555,8 +555,8 @@ public class JavacCompiler extends AbstractCompiler {
                     Runtime.getRuntime().exec(new String[] {"chmod", "a+x", commandLineFile.getAbsolutePath()});
                 }
             } catch (IOException e) {
-                if (log.isWarnEnabled()) {
-                    log.warn("Unable to write '" + commandLineFile.getName() + "' debug script file", e);
+                if (getLog().isWarnEnabled()) {
+                    getLog().warn("Unable to write '" + commandLineFile.getName() + "' debug script file", e);
                 }
             }
         }
@@ -587,8 +587,8 @@ public class JavacCompiler extends AbstractCompiler {
         final Thread thread = Thread.currentThread();
         final ClassLoader contextClassLoader = thread.getContextClassLoader();
         thread.setContextClassLoader(javacClass.getClassLoader());
-        if (log.isDebugEnabled()) {
-            log.debug("ttcl changed run compileInProcessWithProperClassloader");
+        if (getLog().isDebugEnabled()) {
+            getLog().debug("ttcl changed run compileInProcessWithProperClassloader");
         }
         try {
             return compileInProcessWithProperClassloader(javacClass, args);
@@ -880,7 +880,7 @@ public class JavacCompiler extends AbstractCompiler {
         PrintWriter writer = null;
         try {
             File tempFile;
-            if (log.isDebugEnabled()) {
+            if (getLog().isDebugEnabled()) {
                 tempFile = File.createTempFile(JavacCompiler.class.getName(), "arguments", new File(outputDirectory));
             } else {
                 tempFile = File.createTempFile(JavacCompiler.class.getName(), "arguments");
