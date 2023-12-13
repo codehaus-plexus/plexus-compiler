@@ -39,7 +39,10 @@ import org.slf4j.LoggerFactory;
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  */
 public abstract class AbstractCompiler implements Compiler {
-    protected Logger log = LoggerFactory.getLogger(getClass());
+    private final Logger log = LoggerFactory.getLogger(getClass());
+
+    private final org.codehaus.plexus.logging.Logger plexusLogger;
+
     protected static final String EOL = System.lineSeparator();
 
     protected static final String PS = System.getProperty("path.separator");
@@ -68,6 +71,25 @@ public abstract class AbstractCompiler implements Compiler {
         this.outputFileEnding = outputFileEnding;
 
         this.outputFile = outputFile;
+
+        this.plexusLogger = new PlexusLoggerWrapper(log);
+    }
+
+    /**
+     *
+     * @return a Logger
+     */
+    protected Logger getLog() {
+        return log;
+    }
+
+    /**
+     * @return a plexus Logger
+     * @deprecated please use {@link #getLog()}
+     */
+    @Deprecated
+    protected org.codehaus.plexus.logging.Logger getLogger() {
+        return plexusLogger;
     }
 
     // ----------------------------------------------------------------------

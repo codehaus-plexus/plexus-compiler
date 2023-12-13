@@ -229,12 +229,12 @@ public class EclipseJavaCompiler extends AbstractCompiler {
             JavaCompiler compiler = getEcj();
             boolean success = false;
             if (compiler != null) {
-                log.debug("Using JSR-199 EclipseCompiler");
+                getLog().debug("Using JSR-199 EclipseCompiler");
                 // ECJ JSR-199 compiles against the latest Java version it supports if no source
                 // version is given explicitly. BatchCompiler uses 1.3 as default. So check
                 // whether a source version is specified, and if not supply 1.3 explicitly.
                 if (!haveSourceOrReleaseArgument(args)) {
-                    log.debug("ecj: no source level nor release specified, defaulting to Java 1.3");
+                    getLog().debug("ecj: no source level nor release specified, defaulting to Java 1.3");
                     args.add("-source");
                     args.add("1.3");
                 }
@@ -286,17 +286,17 @@ public class EclipseJavaCompiler extends AbstractCompiler {
                     try {
                         charset = Charset.forName(encoding);
                     } catch (IllegalCharsetNameException | UnsupportedCharsetException e) {
-                        log.warn("ecj: invalid or unsupported character set '" + encoding + "', using default");
+                        getLog().warn("ecj: invalid or unsupported character set '" + encoding + "', using default");
                         // charset remains null
                     }
                 }
                 if (charset == null) {
                     charset = Charset.defaultCharset();
                 }
-                if (log.isDebugEnabled()) {
-                    log.debug("ecj: using character set " + charset.displayName());
-                    log.debug("ecj command line: " + args);
-                    log.debug("ecj input source files: " + allSources);
+                if (getLog().isDebugEnabled()) {
+                    getLog().debug("ecj: using character set " + charset.displayName());
+                    getLog().debug("ecj command line: " + args);
+                    getLog().debug("ecj input source files: " + allSources);
                 }
 
                 try (StandardJavaFileManager manager =
@@ -308,19 +308,19 @@ public class EclipseJavaCompiler extends AbstractCompiler {
                 } catch (RuntimeException e) {
                     throw new EcjFailureException(e.getLocalizedMessage());
                 }
-                log.debug(sw.toString());
+                getLog().debug(sw.toString());
             } else {
                 // Use the BatchCompiler and send all errors to xml temp file.
                 File errorF = null;
                 try {
                     errorF = File.createTempFile("ecjerr-", ".xml");
-                    log.debug("Using legacy BatchCompiler; error file " + errorF);
+                    getLog().debug("Using legacy BatchCompiler; error file " + errorF);
 
                     args.add("-log");
                     args.add(errorF.toString());
                     args.addAll(allSources);
 
-                    log.debug("ecj command line: " + args);
+                    getLog().debug("ecj command line: " + args);
 
                     success = BatchCompiler.compile(
                             args.toArray(new String[args.size()]), devNull, devNull, new CompilationProgress() {
@@ -341,7 +341,7 @@ public class EclipseJavaCompiler extends AbstractCompiler {
                                 @Override
                                 public void worked(int i, int i1) {}
                             });
-                    log.debug(sw.toString());
+                    getLog().debug(sw.toString());
 
                     if (errorF.length() < 80) {
                         throw new EcjFailureException(sw.toString());
@@ -524,7 +524,7 @@ public class EclipseJavaCompiler extends AbstractCompiler {
                 }
             }
         }
-        log.debug("Cannot find org.eclipse.jdt.internal.compiler.tool.EclipseCompiler");
+        getLog().debug("Cannot find org.eclipse.jdt.internal.compiler.tool.EclipseCompiler");
         return null;
     }
 
@@ -618,7 +618,7 @@ public class EclipseJavaCompiler extends AbstractCompiler {
         }
 
         if (versionSpec.equals("1.9")) {
-            log.warn("Version 9 should be specified as 9, not 1.9");
+            getLog().warn("Version 9 should be specified as 9, not 1.9");
             return "9";
         }
         return versionSpec;
