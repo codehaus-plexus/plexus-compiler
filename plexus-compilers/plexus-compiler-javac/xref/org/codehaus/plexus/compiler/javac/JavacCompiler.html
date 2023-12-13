@@ -162,8 +162,8 @@
 <a class="jxr_linenumber" name="L154" href="#L154">154</a>                 <strong class="jxr_keyword">try</strong> {
 <a class="jxr_linenumber" name="L155" href="#L155">155</a>                     executable = getJavacExecutable();
 <a class="jxr_linenumber" name="L156" href="#L156">156</a>                 } <strong class="jxr_keyword">catch</strong> (IOException e) {
-<a class="jxr_linenumber" name="L157" href="#L157">157</a>                     <strong class="jxr_keyword">if</strong> (log.isWarnEnabled()) {
-<a class="jxr_linenumber" name="L158" href="#L158">158</a>                         log.warn(<span class="jxr_string">"Unable to autodetect 'javac' path, using 'javac' from the environment."</span>);
+<a class="jxr_linenumber" name="L157" href="#L157">157</a>                     <strong class="jxr_keyword">if</strong> (getLog().isWarnEnabled()) {
+<a class="jxr_linenumber" name="L158" href="#L158">158</a>                         getLog().warn(<span class="jxr_string">"Unable to autodetect 'javac' path, using 'javac' from the environment."</span>);
 <a class="jxr_linenumber" name="L159" href="#L159">159</a>                     }
 <a class="jxr_linenumber" name="L160" href="#L160">160</a>                     executable = <span class="jxr_string">"javac"</span>;
 <a class="jxr_linenumber" name="L161" href="#L161">161</a>                 }
@@ -549,7 +549,7 @@
 <a class="jxr_linenumber" name="L541" href="#L541">541</a> 
 <a class="jxr_linenumber" name="L542" href="#L542">542</a>         List&lt;CompilerMessage&gt; messages;
 <a class="jxr_linenumber" name="L543" href="#L543">543</a> 
-<a class="jxr_linenumber" name="L544" href="#L544">544</a>         <strong class="jxr_keyword">if</strong> (log.isDebugEnabled()) {
+<a class="jxr_linenumber" name="L544" href="#L544">544</a>         <strong class="jxr_keyword">if</strong> (getLog().isDebugEnabled()) {
 <a class="jxr_linenumber" name="L545" href="#L545">545</a>             String debugFileName = StringUtils.isEmpty(config.getDebugFileName()) ? <span class="jxr_string">"javac"</span> : config.getDebugFileName();
 <a class="jxr_linenumber" name="L546" href="#L546">546</a> 
 <a class="jxr_linenumber" name="L547" href="#L547">547</a>             File commandLineFile = <strong class="jxr_keyword">new</strong> File(
@@ -563,8 +563,8 @@
 <a class="jxr_linenumber" name="L555" href="#L555">555</a>                     Runtime.getRuntime().exec(<strong class="jxr_keyword">new</strong> String[] {<span class="jxr_string">"chmod"</span>, <span class="jxr_string">"a+x"</span>, commandLineFile.getAbsolutePath()});
 <a class="jxr_linenumber" name="L556" href="#L556">556</a>                 }
 <a class="jxr_linenumber" name="L557" href="#L557">557</a>             } <strong class="jxr_keyword">catch</strong> (IOException e) {
-<a class="jxr_linenumber" name="L558" href="#L558">558</a>                 <strong class="jxr_keyword">if</strong> (log.isWarnEnabled()) {
-<a class="jxr_linenumber" name="L559" href="#L559">559</a>                     log.warn(<span class="jxr_string">"Unable to write '"</span> + commandLineFile.getName() + <span class="jxr_string">"' debug script file"</span>, e);
+<a class="jxr_linenumber" name="L558" href="#L558">558</a>                 <strong class="jxr_keyword">if</strong> (getLog().isWarnEnabled()) {
+<a class="jxr_linenumber" name="L559" href="#L559">559</a>                     getLog().warn(<span class="jxr_string">"Unable to write '"</span> + commandLineFile.getName() + <span class="jxr_string">"' debug script file"</span>, e);
 <a class="jxr_linenumber" name="L560" href="#L560">560</a>                 }
 <a class="jxr_linenumber" name="L561" href="#L561">561</a>             }
 <a class="jxr_linenumber" name="L562" href="#L562">562</a>         }
@@ -595,8 +595,8 @@
 <a class="jxr_linenumber" name="L587" href="#L587">587</a>         <strong class="jxr_keyword">final</strong> Thread thread = Thread.currentThread();
 <a class="jxr_linenumber" name="L588" href="#L588">588</a>         <strong class="jxr_keyword">final</strong> ClassLoader contextClassLoader = thread.getContextClassLoader();
 <a class="jxr_linenumber" name="L589" href="#L589">589</a>         thread.setContextClassLoader(javacClass.getClassLoader());
-<a class="jxr_linenumber" name="L590" href="#L590">590</a>         <strong class="jxr_keyword">if</strong> (log.isDebugEnabled()) {
-<a class="jxr_linenumber" name="L591" href="#L591">591</a>             log.debug(<span class="jxr_string">"ttcl changed run compileInProcessWithProperClassloader"</span>);
+<a class="jxr_linenumber" name="L590" href="#L590">590</a>         <strong class="jxr_keyword">if</strong> (getLog().isDebugEnabled()) {
+<a class="jxr_linenumber" name="L591" href="#L591">591</a>             getLog().debug(<span class="jxr_string">"ttcl changed run compileInProcessWithProperClassloader"</span>);
 <a class="jxr_linenumber" name="L592" href="#L592">592</a>         }
 <a class="jxr_linenumber" name="L593" href="#L593">593</a>         <strong class="jxr_keyword">try</strong> {
 <a class="jxr_linenumber" name="L594" href="#L594">594</a>             <strong class="jxr_keyword">return</strong> compileInProcessWithProperClassloader(javacClass, args);
@@ -888,7 +888,7 @@
 <a class="jxr_linenumber" name="L880" href="#L880">880</a>         PrintWriter writer = <strong class="jxr_keyword">null</strong>;
 <a class="jxr_linenumber" name="L881" href="#L881">881</a>         <strong class="jxr_keyword">try</strong> {
 <a class="jxr_linenumber" name="L882" href="#L882">882</a>             File tempFile;
-<a class="jxr_linenumber" name="L883" href="#L883">883</a>             <strong class="jxr_keyword">if</strong> (log.isDebugEnabled()) {
+<a class="jxr_linenumber" name="L883" href="#L883">883</a>             <strong class="jxr_keyword">if</strong> (getLog().isDebugEnabled()) {
 <a class="jxr_linenumber" name="L884" href="#L884">884</a>                 tempFile = File.createTempFile(JavacCompiler.<strong class="jxr_keyword">class</strong>.getName(), <span class="jxr_string">"arguments"</span>, <strong class="jxr_keyword">new</strong> File(outputDirectory));
 <a class="jxr_linenumber" name="L885" href="#L885">885</a>             } <strong class="jxr_keyword">else</strong> {
 <a class="jxr_linenumber" name="L886" href="#L886">886</a>                 tempFile = File.createTempFile(JavacCompiler.<strong class="jxr_keyword">class</strong>.getName(), <span class="jxr_string">"arguments"</span>);

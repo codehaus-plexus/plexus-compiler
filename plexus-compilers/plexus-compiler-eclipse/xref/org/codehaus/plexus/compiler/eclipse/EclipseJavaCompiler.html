@@ -237,12 +237,12 @@
 <a class="jxr_linenumber" name="L229" href="#L229">229</a>             JavaCompiler compiler = getEcj();
 <a class="jxr_linenumber" name="L230" href="#L230">230</a>             <strong class="jxr_keyword">boolean</strong> success = false;
 <a class="jxr_linenumber" name="L231" href="#L231">231</a>             <strong class="jxr_keyword">if</strong> (compiler != <strong class="jxr_keyword">null</strong>) {
-<a class="jxr_linenumber" name="L232" href="#L232">232</a>                 log.debug(<span class="jxr_string">"Using JSR-199 EclipseCompiler"</span>);
+<a class="jxr_linenumber" name="L232" href="#L232">232</a>                 getLog().debug(<span class="jxr_string">"Using JSR-199 EclipseCompiler"</span>);
 <a class="jxr_linenumber" name="L233" href="#L233">233</a>                 <em class="jxr_comment">// ECJ JSR-199 compiles against the latest Java version it supports if no source</em>
 <a class="jxr_linenumber" name="L234" href="#L234">234</a>                 <em class="jxr_comment">// version is given explicitly. BatchCompiler uses 1.3 as default. So check</em>
 <a class="jxr_linenumber" name="L235" href="#L235">235</a>                 <em class="jxr_comment">// whether a source version is specified, and if not supply 1.3 explicitly.</em>
 <a class="jxr_linenumber" name="L236" href="#L236">236</a>                 <strong class="jxr_keyword">if</strong> (!haveSourceOrReleaseArgument(args)) {
-<a class="jxr_linenumber" name="L237" href="#L237">237</a>                     log.debug(<span class="jxr_string">"ecj: no source level nor release specified, defaulting to Java 1.3"</span>);
+<a class="jxr_linenumber" name="L237" href="#L237">237</a>                     getLog().debug(<span class="jxr_string">"ecj: no source level nor release specified, defaulting to Java 1.3"</span>);
 <a class="jxr_linenumber" name="L238" href="#L238">238</a>                     args.add(<span class="jxr_string">"-source"</span>);
 <a class="jxr_linenumber" name="L239" href="#L239">239</a>                     args.add(<span class="jxr_string">"1.3"</span>);
 <a class="jxr_linenumber" name="L240" href="#L240">240</a>                 }
@@ -294,17 +294,17 @@
 <a class="jxr_linenumber" name="L286" href="#L286">286</a>                     <strong class="jxr_keyword">try</strong> {
 <a class="jxr_linenumber" name="L287" href="#L287">287</a>                         charset = Charset.forName(encoding);
 <a class="jxr_linenumber" name="L288" href="#L288">288</a>                     } <strong class="jxr_keyword">catch</strong> (IllegalCharsetNameException | UnsupportedCharsetException e) {
-<a class="jxr_linenumber" name="L289" href="#L289">289</a>                         log.warn(<span class="jxr_string">"ecj: invalid or unsupported character set '"</span> + encoding + <span class="jxr_string">"', using default"</span>);
+<a class="jxr_linenumber" name="L289" href="#L289">289</a>                         getLog().warn(<span class="jxr_string">"ecj: invalid or unsupported character set '"</span> + encoding + <span class="jxr_string">"', using default"</span>);
 <a class="jxr_linenumber" name="L290" href="#L290">290</a>                         <em class="jxr_comment">// charset remains null</em>
 <a class="jxr_linenumber" name="L291" href="#L291">291</a>                     }
 <a class="jxr_linenumber" name="L292" href="#L292">292</a>                 }
 <a class="jxr_linenumber" name="L293" href="#L293">293</a>                 <strong class="jxr_keyword">if</strong> (charset == <strong class="jxr_keyword">null</strong>) {
 <a class="jxr_linenumber" name="L294" href="#L294">294</a>                     charset = Charset.defaultCharset();
 <a class="jxr_linenumber" name="L295" href="#L295">295</a>                 }
-<a class="jxr_linenumber" name="L296" href="#L296">296</a>                 <strong class="jxr_keyword">if</strong> (log.isDebugEnabled()) {
-<a class="jxr_linenumber" name="L297" href="#L297">297</a>                     log.debug(<span class="jxr_string">"ecj: using character set "</span> + charset.displayName());
-<a class="jxr_linenumber" name="L298" href="#L298">298</a>                     log.debug(<span class="jxr_string">"ecj command line: "</span> + args);
-<a class="jxr_linenumber" name="L299" href="#L299">299</a>                     log.debug(<span class="jxr_string">"ecj input source files: "</span> + allSources);
+<a class="jxr_linenumber" name="L296" href="#L296">296</a>                 <strong class="jxr_keyword">if</strong> (getLog().isDebugEnabled()) {
+<a class="jxr_linenumber" name="L297" href="#L297">297</a>                     getLog().debug(<span class="jxr_string">"ecj: using character set "</span> + charset.displayName());
+<a class="jxr_linenumber" name="L298" href="#L298">298</a>                     getLog().debug(<span class="jxr_string">"ecj command line: "</span> + args);
+<a class="jxr_linenumber" name="L299" href="#L299">299</a>                     getLog().debug(<span class="jxr_string">"ecj input source files: "</span> + allSources);
 <a class="jxr_linenumber" name="L300" href="#L300">300</a>                 }
 <a class="jxr_linenumber" name="L301" href="#L301">301</a> 
 <a class="jxr_linenumber" name="L302" href="#L302">302</a>                 <strong class="jxr_keyword">try</strong> (StandardJavaFileManager manager =
@@ -316,19 +316,19 @@
 <a class="jxr_linenumber" name="L308" href="#L308">308</a>                 } <strong class="jxr_keyword">catch</strong> (RuntimeException e) {
 <a class="jxr_linenumber" name="L309" href="#L309">309</a>                     <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> <a name="EcjFailureException" href="../../../../../org/codehaus/plexus/compiler/eclipse/EcjFailureException.html#EcjFailureException">EcjFailureException</a>(e.getLocalizedMessage());
 <a class="jxr_linenumber" name="L310" href="#L310">310</a>                 }
-<a class="jxr_linenumber" name="L311" href="#L311">311</a>                 log.debug(sw.toString());
+<a class="jxr_linenumber" name="L311" href="#L311">311</a>                 getLog().debug(sw.toString());
 <a class="jxr_linenumber" name="L312" href="#L312">312</a>             } <strong class="jxr_keyword">else</strong> {
 <a class="jxr_linenumber" name="L313" href="#L313">313</a>                 <em class="jxr_comment">// Use the BatchCompiler and send all errors to xml temp file.</em>
 <a class="jxr_linenumber" name="L314" href="#L314">314</a>                 File errorF = <strong class="jxr_keyword">null</strong>;
 <a class="jxr_linenumber" name="L315" href="#L315">315</a>                 <strong class="jxr_keyword">try</strong> {
 <a class="jxr_linenumber" name="L316" href="#L316">316</a>                     errorF = File.createTempFile(<span class="jxr_string">"ecjerr-"</span>, <span class="jxr_string">".xml"</span>);
-<a class="jxr_linenumber" name="L317" href="#L317">317</a>                     log.debug(<span class="jxr_string">"Using legacy BatchCompiler; error file "</span> + errorF);
+<a class="jxr_linenumber" name="L317" href="#L317">317</a>                     getLog().debug(<span class="jxr_string">"Using legacy BatchCompiler; error file "</span> + errorF);
 <a class="jxr_linenumber" name="L318" href="#L318">318</a> 
 <a class="jxr_linenumber" name="L319" href="#L319">319</a>                     args.add(<span class="jxr_string">"-log"</span>);
 <a class="jxr_linenumber" name="L320" href="#L320">320</a>                     args.add(errorF.toString());
 <a class="jxr_linenumber" name="L321" href="#L321">321</a>                     args.addAll(allSources);
 <a class="jxr_linenumber" name="L322" href="#L322">322</a> 
-<a class="jxr_linenumber" name="L323" href="#L323">323</a>                     log.debug(<span class="jxr_string">"ecj command line: "</span> + args);
+<a class="jxr_linenumber" name="L323" href="#L323">323</a>                     getLog().debug(<span class="jxr_string">"ecj command line: "</span> + args);
 <a class="jxr_linenumber" name="L324" href="#L324">324</a> 
 <a class="jxr_linenumber" name="L325" href="#L325">325</a>                     success = BatchCompiler.compile(
 <a class="jxr_linenumber" name="L326" href="#L326">326</a>                             args.toArray(<strong class="jxr_keyword">new</strong> String[args.size()]), devNull, devNull, <strong class="jxr_keyword">new</strong> CompilationProgress() {
@@ -349,7 +349,7 @@
 <a class="jxr_linenumber" name="L341" href="#L341">341</a>                                 @Override
 <a class="jxr_linenumber" name="L342" href="#L342">342</a>                                 <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> worked(<strong class="jxr_keyword">int</strong> i, <strong class="jxr_keyword">int</strong> i1) {}
 <a class="jxr_linenumber" name="L343" href="#L343">343</a>                             });
-<a class="jxr_linenumber" name="L344" href="#L344">344</a>                     log.debug(sw.toString());
+<a class="jxr_linenumber" name="L344" href="#L344">344</a>                     getLog().debug(sw.toString());
 <a class="jxr_linenumber" name="L345" href="#L345">345</a> 
 <a class="jxr_linenumber" name="L346" href="#L346">346</a>                     <strong class="jxr_keyword">if</strong> (errorF.length() &lt; 80) {
 <a class="jxr_linenumber" name="L347" href="#L347">347</a>                         <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> <a name="EcjFailureException" href="../../../../../org/codehaus/plexus/compiler/eclipse/EcjFailureException.html#EcjFailureException">EcjFailureException</a>(sw.toString());
@@ -532,7 +532,7 @@
 <a class="jxr_linenumber" name="L524" href="#L524">524</a>                 }
 <a class="jxr_linenumber" name="L525" href="#L525">525</a>             }
 <a class="jxr_linenumber" name="L526" href="#L526">526</a>         }
-<a class="jxr_linenumber" name="L527" href="#L527">527</a>         log.debug(<span class="jxr_string">"Cannot find org.eclipse.jdt.internal.compiler.tool.EclipseCompiler"</span>);
+<a class="jxr_linenumber" name="L527" href="#L527">527</a>         getLog().debug(<span class="jxr_string">"Cannot find org.eclipse.jdt.internal.compiler.tool.EclipseCompiler"</span>);
 <a class="jxr_linenumber" name="L528" href="#L528">528</a>         <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">null</strong>;
 <a class="jxr_linenumber" name="L529" href="#L529">529</a>     }
 <a class="jxr_linenumber" name="L530" href="#L530">530</a> 
@@ -626,7 +626,7 @@
 <a class="jxr_linenumber" name="L618" href="#L618">618</a>         }
 <a class="jxr_linenumber" name="L619" href="#L619">619</a> 
 <a class="jxr_linenumber" name="L620" href="#L620">620</a>         <strong class="jxr_keyword">if</strong> (versionSpec.equals(<span class="jxr_string">"1.9"</span>)) {
-<a class="jxr_linenumber" name="L621" href="#L621">621</a>             log.warn(<span class="jxr_string">"Version 9 should be specified as 9, not 1.9"</span>);
+<a class="jxr_linenumber" name="L621" href="#L621">621</a>             getLog().warn(<span class="jxr_string">"Version 9 should be specified as 9, not 1.9"</span>);
 <a class="jxr_linenumber" name="L622" href="#L622">622</a>             <strong class="jxr_keyword">return</strong> <span class="jxr_string">"9"</span>;
 <a class="jxr_linenumber" name="L623" href="#L623">623</a>         }
 <a class="jxr_linenumber" name="L624" href="#L624">624</a>         <strong class="jxr_keyword">return</strong> versionSpec;
