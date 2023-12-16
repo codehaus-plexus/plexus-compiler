@@ -24,13 +24,4 @@ package org.codehaus.plexus.compiler.javac;
 public class JavaxToolsCompilerTest extends AbstractJavacCompilerTest {
     // no op default is to javax.tools if available
 
-    @Override
-    protected int expectedWarnings() {
-        String javaVersion = getJavaVersion();
-        if (javaVersion.contains("21")) {
-            return 8;
-        } else {
-            return super.expectedWarnings();
-        }
-    }
 }

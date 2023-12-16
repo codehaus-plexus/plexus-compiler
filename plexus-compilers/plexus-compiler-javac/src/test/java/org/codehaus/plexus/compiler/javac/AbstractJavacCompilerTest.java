@@ -111,6 +111,15 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
     }
 
     @Override
+    protected int expectedNotes() {
+        String javaVersion = getJavaVersion();
+        if (javaVersion.contains("21")) {
+            return 7;
+        }
+        return 0;
+    }
+
+    @Override
     public String getTargetVersion() {
         String javaVersion = getJavaVersion();
         if (javaVersion.contains("9.0")) {

@@ -1,5 +1,3 @@
-package org.codehaus.plexus.compiler.eclipse;
-
 /**
  * The MIT License
  * <p>
@@ -23,6 +21,8 @@ package org.codehaus.plexus.compiler.eclipse;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package org.codehaus.plexus.compiler.eclipse;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.tools.Diagnostic;
@@ -32,6 +32,7 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
@@ -42,6 +43,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ServiceLoader;
 
@@ -198,6 +200,28 @@ public class EclipseJavaCompiler extends AbstractCompiler {
             }
         }
 
+        // Check for custom -log
+        boolean tempLog;
+        File logFile;
+        EcjLogParser logParser;
+        Map<String, String> extras = config.getCustomCompilerArgumentsAsMap();
+        if (extras.containsKey("-log")) {
+            String key = extras.get("-log");
+            logFile = new File(key);
+            tempLog = false;
+            logParser = key.endsWith(".xml") ? new EcjResponseParser() : new EcjTextLogParser();
+        } else {
+            try {
+                logFile = File.createTempFile("ecjerr-", ".xml");
+            } catch (IOException e) {
+                throw new CompilerException("Unable to create temporary file for compiler output", e);
+            }
+            args.add("-log");
+            args.add(logFile.toString());
+            tempLog = true;
+            logParser = new EcjResponseParser();
+        }
+
         // -- classpath
         List<String> classpathEntries = new ArrayList<>(config.getClasspathEntries());
         classpathEntries.add(config.getOutputLocation());
@@ -343,14 +367,14 @@ public class EclipseJavaCompiler extends AbstractCompiler {
                             });
                     getLog().debug(sw.toString());
 
-                    if (errorF.length() < 80) {
+                    if (logFile.length() < 80) {
                         throw new EcjFailureException(sw.toString());
                     }
-                    messageList = new EcjResponseParser().parse(errorF, errorsAsWarnings);
+                    messageList = logParser.parse(errorF, errorsAsWarnings);
                 } finally {
-                    if (null != errorF) {
+                    if (tempLog) {
                         try {
-                            errorF.delete();
+                            logFile.delete();
                         } catch (Exception x) {
                         }
                     }
@@ -358,14 +382,16 @@ public class EclipseJavaCompiler extends AbstractCompiler {
             }
             boolean hasError = false;
             for (CompilerMessage compilerMessage : messageList) {
-                if (compilerMessage.isError()) {
+                if (compilerMessage.isError()
+                        || (compilerMessage.getKind() == CompilerMessage.Kind.WARNING
+                                        || compilerMessage.getKind() == CompilerMessage.Kind.MANDATORY_WARNING)
+                                && config.isFailOnWarning()) {
                     hasError = true;
                     break;
                 }
             }
             if (!hasError && !success && !errorsAsWarnings) {
-                CompilerMessage.Kind kind =
-                        errorsAsWarnings ? CompilerMessage.Kind.WARNING : CompilerMessage.Kind.ERROR;
+                CompilerMessage.Kind kind = CompilerMessage.Kind.ERROR;
 
                 // -- Compiler reported failure but we do not seem to have one -> probable
                 // exception
@@ -437,7 +463,7 @@ public class EclipseJavaCompiler extends AbstractCompiler {
                 if (null != optionValue) {
                     File propFile = new File(optionValue);
                     if (!propFile.exists() || !propFile.isFile()) {
-                        throw new IllegalArgumentException(
+                        throw new EcjFailureException(
                                 "Properties file specified by -properties " + propFile + " does not exist");
                     }
                 }

@@ -1,5 +1,3 @@
-package org.codehaus.plexus.compiler.eclipse;
-
 /**
  * The MIT License
  *
@@ -23,6 +21,8 @@ package org.codehaus.plexus.compiler.eclipse;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package org.codehaus.plexus.compiler.eclipse;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,6 +35,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 
 public class EclipseCompilerConfigurationTest {
@@ -98,10 +99,12 @@ public class EclipseCompilerConfigurationTest {
     @Test
     public void testProcessCustomArgumentsWithPropertiesAndNonExistingFile() {
         configuration.addCompilerCustomArgument("-properties", "fooBar.txt");
-        IllegalArgumentException expected = Assertions.assertThrows(
-                IllegalArgumentException.class,
+        EcjFailureException expected = Assertions.assertThrows(
+                EcjFailureException.class,
                 () -> EclipseJavaCompiler.processCustomArguments(configuration, Collections.emptyList()));
-        assertThat(expected.getMessage(), is("Properties file specified by -properties fooBar.txt does not exist"));
+        assertThat(
+                expected.getMessage(),
+                containsString("Properties file specified by -properties fooBar.txt does not exist"));
     }
 
     @Test

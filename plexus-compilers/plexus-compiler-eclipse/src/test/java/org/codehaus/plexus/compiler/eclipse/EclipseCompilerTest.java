@@ -23,22 +23,21 @@ package org.codehaus.plexus.compiler.eclipse;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.codehaus.plexus.compiler.AbstractCompilerTest;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.startsWith;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>
  */
-public class EclipseCompilerTest extends AbstractCompilerTest {
+public class EclipseCompilerTest extends AbstractEclipseCompilerTest {
+    public EclipseCompilerTest() {
+        super(5, 1, 1);
+    }
 
     @BeforeEach
     public void setUp() {
@@ -49,25 +48,6 @@ public class EclipseCompilerTest extends AbstractCompilerTest {
     @Override
     protected String getRoleHint() {
         return "eclipse";
-    }
-
-    @Override
-    protected int expectedErrors() {
-        return 4;
-    }
-
-    @Override
-    protected int expectedWarnings() {
-        return 2;
-    }
-
-    @Override
-    protected Collection<String> expectedOutputFiles() {
-        return Arrays.asList(
-                "org/codehaus/foo/Deprecation.class",
-                "org/codehaus/foo/ExternalDeps.class",
-                "org/codehaus/foo/Person.class",
-                "org/codehaus/foo/ReservedWord.class");
     }
 
     // The test is fairly meaningless as we can not validate anything
@@ -86,9 +66,9 @@ public class EclipseCompilerTest extends AbstractCompilerTest {
 
         compilerConfig.addCompilerCustomArgument("-properties", "file_does_not_exist");
 
-        IllegalArgumentException e =
-                assertThrows(IllegalArgumentException.class, () -> getCompiler().performCompile(compilerConfig));
-        assertThat("Message must start with 'Properties file'", e.getMessage(), startsWith("Properties file"));
+        EcjFailureException e =
+                assertThrows(EcjFailureException.class, () -> getCompiler().performCompile(compilerConfig));
+        assertThat("Message must start with 'Properties file'", e.getMessage(), containsString("Properties file"));
     }
 
     private CompilerConfiguration createMinimalCompilerConfig() {

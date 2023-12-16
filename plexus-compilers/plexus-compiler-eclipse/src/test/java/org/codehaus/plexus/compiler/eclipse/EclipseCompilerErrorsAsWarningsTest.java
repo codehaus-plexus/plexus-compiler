@@ -1,16 +1,18 @@
 package org.codehaus.plexus.compiler.eclipse;
 
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.codehaus.plexus.compiler.AbstractCompilerTest;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 
-public class EclipseCompilerErrorsAsWarningsTest extends AbstractCompilerTest {
+/**
+ * Test for errors being reported as warnings.
+ *
+ * @author <a href="jfaust@tsunamit.com">Jason Faust</a>
+ * @since 2.14.0
+ */
+public class EclipseCompilerErrorsAsWarningsTest extends AbstractEclipseCompilerTest {
 
-    protected void configureCompilerConfig(CompilerConfiguration compilerConfig) {
-        compilerConfig.addCompilerCustomArgument("-errorsAsWarnings", "true");
+    public EclipseCompilerErrorsAsWarningsTest() {
+        super(0, 6, 1);
     }
 
     @BeforeEach
@@ -24,27 +26,8 @@ public class EclipseCompilerErrorsAsWarningsTest extends AbstractCompilerTest {
         return "eclipse";
     }
 
-    @Override
-    protected int expectedErrors() {
-        return 0;
-    }
-
-    @Override
-    protected int expectedWarnings() {
-        return 6;
-    }
-
-    @Override
-    protected Collection<String> expectedOutputFiles() {
-        return Arrays.asList(
-                "org/codehaus/foo/Deprecation.class",
-                "org/codehaus/foo/ExternalDeps.class",
-                "org/codehaus/foo/Person.class",
-                "org/codehaus/foo/ReservedWord.class"
-                // "org/codehaus/foo/Bad.class",             // This one has no class file generated as it's one big
-                // issue
-                // "org/codehaus/foo/UnknownSymbol.class",
-                // "org/codehaus/foo/RightClassname.class"
-                );
+    protected void configureCompilerConfig(CompilerConfiguration compilerConfig) {
+        super.configureCompilerConfig(compilerConfig);
+        compilerConfig.addCompilerCustomArgument("-errorsAsWarnings", "true");
     }
 }

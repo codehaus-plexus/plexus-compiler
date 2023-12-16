@@ -1,0 +1,55 @@
+# 9/26/18 1:10:25 PM EDT
+# Eclipse Compiler for Java(TM) v20180905-0317, 3.15.0, Copyright IBM Corp 2000, 2015. All rights reserved.
+----------
+1. ERROR in C:\devenv\gitrepo\plexus-compiler\plexus-compilers\plexus-compiler-eclipse\src\test-input\src\main\org\codehaus\foo\Bad.java (at line 6)
+	pubic String name;
+	^^^^^
+Syntax error on token "pubic", public expected
+----------
+2. ERROR in C:\devenv\gitrepo\plexus-compiler\plexus-compilers\plexus-compiler-eclipse\src\test-input\src\main\org\codehaus\foo\Bad.java (at line 6)
+	pubic String name;
+	^^^^^
+pubic cannot be resolved to a type
+----------
+----------
+3. WARNING in C:\devenv\gitrepo\plexus-compiler\plexus-compilers\plexus-compiler-eclipse\src\test-input\src\main\org\codehaus\foo\Deprecation.java (at line 7)
+	new java.util.Date("testDate");
+	    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+The constructor Date(String) is deprecated
+----------
+----------
+4. ERROR in C:\devenv\gitrepo\plexus-compiler\plexus-compilers\plexus-compiler-eclipse\src\test-input\src\main\org\codehaus\foo\ExternalDeps.java (at line 4)
+	import org.apache.commons.lang.StringUtils;
+	       ^^^^^^^^^^
+The import org.apache cannot be resolved
+----------
+5. ERROR in C:\devenv\gitrepo\plexus-compiler\plexus-compilers\plexus-compiler-eclipse\src\test-input\src\main\org\codehaus\foo\ExternalDeps.java (at line 12)
+	System.out.println( StringUtils.upperCase( str)  );
+	                    ^^^^^^^^^^^
+StringUtils cannot be resolved
+----------
+----------
+6. INFO in C:\devenv\gitrepo\plexus-compiler\plexus-compilers\plexus-compiler-eclipse\src\test-input\src\main\org\codehaus\foo\Info.java (at line 5)
+	"".equals(1);
+	          ^
+Unlikely argument type for equals(): int seems to be unrelated to String
+----------
+----------
+7. ERROR in C:\devenv\gitrepo\plexus-compiler\plexus-compilers\plexus-compiler-eclipse\src\test-input\src\main\org\codehaus\foo\ReservedWord.java (at line 5)
+	String assert;
+	       ^^^^^^
+Syntax error on token "assert", invalid VariableDeclarator
+----------
+----------
+8. ERROR in C:\devenv\gitrepo\plexus-compiler\plexus-compilers\plexus-compiler-eclipse\src\test-input\src\main\org\codehaus\foo\UnknownSymbol.java (at line 7)
+	foo();
+	^^^
+The method foo() is undefined for the type UnknownSymbol
+----------
+----------
+9. ERROR in C:\devenv\gitrepo\plexus-compiler\plexus-compilers\plexus-compiler-eclipse\src\test-input\src\main\org\codehaus\foo\WrongClassname.java (at line 3)
+	public class RightClassname
+	             ^^^^^^^^^^^^^^
+The public type RightClassname must be defined in its own file
+----------
+9 problems (7 errors, 1 warning, 1 info)

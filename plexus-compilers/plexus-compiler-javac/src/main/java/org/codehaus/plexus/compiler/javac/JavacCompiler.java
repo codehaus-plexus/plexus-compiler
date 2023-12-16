@@ -698,7 +698,7 @@ public class JavacCompiler extends AbstractCompiler {
             } else if ((buffer.length() == 0) && line.startsWith("warning: ")) {
                 errors.add(new CompilerMessage(line, CompilerMessage.Kind.WARNING));
             } else if ((buffer.length() == 0) && isNote(line)) {
-                // skip, JDK 1.5 telling us deprecated APIs are used but -Xlint:deprecation isn't set
+                errors.add(new CompilerMessage(line, CompilerMessage.Kind.NOTE));
             } else if ((buffer.length() == 0) && isMisc(line)) {
                 // verbose output was set
                 errors.add(new CompilerMessage(line, CompilerMessage.Kind.OTHER));
