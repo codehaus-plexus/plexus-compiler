@@ -649,7 +649,7 @@ public class JavacCompiler extends AbstractCompiler {
 
             if (line == null) {
                 // javac output not detected by other parsing
-                // maybe better to ignore only the summary an mark the rest as error
+                // maybe better to ignore only the summary and mark the rest as error
                 String bufferAsString = buffer.toString();
                 if (buffer.length() > 0) {
                     if (bufferAsString.startsWith("javac:")) {
