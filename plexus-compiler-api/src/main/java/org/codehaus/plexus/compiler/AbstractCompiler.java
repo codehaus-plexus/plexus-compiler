@@ -25,6 +25,7 @@ package org.codehaus.plexus.compiler;
  */
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -145,9 +146,13 @@ public abstract class AbstractCompiler implements Compiler {
     }
 
     protected static Set<String> getSourceFilesForSourceRoot(CompilerConfiguration config, String sourceLocation) {
-        DirectoryScanner scanner = new DirectoryScanner();
 
+        DirectoryScanner scanner = new DirectoryScanner();
         scanner.setBasedir(sourceLocation);
+
+        if (!scanner.getBasedir().exists()) {
+            return Collections.emptySet();
+        }
 
         Set<String> includes = config.getIncludes();
 
