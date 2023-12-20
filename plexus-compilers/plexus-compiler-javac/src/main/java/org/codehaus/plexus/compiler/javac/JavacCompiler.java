@@ -65,6 +65,7 @@ import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.regex.Pattern;
 
 import org.codehaus.plexus.compiler.AbstractCompiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
@@ -627,6 +628,16 @@ public class JavacCompiler extends AbstractCompiler {
         return new CompilerResult(success, messages);
     }
 
+    // Match ~95% of existing JDK exception name patterns (last checked for JDK 21)
+    private static final Pattern STACK_TRACE_FIRST_LINE = Pattern.compile("^(?:[\\w+.-]+\\.)[\\w$]*?(?:"
+            + "Exception|Error|Throwable|Failure|Result|Abort|Fault|ThreadDeath|Overflow|Warning|"
+            + "NotSupported|NotFound|BadArgs|BadClassFile|Illegal|Invalid|Unexpected|Unchecked|Unmatched\\w+"
+            + ").*$");
+
+    // Match exception causes, existing and omitted stack trace elements
+    private static final Pattern STACK_TRACE_OTHER_LINE =
+            Pattern.compile("^(?:Caused by:\\s.*|\\s*at .*|\\s*\\.\\.\\.\\s\\d+\\smore)$");
+
     /**
      * Parse the output from the compiler into a list of CompilerMessage objects
      *
@@ -643,13 +654,14 @@ public class JavacCompiler extends AbstractCompiler {
         StringBuilder buffer = new StringBuilder();
 
         boolean hasPointer = false;
+        int stackTraceLineCount = 0;
 
         while (true) {
             line = input.readLine();
 
             if (line == null) {
                 // javac output not detected by other parsing
-                // maybe better to ignore only the summary an mark the rest as error
+                // maybe better to ignore only the summary and mark the rest as error
                 String bufferAsString = buffer.toString();
                 if (buffer.length() > 0) {
                     if (bufferAsString.startsWith("javac:")) {
@@ -659,26 +671,44 @@ public class JavacCompiler extends AbstractCompiler {
                     } else if (hasPointer) {
                         // A compiler message remains in buffer at end of parse stream
                         errors.add(parseModernError(exitCode, bufferAsString));
+                    } else if (stackTraceLineCount > 0) {
+                        // Extract stack trace from end of buffer
+                        String[] lines = bufferAsString.split("\\R");
+                        int linesTotal = lines.length;
+                        buffer = new StringBuilder();
+                        int firstLine = linesTotal - stackTraceLineCount;
+
+                        // Salvage Javac localized message 'javac.msg.bug' ("An exception has occurred in the
+                        // compiler ... Please file a bug")
+                        if (firstLine > 0) {
+                            final String lineBeforeStackTrace = lines[firstLine - 1];
+                            // One of those two URL substrings should always appear, without regard to JVM locale.
+                            // TODO: Update, if the URL changes, last checked for JDK 21.
+                            if (lineBeforeStackTrace.contains("java.sun.com/webapps/bugreport")
+                                    || lineBeforeStackTrace.contains("bugreport.java.com")) {
+                                firstLine--;
+                            }
+                        }
+
+                        // Note: For message 'javac.msg.proc.annotation.uncaught.exception' ("An annotation processor
+                        // threw an uncaught exception"), there is no locale-independent substring, and the header is
+                        // also multi-line. It was discarded in the removed method 'parseAnnotationProcessorStream',
+                        // and we continue to do so.
+
+                        for (int i = firstLine; i < linesTotal; i++) {
+                            buffer.append(lines[i]).append(EOL);
+                        }
+                        errors.add(new CompilerMessage(buffer.toString(), CompilerMessage.Kind.ERROR));
                     }
                 }
                 return errors;
             }
 
-            // A compiler error occurred, treat everything that follows as part of the error.
-            if (line.startsWith("An exception has occurred in the compiler")) {
-                buffer = new StringBuilder();
-
-                while (line != null) {
-                    buffer.append(line);
-                    buffer.append(EOL);
-                    line = input.readLine();
-                }
-
-                errors.add(new CompilerMessage(buffer.toString(), CompilerMessage.Kind.ERROR));
-                return errors;
-            } else if (line.startsWith("An annotation processor threw an uncaught exception.")) {
-                CompilerMessage annotationProcessingError = parseAnnotationProcessorStream(input);
-                errors.add(annotationProcessingError);
+            if (stackTraceLineCount == 0 && STACK_TRACE_FIRST_LINE.matcher(line).matches()
+                    || STACK_TRACE_OTHER_LINE.matcher(line).matches()) {
+                stackTraceLineCount++;
+            } else {
+                stackTraceLineCount = 0;
             }
 
             // new error block?
@@ -712,21 +742,6 @@ public class JavacCompiler extends AbstractCompiler {
                 hasPointer = true;
             }
         }
-    }
-
-    private static CompilerMessage parseAnnotationProcessorStream(final BufferedReader input) throws IOException {
-        String line = input.readLine();
-        final StringBuilder buffer = new StringBuilder();
-
-        while (line != null) {
-            if (!line.startsWith("Consult the following stack trace for details.")) {
-                buffer.append(line);
-                buffer.append(EOL);
-            }
-            line = input.readLine();
-        }
-
-        return new CompilerMessage(buffer.toString(), CompilerMessage.Kind.ERROR);
     }
 
     private static boolean isMisc(String line) {
