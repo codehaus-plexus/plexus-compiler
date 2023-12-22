@@ -638,6 +638,10 @@ public class JavacCompiler extends AbstractCompiler {
     private static final Pattern STACK_TRACE_OTHER_LINE =
             Pattern.compile("^(?:Caused by:\\s.*|\\s*at .*|\\s*\\.\\.\\.\\s\\d+\\smore)$");
 
+    // Match generic javac errors with 'javac:' prefix, JMV init and boot layer init errors
+    private static final Pattern JAVAC_OR_JVM_ERROR =
+            Pattern.compile("^(?:javac:|Error occurred during initialization of (?:boot layer|VM)).*", Pattern.DOTALL);
+
     /**
      * Parse the output from the compiler into a list of CompilerMessage objects
      *
@@ -664,10 +668,8 @@ public class JavacCompiler extends AbstractCompiler {
                 // maybe better to ignore only the summary and mark the rest as error
                 String bufferAsString = buffer.toString();
                 if (buffer.length() > 0) {
-                    if (bufferAsString.startsWith("javac:")) {
+                    if (JAVAC_OR_JVM_ERROR.matcher(bufferAsString).matches()) {
                         errors.add(new CompilerMessage(bufferAsString, CompilerMessage.Kind.ERROR));
-                    } else if (bufferAsString.startsWith("Error occurred during initialization of boot layer")) {
-                        errors.add(new CompilerMessage(bufferAsString, CompilerMessage.Kind.OTHER));
                     } else if (hasPointer) {
                         // A compiler message remains in buffer at end of parse stream
                         errors.add(parseModernError(exitCode, bufferAsString));
