@@ -1010,7 +1010,7 @@ public class ErrorMessageParserTest {
     }
 
     @Test
-    public void testJvmError() throws Exception {
+    public void testJvmBootLayerInitializationError() throws Exception {
         String out = "Error occurred during initialization of boot layer" + EOL
                 + "java.lang.module.FindException: Module java.xml.bind not found";
 
@@ -1018,8 +1018,21 @@ public class ErrorMessageParserTest {
                 JavacCompiler.parseModernStream(1, new BufferedReader(new StringReader(out)));
 
         assertThat(compilerErrors, notNullValue());
-
         assertThat(compilerErrors.size(), is(1));
+        assertThat(compilerErrors.get(0).getKind(), is(CompilerMessage.Kind.ERROR));
+    }
+
+    @Test
+    public void testJvmInitializationError() throws Exception {
+        String out = "Error occurred during initialization of VM" + EOL
+                + "Initial heap size set to a larger value than the maximum heap size";
+
+        List<CompilerMessage> compilerErrors =
+                JavacCompiler.parseModernStream(1, new BufferedReader(new StringReader(out)));
+
+        assertThat(compilerErrors, notNullValue());
+        assertThat(compilerErrors.size(), is(1));
+        assertThat(compilerErrors.get(0).getKind(), is(CompilerMessage.Kind.ERROR));
     }
 
     @Test
