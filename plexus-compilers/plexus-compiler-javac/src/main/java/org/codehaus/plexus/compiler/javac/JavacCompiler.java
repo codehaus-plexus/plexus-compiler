@@ -62,6 +62,7 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -80,10 +81,14 @@ import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
 
+import static org.codehaus.plexus.compiler.CompilerMessage.Kind.*;
+import static org.codehaus.plexus.compiler.javac.JavacCompiler.Messages.*;
+
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  * @author <a href="mailto:matthew.pocock@ncl.ac.uk">Matthew Pocock</a>
  * @author <a href="mailto:joerg.wassmer@web.de">J&ouml;rg Wa&szlig;mer</a>
+ * @author Alexander Kriegisch
  * @author Others
  *
  */
@@ -91,14 +96,40 @@ import org.codehaus.plexus.util.cli.Commandline;
 @Singleton
 public class JavacCompiler extends AbstractCompiler {
 
-    // see compiler.warn.warning in compiler.properties of javac sources
-    private static final String[] WARNING_PREFIXES = {"warning: ", "\u8b66\u544a: ", "\u8b66\u544a\uff1a "};
+    /**
+     * Multi-language compiler messages to parse from forked javac output.
+     * <ul>
+     *   <li>OpenJDK 8+ is delivered with 3 locales (en, ja, zh_CN).</li>
+     *   <li>OpenJDK 21+ is delivered with 4 locales (en, ja, zh_CN, de).</li>
+     * </ul>
+     * Instead of manually duplicating multi-language messages into this class, it would be preferable to fetch the
+     * strings directly from the running JDK:
+     * <pre>{@code
+     * new JavacMessages("com.sun.tools.javac.resources.javac", Locale.getDefault())
+     *   .getLocalizedString("javac.msg.proc.annotation.uncaught.exception")
+     * }</pre>
+     * Hoewever, due to JMS module protection, it would be necessary to run Plexus Compiler (and hence also Maven
+     * Compiler and the whole Maven JVM) with {@code --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED}
+     * on more recent JDK versions. As this cannot be reliably expected and using internal APIs - even though stable
+     * since at least JDK 8 - it is not a future-proof approach. So we refrain from doing so, even though during Plexus
+     * Compiler development it might come in handy.
+     * <p>
+     * TODO: Check compiler.properties and javac.properties in OpenJDK javac source code for
+     *       message changes, relevant new messages, new locales.
+     */
+    protected static class Messages {
+        // compiler.properties -> compiler.err.error (en, ja, zh_CN, de)
+        protected static final String[] ERROR_PREFIXES = {"error: ", "エラー: ", "错误: ", "Fehler: "};
 
-    // see compiler.note.note in compiler.properties of javac sources
-    private static final String[] NOTE_PREFIXES = {"Note: ", "\u6ce8: ", "\u6ce8\u610f\uff1a "};
+        // compiler.properties -> compiler.warn.warning (en, ja, zh_CN, de)
+        protected static final String[] WARNING_PREFIXES = {"warning: ", "警告: ", "警告: ", "Warnung: "};
 
-    // see compiler.misc.verbose in compiler.properties of javac sources
-    private static final String[] MISC_PREFIXES = {"["};
+        // compiler.properties -> compiler.note.note (en, ja, zh_CN, de)
+        protected static final String[] NOTE_PREFIXES = {"Note: ", "ノート: ", "注: ", "Hinweis: "};
+
+        // compiler.properties -> compiler.misc.verbose.*
+        protected static final String[] MISC_PREFIXES = {"["};
+    }
 
     private static final Object LOCK = new Object();
 
@@ -563,6 +594,11 @@ public class JavacCompiler extends AbstractCompiler {
         }
 
         try {
+            // TODO:
+            //   Is it really helpful to parse stdOut and stdErr as a single stream, instead of taking the chance to
+            //   draw extra information from the fact that normal javac output is written to stdOut, while warnings and
+            //   errors are written to stdErr? Of course, chronological correlation of messages would be more difficult
+            //   then, but basically, we are throwing away information here.
             returnCode = CommandLineUtils.executeCommandLine(cli, out, out);
 
             messages = parseModernStream(returnCode, new BufferedReader(new StringReader(out.getOutput())));
@@ -643,69 +679,21 @@ public class JavacCompiler extends AbstractCompiler {
             Pattern.compile("^(?:javac:|Error occurred during initialization of (?:boot layer|VM)).*", Pattern.DOTALL);
 
     /**
-     * Parse the output from the compiler into a list of CompilerMessage objects
+     * Parse the compiler output into a list of compiler messages
      *
-     * @param exitCode The exit code of javac.
-     * @param input    The output of the compiler
-     * @return List of CompilerMessage objects
-     * @throws IOException
+     * @param exitCode javac exit code (0 on success, non-zero otherwise)
+     * @param input    compiler output (stdOut and stdErr merged into input stream)
+     * @return list of {@link CompilerMessage} objects
+     * @throws IOException if there is a problem reading from the input reader
      */
     static List<CompilerMessage> parseModernStream(int exitCode, BufferedReader input) throws IOException {
         List<CompilerMessage> errors = new ArrayList<>();
-
         String line;
-
         StringBuilder buffer = new StringBuilder();
-
         boolean hasPointer = false;
         int stackTraceLineCount = 0;
 
-        while (true) {
-            line = input.readLine();
-
-            if (line == null) {
-                // javac output not detected by other parsing
-                // maybe better to ignore only the summary and mark the rest as error
-                String bufferAsString = buffer.toString();
-                if (buffer.length() > 0) {
-                    if (JAVAC_OR_JVM_ERROR.matcher(bufferAsString).matches()) {
-                        errors.add(new CompilerMessage(bufferAsString, CompilerMessage.Kind.ERROR));
-                    } else if (hasPointer) {
-                        // A compiler message remains in buffer at end of parse stream
-                        errors.add(parseModernError(exitCode, bufferAsString));
-                    } else if (stackTraceLineCount > 0) {
-                        // Extract stack trace from end of buffer
-                        String[] lines = bufferAsString.split("\\R");
-                        int linesTotal = lines.length;
-                        buffer = new StringBuilder();
-                        int firstLine = linesTotal - stackTraceLineCount;
-
-                        // Salvage Javac localized message 'javac.msg.bug' ("An exception has occurred in the
-                        // compiler ... Please file a bug")
-                        if (firstLine > 0) {
-                            final String lineBeforeStackTrace = lines[firstLine - 1];
-                            // One of those two URL substrings should always appear, without regard to JVM locale.
-                            // TODO: Update, if the URL changes, last checked for JDK 21.
-                            if (lineBeforeStackTrace.contains("java.sun.com/webapps/bugreport")
-                                    || lineBeforeStackTrace.contains("bugreport.java.com")) {
-                                firstLine--;
-                            }
-                        }
-
-                        // Note: For message 'javac.msg.proc.annotation.uncaught.exception' ("An annotation processor
-                        // threw an uncaught exception"), there is no locale-independent substring, and the header is
-                        // also multi-line. It was discarded in the removed method 'parseAnnotationProcessorStream',
-                        // and we continue to do so.
-
-                        for (int i = firstLine; i < linesTotal; i++) {
-                            buffer.append(lines[i]).append(EOL);
-                        }
-                        errors.add(new CompilerMessage(buffer.toString(), CompilerMessage.Kind.ERROR));
-                    }
-                }
-                return errors;
-            }
-
+        while ((line = input.readLine()) != null) {
             if (stackTraceLineCount == 0 && STACK_TRACE_FIRST_LINE.matcher(line).matches()
                     || STACK_TRACE_OTHER_LINE.matcher(line).matches()) {
                 stackTraceLineCount++;
@@ -717,33 +705,77 @@ public class JavacCompiler extends AbstractCompiler {
             if (!line.startsWith(" ") && hasPointer) {
                 // add the error bean
                 errors.add(parseModernError(exitCode, buffer.toString()));
-
                 // reset for next error block
                 buffer = new StringBuilder(); // this is quicker than clearing it
-
                 hasPointer = false;
             }
 
-            // TODO: there should be a better way to parse these
-            if ((buffer.length() == 0) && line.startsWith("error: ")) {
-                errors.add(new CompilerMessage(line, CompilerMessage.Kind.ERROR));
-            } else if ((buffer.length() == 0) && line.startsWith("warning: ")) {
-                errors.add(new CompilerMessage(line, CompilerMessage.Kind.WARNING));
-            } else if ((buffer.length() == 0) && isNote(line)) {
-                // skip, JDK 1.5 telling us deprecated APIs are used but -Xlint:deprecation isn't set
-            } else if ((buffer.length() == 0) && isMisc(line)) {
-                // verbose output was set
-                errors.add(new CompilerMessage(line, CompilerMessage.Kind.OTHER));
+            if (buffer.length() == 0) {
+                // try to classify output line by type (error, warning etc.)
+                // TODO: there should be a better way to parse these
+                if (isError(line)) {
+                    errors.add(new CompilerMessage(line, ERROR));
+                } else if (isWarning(line)) {
+                    errors.add(new CompilerMessage(line, WARNING));
+                } else if (isNote(line)) {
+                    // skip, JDK telling us deprecated APIs are used but -Xlint:deprecation isn't set
+                } else if (isMisc(line)) {
+                    // verbose output was set
+                    errors.add(new CompilerMessage(line, CompilerMessage.Kind.OTHER));
+                } else {
+                    // add first unclassified line to buffer
+                    buffer.append(line).append(EOL);
+                }
             } else {
-                buffer.append(line);
-
-                buffer.append(EOL);
+                // add next unclassified line to buffer
+                buffer.append(line).append(EOL);
             }
 
             if (line.endsWith("^")) {
                 hasPointer = true;
             }
         }
+
+        // javac output not detected by other parsing
+        // maybe better to ignore only the summary and mark the rest as error
+        String bufferAsString = buffer.toString();
+        if (!bufferAsString.isEmpty()) {
+            if (JAVAC_OR_JVM_ERROR.matcher(bufferAsString).matches()) {
+                errors.add(new CompilerMessage(bufferAsString, ERROR));
+            } else if (hasPointer) {
+                // A compiler message remains in buffer at end of parse stream
+                errors.add(parseModernError(exitCode, bufferAsString));
+            } else if (stackTraceLineCount > 0) {
+                // Extract stack trace from end of buffer
+                String[] lines = bufferAsString.split("\\R");
+                int linesTotal = lines.length;
+                buffer = new StringBuilder();
+                int firstLine = linesTotal - stackTraceLineCount;
+
+                // Salvage Javac localized message 'javac.msg.bug' ("An exception has occurred in the
+                // compiler ... Please file a bug")
+                if (firstLine > 0) {
+                    final String lineBeforeStackTrace = lines[firstLine - 1];
+                    // One of those two URL substrings should always appear, without regard to JVM locale.
+                    // TODO: Update, if the URL changes, last checked for JDK 21.
+                    if (lineBeforeStackTrace.contains("java.sun.com/webapps/bugreport")
+                            || lineBeforeStackTrace.contains("bugreport.java.com")) {
+                        firstLine--;
+                    }
+                }
+
+                // Note: For message 'javac.msg.proc.annotation.uncaught.exception' ("An annotation processor
+                // threw an uncaught exception"), there is no locale-independent substring, and the header is
+                // also multi-line. It was discarded in the removed method 'parseAnnotationProcessorStream',
+                // and we continue to do so.
+
+                for (int i = firstLine; i < linesTotal; i++) {
+                    buffer.append(lines[i]).append(EOL);
+                }
+                errors.add(new CompilerMessage(buffer.toString(), ERROR));
+            }
+        }
+        return errors;
     }
 
     private static boolean isMisc(String line) {
@@ -752,6 +784,14 @@ public class JavacCompiler extends AbstractCompiler {
 
     private static boolean isNote(String line) {
         return startsWithPrefix(line, NOTE_PREFIXES);
+    }
+
+    private static boolean isWarning(String line) {
+        return startsWithPrefix(line, WARNING_PREFIXES);
+    }
+
+    private static boolean isError(String line) {
+        return startsWithPrefix(line, ERROR_PREFIXES);
     }
 
     private static boolean startsWithPrefix(String line, String[] prefixes) {
@@ -764,26 +804,24 @@ public class JavacCompiler extends AbstractCompiler {
     }
 
     /**
-     * Construct a CompilerMessage object from a line of the compiler output
+     * Construct a compiler message object from a compiler output line
      *
-     * @param exitCode The exit code from javac.
-     * @param error    output line from the compiler
-     * @return the CompilerMessage object
+     * @param exitCode javac exit code
+     * @param error    compiler output line
+     * @return compiler message object
      */
     static CompilerMessage parseModernError(int exitCode, String error) {
         final StringTokenizer tokens = new StringTokenizer(error, ":");
 
-        boolean isError = exitCode != 0;
+        CompilerMessage.Kind messageKind = exitCode == 0 ? WARNING : ERROR;
 
         try {
             // With Java 6 error output lines from the compiler got longer. For backward compatibility
-            // .. and the time being, we eat up all (if any) tokens up to the erroneous file and source
-            // .. line indicator tokens.
+            // and the time being, we eat up all (if any) tokens up to the erroneous file and source
+            // line indicator tokens.
 
             boolean tokenIsAnInteger;
-
             StringBuilder file = null;
-
             String currentToken = null;
 
             do {
@@ -796,9 +834,7 @@ public class JavacCompiler extends AbstractCompiler {
                 }
 
                 currentToken = tokens.nextToken();
-
                 // Probably the only backward compatible means of checking if a string is an integer.
-
                 tokenIsAnInteger = true;
 
                 try {
@@ -809,50 +845,36 @@ public class JavacCompiler extends AbstractCompiler {
             } while (!tokenIsAnInteger);
 
             final String lineIndicator = currentToken;
-
-            final int startOfFileName = file.toString().lastIndexOf(']');
-
+            final int startOfFileName = Objects.requireNonNull(file).toString().lastIndexOf(']');
             if (startOfFileName > -1) {
                 file = new StringBuilder(file.substring(startOfFileName + 1 + EOL.length()));
             }
 
             final int line = Integer.parseInt(lineIndicator);
-
             final StringBuilder msgBuffer = new StringBuilder();
-
             String msg = tokens.nextToken(EOL).substring(2);
 
             // Remove the 'warning: ' prefix
-            final String warnPrefix = getWarnPrefix(msg);
+            final String warnPrefix = getWarningPrefix(msg);
             if (warnPrefix != null) {
-                isError = false;
+                messageKind = WARNING;
                 msg = msg.substring(warnPrefix.length());
-            } else {
-                isError = exitCode != 0;
             }
-
-            msgBuffer.append(msg);
-
-            msgBuffer.append(EOL);
+            msgBuffer.append(msg).append(EOL);
 
             String context = tokens.nextToken(EOL);
-
             String pointer = null;
 
             do {
                 final String msgLine = tokens.nextToken(EOL);
-
                 if (pointer != null) {
                     msgBuffer.append(msgLine);
-
                     msgBuffer.append(EOL);
                 } else if (msgLine.endsWith("^")) {
                     pointer = msgLine;
                 } else {
                     msgBuffer.append(context);
-
                     msgBuffer.append(EOL);
-
                     context = msgLine;
                 }
             } while (tokens.hasMoreTokens());
@@ -860,24 +882,22 @@ public class JavacCompiler extends AbstractCompiler {
             msgBuffer.append(EOL);
 
             final String message = msgBuffer.toString();
-
-            final int startcolumn = pointer.indexOf("^");
-
+            final int startcolumn = Objects.requireNonNull(pointer).indexOf("^");
             int endcolumn = (context == null) ? startcolumn : context.indexOf(" ", startcolumn);
-
             if (endcolumn == -1) {
-                endcolumn = context.length();
+                endcolumn = Objects.requireNonNull(context).length();
             }
 
-            return new CompilerMessage(file.toString(), isError, line, startcolumn, line, endcolumn, message.trim());
+            return new CompilerMessage(
+                    file.toString(), messageKind, line, startcolumn, line, endcolumn, message.trim());
         } catch (NoSuchElementException e) {
-            return new CompilerMessage("no more tokens - could not parse error message: " + error, isError);
+            return new CompilerMessage("no more tokens - could not parse error message: " + error, messageKind);
         } catch (Exception e) {
-            return new CompilerMessage("could not parse error message: " + error, isError);
+            return new CompilerMessage("could not parse error message: " + error, messageKind);
         }
     }
 
-    private static String getWarnPrefix(String msg) {
+    private static String getWarningPrefix(String msg) {
         for (String warningPrefix : WARNING_PREFIXES) {
             if (msg.startsWith(warningPrefix)) {
                 return warningPrefix;
