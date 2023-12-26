@@ -184,6 +184,19 @@ public class JavacCompiler extends AbstractCompiler {
             "\n\n系统资源不足。\n有关详细信息, 请参阅以下堆栈跟踪。\n",
             "\n\nDas System hat keine Ressourcen mehr.\nDetails finden Sie im folgenden Stacktrace.\n"
         };
+
+        // javac.properties-> javac.msg.io
+        // (en JDK-8, ja JDK-8, zh_CN JDK-8, en JDK-21, ja JDK-21, zh_CN JDK-21, de JDK-21)
+        protected static final String[] IO_ERROR_HEADERS = {
+            "\n\nAn input/output error occurred.\nConsult the following stack trace for details.\n",
+            "\n\n入出力エラーが発生しました。\n詳細は次のスタック・トレースで調査してください。\n",
+            "\n\n发生输入/输出错误。\n有关详细信息, 请参阅以下堆栈跟踪。\n",
+            "\n\nAn input/output error occurred.\nConsult the following stack trace for details.\n",
+            "\n\n入出力エラーが発生しました。\n詳細は次のスタックトレースで調査してください。\n",
+            "\n\n发生输入/输出错误。\n有关详细信息, 请参阅以下堆栈跟踪。\n",
+            "\n\nEin Eingabe-/Ausgabefehler ist aufgetreten.\nDetails finden Sie im folgenden Stacktrace.\n"
+        };
+
     }
 
     private static final Object LOCK = new Object();
@@ -768,7 +781,8 @@ public class JavacCompiler extends AbstractCompiler {
                 || (cleanedUpMessage = getVMInitError(bufferContent)) != null
                 || (cleanedUpMessage = getFileABugError(bufferContent)) != null
                 || (cleanedUpMessage = getAnnotationProcessingError(bufferContent)) != null
-                || (cleanedUpMessage = getSystemOutOfResourcesError(bufferContent)) != null) {
+                || (cleanedUpMessage = getSystemOutOfResourcesError(bufferContent)) != null
+                || (cleanedUpMessage = getIOError(bufferContent)) != null) {
             errors.add(new CompilerMessage(cleanedUpMessage, ERROR));
         } else if (hasPointer) {
             // A compiler message remains in buffer at end of parse stream
@@ -831,6 +845,10 @@ public class JavacCompiler extends AbstractCompiler {
 
     private static String getSystemOutOfResourcesError(String message) {
         return getTextStartingWithPrefix(message, SYSTEM_OUT_OF_RESOURCES_ERROR_HEADERS);
+    }
+
+    private static String getIOError(String message) {
+        return getTextStartingWithPrefix(message, IO_ERROR_HEADERS);
     }
 
     private static boolean startsWithPrefix(String text, String[] prefixes) {
