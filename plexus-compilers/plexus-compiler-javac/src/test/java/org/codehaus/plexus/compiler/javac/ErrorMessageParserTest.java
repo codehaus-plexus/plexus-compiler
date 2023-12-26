@@ -808,7 +808,10 @@ public class ErrorMessageParserTest {
                         FILE_A_BUG_ERROR_HEADERS[0].replaceAll("\\{0\\}", "21").replaceAll("bug", "beetle")),
                 Arguments.of(
                         "modified annotation processor error header",
-                        ANNOTATION_PROCESSING_ERROR_HEADERS[0].replaceAll("uncaught", "undandled")));
+                        ANNOTATION_PROCESSING_ERROR_HEADERS[0].replaceAll("uncaught", "undandled")),
+                Arguments.of(
+                        "modified out of resources error header",
+                        SYSTEM_OUT_OF_RESOURCES_ERROR_HEADERS[0].replaceAll("resources", "memory")));
     }
 
     @ParameterizedTest(name = "{0}")
@@ -874,6 +877,56 @@ public class ErrorMessageParserTest {
                 Arguments.of("JDK 21 Japanese", FILE_A_BUG_ERROR_HEADERS[7].replaceFirst("\\{0\\}", "21")),
                 Arguments.of("JDK 21 Chinese", FILE_A_BUG_ERROR_HEADERS[8].replaceFirst("\\{0\\}", "21")),
                 Arguments.of("JDK 21 German", FILE_A_BUG_ERROR_HEADERS[9].replaceFirst("\\{0\\}", "21")));
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("testSystemOutOfResourcesError_args")
+    public void testSystemOutOfResourcesError(String jdkAndLocale, String stackTraceHeader) throws Exception {
+        String stackTraceWithHeader = UNIDENTIFIED_LOG_LINES + stackTraceHeader + stackTraceSystemOutOfResourcesError;
+
+        List<CompilerMessage> compilerMessages =
+                JavacCompiler.parseModernStream(4, new BufferedReader(new StringReader(stackTraceWithHeader)));
+
+        assertThat(compilerMessages, notNullValue());
+        assertThat(compilerMessages, hasSize(1));
+
+        String message = compilerMessages.get(0).getMessage().replaceAll(EOL, "\n");
+        // Parser retains stack trace header
+        assertThat(message, startsWith(stackTraceHeader));
+        assertThat(message, endsWith(stackTraceSystemOutOfResourcesError));
+    }
+
+    private static final String stackTraceSystemOutOfResourcesError =
+            "java.lang.OutOfMemoryError: GC overhead limit exceeded\n"
+                    + "\tat com.sun.tools.javac.util.List.of(List.java:135)\n"
+                    + "\tat com.sun.tools.javac.util.ListBuffer.append(ListBuffer.java:129)\n"
+                    + "\tat com.sun.tools.javac.parser.JavacParser.variableDeclaratorsRest(JavacParser.java:3006)\n"
+                    + "\tat com.sun.tools.javac.parser.JavacParser.classOrInterfaceBodyDeclaration(JavacParser.java:3537)\n"
+                    + "\tat com.sun.tools.javac.parser.JavacParser.classOrInterfaceBody(JavacParser.java:3436)\n"
+                    + "\tat com.sun.tools.javac.parser.JavacParser.classDeclaration(JavacParser.java:3285)\n"
+                    + "\tat com.sun.tools.javac.parser.JavacParser.classOrInterfaceOrEnumDeclaration(JavacParser.java:3226)\n"
+                    + "\tat com.sun.tools.javac.parser.JavacParser.typeDeclaration(JavacParser.java:3215)\n"
+                    + "\tat com.sun.tools.javac.parser.JavacParser.parseCompilationUnit(JavacParser.java:3155)\n"
+                    + "\tat com.sun.tools.javac.main.JavaCompiler.parse(JavaCompiler.java:628)\n"
+                    + "\tat com.sun.tools.javac.main.JavaCompiler.parse(JavaCompiler.java:665)\n"
+                    + "\tat com.sun.tools.javac.main.JavaCompiler.parseFiles(JavaCompiler.java:950)\n"
+                    + "\tat com.sun.tools.javac.main.JavaCompiler.compile(JavaCompiler.java:857)\n"
+                    + "\tat com.sun.tools.javac.main.Main.compile(Main.java:523)\n"
+                    + "\tat com.sun.tools.javac.main.Main.compile(Main.java:381)\n"
+                    + "\tat com.sun.tools.javac.main.Main.compile(Main.java:370)\n"
+                    + "\tat com.sun.tools.javac.main.Main.compile(Main.java:361)\n"
+                    + "\tat com.sun.tools.javac.Main.compile(Main.java:56)\n"
+                    + "\tat com.sun.tools.javac.Main.main(Main.java:42)\n";
+
+    private static Stream<Arguments> testSystemOutOfResourcesError_args() {
+        return Stream.of(
+                Arguments.of("JDK 8 English", SYSTEM_OUT_OF_RESOURCES_ERROR_HEADERS[0]),
+                Arguments.of("JDK 8 Japanese", SYSTEM_OUT_OF_RESOURCES_ERROR_HEADERS[1]),
+                Arguments.of("JDK 8 Chinese", SYSTEM_OUT_OF_RESOURCES_ERROR_HEADERS[2]),
+                Arguments.of("JDK 21 English", SYSTEM_OUT_OF_RESOURCES_ERROR_HEADERS[3]),
+                Arguments.of("JDK 21 Japanese", SYSTEM_OUT_OF_RESOURCES_ERROR_HEADERS[4]),
+                Arguments.of("JDK 21 Chinese", SYSTEM_OUT_OF_RESOURCES_ERROR_HEADERS[5]),
+                Arguments.of("JDK 21 German", SYSTEM_OUT_OF_RESOURCES_ERROR_HEADERS[6]));
     }
 
     @Test
