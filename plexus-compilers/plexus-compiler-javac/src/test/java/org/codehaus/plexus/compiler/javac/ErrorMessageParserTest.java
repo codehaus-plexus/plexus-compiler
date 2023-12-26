@@ -37,8 +37,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.hamcrest.CoreMatchers.endsWith;
-import static org.hamcrest.CoreMatchers.startsWith;
+import static org.codehaus.plexus.compiler.javac.JavacCompiler.Messages.*;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -50,6 +50,8 @@ import static org.hamcrest.Matchers.notNullValue;
  */
 public class ErrorMessageParserTest {
     private static final String EOL = System.getProperty("line.separator");
+    private static final String UNIDENTIFIED_LOG_LINES =
+            "These log lines should be cut off\n" + "when preceding known error message headers\n";
 
     @Test
     public void testDeprecationMessage() throws Exception {
@@ -781,9 +783,38 @@ public class ErrorMessageParserTest {
     }
 
     @ParameterizedTest(name = "{0}")
+    @MethodSource("testStackTraceWithUnknownHeader_args")
+    public void testStackTraceWithUnknownHeader(String scenario, String stackTraceHeader) throws Exception {
+        String stackTraceWithHeader = UNIDENTIFIED_LOG_LINES + stackTraceHeader + stackTraceInternalCompilerError;
+
+        List<CompilerMessage> compilerMessages =
+                JavacCompiler.parseModernStream(4, new BufferedReader(new StringReader(stackTraceWithHeader)));
+
+        assertThat(compilerMessages, notNullValue());
+        assertThat(compilerMessages, hasSize(1));
+
+        String message = compilerMessages.get(0).getMessage().replaceAll(EOL, "\n");
+        // Parser retains neither unidentified log lines nor slightly modified stack trace header
+        assertThat(message, not(containsString(UNIDENTIFIED_LOG_LINES)));
+        assertThat(message, not(containsString(stackTraceHeader)));
+        // Parser returns stack strace without any preceding lines
+        assertThat(message, startsWith(stackTraceInternalCompilerError));
+    }
+
+    private static Stream<Arguments> testStackTraceWithUnknownHeader_args() {
+        return Stream.of(
+                Arguments.of(
+                        "modified compiler error header",
+                        FILE_A_BUG_ERROR_HEADERS[0].replaceAll("\\{0\\}", "21").replaceAll("bug", "beetle")),
+                Arguments.of(
+                        "modified annotation processor error header",
+                        ANNOTATION_PROCESSING_ERROR_HEADERS[0].replaceAll("uncaught", "undandled")));
+    }
+
+    @ParameterizedTest(name = "{0}")
     @MethodSource("testBugParade_args")
     public void testBugParade(String jdkAndLocale, String stackTraceHeader) throws Exception {
-        String stackTraceWithHeader = stackTraceHeader + stackTraceInternalCompilerError;
+        String stackTraceWithHeader = UNIDENTIFIED_LOG_LINES + stackTraceHeader + stackTraceInternalCompilerError;
 
         List<CompilerMessage> compilerMessages =
                 JavacCompiler.parseModernStream(4, new BufferedReader(new StringReader(stackTraceWithHeader)));
@@ -798,7 +829,8 @@ public class ErrorMessageParserTest {
     }
 
     private static final String stackTraceInternalCompilerError =
-            "\tat com.sun.tools.javac.comp.MemberEnter.baseEnv(MemberEnter.java:1388)\n"
+            "com.sun.tools.javac.code.Symbol$CompletionFailure: class file for java.util.Optional not found\n"
+                    + "\tat com.sun.tools.javac.comp.MemberEnter.baseEnv(MemberEnter.java:1388)\n"
                     + "\tat com.sun.tools.javac.comp.MemberEnter.complete(MemberEnter.java:1046)\n"
                     + "\tat com.sun.tools.javac.code.Symbol.complete(Symbol.java:574)\n"
                     + "\tat com.sun.tools.javac.code.Symbol$ClassSymbol.complete(Symbol.java:1037)\n"
@@ -832,27 +864,16 @@ public class ErrorMessageParserTest {
 
     private static Stream<Arguments> testBugParade_args() {
         return Stream.of(
-                Arguments.of(
-                        "JDK 8 English",
-                        "An exception has occurred in the compiler ({0}). Please file a bug at the Java Developer Connection (http://java.sun.com/webapps/bugreport)  after checking the Bug Parade for duplicates. Include your program and the following diagnostic in your report.  Thank you.\n"),
-                Arguments.of(
-                        "JDK 8 Japanese",
-                        "コンパイラで例外が発生しました({0})。Bug Paradeで重複がないかをご確認のうえ、Java Developer Connection (http://java.sun.com/webapps/bugreport)でbugの登録をお願いいたします。レポートには、そのプログラムと下記の診断内容を含めてください。ご協力ありがとうございます。\n"),
-                Arguments.of(
-                        "JDK 8 Chinese",
-                        "编译器 ({0}) 中出现异常错误。 如果在 Bug Parade 中没有找到该错误, 请在 Java Developer Connection (http://java.sun.com/webapps/bugreport) 中建立 Bug。请在报告中附上您的程序和以下诊断信息。谢谢。\n"),
-                Arguments.of(
-                        "JDK 21 English",
-                        "An exception has occurred in the compiler ({0}). Please file a bug against the Java compiler via the Java bug reporting page (https://bugreport.java.com) after checking the Bug Database (https://bugs.java.com) for duplicates. Include your program, the following diagnostic, and the parameters passed to the Java compiler in your report. Thank you.\n"),
-                Arguments.of(
-                        "JDK 21 Japanese",
-                        "コンパイラで例外が発生しました({0})。バグ・データベース(https://bugs.java.com)で重複がないかをご確認のうえ、Javaのバグ・レポート・ページ(https://bugreport.java.com)から、Javaコンパイラに対するバグの登録をお願いいたします。レポートには、該当のプログラム、次の診断内容、およびJavaコンパイラに渡されたパラメータをご入力ください。ご協力ありがとうございます。\n"),
-                Arguments.of(
-                        "JDK 21 Chinese",
-                        "编译器 ({0}) 中出现异常错误。如果在 Bug Database (https://bugs.java.com) 中没有找到有关该错误的 Java 编译器 Bug，请通过 Java Bug 报告页 (https://bugreport.java.com) 提交 Java 编译器 Bug。请在报告中附上您的程序、以下诊断信息以及传递到 Java 编译器的参数。谢谢。\n"),
-                Arguments.of(
-                        "JDK 21 German",
-                        "Im Compiler ({0}) ist eine Ausnahme aufgetreten. Erstellen Sie auf der Java-Seite zum Melden von Bugs (https://bugreport.java.com) einen Bugbericht, nachdem Sie die Bugdatenbank (https://bugs.java.com) auf Duplikate geprüft haben. Geben Sie in Ihrem Bericht Ihr Programm, die folgende Diagnose und die Parameter an, die Sie dem Java-Compiler übergeben haben. Vielen Dank.\n"));
+                Arguments.of("JDK 8 English", FILE_A_BUG_ERROR_HEADERS[0].replaceFirst("\\{0\\}", "21")),
+                Arguments.of("JDK 8 Japanese", FILE_A_BUG_ERROR_HEADERS[1].replaceFirst("\\{0\\}", "21")),
+                Arguments.of("JDK 8 Chinese", FILE_A_BUG_ERROR_HEADERS[2].replaceFirst("\\{0\\}", "21")),
+                Arguments.of("JDK 9 English", FILE_A_BUG_ERROR_HEADERS[3].replaceFirst("\\{0\\}", "21")),
+                Arguments.of("JDK 9 Japanese", FILE_A_BUG_ERROR_HEADERS[4].replaceFirst("\\{0\\}", "21")),
+                Arguments.of("JDK 9 Chinese", FILE_A_BUG_ERROR_HEADERS[5].replaceFirst("\\{0\\}", "21")),
+                Arguments.of("JDK 21 English", FILE_A_BUG_ERROR_HEADERS[6].replaceFirst("\\{0\\}", "21")),
+                Arguments.of("JDK 21 Japanese", FILE_A_BUG_ERROR_HEADERS[7].replaceFirst("\\{0\\}", "21")),
+                Arguments.of("JDK 21 Chinese", FILE_A_BUG_ERROR_HEADERS[8].replaceFirst("\\{0\\}", "21")),
+                Arguments.of("JDK 21 German", FILE_A_BUG_ERROR_HEADERS[9].replaceFirst("\\{0\\}", "21")));
     }
 
     @Test
@@ -1011,28 +1032,30 @@ public class ErrorMessageParserTest {
 
     @Test
     public void testJvmBootLayerInitializationError() throws Exception {
-        String out = "Error occurred during initialization of boot layer" + EOL
+        String out = "Error occurred during initialization of boot layer\n"
                 + "java.lang.module.FindException: Module java.xml.bind not found";
 
         List<CompilerMessage> compilerErrors =
-                JavacCompiler.parseModernStream(1, new BufferedReader(new StringReader(out)));
+                JavacCompiler.parseModernStream(1, new BufferedReader(new StringReader(UNIDENTIFIED_LOG_LINES + out)));
 
         assertThat(compilerErrors, notNullValue());
         assertThat(compilerErrors.size(), is(1));
         assertThat(compilerErrors.get(0).getKind(), is(CompilerMessage.Kind.ERROR));
+        assertThat(compilerErrors.get(0).getMessage().replaceAll(EOL, "\n"), startsWith(out));
     }
 
     @Test
     public void testJvmInitializationError() throws Exception {
-        String out = "Error occurred during initialization of VM" + EOL
+        String out = "Error occurred during initialization of VM\n"
                 + "Initial heap size set to a larger value than the maximum heap size";
 
         List<CompilerMessage> compilerErrors =
-                JavacCompiler.parseModernStream(1, new BufferedReader(new StringReader(out)));
+                JavacCompiler.parseModernStream(1, new BufferedReader(new StringReader(UNIDENTIFIED_LOG_LINES + out)));
 
         assertThat(compilerErrors, notNullValue());
         assertThat(compilerErrors.size(), is(1));
         assertThat(compilerErrors.get(0).getKind(), is(CompilerMessage.Kind.ERROR));
+        assertThat(compilerErrors.get(0).getMessage().replaceAll(EOL, "\n"), startsWith(out));
     }
 
     @Test

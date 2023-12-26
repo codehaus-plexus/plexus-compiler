@@ -133,6 +133,48 @@ public class JavacCompiler extends AbstractCompiler {
 
         // compiler.properties -> compiler.misc.verbose.*
         protected static final String[] MISC_PREFIXES = {"["};
+
+        // Generic javac error prefix
+        // TODO: In JDK 8, this generic prefix no longer seems to be in use for javac error messages, at least not in
+        //       the Java part of javac. Maybe in C sources? Does javac even use any native classes?
+        protected static final String[] JAVAC_GENERIC_ERROR_PREFIXES = {"javac:"};
+
+        // Hard-coded, English-only error header in JVM native code, *not* followed by stack trace, but rather
+        // by another text message
+        protected static final String[] VM_INIT_ERROR_HEADERS = {"Error occurred during initialization of VM"};
+
+        // Hard-coded, English-only error header in class System, followed by stack trace
+        protected static final String[] BOOT_LAYER_INIT_ERROR_HEADERS = {
+            "Error occurred during initialization of boot layer"
+        };
+
+        // javac.properties-> javac.msg.proc.annotation.uncaught.exception
+        // (en JDK-8, ja JDK-8, zh_CN JDK-8, en JDK-21, ja JDK-21, zh_CN JDK-21, de JDK-21)
+        protected static final String[] ANNOTATION_PROCESSING_ERROR_HEADERS = {
+            "\n\nAn annotation processor threw an uncaught exception.\nConsult the following stack trace for details.\n\n",
+            "\n\n注釈処理で捕捉されない例外がスローされました。\n詳細は次のスタック・トレースで調査してください。\n\n",
+            "\n\n批注处理程序抛出未捕获的异常错误。\n有关详细信息, 请参阅以下堆栈跟踪。\n\n",
+            "\n\nAn annotation processor threw an uncaught exception.\nConsult the following stack trace for details.\n\n",
+            "\n\n注釈処理で捕捉されない例外がスローされました。\n詳細は次のスタックトレースで調査してください。\n\n",
+            "\n\n批注处理程序抛出未捕获的异常错误。\n有关详细信息, 请参阅以下堆栈跟踪。\n\n",
+            "\n\nEin Annotationsprozessor hat eine nicht abgefangene Ausnahme ausgelöst.\nDetails finden Sie im folgenden Stacktrace.\n\n"
+        };
+
+        // javac.properties-> javac.msg.bug
+        // (en JDK-8, ja JDK-8, zh_CN JDK-8, en JDK-9, ja JDK-9, zh_CN JDK-9, en JDK-21, ja JDK-21, zh_CN JDK-21, de
+        // JDK-21)
+        protected static final String[] FILE_A_BUG_ERROR_HEADERS = {
+            "An exception has occurred in the compiler ({0}). Please file a bug at the Java Developer Connection (http://java.sun.com/webapps/bugreport)  after checking the Bug Parade for duplicates. Include your program and the following diagnostic in your report.  Thank you.\n",
+            "コンパイラで例外が発生しました({0})。Bug Paradeで重複がないかをご確認のうえ、Java Developer Connection (http://java.sun.com/webapps/bugreport)でbugの登録をお願いいたします。レポートには、そのプログラムと下記の診断内容を含めてください。ご協力ありがとうございます。\n",
+            "编译器 ({0}) 中出现异常错误。 如果在 Bug Parade 中没有找到该错误, 请在 Java Developer Connection (http://java.sun.com/webapps/bugreport) 中建立 Bug。请在报告中附上您的程序和以下诊断信息。谢谢。\n",
+            "An exception has occurred in the compiler ({0}). Please file a bug against the Java compiler via the Java bug reporting page (http://bugreport.java.com) after checking the Bug Database (http://bugs.java.com) for duplicates. Include your program and the following diagnostic in your report. Thank you.",
+            "コンパイラで例外が発生しました({0})。Bug Database (http://bugs.java.com)で重複がないかをご確認のうえ、Java bugレポート・ページ(http://bugreport.java.com)でJavaコンパイラに対するbugの登録をお願いいたします。レポートには、そのプログラムと下記の診断内容を含めてください。ご協力ありがとうございます。",
+            "编译器 ({0}) 中出现异常错误。如果在 Bug Database (http://bugs.java.com) 中没有找到该错误, 请通过 Java Bug 报告页 (http://bugreport.java.com) 建立该 Java 编译器 Bug。请在报告中附上您的程序和以下诊断信息。谢谢。",
+            "An exception has occurred in the compiler ({0}). Please file a bug against the Java compiler via the Java bug reporting page (https://bugreport.java.com) after checking the Bug Database (https://bugs.java.com) for duplicates. Include your program, the following diagnostic, and the parameters passed to the Java compiler in your report. Thank you.\n",
+            "コンパイラで例外が発生しました({0})。バグ・データベース(https://bugs.java.com)で重複がないかをご確認のうえ、Javaのバグ・レポート・ページ(https://bugreport.java.com)から、Javaコンパイラに対するバグの登録をお願いいたします。レポートには、該当のプログラム、次の診断内容、およびJavaコンパイラに渡されたパラメータをご入力ください。ご協力ありがとうございます。\n",
+            "编译器 ({0}) 中出现异常错误。如果在 Bug Database (https://bugs.java.com) 中没有找到有关该错误的 Java 编译器 Bug，请通过 Java Bug 报告页 (https://bugreport.java.com) 提交 Java 编译器 Bug。请在报告中附上您的程序、以下诊断信息以及传递到 Java 编译器的参数。谢谢。\n",
+            "Im Compiler ({0}) ist eine Ausnahme aufgetreten. Erstellen Sie auf der Java-Seite zum Melden von Bugs (https://bugreport.java.com) einen Bugbericht, nachdem Sie die Bugdatenbank (https://bugs.java.com) auf Duplikate geprüft haben. Geben Sie in Ihrem Bericht Ihr Programm, die folgende Diagnose und die Parameter an, die Sie dem Java-Compiler übergeben haben. Vielen Dank.\n"
+        };
     }
 
     private static final Object LOCK = new Object();
@@ -630,10 +672,6 @@ public class JavacCompiler extends AbstractCompiler {
     private static final Pattern STACK_TRACE_OTHER_LINE =
             Pattern.compile("^(?:Caused by:\\s.*|\\s*at .*|\\s*\\.\\.\\.\\s\\d+\\smore)$");
 
-    // Match generic javac errors with 'javac:' prefix, JMV init and boot layer init errors
-    private static final Pattern JAVAC_OR_JVM_ERROR =
-            Pattern.compile("^(?:javac:|Error occurred during initialization of (?:boot layer|VM)).*", Pattern.DOTALL);
-
     /**
      * Parse the compiler output into a list of compiler messages
      *
@@ -692,71 +730,129 @@ public class JavacCompiler extends AbstractCompiler {
             }
         }
 
+        String bufferContent = buffer.toString();
+        if (bufferContent.isEmpty()) {
+            return errors;
+        }
+
         // javac output not detected by other parsing
         // maybe better to ignore only the summary and mark the rest as error
-        String bufferAsString = buffer.toString();
-        if (!bufferAsString.isEmpty()) {
-            if (JAVAC_OR_JVM_ERROR.matcher(bufferAsString).matches()) {
-                errors.add(new CompilerMessage(bufferAsString, ERROR));
-            } else if (hasPointer) {
-                // A compiler message remains in buffer at end of parse stream
-                errors.add(parseModernError(exitCode, bufferAsString));
-            } else if (stackTraceLineCount > 0) {
-                // Extract stack trace from end of buffer
-                String[] lines = bufferAsString.split("\\R");
-                int linesTotal = lines.length;
-                buffer = new StringBuilder();
-                int firstLine = linesTotal - stackTraceLineCount;
-
-                // Salvage Javac localized message 'javac.msg.bug' ("An exception has occurred in the
-                // compiler ... Please file a bug")
-                if (firstLine > 0) {
-                    final String lineBeforeStackTrace = lines[firstLine - 1];
-                    // One of those two URL substrings should always appear, without regard to JVM locale.
-                    // TODO: Update, if the URL changes, last checked for JDK 21.
-                    if (lineBeforeStackTrace.contains("java.sun.com/webapps/bugreport")
-                            || lineBeforeStackTrace.contains("bugreport.java.com")) {
-                        firstLine--;
-                    }
-                }
-
-                // Note: For message 'javac.msg.proc.annotation.uncaught.exception' ("An annotation processor
-                // threw an uncaught exception"), there is no locale-independent substring, and the header is
-                // also multi-line. It was discarded in the removed method 'parseAnnotationProcessorStream',
-                // and we continue to do so.
-
-                for (int i = firstLine; i < linesTotal; i++) {
-                    buffer.append(lines[i]).append(EOL);
-                }
-                errors.add(new CompilerMessage(buffer.toString(), ERROR));
+        String cleanedUpMessage;
+        if ((cleanedUpMessage = getJavacGenericError(bufferContent)) != null
+                || (cleanedUpMessage = getBootLayerInitError(bufferContent)) != null
+                || (cleanedUpMessage = getVMInitError(bufferContent)) != null
+                || (cleanedUpMessage = getFileABugError(bufferContent)) != null
+                || (cleanedUpMessage = getAnnotationProcessingError(bufferContent)) != null) {
+            errors.add(new CompilerMessage(cleanedUpMessage, ERROR));
+        } else if (hasPointer) {
+            // A compiler message remains in buffer at end of parse stream
+            errors.add(parseModernError(exitCode, bufferContent));
+        } else if (stackTraceLineCount > 0) {
+            // Extract stack trace from end of buffer
+            String[] lines = bufferContent.split("\\R");
+            int linesTotal = lines.length;
+            buffer = new StringBuilder();
+            int firstLine = linesTotal - stackTraceLineCount;
+            for (int i = firstLine; i < linesTotal; i++) {
+                buffer.append(lines[i]).append(EOL);
             }
+            errors.add(new CompilerMessage(buffer.toString(), ERROR));
         }
+        // TODO: Add something like this? Check if it creates more value or more unnecessary log output in general.
+        // else {
+        //     // Fall-back, if still no error or stack trace was recognised
+        //     errors.add(new CompilerMessage(bufferContent, exitCode == 0 ? OTHER : ERROR));
+        // }
+
         return errors;
     }
 
-    private static boolean isMisc(String line) {
-        return startsWithPrefix(line, MISC_PREFIXES);
+    private static boolean isMisc(String message) {
+        return startsWithPrefix(message, MISC_PREFIXES);
     }
 
-    private static boolean isNote(String line) {
-        return startsWithPrefix(line, NOTE_PREFIXES);
+    private static boolean isNote(String message) {
+        return startsWithPrefix(message, NOTE_PREFIXES);
     }
 
-    private static boolean isWarning(String line) {
-        return startsWithPrefix(line, WARNING_PREFIXES);
+    private static boolean isWarning(String message) {
+        return startsWithPrefix(message, WARNING_PREFIXES);
     }
 
-    private static boolean isError(String line) {
-        return startsWithPrefix(line, ERROR_PREFIXES);
+    private static boolean isError(String message) {
+        return startsWithPrefix(message, ERROR_PREFIXES);
     }
 
-    private static boolean startsWithPrefix(String line, String[] prefixes) {
+    private static String getJavacGenericError(String message) {
+        return getTextStartingWithPrefix(message, JAVAC_GENERIC_ERROR_PREFIXES);
+    }
+
+    private static String getVMInitError(String message) {
+        return getTextStartingWithPrefix(message, VM_INIT_ERROR_HEADERS);
+    }
+
+    private static String getBootLayerInitError(String message) {
+        return getTextStartingWithPrefix(message, BOOT_LAYER_INIT_ERROR_HEADERS);
+    }
+
+    private static String getFileABugError(String message) {
+        return getTextStartingWithPrefix(message, FILE_A_BUG_ERROR_HEADERS);
+    }
+
+    private static String getAnnotationProcessingError(String message) {
+        return getTextStartingWithPrefix(message, ANNOTATION_PROCESSING_ERROR_HEADERS);
+    }
+
+    private static boolean startsWithPrefix(String text, String[] prefixes) {
         for (String prefix : prefixes) {
-            if (line.startsWith(prefix)) {
+            if (text.startsWith(prefix)) {
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * Identify and return a known javac error message prefix and all subsequent text - usually a stack trace - from a
+     * javac log output buffer.
+     *
+     * @param text     log buffer to search for a javac error message stack trace
+     * @param prefixes array of strings in Java properties format, e.g. {@code "some error with line feed\nand parameter
+     *                 placeholders {0} and {1}"} in multiple locales (hence the array). For the search, the
+     *                 placeholders may be represented by any text in the log buffer.
+     * @return if found, the error message + all subsequent text, otherwise {@code null}
+     */
+    static String getTextStartingWithPrefix(String text, String[] prefixes) {
+        // Implementation note: The properties format with placeholders  makes it easy to just copy & paste values from
+        // the JDK compared to having to convert them to regular expressions with ".*" instead of "{0}" and quote
+        // special regex characters. This makes the implementation of this method more complex and potentially a bit
+        // slower, but hopefully is worth the effort for the convenience of future developers maintaining this class.
+
+        // Normalise line feeds to the UNIX format found in JDK multi-line messages in properties files
+        text = text.replaceAll("\\R", "\n");
+
+        // Search text for given error message prefixes/headers, until the first match is found
+        for (String prefix : prefixes) {
+            // Split properties message along placeholders like "{0}", "{1}" etc.
+            String[] prefixParts = prefix.split("\\{\\d+\\}");
+            for (int i = 0; i < prefixParts.length; i++) {
+                // Make sure to treat split sections as literal text in search regex by enclosing them in "\Q" and "\E".
+                // See https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html, search for "Quotation".
+                prefixParts[i] = "\\Q" + prefixParts[i] + "\\E";
+            }
+            // Join message parts, replacing properties placeholders by ".*" regex ones
+            prefix = String.join(".*?", prefixParts);
+            // Find prefix + subsequent text in Pattern.DOTALL mode, represented in regex as "(?s)".
+            // This matches across line break boundaries.
+            Matcher matcher = Pattern.compile("(?s).*(" + prefix + ".*)").matcher(text);
+            if (matcher.matches()) {
+                // Match -> cut off text before header and replace UNIX line breaks by platform ones again
+                return matcher.replaceFirst("$1").replaceAll("\n", EOL);
+            }
+        }
+
+        // No match
+        return null;
     }
 
     /**

@@ -14,8 +14,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import static org.codehaus.plexus.compiler.javac.JavacCompiler.Messages.*;
 import static org.hamcrest.CoreMatchers.endsWith;
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -49,6 +49,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class JavacCompilerTest extends AbstractJavacCompilerTest {
     private static final String EOL = System.getProperty("line.separator");
+    private static final String UNIDENTIFIABLE_LOG_LINES =
+            "These log lines should be cut off\n" + "when preceding known error message headers\n";
 
     @BeforeEach
     public void setUp() {
@@ -60,7 +62,7 @@ public class JavacCompilerTest extends AbstractJavacCompilerTest {
     @MethodSource("testParseModernStream_withAnnotationProcessingErrors_args")
     void testParseModernStream_withAnnotationProcessingErrors(String jdkAndLocale, String stackTraceHeader)
             throws IOException {
-        String stackTraceWithHeader = stackTraceHeader + stackTraceAnnotationProcessingError;
+        String stackTraceWithHeader = UNIDENTIFIABLE_LOG_LINES + stackTraceHeader + stackTraceAnnotationProcessingError;
         List<CompilerMessage> compilerMessages =
                 JavacCompiler.parseModernStream(1, new BufferedReader(new StringReader(stackTraceWithHeader)));
 
@@ -68,8 +70,8 @@ public class JavacCompilerTest extends AbstractJavacCompilerTest {
         assertThat(compilerMessages, hasSize(1));
 
         String message = compilerMessages.get(0).getMessage().replaceAll(EOL, "\n");
-        // Parser does not retain stack trace header, because it is hard to identify in a locale-independent way
-        assertThat(message, not(startsWith(stackTraceHeader)));
+        // Parser retains stack trace header
+        assertThat(message, startsWith(stackTraceHeader));
         assertThat(message, endsWith(stackTraceAnnotationProcessingError));
     }
 
@@ -94,19 +96,13 @@ public class JavacCompilerTest extends AbstractJavacCompilerTest {
 
     private static Stream<Arguments> testParseModernStream_withAnnotationProcessingErrors_args() {
         return Stream.of(
-                Arguments.of(
-                        "JDK 8 English",
-                        "\n\nAn annotation processor threw an uncaught exception.\nConsult the following stack trace for details.\n\n"),
-                Arguments.of("JDK 8 Japanese", "\n\n注釈処理で捕捉されない例外がスローされました。\n詳細は次のスタック・トレースで調査してください。\n\n"),
-                Arguments.of("JDK 8 Chinese", "\n\n注释处理程序抛出未捕获的异常错误。\n有关详细信息, 请参阅以下堆栈跟踪。\n\n"),
-                Arguments.of(
-                        "JDK 21 English",
-                        "\n\nAn annotation processor threw an uncaught exception.\nConsult the following stack trace for details.\n\n"),
-                Arguments.of("JDK 21 Japanese", "\n\n注釈処理で捕捉されない例外がスローされました。\n詳細は次のスタックトレースで調査してください。\n\n"),
-                Arguments.of("JDK 21 Chinese", "\n\n批注处理程序抛出未捕获的异常错误。\n有关详细信息, 请参阅以下堆栈跟踪。\n\n"),
-                Arguments.of(
-                        "JDK 21 German",
-                        "\n\nEin Annotationsprozessor hat eine nicht abgefangene Ausnahme ausgelöst.\nDetails finden Sie im folgenden Stacktrace.\n\n"));
+                Arguments.of("JDK 8 English", ANNOTATION_PROCESSING_ERROR_HEADERS[0]),
+                Arguments.of("JDK 8 Japanese", ANNOTATION_PROCESSING_ERROR_HEADERS[1]),
+                Arguments.of("JDK 8 Chinese", ANNOTATION_PROCESSING_ERROR_HEADERS[2]),
+                Arguments.of("JDK 21 English", ANNOTATION_PROCESSING_ERROR_HEADERS[3]),
+                Arguments.of("JDK 21 Japanese", ANNOTATION_PROCESSING_ERROR_HEADERS[4]),
+                Arguments.of("JDK 21 Chinese", ANNOTATION_PROCESSING_ERROR_HEADERS[5]),
+                Arguments.of("JDK 21 German", ANNOTATION_PROCESSING_ERROR_HEADERS[6]));
     }
 
     @Test
