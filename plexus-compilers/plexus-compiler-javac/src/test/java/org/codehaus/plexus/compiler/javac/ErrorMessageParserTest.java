@@ -811,7 +811,8 @@ public class ErrorMessageParserTest {
                         ANNOTATION_PROCESSING_ERROR_HEADERS[0].replaceAll("uncaught", "undandled")),
                 Arguments.of(
                         "modified out of resources error header",
-                        SYSTEM_OUT_OF_RESOURCES_ERROR_HEADERS[0].replaceAll("resources", "memory")));
+                        SYSTEM_OUT_OF_RESOURCES_ERROR_HEADERS[0].replaceAll("resources", "memory")),
+                Arguments.of("modified I/O error header", IO_ERROR_HEADERS[0].replaceAll("input/output", "I/O")));
     }
 
     @ParameterizedTest(name = "{0}")
@@ -927,6 +928,53 @@ public class ErrorMessageParserTest {
                 Arguments.of("JDK 21 Japanese", SYSTEM_OUT_OF_RESOURCES_ERROR_HEADERS[4]),
                 Arguments.of("JDK 21 Chinese", SYSTEM_OUT_OF_RESOURCES_ERROR_HEADERS[5]),
                 Arguments.of("JDK 21 German", SYSTEM_OUT_OF_RESOURCES_ERROR_HEADERS[6]));
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("testIOError_args")
+    public void testIOError(String jdkAndLocale, String stackTraceHeader) throws Exception {
+        String stackTraceWithHeader = UNIDENTIFIED_LOG_LINES + stackTraceHeader + stackTraceIOError;
+
+        List<CompilerMessage> compilerMessages =
+                JavacCompiler.parseModernStream(4, new BufferedReader(new StringReader(stackTraceWithHeader)));
+
+        assertThat(compilerMessages, notNullValue());
+        assertThat(compilerMessages, hasSize(1));
+
+        String message = compilerMessages.get(0).getMessage().replaceAll(EOL, "\n");
+        // Parser retains stack trace header
+        assertThat(message, startsWith(stackTraceHeader));
+        assertThat(message, endsWith(stackTraceIOError));
+    }
+
+    private static final String stackTraceIOError =
+            "An input/output error occurred.\n" + "Consult the following stack trace for details.\n"
+                    + "java.nio.charset.MalformedInputException: Input length = 1\n"
+                    + "\tat java.base/java.nio.charset.CoderResult.throwException(CoderResult.java:274)\n"
+                    + "\tat java.base/sun.nio.cs.StreamDecoder.implRead(StreamDecoder.java:339)\n"
+                    + "\tat java.base/sun.nio.cs.StreamDecoder.read(StreamDecoder.java:178)\n"
+                    + "\tat java.base/java.io.InputStreamReader.read(InputStreamReader.java:185)\n"
+                    + "\tat java.base/java.io.BufferedReader.fill(BufferedReader.java:161)\n"
+                    + "\tat java.base/java.io.BufferedReader.read(BufferedReader.java:182)\n"
+                    + "\tat jdk.compiler/com.sun.tools.javac.main.CommandLine$Tokenizer.<init>(CommandLine.java:143)\n"
+                    + "\tat jdk.compiler/com.sun.tools.javac.main.CommandLine.loadCmdFile(CommandLine.java:129)\n"
+                    + "\tat jdk.compiler/com.sun.tools.javac.main.CommandLine.appendParsedCommandArgs(CommandLine.java:71)\n"
+                    + "\tat jdk.compiler/com.sun.tools.javac.main.CommandLine.parse(CommandLine.java:102)\n"
+                    + "\tat jdk.compiler/com.sun.tools.javac.main.CommandLine.parse(CommandLine.java:123)\n"
+                    + "\tat jdk.compiler/com.sun.tools.javac.main.Main.compile(Main.java:215)\n"
+                    + "\tat jdk.compiler/com.sun.tools.javac.main.Main.compile(Main.java:170)\n"
+                    + "\tat jdk.compiler/com.sun.tools.javac.Main.compile(Main.java:57)\n"
+                    + "\tat jdk.compiler/com.sun.tools.javac.Main.main(Main.java:43)\n";
+
+    private static Stream<Arguments> testIOError_args() {
+        return Stream.of(
+                Arguments.of("JDK 8 English", IO_ERROR_HEADERS[0]),
+                Arguments.of("JDK 8 Japanese", IO_ERROR_HEADERS[1]),
+                Arguments.of("JDK 8 Chinese", IO_ERROR_HEADERS[2]),
+                Arguments.of("JDK 21 English", IO_ERROR_HEADERS[3]),
+                Arguments.of("JDK 21 Japanese", IO_ERROR_HEADERS[4]),
+                Arguments.of("JDK 21 Chinese", IO_ERROR_HEADERS[5]),
+                Arguments.of("JDK 21 German", IO_ERROR_HEADERS[6]));
     }
 
     @Test
