@@ -812,7 +812,9 @@ public class ErrorMessageParserTest {
                 Arguments.of(
                         "modified out of resources error header",
                         SYSTEM_OUT_OF_RESOURCES_ERROR_HEADERS[0].replaceAll("resources", "memory")),
-                Arguments.of("modified I/O error header", IO_ERROR_HEADERS[0].replaceAll("input/output", "I/O")));
+                Arguments.of("modified I/O error header", IO_ERROR_HEADERS[0].replaceAll("input/output", "I/O")),
+                Arguments.of(
+                        "modified plugin error header", PLUGIN_ERROR_HEADERS[0].replaceAll("uncaught", "unhandled")));
     }
 
     @ParameterizedTest(name = "{0}")
@@ -975,6 +977,46 @@ public class ErrorMessageParserTest {
                 Arguments.of("JDK 21 Japanese", IO_ERROR_HEADERS[4]),
                 Arguments.of("JDK 21 Chinese", IO_ERROR_HEADERS[5]),
                 Arguments.of("JDK 21 German", IO_ERROR_HEADERS[6]));
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("testPluginError_args")
+    public void testPluginError(String jdkAndLocale, String stackTraceHeader) throws Exception {
+        String stackTraceWithHeader = UNIDENTIFIED_LOG_LINES + stackTraceHeader + stackTracePluginError;
+
+        List<CompilerMessage> compilerMessages =
+                JavacCompiler.parseModernStream(4, new BufferedReader(new StringReader(stackTraceWithHeader)));
+
+        assertThat(compilerMessages, notNullValue());
+        assertThat(compilerMessages, hasSize(1));
+
+        String message = compilerMessages.get(0).getMessage().replaceAll(EOL, "\n");
+        // Parser retains stack trace header
+        assertThat(message, startsWith(stackTraceHeader));
+        assertThat(message, endsWith(stackTracePluginError));
+    }
+
+    private static final String stackTracePluginError =
+            "A plugin threw an uncaught exception.\n" + "Consult the following stack trace for details.\n"
+                    + "java.lang.NoSuchMethodError: com.sun.tools.javac.util.JavacMessages.add(Lcom/sun/tools/javac/util/JavacMessages$ResourceBundleHelper;)V\n"
+                    + "\tat com.google.errorprone.BaseErrorProneJavaCompiler.setupMessageBundle(BaseErrorProneJavaCompiler.java:202)\n"
+                    + "\tat com.google.errorprone.ErrorProneJavacPlugin.init(ErrorProneJavacPlugin.java:40)\n"
+                    + "\tat com.sun.tools.javac.main.Main.compile(Main.java:470)\n"
+                    + "\tat com.sun.tools.javac.main.Main.compile(Main.java:381)\n"
+                    + "\tat com.sun.tools.javac.main.Main.compile(Main.java:370)\n"
+                    + "\tat com.sun.tools.javac.main.Main.compile(Main.java:361)\n"
+                    + "\tat com.sun.tools.javac.Main.compile(Main.java:56)\n"
+                    + "\tat com.sun.tools.javac.Main.main(Main.java:42)\n";
+
+    private static Stream<Arguments> testPluginError_args() {
+        return Stream.of(
+                Arguments.of("JDK 8 English", PLUGIN_ERROR_HEADERS[0]),
+                Arguments.of("JDK 8 Japanese", PLUGIN_ERROR_HEADERS[1]),
+                Arguments.of("JDK 8 Chinese", PLUGIN_ERROR_HEADERS[2]),
+                Arguments.of("JDK 21 English", PLUGIN_ERROR_HEADERS[3]),
+                Arguments.of("JDK 21 Japanese", PLUGIN_ERROR_HEADERS[4]),
+                Arguments.of("JDK 21 Chinese", PLUGIN_ERROR_HEADERS[5]),
+                Arguments.of("JDK 21 German", PLUGIN_ERROR_HEADERS[6]));
     }
 
     @Test
