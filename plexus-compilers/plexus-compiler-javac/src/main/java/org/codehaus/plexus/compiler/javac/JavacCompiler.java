@@ -200,6 +200,17 @@ public class JavacCompiler extends AbstractCompiler {
             "\n\nEin Eingabe-/Ausgabefehler ist aufgetreten.\nDetails finden Sie im folgenden Stacktrace.\n"
         };
 
+        // javac.properties-> javac.msg.plugin.uncaught.exception
+        // (en JDK-8, ja JDK-8, zh_CN JDK-8, en JDK-21, ja JDK-21, zh_CN JDK-21, de JDK-21)
+        protected static final String[] PLUGIN_ERROR_HEADERS = {
+            "\n\nA plugin threw an uncaught exception.\nConsult the following stack trace for details.\n",
+            "\n\nプラグインで捕捉されない例外がスローされました。\n詳細は次のスタック・トレースで調査してください。\n",
+            "\n\n插件抛出未捕获的异常错误。\n有关详细信息, 请参阅以下堆栈跟踪。\n",
+            "\n\nA plugin threw an uncaught exception.\nConsult the following stack trace for details.\n",
+            "\n\nプラグインで捕捉されない例外がスローされました。\n詳細は次のスタック・トレースで調査してください。\n",
+            "\n\n插件抛出未捕获的异常错误。\n有关详细信息, 请参阅以下堆栈跟踪。\n",
+            "\n\nEin Plug-in hat eine nicht abgefangene Ausnahme ausgel\u00F6st.\nDetails finden Sie im folgenden Stacktrace.\n"
+        };
     }
 
     private static final Object LOCK = new Object();
@@ -769,7 +780,8 @@ public class JavacCompiler extends AbstractCompiler {
                 || (cleanedUpMessage = getFileABugError(bufferContent)) != null
                 || (cleanedUpMessage = getAnnotationProcessingError(bufferContent)) != null
                 || (cleanedUpMessage = getSystemOutOfResourcesError(bufferContent)) != null
-                || (cleanedUpMessage = getIOError(bufferContent)) != null) {
+                || (cleanedUpMessage = getIOError(bufferContent)) != null
+                || (cleanedUpMessage = getPluginError(bufferContent)) != null) {
             errors.add(new CompilerMessage(cleanedUpMessage, ERROR));
         } else if (hasPointer) {
             // A compiler message remains in buffer at end of parse stream
@@ -836,6 +848,10 @@ public class JavacCompiler extends AbstractCompiler {
 
     private static String getIOError(String message) {
         return getTextStartingWithPrefix(message, IO_ERROR_HEADERS);
+    }
+
+    private static String getPluginError(String message) {
+        return getTextStartingWithPrefix(message, PLUGIN_ERROR_HEADERS);
     }
 
     private static boolean startsWithPrefix(String text, String[] prefixes) {
