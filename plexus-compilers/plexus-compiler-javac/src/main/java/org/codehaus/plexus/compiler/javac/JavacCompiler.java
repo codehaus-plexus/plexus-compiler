@@ -969,11 +969,14 @@ public class JavacCompiler extends AbstractCompiler {
             final StringBuilder msgBuffer = new StringBuilder();
             String msg = tokens.nextToken(EOL).substring(2);
 
-            // Remove the 'warning: ' prefix
-            final String warnPrefix = getWarningPrefix(msg);
-            if (warnPrefix != null) {
+            // Remove "error: " and "warning: " prefixes
+            String prefix;
+            if ((prefix = getErrorPrefix(msg)) != null) {
+                messageKind = ERROR;
+                msg = msg.substring(prefix.length());
+            } else if ((prefix = getWarningPrefix(msg)) != null) {
                 messageKind = WARNING;
-                msg = msg.substring(warnPrefix.length());
+                msg = msg.substring(prefix.length());
             }
             msgBuffer.append(msg).append(EOL);
 
@@ -1012,13 +1015,21 @@ public class JavacCompiler extends AbstractCompiler {
         }
     }
 
-    private static String getWarningPrefix(String msg) {
-        for (String warningPrefix : WARNING_PREFIXES) {
-            if (msg.startsWith(warningPrefix)) {
-                return warningPrefix;
+    private static String getMessagePrefix(String message, String[] prefixes) {
+        for (String prefix : prefixes) {
+            if (message.startsWith(prefix)) {
+                return prefix;
             }
         }
         return null;
+    }
+
+    private static String getWarningPrefix(String message) {
+        return getMessagePrefix(message, WARNING_PREFIXES);
+    }
+
+    private static String getErrorPrefix(String message) {
+        return getMessagePrefix(message, ERROR_PREFIXES);
     }
 
     /**
