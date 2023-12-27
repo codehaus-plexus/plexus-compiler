@@ -753,8 +753,7 @@ public class ErrorMessageParserTest {
 
         assertThat(
                 message1.getMessage(),
-                is("error: cannot find symbol" + EOL + "  symbol:   class Properties" + EOL
-                        + "  location: class Error"));
+                is("cannot find symbol" + EOL + "  symbol:   class Properties" + EOL + "  location: class Error"));
 
         assertThat(message1.getStartColumn(), is(16));
 
@@ -770,8 +769,7 @@ public class ErrorMessageParserTest {
 
         assertThat(
                 message2.getMessage(),
-                is("error: cannot find symbol" + EOL + "  symbol:   class Properties" + EOL
-                        + "  location: class Error"));
+                is("cannot find symbol" + EOL + "  symbol:   class Properties" + EOL + "  location: class Error"));
 
         assertThat(message2.getStartColumn(), is(35));
 
@@ -1259,7 +1257,7 @@ public class ErrorMessageParserTest {
     private void validateBadSourceFile(CompilerMessage message) {
         assertThat("Is an Error", message.getKind(), is(CompilerMessage.Kind.ERROR));
         assertThat("On Correct File", message.getFile(), is("/MTOOLCHAINS-19/src/main/java/ch/pecunifex/x/Cls1.java"));
-        assertThat("Message starts with access Error", message.getMessage(), startsWith("error: cannot access Cls2"));
+        assertThat("Message starts with access Error", message.getMessage(), startsWith("cannot access Cls2"));
     }
 
     private static void assertEquivalent(CompilerMessage expected, CompilerMessage actual) {
