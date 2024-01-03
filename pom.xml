@@ -48,7 +48,7 @@
     <jupiter.version>5.10.1</jupiter.version>
     <aspectj.version>1.9.21</aspectj.version>
     <maven.version>3.5.4</maven.version>
-    <errorprone.version>2.24.0</errorprone.version>
+    <errorprone.version>2.24.1</errorprone.version>
     <trimStackTrace>false</trimStackTrace>
     <preparationGoals>clean install</preparationGoals>
     <maven.compiler.version>3.12.1</maven.compiler.version>
