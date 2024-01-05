@@ -24,7 +24,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.codehaus.plexus.compiler.it</groupId>
-  <artifactId>eclipse-compiler-mapstruct</artifactId>
+  <artifactId>eclipse-compiler-procpath</artifactId>
   <version>1.0-SNAPSHOT</version>
 
   <properties>
@@ -52,6 +52,13 @@
         <version>@maven.compiler.version@</version>
         <configuration>
           <compilerId>eclipse</compilerId>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>org.mapstruct</groupId>
+              <artifactId>mapstruct-processor</artifactId>
+              <version>${org.mapstruct.version}</version>
+            </path>
+          </annotationProcessorPaths>
         </configuration>
         <dependencies>
           <dependency>
@@ -64,33 +71,9 @@
             <artifactId>plexus-compiler-eclipse</artifactId>
             <version>${plexus.compiler.version}</version>
           </dependency>
-          <dependency>
-            <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct-processor</artifactId>
-            <version>${org.mapstruct.version}</version>
-          </dependency>
         </dependencies>
       </plugin>
     </plugins>
   </build>
-
-  <profiles>
-    <profile>
-      <id>without-dummy</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <configuration>
-              <excludes>
-                <exclude>**/Dummy.java</exclude>
-              </excludes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 
 </project>
