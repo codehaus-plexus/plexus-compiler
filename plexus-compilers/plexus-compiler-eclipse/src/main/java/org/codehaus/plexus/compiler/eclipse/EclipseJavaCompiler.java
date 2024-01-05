@@ -147,7 +147,21 @@ public class EclipseJavaCompiler extends AbstractCompiler {
         args.add("-d");
         args.add(config.getOutputLocation());
 
+        // -- classpath
+        // must be done before annotation processors: https://bugs.eclipse.org/bugs/show_bug.cgi?id=573833
+        List<String> classpathEntries = new ArrayList<>(config.getClasspathEntries());
+        classpathEntries.add(config.getOutputLocation());
+        args.add("-classpath");
+        args.add(getPathString(classpathEntries));
+
+        List<String> modulepathEntries = config.getModulepathEntries();
+        if (modulepathEntries != null && !modulepathEntries.isEmpty()) {
+            args.add("--module-path");
+            args.add(getPathString(modulepathEntries));
+        }
+
         // Annotation processors defined?
+        // must be done after classpath: https://bugs.eclipse.org/bugs/show_bug.cgi?id=573833
         if (!isPreJava1_6(config)) {
             File generatedSourcesDir = config.getGeneratedSourcesDirectory();
             if (generatedSourcesDir != null) {
@@ -196,18 +210,6 @@ public class EclipseJavaCompiler extends AbstractCompiler {
                     args.add("-proc:" + config.getProc());
                 }
             }
-        }
-
-        // -- classpath
-        List<String> classpathEntries = new ArrayList<>(config.getClasspathEntries());
-        classpathEntries.add(config.getOutputLocation());
-        args.add("-classpath");
-        args.add(getPathString(classpathEntries));
-
-        List<String> modulepathEntries = config.getModulepathEntries();
-        if (modulepathEntries != null && !modulepathEntries.isEmpty()) {
-            args.add("--module-path");
-            args.add(getPathString(modulepathEntries));
         }
 
         // Collect sources
