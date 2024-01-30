@@ -26,9 +26,9 @@ package org.codehaus.plexus.compiler;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.slf4j.Logger;
@@ -99,18 +99,22 @@ public abstract class AbstractCompiler implements Compiler {
 
     public abstract String getCompilerId();
 
+    @Override
     public CompilerResult performCompile(CompilerConfiguration configuration) throws CompilerException {
         throw new CompilerNotImplementedException("The performCompile method has not been implemented.");
     }
 
+    @Override
     public CompilerOutputStyle getCompilerOutputStyle() {
         return compilerOutputStyle;
     }
 
+    @Override
     public String getInputFileEnding(CompilerConfiguration configuration) throws CompilerException {
         return inputFileEnding;
     }
 
+    @Override
     public String getOutputFileEnding(CompilerConfiguration configuration) throws CompilerException {
         if (compilerOutputStyle != CompilerOutputStyle.ONE_OUTPUT_FILE_PER_INPUT_FILE) {
             throw new RuntimeException("This compiler implementation doesn't have one output file per input file.");
@@ -119,6 +123,7 @@ public abstract class AbstractCompiler implements Compiler {
         return outputFileEnding;
     }
 
+    @Override
     public String getOutputFile(CompilerConfiguration configuration) throws CompilerException {
         if (compilerOutputStyle != CompilerOutputStyle.ONE_OUTPUT_FILE_FOR_ALL_INPUT_FILES) {
             throw new RuntimeException("This compiler implementation doesn't have one output file for all files.");
@@ -127,6 +132,7 @@ public abstract class AbstractCompiler implements Compiler {
         return outputFile;
     }
 
+    @Override
     public boolean canUpdateTarget(CompilerConfiguration configuration) throws CompilerException {
         return true;
     }
@@ -174,7 +180,7 @@ public abstract class AbstractCompiler implements Compiler {
 
         String[] sourceDirectorySources = scanner.getIncludedFiles();
 
-        Set<String> sources = new HashSet<>();
+        Set<String> sources = new TreeSet<>();
 
         for (String sourceDirectorySource : sourceDirectorySources) {
             File f = new File(sourceLocation, sourceDirectorySource);
@@ -186,7 +192,7 @@ public abstract class AbstractCompiler implements Compiler {
     }
 
     protected static String[] getSourceFiles(CompilerConfiguration config) {
-        Set<String> sources = new HashSet<>();
+        Set<String> sources = new TreeSet<>();
 
         Set<File> sourceFiles = config.getSourceFiles();
 
