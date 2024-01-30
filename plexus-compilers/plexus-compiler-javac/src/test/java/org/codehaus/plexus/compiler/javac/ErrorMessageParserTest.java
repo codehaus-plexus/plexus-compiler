@@ -37,8 +37,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.hamcrest.CoreMatchers.endsWith;
-import static org.hamcrest.CoreMatchers.startsWith;
+import static org.codehaus.plexus.compiler.javac.JavacCompiler.Messages.*;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -50,6 +50,8 @@ import static org.hamcrest.Matchers.notNullValue;
  */
 public class ErrorMessageParserTest {
     private static final String EOL = System.getProperty("line.separator");
+    private static final String UNIDENTIFIED_LOG_LINES =
+            "These log lines should be cut off\n" + "when preceding known error message headers\n";
 
     @Test
     public void testDeprecationMessage() throws Exception {
@@ -751,8 +753,7 @@ public class ErrorMessageParserTest {
 
         assertThat(
                 message1.getMessage(),
-                is("error: cannot find symbol" + EOL + "  symbol:   class Properties" + EOL
-                        + "  location: class Error"));
+                is("cannot find symbol" + EOL + "  symbol:   class Properties" + EOL + "  location: class Error"));
 
         assertThat(message1.getStartColumn(), is(16));
 
@@ -768,8 +769,7 @@ public class ErrorMessageParserTest {
 
         assertThat(
                 message2.getMessage(),
-                is("error: cannot find symbol" + EOL + "  symbol:   class Properties" + EOL
-                        + "  location: class Error"));
+                is("cannot find symbol" + EOL + "  symbol:   class Properties" + EOL + "  location: class Error"));
 
         assertThat(message2.getStartColumn(), is(35));
 
@@ -781,9 +781,44 @@ public class ErrorMessageParserTest {
     }
 
     @ParameterizedTest(name = "{0}")
+    @MethodSource("testStackTraceWithUnknownHeader_args")
+    public void testStackTraceWithUnknownHeader(String scenario, String stackTraceHeader) throws Exception {
+        String stackTraceWithHeader = UNIDENTIFIED_LOG_LINES + stackTraceHeader + stackTraceInternalCompilerError;
+
+        List<CompilerMessage> compilerMessages =
+                JavacCompiler.parseModernStream(4, new BufferedReader(new StringReader(stackTraceWithHeader)));
+
+        assertThat(compilerMessages, notNullValue());
+        assertThat(compilerMessages, hasSize(1));
+
+        String message = compilerMessages.get(0).getMessage().replaceAll(EOL, "\n");
+        // Parser retains neither unidentified log lines nor slightly modified stack trace header
+        assertThat(message, not(containsString(UNIDENTIFIED_LOG_LINES)));
+        assertThat(message, not(containsString(stackTraceHeader)));
+        // Parser returns stack strace without any preceding lines
+        assertThat(message, startsWith(stackTraceInternalCompilerError));
+    }
+
+    private static Stream<Arguments> testStackTraceWithUnknownHeader_args() {
+        return Stream.of(
+                Arguments.of(
+                        "modified compiler error header",
+                        FILE_A_BUG_ERROR_HEADERS[0].replaceAll("\\{0\\}", "21").replaceAll("bug", "beetle")),
+                Arguments.of(
+                        "modified annotation processor error header",
+                        ANNOTATION_PROCESSING_ERROR_HEADERS[0].replaceAll("uncaught", "undandled")),
+                Arguments.of(
+                        "modified out of resources error header",
+                        SYSTEM_OUT_OF_RESOURCES_ERROR_HEADERS[0].replaceAll("resources", "memory")),
+                Arguments.of("modified I/O error header", IO_ERROR_HEADERS[0].replaceAll("input/output", "I/O")),
+                Arguments.of(
+                        "modified plugin error header", PLUGIN_ERROR_HEADERS[0].replaceAll("uncaught", "unhandled")));
+    }
+
+    @ParameterizedTest(name = "{0}")
     @MethodSource("testBugParade_args")
     public void testBugParade(String jdkAndLocale, String stackTraceHeader) throws Exception {
-        String stackTraceWithHeader = stackTraceHeader + stackTraceInternalCompilerError;
+        String stackTraceWithHeader = UNIDENTIFIED_LOG_LINES + stackTraceHeader + stackTraceInternalCompilerError;
 
         List<CompilerMessage> compilerMessages =
                 JavacCompiler.parseModernStream(4, new BufferedReader(new StringReader(stackTraceWithHeader)));
@@ -798,7 +833,8 @@ public class ErrorMessageParserTest {
     }
 
     private static final String stackTraceInternalCompilerError =
-            "\tat com.sun.tools.javac.comp.MemberEnter.baseEnv(MemberEnter.java:1388)\n"
+            "com.sun.tools.javac.code.Symbol$CompletionFailure: class file for java.util.Optional not found\n"
+                    + "\tat com.sun.tools.javac.comp.MemberEnter.baseEnv(MemberEnter.java:1388)\n"
                     + "\tat com.sun.tools.javac.comp.MemberEnter.complete(MemberEnter.java:1046)\n"
                     + "\tat com.sun.tools.javac.code.Symbol.complete(Symbol.java:574)\n"
                     + "\tat com.sun.tools.javac.code.Symbol$ClassSymbol.complete(Symbol.java:1037)\n"
@@ -832,27 +868,153 @@ public class ErrorMessageParserTest {
 
     private static Stream<Arguments> testBugParade_args() {
         return Stream.of(
-                Arguments.of(
-                        "JDK 8 English",
-                        "An exception has occurred in the compiler ({0}). Please file a bug at the Java Developer Connection (http://java.sun.com/webapps/bugreport)  after checking the Bug Parade for duplicates. Include your program and the following diagnostic in your report.  Thank you.\n"),
-                Arguments.of(
-                        "JDK 8 Japanese",
-                        "コンパイラで例外が発生しました({0})。Bug Paradeで重複がないかをご確認のうえ、Java Developer Connection (http://java.sun.com/webapps/bugreport)でbugの登録をお願いいたします。レポートには、そのプログラムと下記の診断内容を含めてください。ご協力ありがとうございます。\n"),
-                Arguments.of(
-                        "JDK 8 Chinese",
-                        "编译器 ({0}) 中出现异常错误。 如果在 Bug Parade 中没有找到该错误, 请在 Java Developer Connection (http://java.sun.com/webapps/bugreport) 中建立 Bug。请在报告中附上您的程序和以下诊断信息。谢谢。\n"),
-                Arguments.of(
-                        "JDK 21 English",
-                        "An exception has occurred in the compiler ({0}). Please file a bug against the Java compiler via the Java bug reporting page (https://bugreport.java.com) after checking the Bug Database (https://bugs.java.com) for duplicates. Include your program, the following diagnostic, and the parameters passed to the Java compiler in your report. Thank you.\n"),
-                Arguments.of(
-                        "JDK 21 Japanese",
-                        "コンパイラで例外が発生しました({0})。バグ・データベース(https://bugs.java.com)で重複がないかをご確認のうえ、Javaのバグ・レポート・ページ(https://bugreport.java.com)から、Javaコンパイラに対するバグの登録をお願いいたします。レポートには、該当のプログラム、次の診断内容、およびJavaコンパイラに渡されたパラメータをご入力ください。ご協力ありがとうございます。\n"),
-                Arguments.of(
-                        "JDK 21 Chinese",
-                        "编译器 ({0}) 中出现异常错误。如果在 Bug Database (https://bugs.java.com) 中没有找到有关该错误的 Java 编译器 Bug，请通过 Java Bug 报告页 (https://bugreport.java.com) 提交 Java 编译器 Bug。请在报告中附上您的程序、以下诊断信息以及传递到 Java 编译器的参数。谢谢。\n"),
-                Arguments.of(
-                        "JDK 21 German",
-                        "Im Compiler ({0}) ist eine Ausnahme aufgetreten. Erstellen Sie auf der Java-Seite zum Melden von Bugs (https://bugreport.java.com) einen Bugbericht, nachdem Sie die Bugdatenbank (https://bugs.java.com) auf Duplikate geprüft haben. Geben Sie in Ihrem Bericht Ihr Programm, die folgende Diagnose und die Parameter an, die Sie dem Java-Compiler übergeben haben. Vielen Dank.\n"));
+                Arguments.of("JDK 8 English", FILE_A_BUG_ERROR_HEADERS[0].replaceFirst("\\{0\\}", "21")),
+                Arguments.of("JDK 8 Japanese", FILE_A_BUG_ERROR_HEADERS[1].replaceFirst("\\{0\\}", "21")),
+                Arguments.of("JDK 8 Chinese", FILE_A_BUG_ERROR_HEADERS[2].replaceFirst("\\{0\\}", "21")),
+                Arguments.of("JDK 9 English", FILE_A_BUG_ERROR_HEADERS[3].replaceFirst("\\{0\\}", "21")),
+                Arguments.of("JDK 9 Japanese", FILE_A_BUG_ERROR_HEADERS[4].replaceFirst("\\{0\\}", "21")),
+                Arguments.of("JDK 9 Chinese", FILE_A_BUG_ERROR_HEADERS[5].replaceFirst("\\{0\\}", "21")),
+                Arguments.of("JDK 21 English", FILE_A_BUG_ERROR_HEADERS[6].replaceFirst("\\{0\\}", "21")),
+                Arguments.of("JDK 21 Japanese", FILE_A_BUG_ERROR_HEADERS[7].replaceFirst("\\{0\\}", "21")),
+                Arguments.of("JDK 21 Chinese", FILE_A_BUG_ERROR_HEADERS[8].replaceFirst("\\{0\\}", "21")),
+                Arguments.of("JDK 21 German", FILE_A_BUG_ERROR_HEADERS[9].replaceFirst("\\{0\\}", "21")));
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("testSystemOutOfResourcesError_args")
+    public void testSystemOutOfResourcesError(String jdkAndLocale, String stackTraceHeader) throws Exception {
+        String stackTraceWithHeader = UNIDENTIFIED_LOG_LINES + stackTraceHeader + stackTraceSystemOutOfResourcesError;
+
+        List<CompilerMessage> compilerMessages =
+                JavacCompiler.parseModernStream(4, new BufferedReader(new StringReader(stackTraceWithHeader)));
+
+        assertThat(compilerMessages, notNullValue());
+        assertThat(compilerMessages, hasSize(1));
+
+        String message = compilerMessages.get(0).getMessage().replaceAll(EOL, "\n");
+        // Parser retains stack trace header
+        assertThat(message, startsWith(stackTraceHeader));
+        assertThat(message, endsWith(stackTraceSystemOutOfResourcesError));
+    }
+
+    private static final String stackTraceSystemOutOfResourcesError =
+            "java.lang.OutOfMemoryError: GC overhead limit exceeded\n"
+                    + "\tat com.sun.tools.javac.util.List.of(List.java:135)\n"
+                    + "\tat com.sun.tools.javac.util.ListBuffer.append(ListBuffer.java:129)\n"
+                    + "\tat com.sun.tools.javac.parser.JavacParser.variableDeclaratorsRest(JavacParser.java:3006)\n"
+                    + "\tat com.sun.tools.javac.parser.JavacParser.classOrInterfaceBodyDeclaration(JavacParser.java:3537)\n"
+                    + "\tat com.sun.tools.javac.parser.JavacParser.classOrInterfaceBody(JavacParser.java:3436)\n"
+                    + "\tat com.sun.tools.javac.parser.JavacParser.classDeclaration(JavacParser.java:3285)\n"
+                    + "\tat com.sun.tools.javac.parser.JavacParser.classOrInterfaceOrEnumDeclaration(JavacParser.java:3226)\n"
+                    + "\tat com.sun.tools.javac.parser.JavacParser.typeDeclaration(JavacParser.java:3215)\n"
+                    + "\tat com.sun.tools.javac.parser.JavacParser.parseCompilationUnit(JavacParser.java:3155)\n"
+                    + "\tat com.sun.tools.javac.main.JavaCompiler.parse(JavaCompiler.java:628)\n"
+                    + "\tat com.sun.tools.javac.main.JavaCompiler.parse(JavaCompiler.java:665)\n"
+                    + "\tat com.sun.tools.javac.main.JavaCompiler.parseFiles(JavaCompiler.java:950)\n"
+                    + "\tat com.sun.tools.javac.main.JavaCompiler.compile(JavaCompiler.java:857)\n"
+                    + "\tat com.sun.tools.javac.main.Main.compile(Main.java:523)\n"
+                    + "\tat com.sun.tools.javac.main.Main.compile(Main.java:381)\n"
+                    + "\tat com.sun.tools.javac.main.Main.compile(Main.java:370)\n"
+                    + "\tat com.sun.tools.javac.main.Main.compile(Main.java:361)\n"
+                    + "\tat com.sun.tools.javac.Main.compile(Main.java:56)\n"
+                    + "\tat com.sun.tools.javac.Main.main(Main.java:42)\n";
+
+    private static Stream<Arguments> testSystemOutOfResourcesError_args() {
+        return Stream.of(
+                Arguments.of("JDK 8 English", SYSTEM_OUT_OF_RESOURCES_ERROR_HEADERS[0]),
+                Arguments.of("JDK 8 Japanese", SYSTEM_OUT_OF_RESOURCES_ERROR_HEADERS[1]),
+                Arguments.of("JDK 8 Chinese", SYSTEM_OUT_OF_RESOURCES_ERROR_HEADERS[2]),
+                Arguments.of("JDK 21 English", SYSTEM_OUT_OF_RESOURCES_ERROR_HEADERS[3]),
+                Arguments.of("JDK 21 Japanese", SYSTEM_OUT_OF_RESOURCES_ERROR_HEADERS[4]),
+                Arguments.of("JDK 21 Chinese", SYSTEM_OUT_OF_RESOURCES_ERROR_HEADERS[5]),
+                Arguments.of("JDK 21 German", SYSTEM_OUT_OF_RESOURCES_ERROR_HEADERS[6]));
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("testIOError_args")
+    public void testIOError(String jdkAndLocale, String stackTraceHeader) throws Exception {
+        String stackTraceWithHeader = UNIDENTIFIED_LOG_LINES + stackTraceHeader + stackTraceIOError;
+
+        List<CompilerMessage> compilerMessages =
+                JavacCompiler.parseModernStream(4, new BufferedReader(new StringReader(stackTraceWithHeader)));
+
+        assertThat(compilerMessages, notNullValue());
+        assertThat(compilerMessages, hasSize(1));
+
+        String message = compilerMessages.get(0).getMessage().replaceAll(EOL, "\n");
+        // Parser retains stack trace header
+        assertThat(message, startsWith(stackTraceHeader));
+        assertThat(message, endsWith(stackTraceIOError));
+    }
+
+    private static final String stackTraceIOError =
+            "An input/output error occurred.\n" + "Consult the following stack trace for details.\n"
+                    + "java.nio.charset.MalformedInputException: Input length = 1\n"
+                    + "\tat java.base/java.nio.charset.CoderResult.throwException(CoderResult.java:274)\n"
+                    + "\tat java.base/sun.nio.cs.StreamDecoder.implRead(StreamDecoder.java:339)\n"
+                    + "\tat java.base/sun.nio.cs.StreamDecoder.read(StreamDecoder.java:178)\n"
+                    + "\tat java.base/java.io.InputStreamReader.read(InputStreamReader.java:185)\n"
+                    + "\tat java.base/java.io.BufferedReader.fill(BufferedReader.java:161)\n"
+                    + "\tat java.base/java.io.BufferedReader.read(BufferedReader.java:182)\n"
+                    + "\tat jdk.compiler/com.sun.tools.javac.main.CommandLine$Tokenizer.<init>(CommandLine.java:143)\n"
+                    + "\tat jdk.compiler/com.sun.tools.javac.main.CommandLine.loadCmdFile(CommandLine.java:129)\n"
+                    + "\tat jdk.compiler/com.sun.tools.javac.main.CommandLine.appendParsedCommandArgs(CommandLine.java:71)\n"
+                    + "\tat jdk.compiler/com.sun.tools.javac.main.CommandLine.parse(CommandLine.java:102)\n"
+                    + "\tat jdk.compiler/com.sun.tools.javac.main.CommandLine.parse(CommandLine.java:123)\n"
+                    + "\tat jdk.compiler/com.sun.tools.javac.main.Main.compile(Main.java:215)\n"
+                    + "\tat jdk.compiler/com.sun.tools.javac.main.Main.compile(Main.java:170)\n"
+                    + "\tat jdk.compiler/com.sun.tools.javac.Main.compile(Main.java:57)\n"
+                    + "\tat jdk.compiler/com.sun.tools.javac.Main.main(Main.java:43)\n";
+
+    private static Stream<Arguments> testIOError_args() {
+        return Stream.of(
+                Arguments.of("JDK 8 English", IO_ERROR_HEADERS[0]),
+                Arguments.of("JDK 8 Japanese", IO_ERROR_HEADERS[1]),
+                Arguments.of("JDK 8 Chinese", IO_ERROR_HEADERS[2]),
+                Arguments.of("JDK 21 English", IO_ERROR_HEADERS[3]),
+                Arguments.of("JDK 21 Japanese", IO_ERROR_HEADERS[4]),
+                Arguments.of("JDK 21 Chinese", IO_ERROR_HEADERS[5]),
+                Arguments.of("JDK 21 German", IO_ERROR_HEADERS[6]));
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("testPluginError_args")
+    public void testPluginError(String jdkAndLocale, String stackTraceHeader) throws Exception {
+        String stackTraceWithHeader = UNIDENTIFIED_LOG_LINES + stackTraceHeader + stackTracePluginError;
+
+        List<CompilerMessage> compilerMessages =
+                JavacCompiler.parseModernStream(4, new BufferedReader(new StringReader(stackTraceWithHeader)));
+
+        assertThat(compilerMessages, notNullValue());
+        assertThat(compilerMessages, hasSize(1));
+
+        String message = compilerMessages.get(0).getMessage().replaceAll(EOL, "\n");
+        // Parser retains stack trace header
+        assertThat(message, startsWith(stackTraceHeader));
+        assertThat(message, endsWith(stackTracePluginError));
+    }
+
+    private static final String stackTracePluginError =
+            "A plugin threw an uncaught exception.\n" + "Consult the following stack trace for details.\n"
+                    + "java.lang.NoSuchMethodError: com.sun.tools.javac.util.JavacMessages.add(Lcom/sun/tools/javac/util/JavacMessages$ResourceBundleHelper;)V\n"
+                    + "\tat com.google.errorprone.BaseErrorProneJavaCompiler.setupMessageBundle(BaseErrorProneJavaCompiler.java:202)\n"
+                    + "\tat com.google.errorprone.ErrorProneJavacPlugin.init(ErrorProneJavacPlugin.java:40)\n"
+                    + "\tat com.sun.tools.javac.main.Main.compile(Main.java:470)\n"
+                    + "\tat com.sun.tools.javac.main.Main.compile(Main.java:381)\n"
+                    + "\tat com.sun.tools.javac.main.Main.compile(Main.java:370)\n"
+                    + "\tat com.sun.tools.javac.main.Main.compile(Main.java:361)\n"
+                    + "\tat com.sun.tools.javac.Main.compile(Main.java:56)\n"
+                    + "\tat com.sun.tools.javac.Main.main(Main.java:42)\n";
+
+    private static Stream<Arguments> testPluginError_args() {
+        return Stream.of(
+                Arguments.of("JDK 8 English", PLUGIN_ERROR_HEADERS[0]),
+                Arguments.of("JDK 8 Japanese", PLUGIN_ERROR_HEADERS[1]),
+                Arguments.of("JDK 8 Chinese", PLUGIN_ERROR_HEADERS[2]),
+                Arguments.of("JDK 21 English", PLUGIN_ERROR_HEADERS[3]),
+                Arguments.of("JDK 21 Japanese", PLUGIN_ERROR_HEADERS[4]),
+                Arguments.of("JDK 21 Chinese", PLUGIN_ERROR_HEADERS[5]),
+                Arguments.of("JDK 21 German", PLUGIN_ERROR_HEADERS[6]));
     }
 
     @Test
@@ -1011,28 +1173,30 @@ public class ErrorMessageParserTest {
 
     @Test
     public void testJvmBootLayerInitializationError() throws Exception {
-        String out = "Error occurred during initialization of boot layer" + EOL
+        String out = "Error occurred during initialization of boot layer\n"
                 + "java.lang.module.FindException: Module java.xml.bind not found";
 
         List<CompilerMessage> compilerErrors =
-                JavacCompiler.parseModernStream(1, new BufferedReader(new StringReader(out)));
+                JavacCompiler.parseModernStream(1, new BufferedReader(new StringReader(UNIDENTIFIED_LOG_LINES + out)));
 
         assertThat(compilerErrors, notNullValue());
         assertThat(compilerErrors.size(), is(1));
         assertThat(compilerErrors.get(0).getKind(), is(CompilerMessage.Kind.ERROR));
+        assertThat(compilerErrors.get(0).getMessage().replaceAll(EOL, "\n"), startsWith(out));
     }
 
     @Test
     public void testJvmInitializationError() throws Exception {
-        String out = "Error occurred during initialization of VM" + EOL
+        String out = "Error occurred during initialization of VM\n"
                 + "Initial heap size set to a larger value than the maximum heap size";
 
         List<CompilerMessage> compilerErrors =
-                JavacCompiler.parseModernStream(1, new BufferedReader(new StringReader(out)));
+                JavacCompiler.parseModernStream(1, new BufferedReader(new StringReader(UNIDENTIFIED_LOG_LINES + out)));
 
         assertThat(compilerErrors, notNullValue());
         assertThat(compilerErrors.size(), is(1));
         assertThat(compilerErrors.get(0).getKind(), is(CompilerMessage.Kind.ERROR));
+        assertThat(compilerErrors.get(0).getMessage().replaceAll(EOL, "\n"), startsWith(out));
     }
 
     @Test
@@ -1093,7 +1257,7 @@ public class ErrorMessageParserTest {
     private void validateBadSourceFile(CompilerMessage message) {
         assertThat("Is an Error", message.getKind(), is(CompilerMessage.Kind.ERROR));
         assertThat("On Correct File", message.getFile(), is("/MTOOLCHAINS-19/src/main/java/ch/pecunifex/x/Cls1.java"));
-        assertThat("Message starts with access Error", message.getMessage(), startsWith("error: cannot access Cls2"));
+        assertThat("Message starts with access Error", message.getMessage(), startsWith("cannot access Cls2"));
     }
 
     private static void assertEquivalent(CompilerMessage expected, CompilerMessage actual) {
