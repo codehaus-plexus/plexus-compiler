@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.codehaus.plexus.compiler.CompilerMessage;
+import org.codehaus.plexus.compiler.javac.JavacCompiler.JavaVersion;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -18,6 +20,9 @@ import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -102,5 +107,23 @@ public class JavacCompilerTest extends AbstractJavacCompilerTest {
                 Arguments.of(
                         "JDK 21 German",
                         "\n\nEin Annotationsprozessor hat eine nicht abgefangene Ausnahme ausgelöst.\nDetails finden Sie im folgenden Stacktrace.\n\n"));
+    }
+
+    @Test
+    void testJavaVersionPrefixes() {
+        assertFalse(JavaVersion.JAVA_1_4.isOlderOrEqualTo("1.3"));
+        assertTrue(JavaVersion.JAVA_1_4.isOlderOrEqualTo("1.4"));
+        assertTrue(JavaVersion.JAVA_1_4.isOlderOrEqualTo("1.4.0_something"));
+        assertFalse(JavaVersion.JAVA_1_5.isOlderOrEqualTo("1.4"));
+        assertTrue(JavaVersion.JAVA_1_8.isOlderOrEqualTo("1.8"));
+        assertTrue(JavaVersion.JAVA_1_8.isOlderOrEqualTo("22.0.2-something"));
+        assertTrue(JavaVersion.JAVA_1_8.isOlderOrEqualTo("unknown"));
+    }
+
+    @Test
+    void testExtractMajorAndMinorVersion() {
+        assertEquals("11.0", JavacCompiler.extractMajorAndMinorVersion("javac 11.0.22"));
+        assertEquals("11.0", JavacCompiler.extractMajorAndMinorVersion("11.0.22"));
+        assertEquals("21", JavacCompiler.extractMajorAndMinorVersion("javac 21"));
     }
 }

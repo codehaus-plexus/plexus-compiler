@@ -34,12 +34,10 @@ import java.util.Map;
 import org.codehaus.plexus.compiler.AbstractCompilerTest;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.util.StringUtils;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 /**
  * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>
@@ -207,22 +205,19 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
                 "org/codehaus/foo/ReservedWord.class");
     }
 
-    protected void internalTest(CompilerConfiguration compilerConfiguration, List<String> expectedArguments) {
-        internalTest(compilerConfiguration, expectedArguments, new String[0]);
+    protected void internalTest(
+            CompilerConfiguration compilerConfiguration, List<String> expectedArguments, String javacVersion) {
+        internalTest(compilerConfiguration, expectedArguments, new String[0], javacVersion);
     }
 
     public void internalTest(
-            CompilerConfiguration compilerConfiguration, List<String> expectedArguments, String[] sources) {
-        String[] actualArguments = JavacCompiler.buildCompilerArguments(compilerConfiguration, sources);
+            CompilerConfiguration compilerConfiguration,
+            List<String> expectedArguments,
+            String[] sources,
+            String javacVersion) {
+        String[] actualArguments = JavacCompiler.buildCompilerArguments(compilerConfiguration, sources, javacVersion);
 
-        assertThat(
-                "The expected and actual argument list sizes differ.",
-                actualArguments,
-                Matchers.arrayWithSize(expectedArguments.size()));
-
-        for (int i = 0; i < actualArguments.length; i++) {
-            assertThat("Unexpected argument", actualArguments[i], is(expectedArguments.get(i)));
-        }
+        assertArrayEquals(actualArguments, expectedArguments.toArray(new String[0]));
     }
 
     @Test
@@ -231,11 +226,9 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
-        compilerConfiguration.setCompilerVersion("1.3");
-
         populateArguments(compilerConfiguration, expectedArguments, true, true, false);
 
-        internalTest(compilerConfiguration, expectedArguments);
+        internalTest(compilerConfiguration, expectedArguments, "1.3");
     }
 
     @Test
@@ -244,11 +237,9 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
-        compilerConfiguration.setCompilerVersion("1.4");
-
         populateArguments(compilerConfiguration, expectedArguments, false, false, false);
 
-        internalTest(compilerConfiguration, expectedArguments);
+        internalTest(compilerConfiguration, expectedArguments, "1.4");
     }
 
     @Test
@@ -257,11 +248,9 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
-        compilerConfiguration.setCompilerVersion("1.5");
-
         populateArguments(compilerConfiguration, expectedArguments, false, false, false);
 
-        internalTest(compilerConfiguration, expectedArguments);
+        internalTest(compilerConfiguration, expectedArguments, "1.5");
     }
 
     @Test
@@ -270,11 +259,9 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
-        compilerConfiguration.setCompilerVersion("1.8");
-
         populateArguments(compilerConfiguration, expectedArguments, false, false, true);
 
-        internalTest(compilerConfiguration, expectedArguments);
+        internalTest(compilerConfiguration, expectedArguments, "1.8");
     }
 
     @Test
@@ -283,9 +270,9 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
-        populateArguments(compilerConfiguration, expectedArguments, false, false, false);
+        populateArguments(compilerConfiguration, expectedArguments, false, false, true);
 
-        internalTest(compilerConfiguration, expectedArguments);
+        internalTest(compilerConfiguration, expectedArguments, "unknown");
     }
 
     @Test
@@ -298,9 +285,9 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
 
         compilerConfiguration.setDebugLevel("none");
 
-        populateArguments(compilerConfiguration, expectedArguments, false, false, false);
+        populateArguments(compilerConfiguration, expectedArguments, false, false, true);
 
-        internalTest(compilerConfiguration, expectedArguments);
+        internalTest(compilerConfiguration, expectedArguments, "1.8");
     }
 
     // PLXCOMP-190
@@ -334,7 +321,7 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
         compilerConfiguration.setCustomCompilerArgumentsAsMap(customCompilerArguments);
         // don't expect this argument!!
 
-        internalTest(compilerConfiguration, expectedArguments);
+        internalTest(compilerConfiguration, expectedArguments, "1.8");
     }
 
     @Test
@@ -370,7 +357,7 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
         // unshared table
         expectedArguments.add("-XDuseUnsharedTable=true");
 
-        internalTest(compilerConfiguration, expectedArguments, source);
+        internalTest(compilerConfiguration, expectedArguments, source, "11.0.1");
     }
 
     @Test
@@ -399,7 +386,7 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
         // unshared table
         expectedArguments.add("-XDuseUnsharedTable=true");
 
-        internalTest(compilerConfiguration, expectedArguments);
+        internalTest(compilerConfiguration, expectedArguments, "11.0.1");
     }
 
     @Test
@@ -427,7 +414,7 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
         // unshared table
         expectedArguments.add("-XDuseUnsharedTable=true");
 
-        internalTest(compilerConfiguration, expectedArguments);
+        internalTest(compilerConfiguration, expectedArguments, "11.0.1");
     }
 
     @Test
@@ -449,7 +436,7 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
         // unshared table
         expectedArguments.add("-XDuseUnsharedTable=true");
 
-        internalTest(compilerConfiguration, expectedArguments);
+        internalTest(compilerConfiguration, expectedArguments, "11.0.1");
     }
 
     @Test
@@ -476,7 +463,7 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
         // unshared table
         expectedArguments.add("-XDuseUnsharedTable=true");
 
-        internalTest(compilerConfiguration, expectedArguments);
+        internalTest(compilerConfiguration, expectedArguments, "1.8");
     }
 
     @Test
@@ -507,7 +494,7 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
         // unshared table
         expectedArguments.add("-XDuseUnsharedTable=true");
 
-        internalTest(compilerConfiguration, expectedArguments);
+        internalTest(compilerConfiguration, expectedArguments, "1.8");
     }
 
     /* This test fails on Java 1.4. The multiple parameters of the same source file cause an error, as it is interpreted as a DuplicateClass

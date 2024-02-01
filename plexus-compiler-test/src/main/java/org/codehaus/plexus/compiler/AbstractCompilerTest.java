@@ -41,11 +41,13 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.properties.internal.SystemProperties;
 import org.apache.maven.settings.Settings;
-import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
+import org.apache.maven.settings.building.DefaultSettingsBuilderFactory;
+import org.apache.maven.settings.building.DefaultSettingsBuildingRequest;
+import org.apache.maven.settings.building.SettingsBuildingRequest;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
 import org.hamcrest.io.FileMatchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -83,7 +85,13 @@ public abstract class AbstractCompilerTest {
         if (localRepo == null) {
             File settingsFile = new File(System.getProperty("user.home"), ".m2/settings.xml");
             if (settingsFile.exists()) {
-                Settings settings = new SettingsXpp3Reader().read(ReaderFactory.newXmlReader(settingsFile));
+                SettingsBuildingRequest request = new DefaultSettingsBuildingRequest();
+                request.setUserSettingsFile(settingsFile);
+                request.setSystemProperties(SystemProperties.getSystemProperties());
+                Settings settings = new DefaultSettingsBuilderFactory()
+                        .newInstance()
+                        .build(request)
+                        .getEffectiveSettings();
                 localRepo = settings.getLocalRepository();
             }
         }
@@ -116,7 +124,7 @@ public abstract class AbstractCompilerTest {
         File file = getLocalArtifactPath("commons-lang", "commons-lang", "2.0", "jar");
 
         assertThat(
-                "test prerequisite: commons-lang library must be available in local repository, expected ",
+                "test prerequisite: commons-lang library must be available in local repository at " + file,
                 file,
                 FileMatchers.aReadableFile());
 
