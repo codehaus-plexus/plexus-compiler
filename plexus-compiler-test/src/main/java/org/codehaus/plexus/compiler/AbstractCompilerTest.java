@@ -26,12 +26,7 @@ package org.codehaus.plexus.compiler;
 import javax.inject.Inject;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.maven.artifact.Artifact;
@@ -43,6 +38,7 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
+import org.codehaus.plexus.interpolation.*;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.ReaderFactory;
@@ -85,6 +81,13 @@ public abstract class AbstractCompilerTest {
             if (settingsFile.exists()) {
                 Settings settings = new SettingsXpp3Reader().read(ReaderFactory.newXmlReader(settingsFile));
                 localRepo = settings.getLocalRepository();
+                if (localRepo != null && localRepo.contains("${") && localRepo.contains("}")) {
+                    Interpolator interpolator = new StringSearchInterpolator();
+                    interpolator.addValueSource(new PropertiesBasedValueSource(System.getProperties()));
+                    interpolator.addValueSource(
+                            new PrefixedValueSourceWrapper(new MapBasedValueSource(System.getenv()), "env"));
+                    localRepo = interpolator.interpolate(localRepo);
+                }
             }
         }
         if (localRepo == null) {
