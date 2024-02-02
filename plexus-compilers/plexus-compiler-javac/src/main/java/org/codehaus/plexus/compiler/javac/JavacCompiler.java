@@ -66,6 +66,7 @@ import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -113,6 +114,9 @@ public class JavacCompiler extends AbstractCompiler {
 
     private static final Pattern JAVA_MAJOR_AND_MINOR_VERSION_PATTERN = Pattern.compile("\\d+(\\.\\d+)?");
 
+    /** Cache of javac version per executable (never invalidated) */
+    private static final Map<String, String> VERSION_PER_EXECUTABLE = new ConcurrentHashMap<>();
+
     @Inject
     private InProcessCompiler inProcessCompiler;
 
@@ -138,24 +142,29 @@ public class JavacCompiler extends AbstractCompiler {
     }
 
     private String getOutOfProcessJavacVersion(String executable) throws CompilerException {
-        Commandline cli = new Commandline();
-        cli.setExecutable(executable);
-        /*
-         * The option "-version" should be supported by javac since 1.6 (https://docs.oracle.com/javase/6/docs/technotes/tools/solaris/javac.html)
-         * up to 21 (https://docs.oracle.com/en/java/javase/21/docs/specs/man/javac.html#standard-options)
-         */
-        cli.addArguments(new String[] {"-version"}); //
-        CommandLineUtils.StringStreamConsumer out = new CommandLineUtils.StringStreamConsumer();
-        try {
-            int exitCode = CommandLineUtils.executeCommandLine(cli, out, out);
-            if (exitCode != 0) {
-                throw new CompilerException("Could not retrieve version from " + executable + ". Exit code " + exitCode
-                        + ", Output: " + out.getOutput());
+        String version = VERSION_PER_EXECUTABLE.get(executable);
+        if (version == null) {
+            Commandline cli = new Commandline();
+            cli.setExecutable(executable);
+            /*
+             * The option "-version" should be supported by javac since 1.6 (https://docs.oracle.com/javase/6/docs/technotes/tools/solaris/javac.html)
+             * up to 21 (https://docs.oracle.com/en/java/javase/21/docs/specs/man/javac.html#standard-options)
+             */
+            cli.addArguments(new String[] {"-version"}); //
+            CommandLineUtils.StringStreamConsumer out = new CommandLineUtils.StringStreamConsumer();
+            try {
+                int exitCode = CommandLineUtils.executeCommandLine(cli, out, out);
+                if (exitCode != 0) {
+                    throw new CompilerException("Could not retrieve version from " + executable + ". Exit code "
+                            + exitCode + ", Output: " + out.getOutput());
+                }
+            } catch (CommandLineException e) {
+                throw new CompilerException("Error while executing the external compiler " + executable, e);
             }
-        } catch (CommandLineException e) {
-            throw new CompilerException("Error while executing the external compiler " + executable, e);
+            version = extractMajorAndMinorVersion(out.getOutput());
+            VERSION_PER_EXECUTABLE.put(executable, version);
         }
-        return extractMajorAndMinorVersion(out.getOutput());
+        return version;
     }
 
     static String extractMajorAndMinorVersion(String text) {
@@ -435,7 +444,7 @@ public class JavacCompiler extends AbstractCompiler {
      * Represents a particular Java version (through their according version prefixes)
      */
     enum JavaVersion {
-        JAVA_1_3("1.3", "1.2", "1.1", "1.0"),
+        JAVA_1_3_OR_OLDER("1.3", "1.2", "1.1", "1.0"),
         JAVA_1_4("1.4"),
         JAVA_1_5("1.5"),
         JAVA_1_6("1.6"),
