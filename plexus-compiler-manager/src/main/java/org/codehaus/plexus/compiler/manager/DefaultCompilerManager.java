@@ -25,6 +25,7 @@ package org.codehaus.plexus.compiler.manager;
  */
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import java.util.Map;
 
@@ -36,19 +37,27 @@ import org.codehaus.plexus.compiler.Compiler;
 @Named
 public class DefaultCompilerManager implements CompilerManager {
     @Inject
-    private Map<String, Compiler> compilers;
+    private Map<String, Provider<Compiler>> compilers;
 
     // ----------------------------------------------------------------------
     // CompilerManager Implementation
     // ----------------------------------------------------------------------
 
     public Compiler getCompiler(String compilerId) throws NoSuchCompilerException {
-        Compiler compiler = compilers.get(compilerId);
+        // Provider<Class> is lazy
+        // presence of provider means component is present (but not yet constructed)
+        Provider<Compiler> compiler = compilers.get(compilerId);
 
+        // it exists: as provider is found
         if (compiler == null) {
             throw new NoSuchCompilerException(compilerId);
         }
-
-        return compiler;
+        // provider is lazy: if we are here, it exists but not yet created
+        try {
+            return compiler.get();
+        } catch (Exception e) {
+            // if we are here: DI could not construct it: so report proper error
+            throw new RuntimeException(e);
+        }
     }
 }
