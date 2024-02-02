@@ -501,7 +501,7 @@ public class CompilerConfiguration {
     }
 
     /**
-     * @deprecated Don't use any longer because this is just the configured version which does not necessarily match the version 
+     * @deprecated Don't use any longer because this is just the configured version which does not necessarily match the version
      * of the actually executed compiler binary
      */
     @Deprecated
@@ -510,7 +510,7 @@ public class CompilerConfiguration {
     }
 
     /**
-     * @deprecated Don't use any longer because this is just the configured version which does not necessarily match the version 
+     * @deprecated Don't use any longer because this is just the configured version which does not necessarily match the version
      * of the actually executed compiler binary
      */
     @Deprecated
