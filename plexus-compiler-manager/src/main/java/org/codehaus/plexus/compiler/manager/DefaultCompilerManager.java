@@ -25,30 +25,51 @@ package org.codehaus.plexus.compiler.manager;
  */
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import java.util.Map;
 
 import org.codehaus.plexus.compiler.Compiler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  */
 @Named
 public class DefaultCompilerManager implements CompilerManager {
+    private static final String ERROR_MESSAGE = "Compiler '{}' could not be instantiated or injected properly. "
+            + "Running the build with -Dsisu.debug, looking for exceptions might help.";
+    private static final String ERROR_MESSAGE_DETAIL = "TypeNotPresentException caused by UnsupportedClassVersionError "
+            + "might indicate, that the compiler needs a more recent Java runtime. "
+            + "IllegalArgumentException in ClassReader.<init> might mean, that you need to upgrade Maven.";
+
     @Inject
-    private Map<String, Compiler> compilers;
+    private Map<String, Provider<Compiler>> compilers;
+
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     // ----------------------------------------------------------------------
     // CompilerManager Implementation
     // ----------------------------------------------------------------------
 
     public Compiler getCompiler(String compilerId) throws NoSuchCompilerException {
-        Compiler compiler = compilers.get(compilerId);
+        // Provider<Class> is lazy -> presence of provider means compiler is present, but not yet constructed
+        Provider<Compiler> compilerProvider = compilers.get(compilerId);
 
-        if (compiler == null) {
+        if (compilerProvider == null) {
+            // Compiler could not be injected for some reason
+            log.error(ERROR_MESSAGE + " " + ERROR_MESSAGE_DETAIL, compilerId);
             throw new NoSuchCompilerException(compilerId);
         }
 
-        return compiler;
+        // Provider exists, but compiler was not created yet
+        try {
+            return compilerProvider.get();
+        } catch (Exception e) {
+            // DI could not construct compiler
+            log.error(ERROR_MESSAGE, compilerId);
+            throw new NoSuchCompilerException(compilerId);
+        }
     }
 }
