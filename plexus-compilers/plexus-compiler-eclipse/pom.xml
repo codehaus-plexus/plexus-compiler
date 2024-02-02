@@ -14,7 +14,7 @@
   <description>Eclipse Compiler support for Plexus Compiler component.</description>
 
   <properties>
-    <javaVersion>17</javaVersion>
+    <javaVersion>11</javaVersion>
   </properties>
 
   <dependencies>
@@ -56,5 +56,36 @@
       <scope>compile</scope>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-compile</id>
+            <configuration>
+              <excludes>
+                <exclude>**/EclipseJavaCompilerDelegate.java</exclude>
+              </excludes>
+            </configuration>
+          </execution>
+          <execution>
+            <id>compile-java-17</id>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <release>17</release>
+              <includes>
+                <include>**/EclipseJavaCompilerDelegate.java</include>
+              </includes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>

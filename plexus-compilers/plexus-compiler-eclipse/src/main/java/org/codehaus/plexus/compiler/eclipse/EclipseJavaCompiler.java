@@ -34,6 +34,9 @@ import javax.tools.StandardJavaFileManager;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
@@ -52,8 +55,6 @@ import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.compiler.CompilerOutputStyle;
 import org.codehaus.plexus.compiler.CompilerResult;
 import org.codehaus.plexus.util.StringUtils;
-import org.eclipse.jdt.core.compiler.CompilationProgress;
-import org.eclipse.jdt.core.compiler.batch.BatchCompiler;
 
 /**
  *
@@ -63,12 +64,27 @@ import org.eclipse.jdt.core.compiler.batch.BatchCompiler;
 public class EclipseJavaCompiler extends AbstractCompiler {
     public EclipseJavaCompiler() {
         super(CompilerOutputStyle.ONE_OUTPUT_FILE_PER_INPUT_FILE, ".java", ".class", null);
+        if (Runtime.version().feature() < 17) throw new EcjFailureException("ECJ only works on Java 17+");
+        try {
+            // Do not directly import EclipseJavaCompilerDelegate or any ECJ classes compiled to target 17.
+            // This ensures that the plugin still runs on Java 11 and can report the error above.
+            Class<?> delegateClass = Class.forName("org.codehaus.plexus.compiler.eclipse.EclipseJavaCompilerDelegate");
+            MethodHandles.Lookup lookup = MethodHandles.lookup();
+            MethodType getClassLoaderMT = MethodType.methodType(ClassLoader.class);
+            MethodType batchCompileMT = MethodType.methodType(boolean.class, List.class, PrintWriter.class);
+            getClassLoaderMH = lookup.findStatic(delegateClass, "getClassLoader", getClassLoaderMT);
+            batchCompileMH = lookup.findStatic(delegateClass, "batchCompile", batchCompileMT);
+        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // ----------------------------------------------------------------------
     // Compiler Implementation
     // ----------------------------------------------------------------------
     boolean errorsAsWarnings = false;
+    private final MethodHandle getClassLoaderMH;
+    private final MethodHandle batchCompileMH;
 
     @Override
     public String getCompilerId() {
@@ -324,31 +340,15 @@ public class EclipseJavaCompiler extends AbstractCompiler {
 
                     getLog().debug("ecj command line: " + args);
 
-                    success = BatchCompiler.compile(
-                            args.toArray(new String[args.size()]), devNull, devNull, new CompilationProgress() {
-                                @Override
-                                public void begin(int i) {}
-
-                                @Override
-                                public void done() {}
-
-                                @Override
-                                public boolean isCanceled() {
-                                    return false;
-                                }
-
-                                @Override
-                                public void setTaskName(String s) {}
-
-                                @Override
-                                public void worked(int i, int i1) {}
-                            });
+                    success = (boolean) batchCompileMH.invoke(args, devNull);
                     getLog().debug(sw.toString());
 
                     if (errorF.length() < 80) {
                         throw new EcjFailureException(sw.toString());
                     }
                     messageList = new EcjResponseParser().parse(errorF, errorsAsWarnings);
+                } catch (Throwable e) {
+                    throw new Exception(e);
                 } finally {
                     if (null != errorF) {
                         try {
@@ -508,14 +508,16 @@ public class EclipseJavaCompiler extends AbstractCompiler {
     }
 
     private JavaCompiler getEcj() {
-        ServiceLoader<JavaCompiler> javaCompilerLoader =
-                ServiceLoader.load(JavaCompiler.class, BatchCompiler.class.getClassLoader());
+        ClassLoader classLoader;
+        try {
+            classLoader = (ClassLoader) getClassLoaderMH.invoke();
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+        ServiceLoader<JavaCompiler> javaCompilerLoader = ServiceLoader.load(JavaCompiler.class, classLoader);
         Class<?> c = null;
         try {
-            c = Class.forName(
-                    "org.eclipse.jdt.internal.compiler.tool.EclipseCompiler",
-                    false,
-                    BatchCompiler.class.getClassLoader());
+            c = Class.forName("org.eclipse.jdt.internal.compiler.tool.EclipseCompiler", false, classLoader);
         } catch (ClassNotFoundException e) {
             // Ignore
         }
