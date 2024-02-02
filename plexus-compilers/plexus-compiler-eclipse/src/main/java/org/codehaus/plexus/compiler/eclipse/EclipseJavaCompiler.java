@@ -64,7 +64,7 @@ import org.codehaus.plexus.util.StringUtils;
 public class EclipseJavaCompiler extends AbstractCompiler {
     public EclipseJavaCompiler() {
         super(CompilerOutputStyle.ONE_OUTPUT_FILE_PER_INPUT_FILE, ".java", ".class", null);
-        if (Runtime.version().feature() < 17) throw new EcjFailureException("ECJ only works on Java 17+");
+        if (!isJdkSupported) return;
         try {
             // Do not directly import EclipseJavaCompilerDelegate or any ECJ classes compiled to target 17.
             // This ensures that the plugin still runs on Java 11 and can report the error above.
@@ -82,9 +82,10 @@ public class EclipseJavaCompiler extends AbstractCompiler {
     // ----------------------------------------------------------------------
     // Compiler Implementation
     // ----------------------------------------------------------------------
+    static boolean isJdkSupported = Runtime.version().feature() >= 17;
     boolean errorsAsWarnings = false;
-    private final MethodHandle getClassLoaderMH;
-    private final MethodHandle batchCompileMH;
+    private MethodHandle getClassLoaderMH;
+    private MethodHandle batchCompileMH;
 
     @Override
     public String getCompilerId() {
@@ -93,6 +94,9 @@ public class EclipseJavaCompiler extends AbstractCompiler {
 
     @Override
     public CompilerResult performCompile(CompilerConfiguration config) throws CompilerException {
+        // Safeguard before using method handle accessing EclipseJavaCompilerDelegate
+        if (!isJdkSupported) throw new CompilerException("ECJ needs JRE 17+");
+
         List<String> args = new ArrayList<>();
         args.add("-noExit"); // Make sure ecj does not System.exit on us 8-/
 
@@ -507,7 +511,9 @@ public class EclipseJavaCompiler extends AbstractCompiler {
         return false;
     }
 
-    private JavaCompiler getEcj() {
+    private JavaCompiler getEcj() throws CompilerException {
+        // Safeguard before using method handle accessing EclipseJavaCompilerDelegate
+        if (!isJdkSupported) throw new CompilerException("ECJ needs JRE 17+");
         ClassLoader classLoader;
         try {
             classLoader = (ClassLoader) getClassLoaderMH.invoke();
