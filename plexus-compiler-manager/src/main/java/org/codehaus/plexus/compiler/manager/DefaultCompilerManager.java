@@ -69,7 +69,7 @@ public class DefaultCompilerManager implements CompilerManager {
         } catch (Exception e) {
             // DI could not construct compiler
             log.error(ERROR_MESSAGE, compilerId);
-            throw new NoSuchCompilerException(compilerId);
+            throw new NoSuchCompilerException(compilerId, e);
         }
     }
 }
