@@ -197,7 +197,7 @@
         <artifactId>maven-enforcer-plugin</artifactId>
         <executions>
           <execution>
-            <id>enforce-java</id>
+            <id>enforce-maven-and-java-bytecode</id>
             <goals>
               <goal>enforce</goal>
             </goals>
@@ -207,6 +207,14 @@
                   <version>[17,)</version>
                   <message>[ERROR] OLD JDK [${java.version}] in use. This projects requires JDK 17 or newer</message>
                 </requireJavaVersion>
+                <enforceBytecodeVersion>
+                  <maxJdkVersion>${javaVersion}</maxJdkVersion>
+                  <excludes>
+                    <!-- Java 17 is required for Eclipse Compiler and AspectJ -->
+                    <exclude>org.eclipse.jdt:ecj</exclude>
+                    <exclude>org.aspectj:aspectjtools</exclude>
+                  </excludes>
+                </enforceBytecodeVersion>
               </rules>
             </configuration>
           </execution>
