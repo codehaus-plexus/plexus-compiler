@@ -85,6 +85,11 @@
           </dependency>
           <dependency>
             <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-compiler-manager</artifactId>
+            <version>${plexus.compiler.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-compiler-javac-errorprone</artifactId>
             <version>${plexus.compiler.version}</version>
           </dependency>
