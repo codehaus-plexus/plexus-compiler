@@ -39,7 +39,8 @@ import org.slf4j.LoggerFactory;
 @Named
 public class DefaultCompilerManager implements CompilerManager {
     private static final String ERROR_MESSAGE = "Compiler '{}' could not be instantiated or injected properly. "
-            + "Running the build with -Dsisu.debug, looking for exceptions might help.";
+            + "If you spelled the compiler ID correctly and all necessary dependencies are on the classpath, "
+            + "then next you can try running the build with -Dsisu.debug, looking for exceptions.";
     private static final String ERROR_MESSAGE_DETAIL = "TypeNotPresentException caused by UnsupportedClassVersionError "
             + "might indicate, that the compiler needs a more recent Java runtime. "
             + "IllegalArgumentException in ClassReader.<init> might mean, that you need to upgrade Maven.";
