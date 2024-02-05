@@ -381,7 +381,7 @@ public class JavacCompiler extends AbstractCompiler {
             args.add("-Werror");
         }
 
-        if (!StringUtils.isEmpty(config.getReleaseVersion())) {
+        if (JavaVersion.JAVA_9.isOlderOrEqualTo(javacVersion) && !StringUtils.isEmpty(config.getReleaseVersion())) {
             args.add("--release");
             args.add(config.getReleaseVersion());
         } else {
