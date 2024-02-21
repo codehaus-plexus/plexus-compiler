@@ -31,8 +31,11 @@ public class NoSuchCompilerException extends Exception {
     private final String compilerId;
 
     public NoSuchCompilerException(String compilerId) {
-        super("No such compiler '" + compilerId + "'.");
+        this(compilerId, null);
+    }
 
+    public NoSuchCompilerException(String compilerId, Throwable cause) {
+        super("No such compiler '" + compilerId + "'", cause);
         this.compilerId = compilerId;
     }
 
