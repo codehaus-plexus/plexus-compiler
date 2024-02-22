@@ -268,19 +268,31 @@ public abstract class AbstractCompiler implements Compiler {
 
     protected void logCompiling(String[] sourceFiles, CompilerConfiguration config) {
         if (log.isInfoEnabled()) {
-            String to = (config.getWorkingDirectory() == null)
-                    ? config.getOutputLocation()
-                    : config.getWorkingDirectory()
-                            .toPath()
-                            .relativize(new File(config.getOutputLocation()).toPath())
-                            .toString();
             log.info("Compiling "
                     + (sourceFiles == null
                             ? ""
                             : (sourceFiles.length + " source file" + (sourceFiles.length == 1 ? " " : "s ")))
                     + "with "
                     + getCompilerId() + " [" + config.describe() + "]" + " to "
-                    + to);
+                    + getRelativeWorkingDirectory(config));
         }
+    }
+
+    private static String getRelativeWorkingDirectory(CompilerConfiguration config) {
+        String to;
+        if (config.getWorkingDirectory() == null) {
+            to = config.getOutputLocation();
+        } else {
+            try {
+                to = config.getWorkingDirectory()
+                        .toPath()
+                        .relativize(new File(config.getOutputLocation()).toPath())
+                        .toString();
+            } catch (IllegalArgumentException e) {
+                // may happen on Windows if the working directory is on a different drive
+                to = config.getOutputLocation();
+            }
+        }
+        return to;
     }
 }
