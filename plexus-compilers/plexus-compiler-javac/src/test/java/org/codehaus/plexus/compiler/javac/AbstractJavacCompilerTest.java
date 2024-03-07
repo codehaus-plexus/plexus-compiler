@@ -497,6 +497,29 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
         internalTest(compilerConfiguration, expectedArguments, "1.8");
     }
 
+    @Test
+    public void testWithGivenUnsharedTable() {
+        List<String> expectedArguments = new ArrayList<>();
+
+        CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
+
+        // outputLocation
+        compilerConfiguration.setOutputLocation("/output");
+        expectedArguments.add("-d");
+        expectedArguments.add(new File("/output").getAbsolutePath());
+
+        // releaseVersion
+        compilerConfiguration.setReleaseVersion("6");
+        expectedArguments.add("--release");
+        expectedArguments.add("6");
+
+        // unshared table
+        compilerConfiguration.addCompilerCustomArgument("-XDuseUnsharedTable=false", null);
+        expectedArguments.add("-XDuseUnsharedTable=false");
+
+        internalTest(compilerConfiguration, expectedArguments, "11.0.1");
+    }
+
     /* This test fails on Java 1.4. The multiple parameters of the same source file cause an error, as it is interpreted as a DuplicateClass
      * Setting the size of the array to 3 is fine, but does not exactly test what it is supposed to - disabling the test for now
     public void testCommandLineTooLongWhenForking()

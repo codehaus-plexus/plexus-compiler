@@ -433,7 +433,7 @@ public class JavacCompiler extends AbstractCompiler {
             args.add(value);
         }
 
-        if (!config.isFork()) {
+        if (!config.isFork() && !args.contains("-XDuseUnsharedTable=false")) {
             args.add("-XDuseUnsharedTable=true");
         }
 
