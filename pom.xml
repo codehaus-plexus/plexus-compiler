@@ -48,7 +48,7 @@
     <aspectj.version>1.9.21</aspectj.version>
     <mavenVersion>3.6.3</mavenVersion>
     <minimalMavenBuildVersion>${mavenVersion}</minimalMavenBuildVersion>
-    <errorprone.version>2.28.0</errorprone.version>
+    <errorprone.version>2.29.2</errorprone.version>
     <trimStackTrace>false</trimStackTrace>
     <preparationGoals>clean install</preparationGoals>
     <maven.compiler.version>3.13.0</maven.compiler.version>
