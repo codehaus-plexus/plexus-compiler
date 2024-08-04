@@ -68,7 +68,9 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
                 || javaVersion.contains("18")
                 || javaVersion.contains("19")
                 || javaVersion.contains("20")
-                || javaVersion.contains("21")) {
+                || javaVersion.contains("21")
+                || javaVersion.contains("22")
+                || javaVersion.contains("23")) {
             return 5;
         }
         // javac output changed for misspelled modifiers starting in 1.6...they now generate 2 errors per occurrence,
@@ -92,7 +94,9 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
                 || javaVersion.contains("18")
                 || javaVersion.contains("19")
                 || javaVersion.contains("20")
-                || javaVersion.contains("21")) {
+                || javaVersion.contains("21")
+                || javaVersion.contains("22")
+                || javaVersion.contains("23")) {
             return 1;
         }
         if (javaVersion.contains("1.8")) {
@@ -141,6 +145,12 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
         if (javaVersion.contains("21")) {
             return "21";
         }
+        if (javaVersion.contains("22")) {
+            return "22";
+        }
+        if (javaVersion.contains("23")) {
+            return "23";
+        }
         return super.getTargetVersion();
     }
 
@@ -177,6 +187,12 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
         if (javaVersion.contains("21")) {
             return "21";
         }
+        if (javaVersion.contains("22")) {
+            return "22";
+        }
+        if (javaVersion.contains("23")) {
+            return "23";
+        }
         return super.getTargetVersion();
     }
 
@@ -192,7 +208,9 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
                 || javaVersion.contains("18")
                 || javaVersion.contains("19")
                 || javaVersion.contains("20")
-                || javaVersion.contains("21")) {
+                || javaVersion.contains("21")
+                || javaVersion.contains("22")
+                || javaVersion.contains("23")) {
             return Arrays.asList(
                     "org/codehaus/foo/Deprecation.class",
                     "org/codehaus/foo/ExternalDeps.class",
