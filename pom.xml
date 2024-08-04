@@ -49,6 +49,8 @@
     <mavenVersion>3.6.3</mavenVersion>
     <minimalMavenBuildVersion>${mavenVersion}</minimalMavenBuildVersion>
     <errorprone.version>2.29.2</errorprone.version>
+    <eclipse.sisu.version>0.9.0.M3</eclipse.sisu.version>
+    <sisuMavenPluginVersion>${eclipse.sisu.version}</sisuMavenPluginVersion>
     <trimStackTrace>false</trimStackTrace>
     <preparationGoals>clean install</preparationGoals>
     <maven.compiler.version>3.13.0</maven.compiler.version>
@@ -121,12 +123,12 @@
       <dependency>
         <groupId>org.eclipse.sisu</groupId>
         <artifactId>org.eclipse.sisu.plexus</artifactId>
-        <version>0.9.0.M2</version>
+        <version>${eclipse.sisu.version}</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.sisu</groupId>
         <artifactId>org.eclipse.sisu.inject</artifactId>
-        <version>0.9.0.M2</version>
+        <version>${eclipse.sisu.version}</version>
       </dependency>
       <dependency>
         <groupId>org.hamcrest</groupId>
