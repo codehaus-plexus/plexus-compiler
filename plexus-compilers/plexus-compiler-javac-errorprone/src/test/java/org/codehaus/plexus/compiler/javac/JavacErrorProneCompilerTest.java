@@ -20,10 +20,10 @@ public class JavacErrorProneCompilerTest extends AbstractCompilerTest {
         } else if (javaVersion.contains("18")
                 || javaVersion.contains("19")
                 || javaVersion.contains("20")
+                || javaVersion.contains("21")
+                || javaVersion.contains("22")
                 || javaVersion.contains("23")) {
             return 5;
-        } else if (javaVersion.contains("21") || javaVersion.contains("22")) {
-            return 6;
         }
         return 2;
     }
