@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.codehaus.plexus</groupId>
     <artifactId>plexus-compilers</artifactId>
-    <version>2.13.1-SNAPSHOT</version>
+    <version>2.15.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>plexus-compiler-javac-errorprone</artifactId>
@@ -16,14 +16,10 @@
     See https://errorprone.info</description>
 
   <properties>
-    <maven.compiler.release>11</maven.compiler.release>
+    <javaVersion>11</javaVersion>
   </properties>
 
   <dependencies>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
-    </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-compiler-javac</artifactId>

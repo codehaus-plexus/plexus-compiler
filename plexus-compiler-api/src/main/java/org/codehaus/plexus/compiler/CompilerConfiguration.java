@@ -500,10 +500,20 @@ public class CompilerConfiguration {
         this.optimize = optimize;
     }
 
+    /**
+     * @deprecated Don't use any longer because this is just the configured version which does not necessarily match the version
+     * of the actually executed compiler binary
+     */
+    @Deprecated
     public String getCompilerVersion() {
         return compilerVersion;
     }
 
+    /**
+     * @deprecated Don't use any longer because this is just the configured version which does not necessarily match the version
+     * of the actually executed compiler binary
+     */
+    @Deprecated
     public void setCompilerVersion(String compilerVersion) {
         this.compilerVersion = compilerVersion;
     }
@@ -688,14 +698,17 @@ public class CompilerConfiguration {
                 params.add("debug");
             }
         }
-        if (isOptimize()) {
-            params.add("optimize");
-        }
         if (isVerbose()) {
             params.add("verbose");
         }
         if (isShowDeprecation()) {
             params.add("deprecation");
+        }
+        if (isParameters()) {
+            params.add("parameters");
+        }
+        if (isEnablePreview()) {
+            params.add("preview");
         }
 
         // target bytecode options: release or target, module-path

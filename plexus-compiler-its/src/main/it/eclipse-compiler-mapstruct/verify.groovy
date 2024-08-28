@@ -23,4 +23,4 @@ def dummyClass = new File( basedir, "target/classes/Dummy.class" )
 assert dummyClass.exists()
 
 File buildLog = new File( basedir, 'build.log' )
-assert buildLog.text.count( "Changes detected - recompiling the module!" ) == 2
+assert buildLog.text.count( "Recompiling the module because of changed" ) == 2

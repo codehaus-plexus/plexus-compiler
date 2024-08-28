@@ -34,19 +34,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.DefaultArtifactRepository;
-import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.versioning.VersionRange;
-import org.apache.maven.settings.Settings;
-import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
+import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.impl.LocalRepositoryProvider;
+import org.eclipse.aether.repository.LocalRepository;
+import org.eclipse.aether.repository.LocalRepositoryManager;
 import org.hamcrest.io.FileMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,6 +54,7 @@ import org.junit.jupiter.api.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 
 /**
  *
@@ -70,28 +71,25 @@ public abstract class AbstractCompilerTest {
     private Map<String, Compiler> compilers;
 
     @Inject
-    private ArtifactRepositoryLayout repositoryLayout;
+    private LocalRepositoryProvider localRepositoryProvider;
 
-    private ArtifactRepository localRepository;
+    private LocalRepositoryManager localRepositoryManager;
 
     protected abstract String getRoleHint();
 
     @BeforeEach
     final void setUpLocalRepo() throws Exception {
         String localRepo = System.getProperty("maven.repo.local");
+        assertThat("system property maven.repo.local", localRepo, notNullValue());
 
-        if (localRepo == null) {
-            File settingsFile = new File(System.getProperty("user.home"), ".m2/settings.xml");
-            if (settingsFile.exists()) {
-                Settings settings = new SettingsXpp3Reader().read(ReaderFactory.newXmlReader(settingsFile));
-                localRepo = settings.getLocalRepository();
-            }
-        }
-        if (localRepo == null) {
-            localRepo = System.getProperty("user.home") + "/.m2/repository";
-        }
+        LocalRepository localRepository = new LocalRepository(localRepo);
+        assertThat(
+                "test prerequisite: local repository path: " + localRepository.getBasedir(),
+                localRepository.getBasedir(),
+                FileMatchers.aReadableFile());
 
-        localRepository = new DefaultArtifactRepository("local", "file://" + localRepo, repositoryLayout);
+        RepositorySystemSession session = new DefaultRepositorySystemSession();
+        localRepositoryManager = localRepositoryProvider.newLocalRepositoryManager(session, localRepository);
     }
 
     protected void setCompilerDebug(boolean flag) {
@@ -116,7 +114,7 @@ public abstract class AbstractCompilerTest {
         File file = getLocalArtifactPath("commons-lang", "commons-lang", "2.0", "jar");
 
         assertThat(
-                "test prerequisite: commons-lang library must be available in local repository, expected ",
+                "test prerequisite: commons-lang library must be available in local repository at " + file,
                 file,
                 FileMatchers.aReadableFile());
 
@@ -330,6 +328,8 @@ public abstract class AbstractCompilerTest {
     }
 
     protected File getLocalArtifactPath(Artifact artifact) {
-        return new File(localRepository.getBasedir(), localRepository.pathOf(artifact));
+        return new File(
+                localRepositoryManager.getRepository().getBasedir(),
+                localRepositoryManager.getPathForLocalArtifact(RepositoryUtils.toArtifact(artifact)));
     }
 }

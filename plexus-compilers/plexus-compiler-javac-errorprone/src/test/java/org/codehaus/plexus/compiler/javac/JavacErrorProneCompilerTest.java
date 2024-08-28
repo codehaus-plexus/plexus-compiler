@@ -17,10 +17,13 @@ public class JavacErrorProneCompilerTest extends AbstractCompilerTest {
         String javaVersion = getJavaVersion();
         if (javaVersion.startsWith("1.8")) {
             return 1;
-        } else if (javaVersion.contains("18") || javaVersion.contains("19") || javaVersion.contains("20")) {
+        } else if (javaVersion.contains("18")
+                || javaVersion.contains("19")
+                || javaVersion.contains("20")
+                || javaVersion.contains("21")
+                || javaVersion.contains("22")
+                || javaVersion.contains("23")) {
             return 5;
-        } else if (javaVersion.contains("21")) {
-            return 6;
         }
         return 2;
     }

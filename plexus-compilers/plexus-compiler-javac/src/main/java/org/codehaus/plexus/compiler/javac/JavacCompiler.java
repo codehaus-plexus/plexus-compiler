@@ -58,12 +58,18 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Deque;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Properties;
+import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.codehaus.plexus.compiler.AbstractCompiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
@@ -102,9 +108,14 @@ public class JavacCompiler extends AbstractCompiler {
 
     private static final String JAVAC_CLASSNAME = "com.sun.tools.javac.Main";
 
-    private static volatile Class<?> JAVAC_CLASS;
+    private volatile Class<?> javacClass;
 
-    private final List<Class<?>> javaccClasses = new CopyOnWriteArrayList<>();
+    private final Deque<Class<?>> javacClasses = new ConcurrentLinkedDeque<>();
+
+    private static final Pattern JAVA_MAJOR_AND_MINOR_VERSION_PATTERN = Pattern.compile("\\d+(\\.\\d+)?");
+
+    /** Cache of javac version per executable (never invalidated) */
+    private static final Map<String, String> VERSION_PER_EXECUTABLE = new ConcurrentHashMap<>();
 
     @Inject
     private InProcessCompiler inProcessCompiler;
@@ -126,6 +137,44 @@ public class JavacCompiler extends AbstractCompiler {
         return "javac";
     }
 
+    private String getInProcessJavacVersion() throws CompilerException {
+        return System.getProperty("java.version");
+    }
+
+    private String getOutOfProcessJavacVersion(String executable) throws CompilerException {
+        String version = VERSION_PER_EXECUTABLE.get(executable);
+        if (version == null) {
+            Commandline cli = new Commandline();
+            cli.setExecutable(executable);
+            /*
+             * The option "-version" should be supported by javac since 1.6 (https://docs.oracle.com/javase/6/docs/technotes/tools/solaris/javac.html)
+             * up to 21 (https://docs.oracle.com/en/java/javase/21/docs/specs/man/javac.html#standard-options)
+             */
+            cli.addArguments(new String[] {"-version"}); //
+            CommandLineUtils.StringStreamConsumer out = new CommandLineUtils.StringStreamConsumer();
+            try {
+                int exitCode = CommandLineUtils.executeCommandLine(cli, out, out);
+                if (exitCode != 0) {
+                    throw new CompilerException("Could not retrieve version from " + executable + ". Exit code "
+                            + exitCode + ", Output: " + out.getOutput());
+                }
+            } catch (CommandLineException e) {
+                throw new CompilerException("Error while executing the external compiler " + executable, e);
+            }
+            version = extractMajorAndMinorVersion(out.getOutput());
+            VERSION_PER_EXECUTABLE.put(executable, version);
+        }
+        return version;
+    }
+
+    static String extractMajorAndMinorVersion(String text) {
+        Matcher matcher = JAVA_MAJOR_AND_MINOR_VERSION_PATTERN.matcher(text);
+        if (!matcher.find()) {
+            throw new IllegalArgumentException("Could not extract version from \"" + text + "\"");
+        }
+        return matcher.group();
+    }
+
     @Override
     public CompilerResult performCompile(CompilerConfiguration config) throws CompilerException {
         File destinationDir = new File(config.getOutputLocation());
@@ -142,27 +191,25 @@ public class JavacCompiler extends AbstractCompiler {
 
         logCompiling(sourceFiles, config);
 
-        String[] args = buildCompilerArguments(config, sourceFiles);
+        final String javacVersion;
+        final String executable;
+        if (config.isFork()) {
+            executable = getJavacExecutable(config);
+            javacVersion = getOutOfProcessJavacVersion(executable);
+        } else {
+            javacVersion = getInProcessJavacVersion();
+            executable = null;
+        }
+
+        String[] args = buildCompilerArguments(config, sourceFiles, javacVersion);
 
         CompilerResult result;
 
         if (config.isFork()) {
-            String executable = config.getExecutable();
-
-            if (StringUtils.isEmpty(executable)) {
-                try {
-                    executable = getJavacExecutable();
-                } catch (IOException e) {
-                    if (log.isWarnEnabled()) {
-                        log.warn("Unable to autodetect 'javac' path, using 'javac' from the environment.");
-                    }
-                    executable = "javac";
-                }
-            }
 
             result = compileOutOfProcess(config, executable, args);
         } else {
-            if (isJava16() && !config.isForceJavacCompilerUse()) {
+            if (hasJavaxToolProvider() && !config.isForceJavacCompilerUse()) {
                 // use fqcn to prevent loading of the class on 1.5 environment !
                 result = inProcessCompiler().compileInProcess(args, config, sourceFiles);
             } else {
@@ -177,7 +224,11 @@ public class JavacCompiler extends AbstractCompiler {
         return inProcessCompiler;
     }
 
-    protected static boolean isJava16() {
+    /**
+     *
+     * @return {@code true} if the current context class loader has access to {@code javax.tools.ToolProvider}
+     */
+    protected static boolean hasJavaxToolProvider() {
         try {
             Thread.currentThread().getContextClassLoader().loadClass("javax.tools.ToolProvider");
             return true;
@@ -187,10 +238,18 @@ public class JavacCompiler extends AbstractCompiler {
     }
 
     public String[] createCommandLine(CompilerConfiguration config) throws CompilerException {
-        return buildCompilerArguments(config, getSourceFiles(config));
+        final String javacVersion;
+        if (config.isFork()) {
+            String executable = getJavacExecutable(config);
+            javacVersion = getOutOfProcessJavacVersion(executable);
+        } else {
+            javacVersion = getInProcessJavacVersion();
+        }
+        return buildCompilerArguments(config, getSourceFiles(config), javacVersion);
     }
 
-    public static String[] buildCompilerArguments(CompilerConfiguration config, String[] sourceFiles) {
+    public static String[] buildCompilerArguments(
+            CompilerConfiguration config, String[] sourceFiles, String javacVersion) {
         List<String> args = new ArrayList<>();
 
         // ----------------------------------------------------------------------
@@ -229,11 +288,11 @@ public class JavacCompiler extends AbstractCompiler {
 
             args.add(getPathString(sourceLocations));
         }
-        if (!isJava16() || config.isForceJavacCompilerUse() || config.isFork()) {
+        if (!hasJavaxToolProvider() || config.isForceJavacCompilerUse() || config.isFork()) {
             args.addAll(Arrays.asList(sourceFiles));
         }
 
-        if (!isPreJava16(config)) {
+        if (JavaVersion.JAVA_1_6.isOlderOrEqualTo(javacVersion)) {
             // now add jdk 1.6 annotation processing related parameters
 
             if (config.getGeneratedSourcesDirectory() != null) {
@@ -286,7 +345,7 @@ public class JavacCompiler extends AbstractCompiler {
             args.add("-verbose");
         }
 
-        if (!isPreJava18(config) && config.isParameters()) {
+        if (JavaVersion.JAVA_1_8.isOlderOrEqualTo(javacVersion) && config.isParameters()) {
             args.add("-parameters");
         }
 
@@ -322,7 +381,7 @@ public class JavacCompiler extends AbstractCompiler {
             args.add("-Werror");
         }
 
-        if (!StringUtils.isEmpty(config.getReleaseVersion())) {
+        if (JavaVersion.JAVA_9.isOlderOrEqualTo(javacVersion) && !StringUtils.isEmpty(config.getReleaseVersion())) {
             args.add("--release");
             args.add(config.getReleaseVersion());
         } else {
@@ -336,17 +395,17 @@ public class JavacCompiler extends AbstractCompiler {
                 args.add(config.getTargetVersion());
             }
 
-            if (!suppressSource(config) && StringUtils.isEmpty(config.getSourceVersion())) {
+            if (JavaVersion.JAVA_1_4.isOlderOrEqualTo(javacVersion) && StringUtils.isEmpty(config.getSourceVersion())) {
                 // If omitted, later JDKs complain about a 1.1 target
                 args.add("-source");
                 args.add("1.3");
-            } else if (!suppressSource(config)) {
+            } else if (JavaVersion.JAVA_1_4.isOlderOrEqualTo(javacVersion)) {
                 args.add("-source");
                 args.add(config.getSourceVersion());
             }
         }
 
-        if (!suppressEncoding(config) && !StringUtils.isEmpty(config.getSourceEncoding())) {
+        if (JavaVersion.JAVA_1_4.isOlderOrEqualTo(javacVersion) && !StringUtils.isEmpty(config.getSourceEncoding())) {
             args.add("-encoding");
             args.add(config.getSourceEncoding());
         }
@@ -374,7 +433,7 @@ public class JavacCompiler extends AbstractCompiler {
             args.add(value);
         }
 
-        if (!config.isFork()) {
+        if (!config.isFork() && !args.contains("-XDuseUnsharedTable=false")) {
             args.add("-XDuseUnsharedTable=true");
         }
 
@@ -382,115 +441,38 @@ public class JavacCompiler extends AbstractCompiler {
     }
 
     /**
-     * Determine if the compiler is a version prior to 1.4.
-     * This is needed as 1.3 and earlier did not support -source or -encoding parameters
-     *
-     * @param config The compiler configuration to test.
-     * @return true if the compiler configuration represents a Java 1.4 compiler or later, false otherwise
+     * Represents a particular Java version (through their according version prefixes)
      */
-    private static boolean isPreJava14(CompilerConfiguration config) {
-        String v = config.getCompilerVersion();
+    enum JavaVersion {
+        JAVA_1_3_OR_OLDER("1.3", "1.2", "1.1", "1.0"),
+        JAVA_1_4("1.4"),
+        JAVA_1_5("1.5"),
+        JAVA_1_6("1.6"),
+        JAVA_1_7("1.7"),
+        JAVA_1_8("1.8"),
+        JAVA_9("9"); // since Java 9 a different versioning scheme was used (https://openjdk.org/jeps/223)
+        final Set<String> versionPrefixes;
 
-        if (v == null) {
-            return false;
+        JavaVersion(String... versionPrefixes) {
+            this.versionPrefixes = new HashSet<>(Arrays.asList(versionPrefixes));
         }
 
-        return v.startsWith("1.3") || v.startsWith("1.2") || v.startsWith("1.1") || v.startsWith("1.0");
-    }
-
-    /**
-     * Determine if the compiler is a version prior to 1.6.
-     * This is needed for annotation processing parameters.
-     *
-     * @param config The compiler configuration to test.
-     * @return true if the compiler configuration represents a Java 1.6 compiler or later, false otherwise
-     */
-    private static boolean isPreJava16(CompilerConfiguration config) {
-        String v = config.getReleaseVersion();
-
-        if (v == null) {
-            v = config.getCompilerVersion();
-        }
-
-        if (v == null) {
-            v = config.getSourceVersion();
-        }
-
-        if (v == null) {
+        /**
+         * The internal logic checks if the given version starts with the prefix of one of the enums preceding the current one.
+         *
+         * @param version the version to check
+         * @return {@code true} if the version represented by this enum is older than or equal (in its minor and major version) to a given version
+         */
+        boolean isOlderOrEqualTo(String version) {
+            // go through all previous enums
+            JavaVersion[] allJavaVersionPrefixes = JavaVersion.values();
+            for (int n = ordinal() - 1; n > -1; n--) {
+                if (allJavaVersionPrefixes[n].versionPrefixes.stream().anyMatch(version::startsWith)) {
+                    return false;
+                }
+            }
             return true;
         }
-
-        return v.startsWith("5")
-                || v.startsWith("1.5")
-                || v.startsWith("1.4")
-                || v.startsWith("1.3")
-                || v.startsWith("1.2")
-                || v.startsWith("1.1")
-                || v.startsWith("1.0");
-    }
-
-    private static boolean isPreJava18(CompilerConfiguration config) {
-        String v = config.getReleaseVersion();
-
-        if (v == null) {
-            v = config.getCompilerVersion();
-        }
-
-        if (v == null) {
-            v = config.getSourceVersion();
-        }
-
-        if (v == null) {
-            return true;
-        }
-
-        return v.startsWith("7")
-                || v.startsWith("1.7")
-                || v.startsWith("6")
-                || v.startsWith("1.6")
-                || v.startsWith("1.5")
-                || v.startsWith("1.4")
-                || v.startsWith("1.3")
-                || v.startsWith("1.2")
-                || v.startsWith("1.1")
-                || v.startsWith("1.0");
-    }
-
-    private static boolean isPreJava9(CompilerConfiguration config) {
-
-        String v = config.getReleaseVersion();
-
-        if (v == null) {
-            v = config.getCompilerVersion();
-        }
-
-        if (v == null) {
-            v = config.getSourceVersion();
-        }
-
-        if (v == null) {
-            return true;
-        }
-
-        return v.startsWith("8")
-                || v.startsWith("1.8")
-                || v.startsWith("7")
-                || v.startsWith("1.7")
-                || v.startsWith("1.6")
-                || v.startsWith("1.5")
-                || v.startsWith("1.4")
-                || v.startsWith("1.3")
-                || v.startsWith("1.2")
-                || v.startsWith("1.1")
-                || v.startsWith("1.0");
-    }
-
-    private static boolean suppressSource(CompilerConfiguration config) {
-        return isPreJava14(config);
-    }
-
-    private static boolean suppressEncoding(CompilerConfiguration config) {
-        return isPreJava14(config);
     }
 
     /**
@@ -540,7 +522,7 @@ public class JavacCompiler extends AbstractCompiler {
 
         List<CompilerMessage> messages;
 
-        if (log.isDebugEnabled()) {
+        if (getLog().isDebugEnabled()) {
             String debugFileName = StringUtils.isEmpty(config.getDebugFileName()) ? "javac" : config.getDebugFileName();
 
             File commandLineFile = new File(
@@ -554,8 +536,8 @@ public class JavacCompiler extends AbstractCompiler {
                     Runtime.getRuntime().exec(new String[] {"chmod", "a+x", commandLineFile.getAbsolutePath()});
                 }
             } catch (IOException e) {
-                if (log.isWarnEnabled()) {
-                    log.warn("Unable to write '" + commandLineFile.getName() + "' debug script file", e);
+                if (getLog().isWarnEnabled()) {
+                    getLog().warn("Unable to write '" + commandLineFile.getName() + "' debug script file", e);
                 }
             }
         }
@@ -590,8 +572,8 @@ public class JavacCompiler extends AbstractCompiler {
         final Thread thread = Thread.currentThread();
         final ClassLoader contextClassLoader = thread.getContextClassLoader();
         thread.setContextClassLoader(javacClass.getClassLoader());
-        if (log.isDebugEnabled()) {
-            log.debug("ttcl changed run compileInProcessWithProperClassloader");
+        if (getLog().isDebugEnabled()) {
+            getLog().debug("ttcl changed run compileInProcessWithProperClassloader");
         }
         try {
             return compileInProcessWithProperClassloader(javacClass, args);
@@ -634,6 +616,20 @@ public class JavacCompiler extends AbstractCompiler {
         return new CompilerResult(success, messages);
     }
 
+    // Match ~95% of existing JDK exception name patterns (last checked for JDK 21)
+    private static final Pattern STACK_TRACE_FIRST_LINE = Pattern.compile("^(?:[\\w+.-]+\\.)[\\w$]*?(?:"
+            + "Exception|Error|Throwable|Failure|Result|Abort|Fault|ThreadDeath|Overflow|Warning|"
+            + "NotSupported|NotFound|BadArgs|BadClassFile|Illegal|Invalid|Unexpected|Unchecked|Unmatched\\w+"
+            + ").*$");
+
+    // Match exception causes, existing and omitted stack trace elements
+    private static final Pattern STACK_TRACE_OTHER_LINE =
+            Pattern.compile("^(?:Caused by:\\s.*|\\s*at .*|\\s*\\.\\.\\.\\s\\d+\\smore)$");
+
+    // Match generic javac errors with 'javac:' prefix, JMV init and boot layer init errors
+    private static final Pattern JAVAC_OR_JVM_ERROR =
+            Pattern.compile("^(?:javac:|Error occurred during initialization of (?:boot layer|VM)).*", Pattern.DOTALL);
+
     /**
      * Parse the output from the compiler into a list of CompilerMessage objects
      *
@@ -650,42 +646,59 @@ public class JavacCompiler extends AbstractCompiler {
         StringBuilder buffer = new StringBuilder();
 
         boolean hasPointer = false;
+        int stackTraceLineCount = 0;
 
         while (true) {
             line = input.readLine();
 
             if (line == null) {
                 // javac output not detected by other parsing
-                // maybe better to ignore only the summary an mark the rest as error
+                // maybe better to ignore only the summary and mark the rest as error
                 String bufferAsString = buffer.toString();
                 if (buffer.length() > 0) {
-                    if (bufferAsString.startsWith("javac:")) {
+                    if (JAVAC_OR_JVM_ERROR.matcher(bufferAsString).matches()) {
                         errors.add(new CompilerMessage(bufferAsString, CompilerMessage.Kind.ERROR));
-                    } else if (bufferAsString.startsWith("Error occurred during initialization of boot layer")) {
-                        errors.add(new CompilerMessage(bufferAsString, CompilerMessage.Kind.OTHER));
                     } else if (hasPointer) {
                         // A compiler message remains in buffer at end of parse stream
                         errors.add(parseModernError(exitCode, bufferAsString));
+                    } else if (stackTraceLineCount > 0) {
+                        // Extract stack trace from end of buffer
+                        String[] lines = bufferAsString.split("\\R");
+                        int linesTotal = lines.length;
+                        buffer = new StringBuilder();
+                        int firstLine = linesTotal - stackTraceLineCount;
+
+                        // Salvage Javac localized message 'javac.msg.bug' ("An exception has occurred in the
+                        // compiler ... Please file a bug")
+                        if (firstLine > 0) {
+                            final String lineBeforeStackTrace = lines[firstLine - 1];
+                            // One of those two URL substrings should always appear, without regard to JVM locale.
+                            // TODO: Update, if the URL changes, last checked for JDK 21.
+                            if (lineBeforeStackTrace.contains("java.sun.com/webapps/bugreport")
+                                    || lineBeforeStackTrace.contains("bugreport.java.com")) {
+                                firstLine--;
+                            }
+                        }
+
+                        // Note: For message 'javac.msg.proc.annotation.uncaught.exception' ("An annotation processor
+                        // threw an uncaught exception"), there is no locale-independent substring, and the header is
+                        // also multi-line. It was discarded in the removed method 'parseAnnotationProcessorStream',
+                        // and we continue to do so.
+
+                        for (int i = firstLine; i < linesTotal; i++) {
+                            buffer.append(lines[i]).append(EOL);
+                        }
+                        errors.add(new CompilerMessage(buffer.toString(), CompilerMessage.Kind.ERROR));
                     }
                 }
                 return errors;
             }
 
-            // A compiler error occurred, treat everything that follows as part of the error.
-            if (line.startsWith("An exception has occurred in the compiler")) {
-                buffer = new StringBuilder();
-
-                while (line != null) {
-                    buffer.append(line);
-                    buffer.append(EOL);
-                    line = input.readLine();
-                }
-
-                errors.add(new CompilerMessage(buffer.toString(), CompilerMessage.Kind.ERROR));
-                return errors;
-            } else if (line.startsWith("An annotation processor threw an uncaught exception.")) {
-                CompilerMessage annotationProcessingError = parseAnnotationProcessorStream(input);
-                errors.add(annotationProcessingError);
+            if (stackTraceLineCount == 0 && STACK_TRACE_FIRST_LINE.matcher(line).matches()
+                    || STACK_TRACE_OTHER_LINE.matcher(line).matches()) {
+                stackTraceLineCount++;
+            } else {
+                stackTraceLineCount = 0;
             }
 
             // new error block?
@@ -719,21 +732,6 @@ public class JavacCompiler extends AbstractCompiler {
                 hasPointer = true;
             }
         }
-    }
-
-    private static CompilerMessage parseAnnotationProcessorStream(final BufferedReader input) throws IOException {
-        String line = input.readLine();
-        final StringBuilder buffer = new StringBuilder();
-
-        while (line != null) {
-            if (!line.startsWith("Consult the following stack trace for details.")) {
-                buffer.append(line);
-                buffer.append(EOL);
-            }
-            line = input.readLine();
-        }
-
-        return new CompilerMessage(buffer.toString(), CompilerMessage.Kind.ERROR);
     }
 
     private static boolean isMisc(String line) {
@@ -887,7 +885,7 @@ public class JavacCompiler extends AbstractCompiler {
         PrintWriter writer = null;
         try {
             File tempFile;
-            if (log.isDebugEnabled()) {
+            if (getLog().isDebugEnabled()) {
                 tempFile = File.createTempFile(JavacCompiler.class.getName(), "arguments", new File(outputDirectory));
             } else {
                 tempFile = File.createTempFile(JavacCompiler.class.getName(), "arguments");
@@ -916,10 +914,32 @@ public class JavacCompiler extends AbstractCompiler {
     }
 
     /**
+     * Get the path of the javac tool executable to use.
+     * Either given through explicit configuration or via {@link #getJavacExecutable()}.
+     * @param config the configuration
+     * @return the path of the javac tool
+     */
+    protected String getJavacExecutable(CompilerConfiguration config) {
+        String executable = config.getExecutable();
+
+        if (StringUtils.isEmpty(executable)) {
+            try {
+                executable = getJavacExecutable();
+            } catch (IOException e) {
+                if (getLog().isWarnEnabled()) {
+                    getLog().warn("Unable to autodetect 'javac' path, using 'javac' from the environment.");
+                }
+                executable = "javac";
+            }
+        }
+        return executable;
+    }
+
+    /**
      * Get the path of the javac tool executable: try to find it depending the OS or the <code>java.home</code>
      * system property or the <code>JAVA_HOME</code> environment variable.
      *
-     * @return the path of the Javadoc tool
+     * @return the path of the javac tool
      * @throws IOException if not found
      */
     private static String getJavacExecutable() throws IOException {
@@ -963,7 +983,7 @@ public class JavacCompiler extends AbstractCompiler {
     private void releaseJavaccClass(Class<?> javaccClass, CompilerConfiguration compilerConfiguration) {
         if (compilerConfiguration.getCompilerReuseStrategy()
                 == CompilerConfiguration.CompilerReuseStrategy.ReuseCreated) {
-            javaccClasses.add(javaccClass);
+            javacClasses.add(javaccClass);
         }
     }
 
@@ -974,32 +994,28 @@ public class JavacCompiler extends AbstractCompiler {
      * @throws CompilerException if the class has not been found.
      */
     private Class<?> getJavacClass(CompilerConfiguration compilerConfiguration) throws CompilerException {
-        Class<?> c = null;
+        Class<?> c;
         switch (compilerConfiguration.getCompilerReuseStrategy()) {
             case AlwaysNew:
                 return createJavacClass();
             case ReuseCreated:
-                synchronized (javaccClasses) {
-                    if (javaccClasses.size() > 0) {
-                        c = javaccClasses.get(0);
-                        javaccClasses.remove(c);
-                        return c;
-                    }
+                c = javacClasses.poll();
+                if (c == null) {
+                    c = createJavacClass();
                 }
-                c = createJavacClass();
                 return c;
             case ReuseSame:
             default:
-                c = JavacCompiler.JAVAC_CLASS;
-                if (c != null) {
-                    return c;
-                }
-                synchronized (JavacCompiler.LOCK) {
-                    if (c == null) {
-                        JavacCompiler.JAVAC_CLASS = c = createJavacClass();
+                c = javacClass;
+                if (c == null) {
+                    synchronized (this) {
+                        c = javacClass;
+                        if (c == null) {
+                            javacClass = c = createJavacClass();
+                        }
                     }
-                    return c;
                 }
+                return c;
         }
     }
 

@@ -5,11 +5,11 @@
   <parent>
     <groupId>org.codehaus.plexus</groupId>
     <artifactId>plexus</artifactId>
-    <version>15</version>
+    <version>18</version>
   </parent>
 
   <artifactId>plexus-compiler</artifactId>
-  <version>2.13.1-SNAPSHOT</version>
+  <version>2.15.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Plexus Compiler</name>
@@ -42,17 +42,18 @@
 
   <properties>
     <scm.url>scm:git:git@github.com:codehaus-plexus/plexus-compiler.git</scm.url>
-    <javaVersion>11</javaVersion>
-    <maven.compiler.release>8</maven.compiler.release>
+    <javaVersion>8</javaVersion>
     <redirectTestOutputToFile>true</redirectTestOutputToFile>
-    <project.build.outputTimestamp>2022-12-17T17:23:49Z</project.build.outputTimestamp>
-    <jupiter.version>5.10.0</jupiter.version>
-    <aspectj.version>1.9.19</aspectj.version>
-    <maven.version>3.5.4</maven.version>
-    <errorprone.version>2.23.0</errorprone.version>
+    <project.build.outputTimestamp>2024-03-10T16:45:10Z</project.build.outputTimestamp>
+    <aspectj.version>1.9.21</aspectj.version>
+    <mavenVersion>3.6.3</mavenVersion>
+    <minimalMavenBuildVersion>${mavenVersion}</minimalMavenBuildVersion>
+    <errorprone.version>2.30.0</errorprone.version>
+    <eclipse.sisu.version>0.9.0.M3</eclipse.sisu.version>
+    <sisuMavenPluginVersion>${eclipse.sisu.version}</sisuMavenPluginVersion>
     <trimStackTrace>false</trimStackTrace>
     <preparationGoals>clean install</preparationGoals>
-    <maven.compiler.version>3.11.0</maven.compiler.version>
+    <maven.compiler.version>3.13.0</maven.compiler.version>
   </properties>
 
   <dependencyManagement>
@@ -74,6 +75,11 @@
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-compiler-eclipse</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-compiler-javac-errorprone</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -84,8 +90,13 @@
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-compiler-manager</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-annotations</artifactId>
-        <version>2.1.1</version>
+        <version>2.2.0</version>
       </dependency>
       <dependency>
         <groupId>javax.inject</groupId>
@@ -95,39 +106,49 @@
       <dependency>
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
-        <version>${jupiter.version}</version>
+        <version>${junit5Version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-testing</artifactId>
-        <version>1.1.0</version>
+        <version>1.4.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>33.2.1-jre</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.sisu</groupId>
         <artifactId>org.eclipse.sisu.plexus</artifactId>
-        <version>0.9.0.M2</version>
+        <version>${eclipse.sisu.version}</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.sisu</groupId>
         <artifactId>org.eclipse.sisu.inject</artifactId>
-        <version>0.9.0.M2</version>
+        <version>${eclipse.sisu.version}</version>
       </dependency>
       <dependency>
         <groupId>org.hamcrest</groupId>
         <artifactId>hamcrest</artifactId>
-        <version>2.2</version>
+        <version>3.0</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>
-        <version>4.0.0</version>
+        <version>4.0.1</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-xml</artifactId>
-        <version>4.0.1</version>
+        <version>3.0.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>1.7.36</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -138,9 +159,11 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>3.2.1</version>
           <configuration>
             <redirectTestOutputToFile>${redirectTestOutputToFile}</redirectTestOutputToFile>
+            <systemPropertyVariables>
+              <maven.repo.local>${settings.localRepository}</maven.repo.local>
+            </systemPropertyVariables>
           </configuration>
         </plugin>
         <plugin>
@@ -159,13 +182,6 @@
             <autoVersionSubmodules>true</autoVersionSubmodules>
           </configuration>
         </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-javadoc-plugin</artifactId>
-          <configuration>
-            <additionalparam>-Xdoclint:none</additionalparam>
-          </configuration>
-        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
@@ -179,14 +195,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>3.4.1</version>
-        <dependencies>
-          <dependency>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>extra-enforcer-rules</artifactId>
-            <version>1.7.0</version>
-          </dependency>
-        </dependencies>
         <executions>
           <execution>
             <id>enforce-java</id>
@@ -196,24 +204,10 @@
             <configuration>
               <rules>
                 <requireJavaVersion>
-                  <version>[11,)</version>
-                  <message>[ERROR] OLD JDK [${java.version}] in use. This projects requires JDK 11 or newer</message>
+                  <version>[17,)</version>
+                  <message>[ERROR] OLD JDK [${java.version}] in use. This projects requires JDK 17 or newer</message>
                 </requireJavaVersion>
               </rules>
-            </configuration>
-          </execution>
-          <execution>
-            <id>enforce-bytecode-version</id>
-            <goals>
-              <goal>enforce</goal>
-            </goals>
-            <configuration>
-              <rules>
-                <enforceBytecodeVersion>
-                  <maxJdkVersion>${maven.compiler.release}</maxJdkVersion>
-                </enforceBytecodeVersion>
-              </rules>
-              <fail>true</fail>
             </configuration>
           </execution>
         </executions>
@@ -227,36 +221,4 @@
     </plugins>
   </build>
 
-  <profiles>
-    <profile>
-      <!--
-      Make sure maven.repo.local is passed through to the tests if set or the tests will fail to resolve artifacts
-      (c.f. SUREFIRE-491).
-      -->
-      <id>maven.repo.local</id>
-      <activation>
-        <property>
-          <name>maven.repo.local</name>
-        </property>
-      </activation>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-surefire-plugin</artifactId>
-              <configuration>
-                <systemProperties combine.children="append">
-                  <property>
-                    <name>maven.repo.local</name>
-                    <value>${maven.repo.local}</value>
-                  </property>
-                </systemProperties>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-  </profiles>
 </project>

@@ -25,9 +25,10 @@ package org.codehaus.plexus.compiler;
  */
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.slf4j.Logger;
@@ -39,7 +40,10 @@ import org.slf4j.LoggerFactory;
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  */
 public abstract class AbstractCompiler implements Compiler {
-    protected Logger log = LoggerFactory.getLogger(getClass());
+    private final Logger log = LoggerFactory.getLogger(getClass());
+
+    private final org.codehaus.plexus.logging.Logger plexusLogger;
+
     protected static final String EOL = System.lineSeparator();
 
     protected static final String PS = System.getProperty("path.separator");
@@ -68,6 +72,25 @@ public abstract class AbstractCompiler implements Compiler {
         this.outputFileEnding = outputFileEnding;
 
         this.outputFile = outputFile;
+
+        this.plexusLogger = new PlexusLoggerWrapper(log);
+    }
+
+    /**
+     *
+     * @return a Logger
+     */
+    protected Logger getLog() {
+        return log;
+    }
+
+    /**
+     * @return a plexus Logger
+     * @deprecated please use {@link #getLog()}
+     */
+    @Deprecated
+    protected org.codehaus.plexus.logging.Logger getLogger() {
+        return plexusLogger;
     }
 
     // ----------------------------------------------------------------------
@@ -76,18 +99,22 @@ public abstract class AbstractCompiler implements Compiler {
 
     public abstract String getCompilerId();
 
+    @Override
     public CompilerResult performCompile(CompilerConfiguration configuration) throws CompilerException {
         throw new CompilerNotImplementedException("The performCompile method has not been implemented.");
     }
 
+    @Override
     public CompilerOutputStyle getCompilerOutputStyle() {
         return compilerOutputStyle;
     }
 
+    @Override
     public String getInputFileEnding(CompilerConfiguration configuration) throws CompilerException {
         return inputFileEnding;
     }
 
+    @Override
     public String getOutputFileEnding(CompilerConfiguration configuration) throws CompilerException {
         if (compilerOutputStyle != CompilerOutputStyle.ONE_OUTPUT_FILE_PER_INPUT_FILE) {
             throw new RuntimeException("This compiler implementation doesn't have one output file per input file.");
@@ -96,6 +123,7 @@ public abstract class AbstractCompiler implements Compiler {
         return outputFileEnding;
     }
 
+    @Override
     public String getOutputFile(CompilerConfiguration configuration) throws CompilerException {
         if (compilerOutputStyle != CompilerOutputStyle.ONE_OUTPUT_FILE_FOR_ALL_INPUT_FILES) {
             throw new RuntimeException("This compiler implementation doesn't have one output file for all files.");
@@ -104,6 +132,7 @@ public abstract class AbstractCompiler implements Compiler {
         return outputFile;
     }
 
+    @Override
     public boolean canUpdateTarget(CompilerConfiguration configuration) throws CompilerException {
         return true;
     }
@@ -123,9 +152,13 @@ public abstract class AbstractCompiler implements Compiler {
     }
 
     protected static Set<String> getSourceFilesForSourceRoot(CompilerConfiguration config, String sourceLocation) {
-        DirectoryScanner scanner = new DirectoryScanner();
 
+        DirectoryScanner scanner = new DirectoryScanner();
         scanner.setBasedir(sourceLocation);
+
+        if (!scanner.getBasedir().exists()) {
+            return Collections.emptySet();
+        }
 
         Set<String> includes = config.getIncludes();
 
@@ -147,7 +180,7 @@ public abstract class AbstractCompiler implements Compiler {
 
         String[] sourceDirectorySources = scanner.getIncludedFiles();
 
-        Set<String> sources = new HashSet<>();
+        Set<String> sources = new TreeSet<>();
 
         for (String sourceDirectorySource : sourceDirectorySources) {
             File f = new File(sourceLocation, sourceDirectorySource);
@@ -159,7 +192,7 @@ public abstract class AbstractCompiler implements Compiler {
     }
 
     protected static String[] getSourceFiles(CompilerConfiguration config) {
-        Set<String> sources = new HashSet<>();
+        Set<String> sources = new TreeSet<>();
 
         Set<File> sourceFiles = config.getSourceFiles();
 
@@ -235,19 +268,31 @@ public abstract class AbstractCompiler implements Compiler {
 
     protected void logCompiling(String[] sourceFiles, CompilerConfiguration config) {
         if (log.isInfoEnabled()) {
-            String to = (config.getWorkingDirectory() == null)
-                    ? config.getOutputLocation()
-                    : config.getWorkingDirectory()
-                            .toPath()
-                            .relativize(new File(config.getOutputLocation()).toPath())
-                            .toString();
             log.info("Compiling "
                     + (sourceFiles == null
                             ? ""
                             : (sourceFiles.length + " source file" + (sourceFiles.length == 1 ? " " : "s ")))
                     + "with "
                     + getCompilerId() + " [" + config.describe() + "]" + " to "
-                    + to);
+                    + getRelativeWorkingDirectory(config));
         }
+    }
+
+    private static String getRelativeWorkingDirectory(CompilerConfiguration config) {
+        String to;
+        if (config.getWorkingDirectory() == null) {
+            to = config.getOutputLocation();
+        } else {
+            try {
+                to = config.getWorkingDirectory()
+                        .toPath()
+                        .relativize(new File(config.getOutputLocation()).toPath())
+                        .toString();
+            } catch (IllegalArgumentException e) {
+                // may happen on Windows if the working directory is on a different drive
+                to = config.getOutputLocation();
+            }
+        }
+        return to;
     }
 }

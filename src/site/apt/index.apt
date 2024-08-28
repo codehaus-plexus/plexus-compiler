@@ -38,15 +38,15 @@ Plexus Compiler
 
   * {{{./plexus-compilers/}<<<plexus-compilers>>>}}: different compilers
 
-    * {{{./plexus-compilers/plexus-compiler-aspectj/}<<<plexus-compiler-aspectj>>>}}: AspectJ compiler,
+    * {{{./plexus-compilers/plexus-compiler-aspectj/}<<<plexus-compiler-aspectj>>>}}: AspectJ compiler, <<requires>> <<<JDK 17+>>> and <<<Maven 3.9.6+>>>
 
-    * {{{./plexus-compilers/plexus-compiler-csharp/}<<<plexus-compiler-csharp>>>}}: C#/Mono compiler,
+    * {{{./plexus-compilers/plexus-compiler-csharp/}<<<plexus-compiler-csharp>>>}}: C#/Mono compiler, <<requires>> <<<JDK 8+>>>
 
-    * {{{./plexus-compilers/plexus-compiler-eclipse/}<<<plexus-compiler-eclipse>>>}}: Eclipse compiler,
+    * {{{./plexus-compilers/plexus-compiler-eclipse/}<<<plexus-compiler-eclipse>>>}}: Eclipse compiler, <<requires>> <<<JDK 17+>>> and <<<Maven 3.9.6+>>>
 
-    * {{{./plexus-compilers/plexus-compiler-javac/}<<<plexus-compiler-javac>>>}}: javac compiler,
+    * {{{./plexus-compilers/plexus-compiler-javac/}<<<plexus-compiler-javac>>>}}: javac compiler, <<requires>> <<<JDK 8+>>>
 
-    * {{{./plexus-compilers/plexus-compiler-javac-errorprone/}<<<plexus-compiler-javac-errorprone>>>}}: javac compiler with {{{https://errorprone.info}error-prone}} static analysis checks enabled,
+    * {{{./plexus-compilers/plexus-compiler-javac-errorprone/}<<<plexus-compiler-javac-errorprone>>>}}: javac compiler with {{{https://errorprone.info}error-prone}} static analysis checks enabled, <<requires>> <<<JDK 11+>>>
 
     []
 

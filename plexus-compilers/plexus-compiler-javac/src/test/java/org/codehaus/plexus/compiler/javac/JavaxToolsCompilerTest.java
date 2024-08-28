@@ -27,8 +27,8 @@ public class JavaxToolsCompilerTest extends AbstractJavacCompilerTest {
     @Override
     protected int expectedWarnings() {
         String javaVersion = getJavaVersion();
-        if (javaVersion.contains("21")) {
-            return 8;
+        if (javaVersion.contains("21") || javaVersion.contains("22") || javaVersion.contains("23")) {
+            return 1;
         } else {
             return super.expectedWarnings();
         }

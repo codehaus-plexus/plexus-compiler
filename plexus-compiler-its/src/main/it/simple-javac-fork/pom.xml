@@ -32,8 +32,8 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <maven.compiler.release>11</maven.compiler.release>
-    <plexus.compiler.version>@pom.version@</plexus.compiler.version>
+    <javaVersion>11</javaVersion>
+    <plexus.compiler.version>@project.version@</plexus.compiler.version>
   </properties>
 
   <dependencies>
@@ -61,6 +61,11 @@
             <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-compiler-api</artifactId>
+            <version>${plexus.compiler.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-compiler-manager</artifactId>
             <version>${plexus.compiler.version}</version>
           </dependency>
           <dependency>
