@@ -545,6 +545,10 @@ public class JavacCompiler extends AbstractCompiler {
         try {
             returnCode = CommandLineUtils.executeCommandLine(cli, out, out);
 
+            if (getLog().isDebugEnabled()) {
+                getLog().debug("Compiler output:{}{}", EOL, out.getOutput());
+            }
+
             messages = parseModernStream(returnCode, new BufferedReader(new StringReader(out.getOutput())));
         } catch (CommandLineException | IOException e) {
             throw new CompilerException("Error while executing the external compiler.", e);
@@ -587,7 +591,7 @@ public class JavacCompiler extends AbstractCompiler {
     /**
      * Helper method for compileInProcess()
      */
-    private static CompilerResult compileInProcess0(Class<?> javacClass, String[] args) throws CompilerException {
+    private CompilerResult compileInProcess0(Class<?> javacClass, String[] args) throws CompilerException {
         StringWriter out = new StringWriter();
 
         Integer ok;
@@ -598,6 +602,10 @@ public class JavacCompiler extends AbstractCompiler {
             Method compile = javacClass.getMethod("compile", new Class[] {String[].class, PrintWriter.class});
 
             ok = (Integer) compile.invoke(null, new Object[] {args, new PrintWriter(out)});
+
+            if (getLog().isDebugEnabled()) {
+                getLog().debug("Compiler output:{}{}", EOL, out.toString());
+            }
 
             messages = parseModernStream(ok, new BufferedReader(new StringReader(out.toString())));
         } catch (NoSuchMethodException | IOException | InvocationTargetException | IllegalAccessException e) {
