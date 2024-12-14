@@ -259,16 +259,17 @@ public class JavacCompiler extends AbstractCompiler {
              */
             cli.addArguments(new String[] {"-version"}); //
             CommandLineUtils.StringStreamConsumer out = new CommandLineUtils.StringStreamConsumer();
+            CommandLineUtils.StringStreamConsumer err = new CommandLineUtils.StringStreamConsumer();
             try {
-                int exitCode = CommandLineUtils.executeCommandLine(cli, out, out);
+                int exitCode = CommandLineUtils.executeCommandLine(cli, out, err);
                 if (exitCode != 0) {
                     throw new CompilerException("Could not retrieve version from " + executable + ". Exit code "
-                            + exitCode + ", Output: " + out.getOutput());
+                            + exitCode + ", Output: " + out.getOutput() + ", Error: " + err.getOutput());
                 }
             } catch (CommandLineException e) {
                 throw new CompilerException("Error while executing the external compiler " + executable, e);
             }
-            version = extractMajorAndMinorVersion(out.getOutput());
+            version = tryParseVersion(out.getOutput().trim());
             VERSION_PER_EXECUTABLE.put(executable, version);
         }
         return version;
@@ -280,6 +281,19 @@ public class JavacCompiler extends AbstractCompiler {
             throw new IllegalArgumentException("Could not extract version from \"" + text + "\"");
         }
         return matcher.group();
+    }
+
+    private String tryParseVersion(String version) {
+        if (version.startsWith("javac ")) {
+            version = version.substring(6);
+            if (version.startsWith("1.")) {
+                version = version.substring(0, 3);
+            } else {
+                version = version.substring(0, 2);
+            }
+            return version;
+        }
+        return null;
     }
 
     @Override
