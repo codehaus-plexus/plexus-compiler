@@ -121,5 +121,6 @@ public class JavacCompilerTest extends AbstractJavacCompilerTest {
         assertEquals("11.0", JavacCompiler.extractMajorAndMinorVersion("javac 11.0.22"));
         assertEquals("11.0", JavacCompiler.extractMajorAndMinorVersion("11.0.22"));
         assertEquals("21", JavacCompiler.extractMajorAndMinorVersion("javac 21"));
+        assertEquals("1.8", JavacCompiler.extractMajorAndMinorVersion("javac 1.8.0_432"));
     }
 }
