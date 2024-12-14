@@ -220,6 +220,16 @@ public class JavacCompiler extends AbstractCompiler {
     private final Deque<Class<?>> javacClasses = new ConcurrentLinkedDeque<>();
 
     private static final Pattern JAVA_MAJOR_AND_MINOR_VERSION_PATTERN = Pattern.compile("\\d+(\\.\\d+)?");
+    private static final String JAVAC_PREFIX = "javac";
+
+    /**
+     * List of variable that may produce an output "Picked up %s: %s\n".
+     * <p>
+     * There may be more, but for Jenkins withMaven, this is enough.
+     *
+     * @see <a href="https://github.com/openjdk/jdk/blob/81e43114eca5199a0d816c02f50ecb6bc370135b/src/hotspot/share/runtime/arguments.cpp#L3074">arguments.cpp</a>
+     */
+    private static final String[] PICKED_ENV_VARS = {"_JAVA_OPTIONS", "JAVA_TOOL_OPTIONS"};
 
     /** Cache of javac version per executable (never invalidated) */
     private static final Map<String, String> VERSION_PER_EXECUTABLE = new ConcurrentHashMap<>();
@@ -258,6 +268,7 @@ public class JavacCompiler extends AbstractCompiler {
              * up to 21 (https://docs.oracle.com/en/java/javase/21/docs/specs/man/javac.html#standard-options)
              */
             cli.addArguments(new String[] {"-version"}); //
+
             CommandLineUtils.StringStreamConsumer out = new CommandLineUtils.StringStreamConsumer();
             try {
                 int exitCode = CommandLineUtils.executeCommandLine(cli, out, out);
@@ -268,18 +279,37 @@ public class JavacCompiler extends AbstractCompiler {
             } catch (CommandLineException e) {
                 throw new CompilerException("Error while executing the external compiler " + executable, e);
             }
-            version = extractMajorAndMinorVersion(out.getOutput());
+
+            /*
+             * javac will output the content of JAVA_TOOL_OPTIONS which may (sic) contains javac: we are forced to remove it.
+             */
+            String cleanedOutput = cleanPickedUp(out.getOutput(), CommandLineUtils.getSystemEnvVars());
+            version = extractMajorAndMinorVersion(cleanedOutput);
             VERSION_PER_EXECUTABLE.put(executable, version);
         }
         return version;
     }
 
     static String extractMajorAndMinorVersion(String text) {
+        int javacIndex = text.indexOf("javac");
         Matcher matcher = JAVA_MAJOR_AND_MINOR_VERSION_PATTERN.matcher(text);
-        if (!matcher.find()) {
+        int start = javacIndex == -1 ? 0 : javacIndex + JAVAC_PREFIX.length();
+        if (!matcher.find(start)) {
             throw new IllegalArgumentException("Could not extract version from \"" + text + "\"");
         }
         return matcher.group();
+    }
+
+    static String cleanPickedUp(String text, Properties envvars) {
+        String ls = "\n";
+        String ntext = StringUtils.unifyLineSeparators(text, ls);
+        for (String env : PICKED_ENV_VARS) {
+            String value = StringUtils.unifyLineSeparators(envvars.getProperty(env), ls);
+            if (value != null) {
+                ntext = ntext.replace(String.format("Picked up %s: %s\n", env, value), "");
+            }
+        }
+        return ntext;
     }
 
     @Override
