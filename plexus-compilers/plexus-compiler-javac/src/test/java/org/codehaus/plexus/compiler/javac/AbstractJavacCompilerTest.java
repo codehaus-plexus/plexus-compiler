@@ -70,7 +70,8 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
                 || javaVersion.contains("20")
                 || javaVersion.contains("21")
                 || javaVersion.contains("22")
-                || javaVersion.contains("23")) {
+                || javaVersion.contains("23")
+                || javaVersion.contains("24")) {
             return 5;
         }
         // javac output changed for misspelled modifiers starting in 1.6...they now generate 2 errors per occurrence,
@@ -96,7 +97,8 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
                 || javaVersion.contains("20")
                 || javaVersion.contains("21")
                 || javaVersion.contains("22")
-                || javaVersion.contains("23")) {
+                || javaVersion.contains("23")
+                || javaVersion.contains("24")) {
             return 1;
         }
         if (javaVersion.contains("1.8")) {
@@ -151,6 +153,9 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
         if (javaVersion.contains("23")) {
             return "23";
         }
+        if (javaVersion.contains("24")) {
+            return "24";
+        }
         return super.getTargetVersion();
     }
 
@@ -159,39 +164,30 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
         String javaVersion = getJavaVersion();
         if (javaVersion.contains("9.0")) {
             return "1.7";
-        }
-        if (javaVersion.contains("11")) {
+        } else if (javaVersion.contains("11")) {
             return "11";
-        }
-        if (javaVersion.contains("14")) {
+        } else if (javaVersion.contains("14")) {
             return "14";
-        }
-        if (javaVersion.contains("15")) {
+        } else if (javaVersion.contains("15")) {
             return "15";
-        }
-        if (javaVersion.contains("16")) {
+        } else if (javaVersion.contains("16")) {
             return "16";
-        }
-        if (javaVersion.contains("17")) {
+        } else if (javaVersion.contains("17")) {
             return "17";
-        }
-        if (javaVersion.contains("18")) {
+        } else if (javaVersion.contains("18")) {
             return "18";
-        }
-        if (javaVersion.contains("19")) {
+        } else if (javaVersion.contains("19")) {
             return "19";
-        }
-        if (javaVersion.contains("20")) {
+        } else if (javaVersion.contains("20")) {
             return "20";
-        }
-        if (javaVersion.contains("21")) {
+        } else if (javaVersion.contains("21")) {
             return "21";
-        }
-        if (javaVersion.contains("22")) {
+        } else if (javaVersion.contains("22")) {
             return "22";
-        }
-        if (javaVersion.contains("23")) {
+        } else if (javaVersion.contains("23")) {
             return "23";
+        } else if (javaVersion.contains("24")) {
+            return "24";
         }
         return super.getTargetVersion();
     }
@@ -210,7 +206,8 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
                 || javaVersion.contains("20")
                 || javaVersion.contains("21")
                 || javaVersion.contains("22")
-                || javaVersion.contains("23")) {
+                || javaVersion.contains("23")
+                || javaVersion.contains("24")) {
             return Arrays.asList(
                     "org/codehaus/foo/Deprecation.class",
                     "org/codehaus/foo/ExternalDeps.class",

@@ -25,6 +25,10 @@ jobs:
     uses: codehaus-plexus/.github/.github/workflows/maven.yml@master
     with:
       matrix-exclude: '[ {"jdk": "8"}, {"jdk": "11"}, {"jdk": "23", distribution: "microsoft" } ]'
+      matrix-include: >
+        [
+          {"jdk": "24-ea", "os": "ubuntu-latest", distribution: "temurin" }
+        ]
       jdk-distribution-matrix: '["zulu", "temurin", "microsoft", "liberica", "corretto"]'
       maven_args: 'verify javadoc:javadoc -e -B -V -fae'
 
