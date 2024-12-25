@@ -41,7 +41,7 @@ public class EclipseCompilerErrorsAsWarningsTest extends AbstractCompilerTest {
                 || javaVersion.contains("11")
                 || javaVersion.contains("17")
                 || javaVersion.contains("21")
-                || javaVersion.contains("23")) {
+                || javaVersion.contains("24")) {
             return Arrays.asList(
                     "org/codehaus/foo/Deprecation.class",
                     "org/codehaus/foo/ExternalDeps.class",

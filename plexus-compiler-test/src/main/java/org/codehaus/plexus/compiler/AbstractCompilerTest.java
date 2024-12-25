@@ -305,7 +305,6 @@ public abstract class AbstractCompilerTest {
     }
 
     protected String getJavaVersion() {
-
         String javaVersion = System.getProperty("java.version");
         String realJavaVersion = javaVersion;
 
