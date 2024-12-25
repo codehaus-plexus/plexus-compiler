@@ -22,7 +22,8 @@ public class JavacErrorProneCompilerTest extends AbstractCompilerTest {
                 || javaVersion.contains("20")
                 || javaVersion.contains("21")
                 || javaVersion.contains("22")
-                || javaVersion.contains("23")) {
+                || javaVersion.contains("23")
+                || javaVersion.contains("24")) {
             return 5;
         }
         return 2;
