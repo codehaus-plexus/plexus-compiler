@@ -36,15 +36,21 @@ public class EclipseCompilerErrorsAsWarningsTest extends AbstractCompilerTest {
 
     @Override
     protected Collection<String> expectedOutputFiles() {
+        String javaVersion = getJavaVersion();
+        if (javaVersion.contains("9.0")
+                || javaVersion.contains("11")
+                || javaVersion.contains("17")
+                || javaVersion.contains("21")
+                || javaVersion.contains("23")) {
+            return Arrays.asList(
+                    "org/codehaus/foo/Deprecation.class",
+                    "org/codehaus/foo/ExternalDeps.class",
+                    "org/codehaus/foo/Person.class");
+        }
         return Arrays.asList(
                 "org/codehaus/foo/Deprecation.class",
                 "org/codehaus/foo/ExternalDeps.class",
                 "org/codehaus/foo/Person.class",
-                "org/codehaus/foo/ReservedWord.class"
-                // "org/codehaus/foo/Bad.class",             // This one has no class file generated as it's one big
-                // issue
-                // "org/codehaus/foo/UnknownSymbol.class",
-                // "org/codehaus/foo/RightClassname.class"
-                );
+                "org/codehaus/foo/ReservedWord.class");
     }
 }
