@@ -234,11 +234,11 @@ public class EclipseJavaCompiler extends AbstractCompiler {
                 getLog().debug("Using JSR-199 EclipseCompiler");
                 // ECJ JSR-199 compiles against the latest Java version it supports if no source
                 // version is given explicitly. BatchCompiler uses 1.3 as default. So check
-                // whether a source version is specified, and if not supply 1.3 explicitly.
+                // whether a source version is specified, and if not supply 8 explicitly.
                 if (!haveSourceOrReleaseArgument(args)) {
-                    getLog().debug("ecj: no source level nor release specified, defaulting to Java 1.3");
+                    getLog().debug("ecj: no source level nor release specified, defaulting to Java 8");
                     args.add("-source");
-                    args.add("1.3");
+                    args.add("8");
                 }
 
                 // Also check for the encoding. Could have been set via the CompilerConfig

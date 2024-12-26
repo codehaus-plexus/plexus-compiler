@@ -53,16 +53,27 @@ public class EclipseCompilerTest extends AbstractCompilerTest {
 
     @Override
     protected int expectedErrors() {
-        return 4;
+        return 5;
     }
 
     @Override
     protected int expectedWarnings() {
-        return 2;
+        return 1;
     }
 
     @Override
     protected Collection<String> expectedOutputFiles() {
+        String javaVersion = getJavaVersion();
+        if (javaVersion.contains("9.0")
+                || javaVersion.contains("11")
+                || javaVersion.contains("17")
+                || javaVersion.contains("21")
+                || javaVersion.contains("23")) {
+            return Arrays.asList(
+                    "org/codehaus/foo/Deprecation.class",
+                    "org/codehaus/foo/ExternalDeps.class",
+                    "org/codehaus/foo/Person.class");
+        }
         return Arrays.asList(
                 "org/codehaus/foo/Deprecation.class",
                 "org/codehaus/foo/ExternalDeps.class",
