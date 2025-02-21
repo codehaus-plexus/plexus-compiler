@@ -53,7 +53,7 @@
     <sisuMavenPluginVersion>${eclipse.sisu.version}</sisuMavenPluginVersion>
     <trimStackTrace>false</trimStackTrace>
     <preparationGoals>clean install</preparationGoals>
-    <maven.compiler.version>3.13.0</maven.compiler.version>
+    <maven.compiler.version>3.14.0</maven.compiler.version>
   </properties>
 
   <dependencyManagement>
