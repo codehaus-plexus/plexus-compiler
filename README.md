@@ -8,8 +8,8 @@ Plexus-Compiler
 
 This component is an Compilation API used by Apache Maven Compiler plugin on the top of different Compiler Engines: Javac, Eclipse Compiler, etc..
 
-### Error Prone usage 
+### Error Prone usage
 
-Please refer to [documentation](https://errorprone.info/docs/installation#maven) 
+Please refer to [documentation](https://errorprone.info/docs/installation#maven)
 
 Or the project [it test](plexus-compiler-its/src/main/it/error-prone-compiler/pom.xml)
