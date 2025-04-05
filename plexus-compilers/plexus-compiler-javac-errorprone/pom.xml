@@ -16,7 +16,7 @@
     See https://errorprone.info</description>
 
   <properties>
-    <javaVersion>11</javaVersion>
+    <javaVersion>17</javaVersion>
   </properties>
 
   <dependencies>
