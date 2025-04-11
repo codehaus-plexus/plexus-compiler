@@ -56,6 +56,7 @@ import org.codehaus.plexus.util.cli.WriterStreamConsumer;
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  * @author <a href="mailto:matthew.pocock@ncl.ac.uk">Matthew Pocock</a>
  * @author <a href="mailto:chris.stevenson@gmail.com">Chris Stevenson</a>
+ * @author <a href="mailto:mazas.marc@gmail.com">Marc Mazas</a>
  */
 @Named("csharp")
 public class CSharpCompiler extends AbstractCompiler {
@@ -219,6 +220,171 @@ public class CSharpCompiler extends AbstractCompiler {
     Options can be of the form -option or /option
         */
 
+    /*
+    C:\Program Files\Microsoft Visual Studio\2022\Professional\MSBuild\Current\Bin\Roslyn>csc -help -preferreduilang:en
+    Microsoft (R) Visual C# Compiler version 4.11.0-3.24460.3 (5649376e)
+    Copyright (C) Microsoft Corporation. All rights reserved.
+
+
+                                 Visual C# Compiler Options
+
+                           - OUTPUT FILES -
+    -out:<file>                   Specify output file name (default: base name of
+                                  file with main class or first file)
+    -target:exe                   Build a console executable (default) (Short
+                                  form: -t:exe)
+    -target:winexe                Build a Windows executable (Short form:
+                                  -t:winexe)
+    -target:library               Build a library (Short form: -t:library)
+    -target:module                Build a module that can be added to another
+                                  assembly (Short form: -t:module)
+    -target:appcontainerexe       Build an Appcontainer executable (Short form:
+                                  -t:appcontainerexe)
+    -target:winmdobj              Build a Windows Runtime intermediate file that
+                                  is consumed by WinMDExp (Short form: -t:winmdobj)
+    -doc:<file>                   XML Documentation file to generate
+    -refout:<file>                Reference assembly output to generate
+    -platform:<string>            Limit which platforms this code can run on: x86,
+                                  Itanium, x64, arm, arm64, anycpu32bitpreferred, or
+                                  anycpu. The default is anycpu.
+
+                           - INPUT FILES -
+    -recurse:<wildcard>           Include all files in the current directory and
+                                  subdirectories according to the wildcard
+                                  specifications
+    -reference:<alias>=<file>     Reference metadata from the specified assembly
+                                  file using the given alias (Short form: -r)
+    -reference:<file list>        Reference metadata from the specified assembly
+                                  files (Short form: -r)
+    -addmodule:<file list>        Link the specified modules into this assembly
+    -link:<file list>             Embed metadata from the specified interop
+                                  assembly files (Short form: -l)
+    -analyzer:<file list>         Run the analyzers from this assembly
+                                  (Short form: -a)
+    -additionalfile:<file list>   Additional files that don't directly affect code
+                                  generation but may be used by analyzers for producing
+                                  errors or warnings.
+    -embed                        Embed all source files in the PDB.
+    -embed:<file list>            Embed specific files in the PDB.
+
+                           - RESOURCES -
+    -win32res:<file>              Specify a Win32 resource file (.res)
+    -win32icon:<file>             Use this icon for the output
+    -win32manifest:<file>         Specify a Win32 manifest file (.xml)
+    -nowin32manifest              Do not include the default Win32 manifest
+    -resource:<resinfo>           Embed the specified resource (Short form: -res)
+    -linkresource:<resinfo>       Link the specified resource to this assembly
+                                  (Short form: -linkres) Where the resinfo format
+                                  is <file>[,<string name>[,public|private]]
+
+                           - CODE GENERATION -
+    -debug[+|-]                   Emit debugging information
+    -debug:{full|pdbonly|portable|embedded}
+                                  Specify debugging type ('full' is default,
+                                  'portable' is a cross-platform format,
+                                  'embedded' is a cross-platform format embedded into
+                                  the target .dll or .exe)
+    -optimize[+|-]                Enable optimizations (Short form: -o)
+    -deterministic                Produce a deterministic assembly
+                                  (including module version GUID and timestamp)
+    -refonly                      Produce a reference assembly in place of the main output
+    -instrument:TestCoverage      Produce an assembly instrumented to collect
+                                  coverage information
+    -sourcelink:<file>            Source link info to embed into PDB.
+
+                           - ERRORS AND WARNINGS -
+    -warnaserror[+|-]             Report all warnings as errors
+    -warnaserror[+|-]:<warn list> Report specific warnings as errors
+                                  (use "nullable" for all nullability warnings)
+    -warn:<n>                     Set warning level (0 or higher) (Short form: -w)
+    -nowarn:<warn list>           Disable specific warning messages
+                                  (use "nullable" for all nullability warnings)
+    -ruleset:<file>               Specify a ruleset file that disables specific
+                                  diagnostics.
+    -errorlog:<file>[,version=<sarif_version>]
+                                  Specify a file to log all compiler and analyzer
+                                  diagnostics.
+                                  sarif_version:{1|2|2.1} Default is 1. 2 and 2.1
+                                  both mean SARIF version 2.1.0.
+    -reportanalyzer               Report additional analyzer information, such as
+                                  execution time.
+    -skipanalyzers[+|-]           Skip execution of diagnostic analyzers.
+
+                           - LANGUAGE -
+    -checked[+|-]                 Generate overflow checks
+    -unsafe[+|-]                  Allow 'unsafe' code
+    -define:<symbol list>         Define conditional compilation symbol(s) (Short
+                                  form: -d)
+    -langversion:?                Display the allowed values for language version
+    -langversion:<string>         Specify language version such as
+                                  `latest` (latest version, including minor versions),
+                                  `default` (same as `latest`),
+                                  `latestmajor` (latest version, excluding minor versions),
+                                  `preview` (latest version, including features in unsupported preview),
+                                  or specific versions like `6` or `7.1`
+    -nullable[+|-]                Specify nullable context option enable|disable.
+    -nullable:{enable|disable|warnings|annotations}
+                                  Specify nullable context option enable|disable|warnings|annotations.
+
+                           - SECURITY -
+    -delaysign[+|-]               Delay-sign the assembly using only the public
+                                  portion of the strong name key
+    -publicsign[+|-]              Public-sign the assembly using only the public
+                                  portion of the strong name key
+    -keyfile:<file>               Specify a strong name key file
+    -keycontainer:<string>        Specify a strong name key container
+    -highentropyva[+|-]           Enable high-entropy ASLR
+
+                           - MISCELLANEOUS -
+    @<file>                       Read response file for more options
+    -help                         Display this usage message (Short form: -?)
+    -nologo                       Suppress compiler copyright message
+    -noconfig                     Do not auto include CSC.RSP file
+    -parallel[+|-]                Concurrent build.
+    -version                      Display the compiler version number and exit.
+
+                           - ADVANCED -
+    -baseaddress:<address>        Base address for the library to be built
+    -checksumalgorithm:<alg>      Specify algorithm for calculating source file
+                                  checksum stored in PDB. Supported values are:
+                                  SHA1 or SHA256 (default).
+    -codepage:<n>                 Specify the codepage to use when opening source
+                                  files
+    -utf8output                   Output compiler messages in UTF-8 encoding
+    -main:<type>                  Specify the type that contains the entry point
+                                  (ignore all other possible entry points) (Short
+                                  form: -m)
+    -fullpaths                    Compiler generates fully qualified paths
+    -filealign:<n>                Specify the alignment used for output file
+                                  sections
+    -pathmap:<K1>=<V1>,<K2>=<V2>,...
+                                  Specify a mapping for source path names output by
+                                  the compiler.
+    -pdb:<file>                   Specify debug information file name (default:
+                                  output file name with .pdb extension)
+    -errorendlocation             Output line and column of the end location of
+                                  each error
+    -preferreduilang              Specify the preferred output language name.
+    -nosdkpath                    Disable searching the default SDK path for standard library assemblies.
+    -nostdlib[+|-]                Do not reference standard library (mscorlib.dll)
+    -subsystemversion:<string>    Specify subsystem version of this assembly
+    -lib:<file list>              Specify additional directories to search in for
+                                  references
+    -errorreport:<string>         Specify how to handle internal compiler errors:
+                                  prompt, send, queue, or none. The default is
+                                  queue.
+    -appconfig:<file>             Specify an application configuration file
+                                  containing assembly binding settings
+    -moduleassemblyname:<string>  Name of the assembly which this module will be
+                                  a part of
+    -modulename:<string>          Specify the name of the source module
+    -generatedfilesout:<dir>      Place files generated during compilation in the
+                                  specified directory.
+    -reportivts[+|-]                    Output information on all IVTs granted to this
+                                  assembly by all dependencies, and annotate foreign assembly
+                                  accessibility errors with what assembly they came from.
+     */
+
     private String[] buildCompilerArguments(CompilerConfiguration config, String[] sourceFiles)
             throws CompilerException {
         List<String> args = new ArrayList<>();
@@ -291,7 +457,7 @@ public class CSharpCompiler extends AbstractCompiler {
         }
 
         // ----------------------------------------------------------------------
-        // Xml Doc output
+        // Nowarn option
         // ----------------------------------------------------------------------
 
         String nowarn = compilerArguments.get("-nowarn");
@@ -341,6 +507,33 @@ public class CSharpCompiler extends AbstractCompiler {
 
         if (!StringUtils.isEmpty(nologo)) {
             args.add("/nologo");
+        }
+
+        // ----------------------------------------------------------------------
+        // Unsafe option
+        // ----------------------------------------------------------------------
+        String unsafe = compilerArguments.get("-unsafe");
+
+        if (!StringUtils.isEmpty(unsafe) && unsafe.equals("true")) {
+            args.add("/unsafe");
+        }
+
+        // ----------------------------------------------------------------------
+        // PreferredUILang option
+        // ----------------------------------------------------------------------
+        String preferreduilang = compilerArguments.get("-preferreduilang");
+
+        if (!StringUtils.isEmpty(preferreduilang)) {
+            args.add("/preferreduilang:" + preferreduilang);
+        }
+
+        // ----------------------------------------------------------------------
+        // Utf8Output option
+        // ----------------------------------------------------------------------
+        String utf8output = compilerArguments.get("-utf8output");
+
+        if (!StringUtils.isEmpty(utf8output)) {
+            args.add("/utf8output:");
         }
 
         // ----------------------------------------------------------------------
