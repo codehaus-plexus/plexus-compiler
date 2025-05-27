@@ -551,8 +551,8 @@ public class AspectJCompiler extends AbstractCompiler {
                 .replaceFirst("[.]0$", "");
 
         switch (version) {
-                // Java 1.6 as a default source/target seems to make sense. Maven Compiler should set its own default
-                // anyway, so this probably never needs to be used. But not having a default feels bad, too.
+            // Java 1.6 as a default source/target seems to make sense. Maven Compiler should set its own default
+            // anyway, so this probably never needs to be used. But not having a default feels bad, too.
             case "":
                 return ClassFileConstants.JDK1_6;
             case "1":
