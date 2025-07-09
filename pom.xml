@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.codehaus.plexus</groupId>
     <artifactId>plexus</artifactId>
-    <version>20</version>
+    <version>22</version>
   </parent>
 
   <artifactId>plexus-compiler</artifactId>
@@ -49,7 +49,7 @@
     <mavenVersion>3.6.3</mavenVersion>
     <minimalMavenBuildVersion>${mavenVersion}</minimalMavenBuildVersion>
     <errorprone.version>2.37.0</errorprone.version>
-    <eclipse.sisu.version>0.9.0.M3</eclipse.sisu.version>
+    <eclipse.sisu.version>0.9.0.M4</eclipse.sisu.version>
     <sisuMavenPluginVersion>${eclipse.sisu.version}</sisuMavenPluginVersion>
     <trimStackTrace>false</trimStackTrace>
     <preparationGoals>clean install</preparationGoals>
@@ -118,7 +118,7 @@
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
-        <version>33.4.6-jre</version>
+        <version>33.4.8-jre</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.sisu</groupId>
