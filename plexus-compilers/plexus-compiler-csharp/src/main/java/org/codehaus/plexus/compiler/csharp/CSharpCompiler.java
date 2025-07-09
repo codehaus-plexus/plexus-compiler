@@ -29,6 +29,7 @@ import java.io.Writer;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -140,6 +141,7 @@ public class CSharpCompiler extends AbstractCompiler {
         }
 
         compilerArguments = config.getCustomCompilerArgumentsAsMap();
+        Map<String, String> ca2 = new HashMap<String, String>();
 
         Iterator<String> i = compilerArguments.keySet().iterator();
 
@@ -151,12 +153,15 @@ public class CSharpCompiler extends AbstractCompiler {
                 i.remove();
                 String k = arr[0];
                 v = arr[1];
-                compilerArguments.put(k, v);
+                //                compilerArguments.put(k, v);
+                ca2.put(k, v);
                 if (config.isDebug()) {
-                    System.out.println("transforming argument from " + orig + " to " + k + " = [" + v + "]");
+                    System.out.println(
+                            "internal splitting of argument '" + orig + "' to key '" + k + "', value '" + v + "'");
                 }
             }
         }
+        compilerArguments.putAll(ca2);
 
         config.setCustomCompilerArgumentsAsMap(compilerArguments);
 
@@ -389,11 +394,12 @@ public class CSharpCompiler extends AbstractCompiler {
             throws CompilerException {
         List<String> args = new ArrayList<>();
 
-        if (config.isDebug()) {
-            args.add("/debug+");
-        } else {
-            args.add("/debug-");
-        }
+        // plugin parameter is no the same as the compiler option! so replaced
+        //        if (config.isDebug()) {
+        //            args.add("/debug+");
+        //        } else {
+        //            args.add("/debug-");
+        //        }
 
         // config.isShowWarnings()
         // config.getSourceVersion()
@@ -433,11 +439,13 @@ public class CSharpCompiler extends AbstractCompiler {
             }
         }
 
+        // TODO: include all user compiler arguments and not only some!
+
+        Map<String, String> compilerArguments = getCompilerArguments(config);
+
         // ----------------------------------------------------------------------
         // Main class
         // ----------------------------------------------------------------------
-
-        Map<String, String> compilerArguments = getCompilerArguments(config);
 
         String mainClass = compilerArguments.get("-main");
 
@@ -457,7 +465,17 @@ public class CSharpCompiler extends AbstractCompiler {
         }
 
         // ----------------------------------------------------------------------
-        // Nowarn option
+        // Debug option (full, pdbonly...)
+        // ----------------------------------------------------------------------
+
+        String debug = compilerArguments.get("-debug");
+
+        if (!StringUtils.isEmpty(debug)) {
+            args.add("/debug:" + debug);
+        }
+
+        // ----------------------------------------------------------------------
+        // Nowarn option (w#1,w#2...)
         // ----------------------------------------------------------------------
 
         String nowarn = compilerArguments.get("-nowarn");
@@ -489,7 +507,7 @@ public class CSharpCompiler extends AbstractCompiler {
         }
 
         // ----------------------------------------------------------------------
-        // Target - type of assembly to produce, lib,exe,winexe etc...
+        // Target - type of assembly to produce: library,exe,winexe...
         // ----------------------------------------------------------------------
 
         String target = compilerArguments.get("-target");
@@ -505,7 +523,7 @@ public class CSharpCompiler extends AbstractCompiler {
         // ----------------------------------------------------------------------
         String nologo = compilerArguments.get("-nologo");
 
-        if (!StringUtils.isEmpty(nologo)) {
+        if (!StringUtils.isEmpty(nologo) && !"false".equals(nologo.toLowerCase())) {
             args.add("/nologo");
         }
 
@@ -514,7 +532,7 @@ public class CSharpCompiler extends AbstractCompiler {
         // ----------------------------------------------------------------------
         String unsafe = compilerArguments.get("-unsafe");
 
-        if (!StringUtils.isEmpty(unsafe) && unsafe.equals("true")) {
+        if (!StringUtils.isEmpty(unsafe) && "true".equals(unsafe.toLowerCase())) {
             args.add("/unsafe");
         }
 
@@ -532,8 +550,8 @@ public class CSharpCompiler extends AbstractCompiler {
         // ----------------------------------------------------------------------
         String utf8output = compilerArguments.get("-utf8output");
 
-        if (!StringUtils.isEmpty(utf8output)) {
-            args.add("/utf8output:");
+        if (!StringUtils.isEmpty(utf8output) && !"false".equals(utf8output)) {
+            args.add("/utf8output");
         }
 
         // ----------------------------------------------------------------------
@@ -546,6 +564,10 @@ public class CSharpCompiler extends AbstractCompiler {
         // ----------------------------------------------------------------------
         for (String sourceFile : sourceFiles) {
             args.add(sourceFile);
+        }
+
+        if (config.isDebug()) {
+            System.out.println("built compiler arguments:" + args);
         }
 
         return args.toArray(new String[args.size()]);
