@@ -781,7 +781,7 @@ public class CSharpCompiler extends AbstractCompiler {
 
         if (excludes != null && !excludes.isEmpty()) {
             String[] exclStrs = excludes.toArray(new String[excludes.size()]);
-            scanner.setIncludes(exclStrs);
+            scanner.setExcludes(exclStrs);
         }
 
         scanner.scan();
