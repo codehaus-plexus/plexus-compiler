@@ -1,0 +1,5 @@
+Picked up JAVA_TOOL_OPTIONS: -Daaa
+
+-Dxxx
+Picked up _JAVA_OPTIONS: -Dccc
+javac 17.0.13
