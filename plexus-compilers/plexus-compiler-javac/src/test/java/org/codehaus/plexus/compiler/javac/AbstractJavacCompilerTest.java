@@ -62,7 +62,7 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
         if (javaVersion.contains("11")
                 || javaVersion.contains("17")
                 || javaVersion.contains("21")
-                || javaVersion.contains("24")) {
+                || javaVersion.contains("25")) {
             return 5;
         }
         // javac output changed for misspelled modifiers starting in 1.6...they now generate 2 errors per occurrence,
@@ -77,19 +77,10 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
     @Override
     protected int expectedWarnings() {
         String javaVersion = getJavaVersion();
-        if (javaVersion.contains("9.0")
-                || javaVersion.contains("11")
-                || javaVersion.contains("14")
-                || javaVersion.contains("15")
-                || javaVersion.contains("16")
+        if (javaVersion.contains("11")
                 || javaVersion.contains("17")
-                || javaVersion.contains("18")
-                || javaVersion.contains("19")
-                || javaVersion.contains("20")
                 || javaVersion.contains("21")
-                || javaVersion.contains("22")
-                || javaVersion.contains("23")
-                || javaVersion.contains("24")) {
+                || javaVersion.contains("25")) {
             return 1;
         }
         if (javaVersion.contains("1.8")) {
@@ -134,6 +125,8 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
             return "23";
         } else if (javaVersion.contains("24")) {
             return "24";
+        } else if (javaVersion.contains("25")) {
+            return "25";
         }
         return super.getTargetVersion();
     }
@@ -167,6 +160,8 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
             return "23";
         } else if (javaVersion.contains("24")) {
             return "24";
+        } else if (javaVersion.contains("25")) {
+            return "25";
         }
         return super.getTargetVersion();
     }
@@ -174,19 +169,10 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
     @Override
     protected Collection<String> expectedOutputFiles() {
         String javaVersion = getJavaVersion();
-        if (javaVersion.contains("9.0")
-                || javaVersion.contains("11")
-                || javaVersion.contains("14")
-                || javaVersion.contains("15")
-                || javaVersion.contains("16")
+        if (javaVersion.contains("11")
                 || javaVersion.contains("17")
-                || javaVersion.contains("18")
-                || javaVersion.contains("19")
-                || javaVersion.contains("20")
                 || javaVersion.contains("21")
-                || javaVersion.contains("22")
-                || javaVersion.contains("23")
-                || javaVersion.contains("24")) {
+                || javaVersion.contains("25")) {
             return Arrays.asList(
                     "org/codehaus/foo/Deprecation.class",
                     "org/codehaus/foo/ExternalDeps.class",
