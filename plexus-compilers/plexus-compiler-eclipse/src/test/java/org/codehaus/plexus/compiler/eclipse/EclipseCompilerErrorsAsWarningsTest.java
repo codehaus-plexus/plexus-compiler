@@ -37,11 +37,10 @@ public class EclipseCompilerErrorsAsWarningsTest extends AbstractCompilerTest {
     @Override
     protected Collection<String> expectedOutputFiles() {
         String javaVersion = getJavaVersion();
-        if (javaVersion.contains("9.0")
-                || javaVersion.contains("11")
+        if (javaVersion.contains("11")
                 || javaVersion.contains("17")
                 || javaVersion.contains("21")
-                || javaVersion.contains("24")) {
+                || javaVersion.contains("25")) {
             return Arrays.asList(
                     "org/codehaus/foo/Deprecation.class",
                     "org/codehaus/foo/ExternalDeps.class",

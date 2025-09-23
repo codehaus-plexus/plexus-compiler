@@ -550,45 +550,33 @@ public class AspectJCompiler extends AbstractCompiler {
                 // Accept, but cut off trailing ".0", as ECJ/ACJ explicitly support versions like 5.0, 8.0, 11.0
                 .replaceFirst("[.]0$", "");
 
-        switch (version) {
-            // Java 1.6 as a default source/target seems to make sense. Maven Compiler should set its own default
-            // anyway, so this probably never needs to be used. But not having a default feels bad, too.
-            case "":
-                return ClassFileConstants.JDK1_6;
-            case "1":
-                return ClassFileConstants.JDK1_1;
-            case "2":
-                return ClassFileConstants.JDK1_2;
-            case "3":
-                return ClassFileConstants.JDK1_3;
-            case "4":
-                return ClassFileConstants.JDK1_4;
-            case "5":
-                return ClassFileConstants.JDK1_5;
-            case "6":
-                return ClassFileConstants.JDK1_6;
-            case "7":
-                return ClassFileConstants.JDK1_7;
-            case "8":
-                return ClassFileConstants.JDK1_8;
-            case "9":
-                return ClassFileConstants.JDK9;
-            case "10":
-                return ClassFileConstants.JDK10;
-            case "11":
-                return ClassFileConstants.JDK11;
-            case "12":
-                return ClassFileConstants.JDK12;
-            case "13":
-                return ClassFileConstants.JDK13;
-            case "14":
-                return ClassFileConstants.JDK14;
-            case "15":
-                return ClassFileConstants.JDK15;
-            case "16":
-                return ClassFileConstants.JDK16;
-        }
-        throw new CompilerException("Unknown Java source/target version number: " + version);
+        return switch (version) {
+                // Java 1.6 as a default source/target seems to make sense. Maven Compiler should set its own default
+                // anyway, so this probably never needs to be used. But not having a default feels bad, too.
+            case "" -> ClassFileConstants.JDK1_6;
+            case "1" -> ClassFileConstants.JDK1_1;
+            case "2" -> ClassFileConstants.JDK1_2;
+            case "3" -> ClassFileConstants.JDK1_3;
+            case "4" -> ClassFileConstants.JDK1_4;
+            case "5" -> ClassFileConstants.JDK1_5;
+            case "6" -> ClassFileConstants.JDK1_6;
+            case "7" -> ClassFileConstants.JDK1_7;
+            case "8" -> ClassFileConstants.JDK1_8;
+            case "9" -> ClassFileConstants.JDK9;
+            case "10" -> ClassFileConstants.JDK10;
+            case "11" -> ClassFileConstants.JDK11;
+            case "12" -> ClassFileConstants.JDK12;
+            case "13" -> ClassFileConstants.JDK13;
+            case "14" -> ClassFileConstants.JDK14;
+            case "15" -> ClassFileConstants.JDK15;
+            case "16" -> ClassFileConstants.JDK16;
+            case "17" -> ClassFileConstants.JDK17;
+            case "18" -> ClassFileConstants.JDK18;
+            case "19" -> ClassFileConstants.JDK19;
+            case "20" -> ClassFileConstants.JDK20;
+            case "21" -> ClassFileConstants.JDK21;
+            default -> throw new CompilerException("Unknown Java source/target version number: " + version);
+        };
     }
 
     /**
