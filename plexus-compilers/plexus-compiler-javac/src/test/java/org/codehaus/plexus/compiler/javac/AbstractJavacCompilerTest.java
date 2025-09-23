@@ -163,7 +163,7 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
         } else if (javaVersion.contains("25")) {
             return "25";
         }
-        return super.getTargetVersion();
+        return super.getSourceVersion();
     }
 
     @Override
