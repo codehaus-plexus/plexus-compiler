@@ -17,12 +17,9 @@
  * under the License.
  */
 
-import junit.framework.TestCase;
-
 import java.util.*;
 
 public class MyTest
-    extends TestCase
 {
     // InfiniteRecursion
     int oops() {
