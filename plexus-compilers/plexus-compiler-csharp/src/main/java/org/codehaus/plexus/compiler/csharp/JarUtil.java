@@ -17,13 +17,17 @@ public class JarUtil {
             Enumeration<JarEntry> enumEntries = jar.entries();
             while (enumEntries.hasMoreElements()) {
                 JarEntry file = enumEntries.nextElement();
-                Path f = destDir.resolve(file.getName());
+                Path f = destDir.resolve(file.getName()).normalize();
                 if (!f.startsWith(toPath)) {
                     throw new IOException("Bad zip entry");
                 }
                 if (file.isDirectory()) {
                     Files.createDirectories(f);
                     continue;
+                }
+                Path parent = f.getParent();
+                if (parent != null) {
+                    Files.createDirectories(parent);
                 }
                 try (InputStream is = jar.getInputStream(file);
                         OutputStream fos = Files.newOutputStream(f)) {
