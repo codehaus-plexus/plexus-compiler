@@ -133,7 +133,7 @@ public abstract class AbstractCompilerTckTest {
         File compilerOutput = getCompilerOutput();
 
         if (compilerOutput.exists()) {
-            FileUtils.deleteDirectory(compilerOutput);
+            org.apache.commons.io.FileUtils.deleteDirectory(compilerOutput);
         }
 
         configuration.setOutputLocation(compilerOutput.getAbsolutePath());
