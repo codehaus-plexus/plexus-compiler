@@ -1,1 +1,1 @@
-typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"org.codehaus.plexus.compiler.ajc","l":"AspectJCompiler"},{"p":"org.codehaus.plexus.compiler.ajc","l":"AspectJCompilerConfiguration"}];updateSearchResults();
+typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html","k":"18"},{"p":"org.codehaus.plexus.compiler.ajc","l":"AspectJCompiler"},{"p":"org.codehaus.plexus.compiler.ajc","l":"AspectJCompilerConfiguration"}];updateSearchResults();
