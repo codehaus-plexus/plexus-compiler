@@ -258,18 +258,22 @@ public class JavacCompiler extends AbstractCompiler {
              * up to 21 (https://docs.oracle.com/en/java/javase/21/docs/specs/man/javac.html#standard-options)
              */
             cli.addArguments(new String[] {"-version"}); //
-            CommandLineUtils.StringStreamConsumer out = new CommandLineUtils.StringStreamConsumer();
-            CommandLineUtils.StringStreamConsumer err = new CommandLineUtils.StringStreamConsumer();
+            List<String> out = new ArrayList<>();
+            List<String> err = new ArrayList<>();
             try {
-                int exitCode = CommandLineUtils.executeCommandLine(cli, out, err);
+                int exitCode = CommandLineUtils.executeCommandLine(cli, out::add, err::add);
                 if (exitCode != 0) {
                     throw new CompilerException("Could not retrieve version from " + executable + ". Exit code "
-                            + exitCode + ", Output: " + out.getOutput() + ", Error: " + err.getOutput());
+                            + exitCode + ", Output: " + String.join(System.lineSeparator(), out) + ", Error: "
+                            + String.join(System.lineSeparator(), err));
                 }
             } catch (CommandLineException e) {
                 throw new CompilerException("Error while executing the external compiler " + executable, e);
             }
-            version = tryParseVersion(out.getOutput().trim());
+            version = tryParseVersion(out);
+            if (version == null) {
+                version = tryParseVersion(err);
+            }
             VERSION_PER_EXECUTABLE.put(executable, version);
         }
         return version;
@@ -283,15 +287,17 @@ public class JavacCompiler extends AbstractCompiler {
         return matcher.group();
     }
 
-    private String tryParseVersion(String version) {
-        if (version.startsWith("javac ")) {
-            version = version.substring(6);
-            if (version.startsWith("1.")) {
-                version = version.substring(0, 3);
-            } else {
-                version = version.substring(0, 2);
+    private String tryParseVersion(List<String> versions) {
+        for (String version : versions) {
+            if (version.startsWith("javac ")) {
+                version = version.substring(6);
+                if (version.startsWith("1.")) {
+                    version = version.substring(0, 3);
+                } else {
+                    version = version.substring(0, 2);
+                }
+                return version;
             }
-            return version;
         }
         return null;
     }
