@@ -1,6 +1,7 @@
 package org.codehaus.plexus.compiler.csharp;
 
 import org.codehaus.plexus.compiler.CompilerMessage;
+import org.codehaus.plexus.compiler.CompilerMessage.Kind;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
@@ -60,7 +61,7 @@ public class DefaultCSharpCompilerParser {
     private static CompilerMessage parseLineWithNoColumnNumber(String line) {
 
         String file = null;
-        boolean error = true;
+        Kind error = Kind.ERROR;
         int startline = -1;
         int startcolumn = -1;
         int endline = -1;
@@ -88,7 +89,7 @@ public class DefaultCSharpCompilerParser {
 
             message = line.substring(j + 1 + ERROR_PREFIX.length());
 
-            error = line.contains(") error");
+            error = line.contains(") error") ? Kind.ERROR : Kind.WARNING;
         } else {
             System.err.println("Unknown output: " + line);
 
@@ -101,7 +102,7 @@ public class DefaultCSharpCompilerParser {
     private static CompilerMessage parseLineWithColumnNumberAndLineNumber(String line) {
 
         String file = null;
-        boolean error = true;
+        Kind error = Kind.ERROR;
         int startline = -1;
         int startcolumn = -1;
         int endline = -1;
@@ -145,7 +146,7 @@ public class DefaultCSharpCompilerParser {
 
             message = line.substring(j + 1 + ERROR_PREFIX.length());
 
-            error = line.contains("): error");
+            error = line.contains("): error") ? Kind.ERROR : Kind.WARNING;
         } else {
             System.err.println("Unknown output: " + line);
 
