@@ -28,9 +28,9 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -68,26 +68,16 @@ public class CSharpCompiler extends AbstractCompiler {
 
     private static final String[] DEFAULT_INCLUDES = {"**/**"};
 
-    private Map<String, String> compilerArguments;
-
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
-
     public CSharpCompiler() {
         super(CompilerOutputStyle.ONE_OUTPUT_FILE_FOR_ALL_INPUT_FILES, ".cs", null, null);
     }
-
-    // ----------------------------------------------------------------------
-    // Compiler Implementation
-    // ----------------------------------------------------------------------
 
     @Override
     public String getCompilerId() {
         return "csharp";
     }
 
-    public boolean canUpdateTarget(CompilerConfiguration configuration) throws CompilerException {
+    public boolean canUpdateTarget(CompilerConfiguration configuration) {
         return false;
     }
 
@@ -130,37 +120,39 @@ public class CSharpCompiler extends AbstractCompiler {
         return buildCompilerArguments(config, CSharpCompiler.getSourceFiles(config));
     }
 
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
+    /**
+     * Parse compiler arguments and normalize legacy colon-separated format.
+     * Converts arguments like "-main:MyClass" (stored as key with null value)
+     * into proper key-value pairs: "-main" -> "MyClass".
+     *
+     * @param config the compiler configuration
+     * @return normalized map of compiler arguments
+     */
+    Map<String, String> getCompilerArguments(CompilerConfiguration config) {
+        Map<String, String> customArgs = config.getCustomCompilerArgumentsAsMap();
+        Map<String, String> normalizedArgs = new HashMap<>();
 
-    private Map<String, String> getCompilerArguments(CompilerConfiguration config) {
-        if (compilerArguments != null) {
-            return compilerArguments;
-        }
+        for (Map.Entry<String, String> entry : customArgs.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
 
-        compilerArguments = config.getCustomCompilerArgumentsAsMap();
+            // Handle legacy format: "-main:MyClass" stored as key with null value
+            if (value == null && key.contains(":")) {
+                int colonIndex = key.indexOf(':');
+                String actualKey = key.substring(0, colonIndex);
+                String actualValue = key.substring(colonIndex + 1);
+                normalizedArgs.put(actualKey, actualValue);
 
-        Iterator<String> i = compilerArguments.keySet().iterator();
-
-        while (i.hasNext()) {
-            String orig = i.next();
-            String v = compilerArguments.get(orig);
-            if (orig.contains(":") && v == null) {
-                String[] arr = orig.split(":");
-                i.remove();
-                String k = arr[0];
-                v = arr[1];
-                compilerArguments.put(k, v);
                 if (config.isDebug()) {
-                    System.out.println("transforming argument from " + orig + " to " + k + " = [" + v + "]");
+                    System.out.println("Normalized argument '" + key + "' to key='" + actualKey + "', value='"
+                            + actualValue + "'");
                 }
+            } else {
+                normalizedArgs.put(key, value);
             }
         }
 
-        config.setCustomCompilerArgumentsAsMap(compilerArguments);
-
-        return compilerArguments;
+        return normalizedArgs;
     }
 
     private String findExecutable(CompilerConfiguration config) {
@@ -179,45 +171,53 @@ public class CSharpCompiler extends AbstractCompiler {
 
     /*
     $ mcs --help
-    Mono C# compiler, (C) 2001 - 2003 Ximian, Inc.
+    Turbo C# compiler, Copyright 2001-2011 Novell, Inc., 2011-2016 Xamarin, Inc, 2016-2017 Microsoft Corp
     mcs [options] source-files
-       --about            About the Mono C# compiler
-       -addmodule:MODULE  Adds the module to the generated assembly
-       -checked[+|-]      Set default context to checked
-       -codepage:ID       Sets code page to the one in ID (number, utf8, reset)
-       -clscheck[+|-]     Disables CLS Compliance verifications
-       -define:S1[;S2]    Defines one or more symbols (short: /d:)
-       -debug[+|-], -g    Generate debugging information
-       -delaysign[+|-]    Only insert the public key into the assembly (no signing)
-       -doc:FILE          XML Documentation file to generate
-       -keycontainer:NAME The key pair container used to strongname the assembly
-       -keyfile:FILE      The strongname key file used to strongname the assembly
-       -langversion:TEXT  Specifies language version modes: ISO-1 or Default
-       -lib:PATH1,PATH2   Adds the paths to the assembly link path
-       -main:class        Specified the class that contains the entry point
-       -noconfig[+|-]     Disables implicit references to assemblies
-       -nostdlib[+|-]     Does not load core libraries
-       -nowarn:W1[,W2]    Disables one or more warnings
-       -optimize[+|-]     Enables code optimalizations
-       -out:FNAME         Specifies output file
-       -pkg:P1[,Pn]       References packages P1..Pn
-       -recurse:SPEC      Recursively compiles the files in SPEC ([dir]/file)
-       -reference:ASS     References the specified assembly (-r:ASS)
-       -target:KIND       Specifies the target (KIND is one of: exe, winexe,
-                          library, module), (short: /t:)
-       -unsafe[+|-]       Allows unsafe code
-       -warnaserror[+|-]  Treat warnings as errors
-       -warn:LEVEL        Sets warning level (the highest is 4, the default is 2)
-       -help2             Show other help flags
+       --about              About the Mono C# compiler
+       -addmodule:M1[,Mn]   Adds the module to the generated assembly
+       -checked[+|-]        Sets default aritmetic overflow context
+       -clscheck[+|-]       Disables CLS Compliance verifications
+       -codepage:ID         Sets code page to the one in ID (number, utf8, reset)
+       -define:S1[;S2]      Defines one or more conditional symbols (short: -d)
+       -debug[+|-], -g      Generate debugging information
+       -delaysign[+|-]      Only insert the public key into the assembly (no signing)
+       -doc:FILE            Process documentation comments to XML file
+       -fullpaths           Any issued error or warning uses absolute file path
+       -help                Lists all compiler options (short: -?)
+       -keycontainer:NAME   The key pair container used to sign the output assembly
+       -keyfile:FILE        The key file used to strongname the ouput assembly
+       -langversion:TEXT    Specifies language version: ISO-1, ISO-2, 3, 4, 5, 6, Default or Experimental
+       -lib:PATH1[,PATHn]   Specifies the location of referenced assemblies
+       -main:CLASS          Specifies the class with the Main method (short: -m)
+       -noconfig            Disables implicitly referenced assemblies
+       -nostdlib[+|-]       Does not reference mscorlib.dll library
+       -nowarn:W1[,Wn]      Suppress one or more compiler warnings
+       -optimize[+|-]       Enables advanced compiler optimizations (short: -o)
+       -out:FILE            Specifies output assembly name
+       -pathmap:K=V[,Kn=Vn] Sets a mapping for source path names used in generated output
+       -pkg:P1[,Pn]         References packages P1..Pn
+       -platform:ARCH       Specifies the target platform of the output assembly
+                            ARCH can be one of: anycpu, anycpu32bitpreferred, arm,
+                            x86, x64 or itanium. The default is anycpu.
+       -recurse:SPEC        Recursively compiles files according to SPEC pattern
+       -reference:A1[,An]   Imports metadata from the specified assembly (short: -r)
+       -reference:ALIAS=A   Imports metadata using specified extern alias (short: -r)
+       -sdk:VERSION         Specifies SDK version of referenced assemblies
+                            VERSION can be one of: 2, 4, 4.5 (default) or a custom value
+       -target:KIND         Specifies the format of the output assembly (short: -t)
+                            KIND can be one of: exe, winexe, library, module
+       -unsafe[+|-]         Allows to compile code which uses unsafe keyword
+       -warnaserror[+|-]    Treats all warnings as errors
+       -warnaserror[+|-]:W1[,Wn] Treats one or more compiler warnings as errors
+       -warn:0-4            Sets warning level, the default is 4 (short -w:)
+       -helpinternal        Shows internal and advanced compiler options
 
     Resources:
-       -linkresource:FILE[,ID] Links FILE as a resource
-       -resource:FILE[,ID]     Embed FILE as a resource
+       -linkresource:FILE[,ID] Links FILE as a resource (short: -linkres)
+       -resource:FILE[,ID]     Embed FILE as a resource (short: -res)
        -win32res:FILE          Specifies Win32 resource file (.res)
        -win32icon:FILE         Use this icon for the output
        @file                   Read response file for more options
-
-    Options can be of the form -option or /option
         */
 
     /*
@@ -385,24 +385,13 @@ public class CSharpCompiler extends AbstractCompiler {
                                   accessibility errors with what assembly they came from.
      */
 
-    private String[] buildCompilerArguments(CompilerConfiguration config, String[] sourceFiles)
-            throws CompilerException {
+    String[] buildCompilerArguments(CompilerConfiguration config, String[] sourceFiles) throws CompilerException {
         List<String> args = new ArrayList<>();
-
-        if (config.isDebug()) {
-            args.add("/debug+");
-        } else {
-            args.add("/debug-");
-        }
 
         // config.isShowWarnings()
         // config.getSourceVersion()
         // config.getTargetVersion()
         // config.getSourceEncoding()
-
-        // ----------------------------------------------------------------------
-        //
-        // ----------------------------------------------------------------------
 
         for (String element : config.getClasspathEntries()) {
             File f = new File(element);
@@ -433,122 +422,91 @@ public class CSharpCompiler extends AbstractCompiler {
             }
         }
 
-        // ----------------------------------------------------------------------
-        // Main class
-        // ----------------------------------------------------------------------
-
+        // TODO: include all user compiler arguments and not only some!
         Map<String, String> compilerArguments = getCompilerArguments(config);
 
         String mainClass = compilerArguments.get("-main");
-
         if (!StringUtils.isEmpty(mainClass)) {
             args.add("/main:" + mainClass);
         }
 
-        // ----------------------------------------------------------------------
         // Xml Doc output
-        // ----------------------------------------------------------------------
-
         String doc = compilerArguments.get("-doc");
-
         if (!StringUtils.isEmpty(doc)) {
             args.add("/doc:"
                     + new File(config.getOutputLocation(), config.getOutputFileName() + ".xml").getAbsolutePath());
         }
 
-        // ----------------------------------------------------------------------
-        // Nowarn option
-        // ----------------------------------------------------------------------
+        // Debug option (full, pdbonly...)
+        String debug = compilerArguments.get("-debug");
+        if (!StringUtils.isEmpty(debug)) {
+            args.add("/debug:" + debug);
+        }
 
+        // Nowarn option (w#1,w#2...)
         String nowarn = compilerArguments.get("-nowarn");
-
         if (!StringUtils.isEmpty(nowarn)) {
             args.add("/nowarn:" + nowarn);
         }
 
-        // ----------------------------------------------------------------------
         // Out - Override output name, this is required for generating the unit test dll
-        // ----------------------------------------------------------------------
-
         String out = compilerArguments.get("-out");
-
         if (!StringUtils.isEmpty(out)) {
             args.add("/out:" + new File(config.getOutputLocation(), out).getAbsolutePath());
         } else {
             args.add("/out:" + new File(config.getOutputLocation(), getOutputFile(config)).getAbsolutePath());
         }
 
-        // ----------------------------------------------------------------------
         // Resource File - compile in a resource file into the assembly being created
-        // ----------------------------------------------------------------------
         String resourcefile = compilerArguments.get("-resourcefile");
-
         if (!StringUtils.isEmpty(resourcefile)) {
             String resourceTarget = compilerArguments.get("-resourcetarget");
             args.add("/res:" + new File(resourcefile).getAbsolutePath() + "," + resourceTarget);
         }
 
-        // ----------------------------------------------------------------------
-        // Target - type of assembly to produce, lib,exe,winexe etc...
-        // ----------------------------------------------------------------------
-
+        // Target - type of assembly to produce: library,exe,winexe...
         String target = compilerArguments.get("-target");
-
         if (StringUtils.isEmpty(target)) {
             args.add("/target:library");
         } else {
             args.add("/target:" + target);
         }
 
-        // ----------------------------------------------------------------------
         // remove MS logo from output (not applicable for mono)
-        // ----------------------------------------------------------------------
         String nologo = compilerArguments.get("-nologo");
-
-        if (!StringUtils.isEmpty(nologo)) {
+        if (!StringUtils.isEmpty(nologo) && !"false".equalsIgnoreCase(nologo)) {
             args.add("/nologo");
         }
 
-        // ----------------------------------------------------------------------
         // Unsafe option
-        // ----------------------------------------------------------------------
         String unsafe = compilerArguments.get("-unsafe");
-
-        if (!StringUtils.isEmpty(unsafe) && unsafe.equals("true")) {
+        if (!StringUtils.isEmpty(unsafe) && "true".equalsIgnoreCase(unsafe)) {
             args.add("/unsafe");
         }
 
-        // ----------------------------------------------------------------------
         // PreferredUILang option
-        // ----------------------------------------------------------------------
         String preferreduilang = compilerArguments.get("-preferreduilang");
-
         if (!StringUtils.isEmpty(preferreduilang)) {
             args.add("/preferreduilang:" + preferreduilang);
         }
 
-        // ----------------------------------------------------------------------
         // Utf8Output option
-        // ----------------------------------------------------------------------
         String utf8output = compilerArguments.get("-utf8output");
-
-        if (!StringUtils.isEmpty(utf8output)) {
-            args.add("/utf8output:");
+        if (!StringUtils.isEmpty(utf8output) && !"false".equals(utf8output)) {
+            args.add("/utf8output");
         }
 
-        // ----------------------------------------------------------------------
         // add any resource files
-        // ----------------------------------------------------------------------
         this.addResourceArgs(config, args);
 
-        // ----------------------------------------------------------------------
         // add source files
-        // ----------------------------------------------------------------------
-        for (String sourceFile : sourceFiles) {
-            args.add(sourceFile);
+        Collections.addAll(args, sourceFiles);
+
+        if (config.isDebug()) {
+            System.out.println("built compiler arguments:" + args);
         }
 
-        return args.toArray(new String[args.size()]);
+        return args.toArray(new String[0]);
     }
 
     private void addResourceArgs(CompilerConfiguration config, List<String> args) {
@@ -560,7 +518,7 @@ public class CSharpCompiler extends AbstractCompiler {
             scanner.addDefaultExcludes();
             scanner.scan();
 
-            List<String> includedFiles = Arrays.asList(scanner.getIncludedFiles());
+            String[] includedFiles = scanner.getIncludedFiles();
             for (String name : includedFiles) {
                 File filteredResource = new File(filteredResourceDir, name);
                 String assemblyResourceName = this.convertNameToAssemblyResourceName(name);
@@ -585,7 +543,7 @@ public class CSharpCompiler extends AbstractCompiler {
         if (tempResourcesDirAsString != null) {
             filteredResourceDir = new File(tempResourcesDirAsString);
             if (config.isDebug()) {
-                System.out.println("Found resourceDir at: " + filteredResourceDir.toString());
+                System.out.println("Found resourceDir at: " + filteredResourceDir);
             }
         } else {
             if (config.isDebug()) {
