@@ -49,7 +49,7 @@
     <mavenVersion>3.6.3</mavenVersion>
     <minimalMavenBuildVersion>${mavenVersion}</minimalMavenBuildVersion>
     <errorprone.version>2.37.0</errorprone.version>
-    <eclipse.sisu.version>0.9.0.M4</eclipse.sisu.version>
+    <eclipse.sisu.version>1.0.0</eclipse.sisu.version>
     <sisuMavenPluginVersion>${eclipse.sisu.version}</sisuMavenPluginVersion>
     <trimStackTrace>false</trimStackTrace>
     <preparationGoals>clean install</preparationGoals>
