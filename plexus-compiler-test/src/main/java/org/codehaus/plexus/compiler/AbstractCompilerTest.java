@@ -111,7 +111,7 @@ public abstract class AbstractCompilerTest {
     protected List<String> getClasspath() throws Exception {
         List<String> cp = new ArrayList<>();
 
-        File file = getLocalArtifactPath("commons-lang", "commons-lang", "2.0", "jar");
+        File file = getLocalArtifactPath("commons-lang", "commons-lang", "2.6", "jar");
 
         assertThat(
                 "test prerequisite: commons-lang library must be available in local repository at " + file,
