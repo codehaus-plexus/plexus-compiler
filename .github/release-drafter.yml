@@ -1,0 +1,2 @@
+_extends: .github:/.github/release-drafter.yml
+tag-template: plexus-compiler-$NEXT_MINOR_VERSION
