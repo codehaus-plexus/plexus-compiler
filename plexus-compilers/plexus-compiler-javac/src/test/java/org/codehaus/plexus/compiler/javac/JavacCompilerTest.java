@@ -15,13 +15,9 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.codehaus.plexus.compiler.javac.JavacCompiler.Messages.*;
-import static org.hamcrest.CoreMatchers.endsWith;
-import static org.hamcrest.CoreMatchers.startsWith;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /*
@@ -66,13 +62,13 @@ public class JavacCompilerTest extends AbstractJavacCompilerTest {
         List<CompilerMessage> compilerMessages =
                 JavacCompiler.parseModernStream(1, new BufferedReader(new StringReader(stackTraceWithHeader)));
 
-        assertThat(compilerMessages, notNullValue());
-        assertThat(compilerMessages, hasSize(1));
+        assertNotNull(compilerMessages);
+        assertEquals(1, compilerMessages.size());
 
         String message = compilerMessages.get(0).getMessage().replaceAll(EOL, "\n");
         // Parser retains stack trace header
-        assertThat(message, startsWith(stackTraceHeader));
-        assertThat(message, endsWith(stackTraceAnnotationProcessingError));
+        assertTrue(message.startsWith(stackTraceHeader));
+        assertTrue(message.endsWith(stackTraceAnnotationProcessingError));
     }
 
     private static final String stackTraceAnnotationProcessingError =

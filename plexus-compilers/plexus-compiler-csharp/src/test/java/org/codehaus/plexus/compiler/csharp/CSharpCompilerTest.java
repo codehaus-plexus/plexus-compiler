@@ -31,11 +31,10 @@ import java.util.List;
 import org.codehaus.plexus.compiler.CompilerMessage;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
@@ -51,32 +50,32 @@ public class CSharpCompilerTest {
 
         error = DefaultCSharpCompilerParser.parseLine("error CS2008: No files to compile were specified");
 
-        assertThat(error, notNullValue());
+        assertNotNull(error);
 
-        assertThat(error.getMessage(), is("CS2008: No files to compile were specified"));
+        assertEquals("CS2008: No files to compile were specified", error.getMessage());
 
         error = DefaultCSharpCompilerParser.parseLine("Compilation failed: 1 error(s), 0 warnings");
 
-        assertThat(error, nullValue());
+        assertNull(error);
 
         error = DefaultCSharpCompilerParser.parseLine("Compilation succeeded - 2 warning(s)");
 
-        assertThat(error, nullValue());
+        assertNull(error);
 
         error = DefaultCSharpCompilerParser.parseLine(
                 "/home/trygvis/dev/com.myrealbox/trunk/mcs/nunit20/core/./TestRunnerThread.cs(29) error CS0246: Cannot find type 'NameValueCollection'");
 
-        assertThat(error, notNullValue());
+        assertNotNull(error);
 
-        assertThat(error.getStartLine(), is(29));
+        assertEquals(29, error.getStartLine());
 
-        assertThat(error.getStartColumn(), is(-1));
+        assertEquals(-1, error.getStartColumn());
 
-        assertThat(error.getEndLine(), is(29));
+        assertEquals(29, error.getEndLine());
 
-        assertThat(error.getEndColumn(), is(-1));
+        assertEquals(-1, error.getEndColumn());
 
-        assertThat(error.getMessage(), is("CS0246: Cannot find type 'NameValueCollection'"));
+        assertEquals("CS0246: Cannot find type 'NameValueCollection'", error.getMessage());
 
         // ----------------------------------------------------------------------
         //
@@ -102,9 +101,9 @@ public class CSharpCompilerTest {
         List<CompilerMessage> messages =
                 CSharpCompiler.parseCompilerOutput(new BufferedReader(new StringReader(input)));
 
-        assertThat(messages, notNullValue());
+        assertNotNull(messages);
 
-        assertThat(messages.size(), is(14));
+        assertEquals(14, messages.size());
     }
 
     @Test
@@ -139,13 +138,12 @@ public class CSharpCompilerTest {
         List<CompilerMessage> messagesWinCsc =
                 CSharpCompiler.parseCompilerOutput(new BufferedReader(new StringReader(cscWin)));
 
-        assertThat(messagesWinCsc, notNullValue());
+        assertNotNull(messagesWinCsc);
 
-        assertThat(messagesWinCsc.size(), is(24));
+        assertEquals(24, messagesWinCsc.size());
 
-        assertThat("Check that the line number is not -1", messagesWinCsc.get(0).getStartLine(), not(-1));
-        assertThat(
-                "Check that the column number is not -1", messagesWinCsc.get(0).getStartColumn(), not(-1));
+        assertNotEquals(-1, messagesWinCsc.get(0).getStartLine(), "Check that the line number is not -1");
+        assertNotEquals(-1, messagesWinCsc.get(0).getStartColumn(), "Check that the column number is not -1");
     }
 
     @Test
@@ -162,13 +160,11 @@ public class CSharpCompilerTest {
         List<CompilerMessage> messagesMonoWin =
                 CSharpCompiler.parseCompilerOutput(new BufferedReader(new StringReader(monoWin)));
 
-        assertThat(messagesMonoWin, notNullValue());
+        assertNotNull(messagesMonoWin);
 
-        assertThat(messagesMonoWin.size(), is(5));
+        assertEquals(5, messagesMonoWin.size());
 
-        assertThat(
-                "Check that the line number is not -1", messagesMonoWin.get(0).getStartLine(), not(-1));
-        assertThat(
-                "Check that the column number is not -1", messagesMonoWin.get(0).getStartColumn(), not(-1));
+        assertNotEquals(-1, messagesMonoWin.get(0).getStartLine(), "Check that the line number is not -1");
+        assertNotEquals(-1, messagesMonoWin.get(0).getStartColumn(), "Check that the column number is not -1");
     }
 }

@@ -38,11 +38,10 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.codehaus.plexus.compiler.javac.JavacCompiler.Messages.*;
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
@@ -63,19 +62,19 @@ public class ErrorMessageParserTest {
 
         CompilerMessage compilerError = JavacCompiler.parseModernError(0, error);
 
-        assertThat(compilerError, notNullValue());
+        assertNotNull(compilerError);
 
-        assertThat(compilerError.isError(), is(false));
+        assertFalse(compilerError.isError());
 
-        assertThat(compilerError.getMessage(), is("Date(java.lang.String) in java.util.Date has been deprecated"));
+        assertEquals("Date(java.lang.String) in java.util.Date has been deprecated", compilerError.getMessage());
 
-        assertThat(compilerError.getStartColumn(), is(63));
+        assertEquals(63, compilerError.getStartColumn());
 
-        assertThat(compilerError.getEndColumn(), is(66));
+        assertEquals(66, compilerError.getEndColumn());
 
-        assertThat(compilerError.getStartLine(), is(1));
+        assertEquals(1, compilerError.getStartLine());
 
-        assertThat(compilerError.getEndLine(), is(1));
+        assertEquals(1, compilerError.getEndLine());
     }
 
     @Test
@@ -87,19 +86,19 @@ public class ErrorMessageParserTest {
 
         CompilerMessage compilerError = JavacCompiler.parseModernError(0, error);
 
-        assertThat(compilerError, notNullValue());
+        assertNotNull(compilerError);
 
-        assertThat(compilerError.isError(), is(false));
+        assertFalse(compilerError.isError());
 
-        assertThat(compilerError.getMessage(), is("finally clause cannot complete normally"));
+        assertEquals("finally clause cannot complete normally", compilerError.getMessage());
 
-        assertThat(compilerError.getStartColumn(), is(26));
+        assertEquals(26, compilerError.getStartColumn());
 
-        assertThat(compilerError.getEndColumn(), is(27));
+        assertEquals(27, compilerError.getEndColumn());
 
-        assertThat(compilerError.getStartLine(), is(8));
+        assertEquals(8, compilerError.getStartLine());
 
-        assertThat(compilerError.getEndLine(), is(8));
+        assertEquals(8, compilerError.getEndLine());
     }
 
     @Test
@@ -108,19 +107,19 @@ public class ErrorMessageParserTest {
 
         CompilerMessage compilerError = JavacCompiler.parseModernError(1, error);
 
-        assertThat(compilerError, notNullValue());
+        assertNotNull(compilerError);
 
-        assertThat(compilerError.isError(), is(true));
+        assertTrue(compilerError.isError());
 
-        assertThat(compilerError.getMessage(), is("not a statement"));
+        assertEquals("not a statement", compilerError.getMessage());
 
-        assertThat(compilerError.getStartColumn(), is(9));
+        assertEquals(9, compilerError.getStartColumn());
 
-        assertThat(compilerError.getEndColumn(), is(11));
+        assertEquals(11, compilerError.getEndColumn());
 
-        assertThat(compilerError.getStartLine(), is(7));
+        assertEquals(7, compilerError.getStartLine());
 
-        assertThat(compilerError.getEndLine(), is(7));
+        assertEquals(7, compilerError.getEndLine());
     }
 
     @Test
@@ -133,22 +132,22 @@ public class ErrorMessageParserTest {
 
         CompilerMessage compilerError = JavacCompiler.parseModernError(1, error);
 
-        assertThat(compilerError, notNullValue());
+        assertNotNull(compilerError);
 
-        assertThat(compilerError.isError(), is(true));
+        assertTrue(compilerError.isError());
 
-        assertThat(
-                compilerError.getMessage(),
-                is("cannot find symbol" + EOL + "symbol  : method foo()" + EOL
-                        + "location: class org.codehaus.foo.UnknownSymbol"));
+        assertEquals(
+                "cannot find symbol" + EOL + "symbol  : method foo()" + EOL
+                        + "location: class org.codehaus.foo.UnknownSymbol",
+                compilerError.getMessage());
 
-        assertThat(compilerError.getStartColumn(), is(8));
+        assertEquals(8, compilerError.getStartColumn());
 
-        assertThat(compilerError.getEndColumn(), is(14));
+        assertEquals(14, compilerError.getEndColumn());
 
-        assertThat(compilerError.getStartLine(), is(7));
+        assertEquals(7, compilerError.getStartLine());
 
-        assertThat(compilerError.getEndLine(), is(7));
+        assertEquals(7, compilerError.getEndLine());
     }
 
     @Test
@@ -167,7 +166,7 @@ public class ErrorMessageParserTest {
         List<CompilerMessage> messages =
                 JavacCompiler.parseModernStream(1, new BufferedReader(new StringReader(errors)));
 
-        assertThat(messages.size(), is(2));
+        assertEquals(2, messages.size());
     }
 
     @Test
@@ -186,7 +185,7 @@ public class ErrorMessageParserTest {
         List<CompilerMessage> messages =
                 JavacCompiler.parseModernStream(1, new BufferedReader(new StringReader(errors)));
 
-        assertThat(messages.size(), is(2));
+        assertEquals(2, messages.size());
     }
 
     @Test
@@ -202,7 +201,7 @@ public class ErrorMessageParserTest {
         List<CompilerMessage> messages =
                 JavacCompiler.parseModernStream(1, new BufferedReader(new StringReader(errors)));
 
-        assertThat(messages.size(), is(1));
+        assertEquals(1, messages.size());
     }
 
     @Test
@@ -217,8 +216,8 @@ public class ErrorMessageParserTest {
         List<CompilerMessage> messages =
                 JavacCompiler.parseModernStream(0, new BufferedReader(new StringReader(errors)));
 
-        assertThat(messages.size(), is(1));
-        assertThat(messages.get(0).isError(), is(false));
+        assertEquals(1, messages.size());
+        assertFalse(messages.get(0).isError());
     }
 
     @Test
@@ -230,8 +229,7 @@ public class ErrorMessageParserTest {
 
         CompilerMessage compilerError = JavacCompiler.parseModernError(1, error);
 
-        assertThat(
-                String.valueOf(compilerError), is("/my/prj/src/main/java/test/prj/App.java:[11,45] not a statement"));
+        assertEquals("/my/prj/src/main/java/test/prj/App.java:[11,45] not a statement", String.valueOf(compilerError));
     }
 
     @Test
@@ -244,10 +242,9 @@ public class ErrorMessageParserTest {
 
         CompilerMessage compilerError = JavacCompiler.parseModernError(1, error);
 
-        assertThat(
-                String.valueOf(compilerError),
-                is(
-                        "c:\\Documents and Settings\\My Self\\Documents\\prj\\src\\main\\java\\test\\prj\\App.java:[11,45] not a statement"));
+        assertEquals(
+                "c:\\Documents and Settings\\My Self\\Documents\\prj\\src\\main\\java\\test\\prj\\App.java:[11,45] not a statement",
+                String.valueOf(compilerError));
     }
 
     /**
@@ -629,7 +626,7 @@ public class ErrorMessageParserTest {
                 + CRLF;
         List<CompilerMessage> compilerMessages =
                 JavacCompiler.parseModernStream(0, new BufferedReader(new StringReader(errors)));
-        assertThat("count", compilerMessages.size(), is(187));
+        assertEquals(187, compilerMessages.size(), "count");
         List<CompilerMessage> compilerErrors = new ArrayList<>(3);
         for (CompilerMessage message : compilerMessages) {
             if (message.getKind() != CompilerMessage.Kind.OTHER) {
@@ -637,44 +634,45 @@ public class ErrorMessageParserTest {
             }
         }
 
-        assertEquivalent(
-                new CompilerMessage(
-                        "[options] bootstrap class path not set in conjunction with -source " + "1.6",
-                        CompilerMessage.Kind.WARNING),
-                compilerErrors.get(0));
+        CompilerMessage expected = new CompilerMessage(
+                "[options] bootstrap class path not set in conjunction with -source " + "1.6",
+                CompilerMessage.Kind.WARNING);
+        CompilerMessage actual = compilerErrors.get(0);
+        assertEquals(expected.getMessage(), actual.getMessage());
+        assertEquals(expected.getKind(), actual.getKind());
         CompilerMessage error1 = compilerErrors.get(1);
-        assertThat(
-                "file",
+        assertEquals(
+                "C:\\commander\\pre\\ec\\ec-http\\src\\main\\java\\com\\electriccloud\\http\\HttpUtil.java",
                 error1.getFile(),
-                is("C:\\commander\\pre\\ec\\ec-http\\src\\main\\java\\com\\electriccloud\\http\\HttpUtil.java"));
-        assertThat(
-                "message",
+                "file");
+        assertEquals(
+                "[deprecation] ThreadSafeClientConnManager in org.apache.http.impl.conn.tsccm has been deprecated",
                 error1.getMessage(),
-                is("[deprecation] ThreadSafeClientConnManager in org.apache.http.impl.conn.tsccm has been deprecated"));
-        assertThat("line", error1.getStartLine(), is(31));
-        assertThat("column", error1.getStartColumn(), is(38));
+                "message");
+        assertEquals(31, error1.getStartLine(), "line");
+        assertEquals(38, error1.getStartColumn(), "column");
         CompilerMessage error2 = compilerErrors.get(2);
-        assertThat(
-                "file",
+        assertEquals(
+                "C:\\commander\\pre\\ec\\ec-http\\src\\main\\java\\com\\electriccloud\\http\\HttpUtil.java",
                 error2.getFile(),
-                is("C:\\commander\\pre\\ec\\ec-http\\src\\main\\java\\com\\electriccloud\\http\\HttpUtil.java"));
-        assertThat(
-                "message",
+                "file");
+        assertEquals(
+                "[deprecation] ThreadSafeClientConnManager in org.apache.http.impl.conn.tsccm has been deprecated",
                 error2.getMessage(),
-                is("[deprecation] ThreadSafeClientConnManager in org.apache.http.impl.conn.tsccm has been deprecated"));
-        assertThat("line", error2.getStartLine(), is(151));
-        assertThat("column", error2.getStartColumn(), is(8));
+                "message");
+        assertEquals(151, error2.getStartLine(), "line");
+        assertEquals(8, error2.getStartColumn(), "column");
         CompilerMessage error3 = compilerErrors.get(3);
-        assertThat(
-                "file",
+        assertEquals(
+                "C:\\commander\\pre\\ec\\ec-http\\src\\main\\java\\com\\electriccloud\\http\\HttpUtil.java",
                 error3.getFile(),
-                is("C:\\commander\\pre\\ec\\ec-http\\src\\main\\java\\com\\electriccloud\\http\\HttpUtil.java"));
-        assertThat(
-                "message",
+                "file");
+        assertEquals(
+                "[deprecation] ThreadSafeClientConnManager in org.apache.http.impl.conn.tsccm has been deprecated",
                 error3.getMessage(),
-                is("[deprecation] ThreadSafeClientConnManager in org.apache.http.impl.conn.tsccm has been deprecated"));
-        assertThat("line", error3.getStartLine(), is(152));
-        assertThat("column", error3.getStartColumn(), is(16));
+                "message");
+        assertEquals(152, error3.getStartLine(), "line");
+        assertEquals(16, error3.getStartColumn(), "column");
     }
 
     @Test
@@ -693,39 +691,39 @@ public class ErrorMessageParserTest {
         List<CompilerMessage> compilerErrors =
                 JavacCompiler.parseModernStream(1, new BufferedReader(new StringReader(out)));
 
-        assertThat(compilerErrors, notNullValue());
+        assertNotNull(compilerErrors);
 
         CompilerMessage message1 = compilerErrors.get(0);
 
-        assertThat(message1.isError(), is(true));
+        assertTrue(message1.isError());
 
-        assertThat(
-                message1.getMessage(),
-                is("cannot find symbol" + EOL + "symbol  : class Properties" + EOL + "location: class Error"));
+        assertEquals(
+                "cannot find symbol" + EOL + "symbol  : class Properties" + EOL + "location: class Error",
+                message1.getMessage());
 
-        assertThat(message1.getStartColumn(), is(16));
+        assertEquals(16, message1.getStartColumn());
 
-        assertThat(message1.getEndColumn(), is(26));
+        assertEquals(26, message1.getEndColumn());
 
-        assertThat(message1.getStartLine(), is(3));
+        assertEquals(3, message1.getStartLine());
 
-        assertThat(message1.getEndLine(), is(3));
+        assertEquals(3, message1.getEndLine());
 
         CompilerMessage message2 = compilerErrors.get(1);
 
-        assertThat(message2.isError(), is(true));
+        assertTrue(message2.isError());
 
-        assertThat(
-                message2.getMessage(),
-                is("cannot find symbol" + EOL + "symbol  : class Properties" + EOL + "location: class Error"));
+        assertEquals(
+                "cannot find symbol" + EOL + "symbol  : class Properties" + EOL + "location: class Error",
+                message2.getMessage());
 
-        assertThat(message2.getStartColumn(), is(35));
+        assertEquals(35, message2.getStartColumn());
 
-        assertThat(message2.getEndColumn(), is(48));
+        assertEquals(48, message2.getEndColumn());
 
-        assertThat(message2.getStartLine(), is(3));
+        assertEquals(3, message2.getStartLine());
 
-        assertThat(message2.getEndLine(), is(3));
+        assertEquals(3, message2.getEndLine());
     }
 
     @Test
@@ -745,39 +743,39 @@ public class ErrorMessageParserTest {
         List<CompilerMessage> compilerErrors =
                 JavacCompiler.parseModernStream(1, new BufferedReader(new StringReader(out)));
 
-        assertThat(compilerErrors, notNullValue());
+        assertNotNull(compilerErrors);
 
         CompilerMessage message1 = compilerErrors.get(0);
 
-        assertThat(message1.isError(), is(true));
+        assertTrue(message1.isError());
 
-        assertThat(
-                message1.getMessage(),
-                is("cannot find symbol" + EOL + "  symbol:   class Properties" + EOL + "  location: class Error"));
+        assertEquals(
+                "cannot find symbol" + EOL + "  symbol:   class Properties" + EOL + "  location: class Error",
+                message1.getMessage());
 
-        assertThat(message1.getStartColumn(), is(16));
+        assertEquals(16, message1.getStartColumn());
 
-        assertThat(message1.getEndColumn(), is(26));
+        assertEquals(26, message1.getEndColumn());
 
-        assertThat(message1.getStartLine(), is(3));
+        assertEquals(3, message1.getStartLine());
 
-        assertThat(message1.getEndLine(), is(3));
+        assertEquals(3, message1.getEndLine());
 
         CompilerMessage message2 = compilerErrors.get(1);
 
-        assertThat(message2.isError(), is(true));
+        assertTrue(message2.isError());
 
-        assertThat(
-                message2.getMessage(),
-                is("cannot find symbol" + EOL + "  symbol:   class Properties" + EOL + "  location: class Error"));
+        assertEquals(
+                "cannot find symbol" + EOL + "  symbol:   class Properties" + EOL + "  location: class Error",
+                message2.getMessage());
 
-        assertThat(message2.getStartColumn(), is(35));
+        assertEquals(35, message2.getStartColumn());
 
-        assertThat(message2.getEndColumn(), is(48));
+        assertEquals(48, message2.getEndColumn());
 
-        assertThat(message2.getStartLine(), is(3));
+        assertEquals(3, message2.getStartLine());
 
-        assertThat(message2.getEndLine(), is(3));
+        assertEquals(3, message2.getEndLine());
     }
 
     @ParameterizedTest(name = "{0}")
@@ -788,15 +786,15 @@ public class ErrorMessageParserTest {
         List<CompilerMessage> compilerMessages =
                 JavacCompiler.parseModernStream(4, new BufferedReader(new StringReader(stackTraceWithHeader)));
 
-        assertThat(compilerMessages, notNullValue());
-        assertThat(compilerMessages, hasSize(1));
+        assertNotNull(compilerMessages);
+        assertEquals(1, compilerMessages.size());
 
         String message = compilerMessages.get(0).getMessage().replaceAll(EOL, "\n");
         // Parser retains neither unidentified log lines nor slightly modified stack trace header
-        assertThat(message, not(containsString(UNIDENTIFIED_LOG_LINES)));
-        assertThat(message, not(containsString(stackTraceHeader)));
+        assertTrue(!message.contains(UNIDENTIFIED_LOG_LINES));
+        assertTrue(!message.contains(stackTraceHeader));
         // Parser returns stack strace without any preceding lines
-        assertThat(message, startsWith(stackTraceInternalCompilerError));
+        assertTrue(message.startsWith(stackTraceInternalCompilerError));
     }
 
     private static Stream<Arguments> testStackTraceWithUnknownHeader_args() {
@@ -823,13 +821,13 @@ public class ErrorMessageParserTest {
         List<CompilerMessage> compilerMessages =
                 JavacCompiler.parseModernStream(4, new BufferedReader(new StringReader(stackTraceWithHeader)));
 
-        assertThat(compilerMessages, notNullValue());
-        assertThat(compilerMessages, hasSize(1));
+        assertNotNull(compilerMessages);
+        assertEquals(1, compilerMessages.size());
 
         String message = compilerMessages.get(0).getMessage().replaceAll(EOL, "\n");
         // Parser retains stack trace header
-        assertThat(message, startsWith(stackTraceHeader));
-        assertThat(message, endsWith(stackTraceInternalCompilerError));
+        assertTrue(message.startsWith(stackTraceHeader));
+        assertTrue(message.endsWith(stackTraceInternalCompilerError));
     }
 
     private static final String stackTraceInternalCompilerError =
@@ -888,13 +886,13 @@ public class ErrorMessageParserTest {
         List<CompilerMessage> compilerMessages =
                 JavacCompiler.parseModernStream(4, new BufferedReader(new StringReader(stackTraceWithHeader)));
 
-        assertThat(compilerMessages, notNullValue());
-        assertThat(compilerMessages, hasSize(1));
+        assertNotNull(compilerMessages);
+        assertEquals(1, compilerMessages.size());
 
         String message = compilerMessages.get(0).getMessage().replaceAll(EOL, "\n");
         // Parser retains stack trace header
-        assertThat(message, startsWith(stackTraceHeader));
-        assertThat(message, endsWith(stackTraceSystemOutOfResourcesError));
+        assertTrue(message.startsWith(stackTraceHeader));
+        assertTrue(message.endsWith(stackTraceSystemOutOfResourcesError));
     }
 
     private static final String stackTraceSystemOutOfResourcesError =
@@ -938,13 +936,13 @@ public class ErrorMessageParserTest {
         List<CompilerMessage> compilerMessages =
                 JavacCompiler.parseModernStream(4, new BufferedReader(new StringReader(stackTraceWithHeader)));
 
-        assertThat(compilerMessages, notNullValue());
-        assertThat(compilerMessages, hasSize(1));
+        assertNotNull(compilerMessages);
+        assertEquals(1, compilerMessages.size());
 
         String message = compilerMessages.get(0).getMessage().replaceAll(EOL, "\n");
         // Parser retains stack trace header
-        assertThat(message, startsWith(stackTraceHeader));
-        assertThat(message, endsWith(stackTraceIOError));
+        assertTrue(message.startsWith(stackTraceHeader));
+        assertTrue(message.endsWith(stackTraceIOError));
     }
 
     private static final String stackTraceIOError =
@@ -985,13 +983,13 @@ public class ErrorMessageParserTest {
         List<CompilerMessage> compilerMessages =
                 JavacCompiler.parseModernStream(4, new BufferedReader(new StringReader(stackTraceWithHeader)));
 
-        assertThat(compilerMessages, notNullValue());
-        assertThat(compilerMessages, hasSize(1));
+        assertNotNull(compilerMessages);
+        assertEquals(1, compilerMessages.size());
 
         String message = compilerMessages.get(0).getMessage().replaceAll(EOL, "\n");
         // Parser retains stack trace header
-        assertThat(message, startsWith(stackTraceHeader));
-        assertThat(message, endsWith(stackTracePluginError));
+        assertTrue(message.startsWith(stackTraceHeader));
+        assertTrue(message.endsWith(stackTracePluginError));
     }
 
     private static final String stackTracePluginError =
@@ -1025,8 +1023,8 @@ public class ErrorMessageParserTest {
         final List<CompilerMessage> compilerErrors =
                 JavacCompiler.parseModernStream(0, new BufferedReader(new StringReader(error)));
 
-        assertThat(compilerErrors, notNullValue());
-        assertThat(compilerErrors.size(), is(1));
+        assertNotNull(compilerErrors);
+        assertEquals(1, compilerErrors.size());
         assertEquivalent(
                 new CompilerMessage(
                         "[options] bootstrap class path not set in conjunction with -source 1.6",
@@ -1046,8 +1044,8 @@ public class ErrorMessageParserTest {
         final List<CompilerMessage> compilerErrors =
                 JavacCompiler.parseModernStream(0, new BufferedReader(new StringReader(error)));
 
-        assertThat(compilerErrors, notNullValue());
-        assertThat(compilerErrors.size(), is(1));
+        assertNotNull(compilerErrors);
+        assertEquals(1, compilerErrors.size());
         assertEquivalent(
                 new CompilerMessage(
                         "C:\\repo\\src\\it\\includes-output-when-compiler-forked\\src\\main\\java\\MyClass" + ".java",
@@ -1072,8 +1070,8 @@ public class ErrorMessageParserTest {
         final List<CompilerMessage> compilerErrors =
                 JavacCompiler.parseModernStream(0, new BufferedReader(new StringReader(error)));
 
-        assertThat(compilerErrors, notNullValue());
-        assertThat(compilerErrors.size(), is(2));
+        assertNotNull(compilerErrors);
+        assertEquals(2, compilerErrors.size());
         assertEquivalent(
                 new CompilerMessage(
                         "[options] bootstrap class path not set in conjunction with -source 1.6",
@@ -1141,8 +1139,8 @@ public class ErrorMessageParserTest {
         List<CompilerMessage> compilerErrors =
                 JavacCompiler.parseModernStream(0, new BufferedReader(new StringReader(error)));
 
-        assertThat(compilerErrors, notNullValue());
-        assertThat(compilerErrors.size(), is(4));
+        assertNotNull(compilerErrors);
+        assertEquals(4, compilerErrors.size());
 
         assertEquivalent(
                 new CompilerMessage(
@@ -1162,13 +1160,14 @@ public class ErrorMessageParserTest {
                 compilerErrors.get(2));
 
         CompilerMessage finalMessage = compilerErrors.get(3);
-        assertThat(finalMessage.getKind(), is(CompilerMessage.Kind.ERROR));
-        assertThat(
-                "Starts correctly", finalMessage.getMessage(), startsWith("An exception has occurred in the compiler"));
-        assertThat(
-                "continues through end of output",
-                finalMessage.getMessage(),
-                endsWith("\tat jdk.compiler/com.sun" + ".tools.javac.Main.main(Main.java:43)" + EOL));
+        assertEquals(CompilerMessage.Kind.ERROR, finalMessage.getKind());
+        assertTrue(
+                finalMessage.getMessage().startsWith("An exception has occurred in the compiler"), "Starts correctly");
+        assertTrue(
+                finalMessage
+                        .getMessage()
+                        .endsWith("\tat jdk.compiler/com.sun" + ".tools.javac.Main.main(Main.java:43)" + EOL),
+                "continues through end of output");
     }
 
     @Test
@@ -1179,10 +1178,10 @@ public class ErrorMessageParserTest {
         List<CompilerMessage> compilerErrors =
                 JavacCompiler.parseModernStream(1, new BufferedReader(new StringReader(UNIDENTIFIED_LOG_LINES + out)));
 
-        assertThat(compilerErrors, notNullValue());
-        assertThat(compilerErrors.size(), is(1));
-        assertThat(compilerErrors.get(0).getKind(), is(CompilerMessage.Kind.ERROR));
-        assertThat(compilerErrors.get(0).getMessage().replaceAll(EOL, "\n"), startsWith(out));
+        assertNotNull(compilerErrors);
+        assertEquals(1, compilerErrors.size());
+        assertEquals(CompilerMessage.Kind.ERROR, compilerErrors.get(0).getKind());
+        assertTrue(compilerErrors.get(0).getMessage().replaceAll(EOL, "\n").startsWith(out));
     }
 
     @Test
@@ -1193,10 +1192,10 @@ public class ErrorMessageParserTest {
         List<CompilerMessage> compilerErrors =
                 JavacCompiler.parseModernStream(1, new BufferedReader(new StringReader(UNIDENTIFIED_LOG_LINES + out)));
 
-        assertThat(compilerErrors, notNullValue());
-        assertThat(compilerErrors.size(), is(1));
-        assertThat(compilerErrors.get(0).getKind(), is(CompilerMessage.Kind.ERROR));
-        assertThat(compilerErrors.get(0).getMessage().replaceAll(EOL, "\n"), startsWith(out));
+        assertNotNull(compilerErrors);
+        assertEquals(1, compilerErrors.size());
+        assertEquals(CompilerMessage.Kind.ERROR, compilerErrors.get(0).getKind());
+        assertTrue(compilerErrors.get(0).getMessage().replaceAll(EOL, "\n").startsWith(out));
     }
 
     @Test
@@ -1211,9 +1210,9 @@ public class ErrorMessageParserTest {
         List<CompilerMessage> compilerErrors =
                 JavacCompiler.parseModernStream(1, new BufferedReader(new StringReader(out)));
 
-        assertThat(compilerErrors, notNullValue());
+        assertNotNull(compilerErrors);
 
-        assertThat(compilerErrors.size(), is(1));
+        assertEquals(1, compilerErrors.size());
 
         CompilerMessage message = compilerErrors.get(0);
         validateBadSourceFile(message);
@@ -1235,38 +1234,36 @@ public class ErrorMessageParserTest {
         List<CompilerMessage> compilerErrors =
                 JavacCompiler.parseModernStream(1, new BufferedReader(new StringReader(out)));
 
-        assertThat(compilerErrors, notNullValue());
+        assertNotNull(compilerErrors);
 
-        assertThat(compilerErrors, hasSize(2));
+        assertEquals(2, compilerErrors.size());
 
         CompilerMessage firstMessage = compilerErrors.get(0);
-        assertThat("Is a Warning", firstMessage.getKind(), is(CompilerMessage.Kind.WARNING));
-        assertThat(
-                "On Correct File",
-                firstMessage.getFile(),
-                is("/MTOOLCHAINS-19/src/main/java/ch/pecunifex/x/Cls1.java"));
-        assertThat(
-                "Internal API Warning",
+        assertEquals(CompilerMessage.Kind.WARNING, firstMessage.getKind(), "Is a Warning");
+        assertEquals(
+                "/MTOOLCHAINS-19/src/main/java/ch/pecunifex/x/Cls1.java", firstMessage.getFile(), "On Correct File");
+        assertEquals(
+                "FontDesignMetrics is internal proprietary API and may be removed in a future release",
                 firstMessage.getMessage(),
-                is("FontDesignMetrics is internal proprietary API and may be removed in a future release"));
+                "Internal API Warning");
 
         CompilerMessage secondMessage = compilerErrors.get(1);
         validateBadSourceFile(secondMessage);
     }
 
     private void validateBadSourceFile(CompilerMessage message) {
-        assertThat("Is an Error", message.getKind(), is(CompilerMessage.Kind.ERROR));
-        assertThat("On Correct File", message.getFile(), is("/MTOOLCHAINS-19/src/main/java/ch/pecunifex/x/Cls1.java"));
-        assertThat("Message starts with access Error", message.getMessage(), startsWith("cannot access Cls2"));
+        assertEquals(CompilerMessage.Kind.ERROR, message.getKind(), "Is an Error");
+        assertEquals("/MTOOLCHAINS-19/src/main/java/ch/pecunifex/x/Cls1.java", message.getFile(), "On Correct File");
+        assertTrue(message.getMessage().startsWith("cannot access Cls2"), "Message starts with access Error");
     }
 
     private static void assertEquivalent(CompilerMessage expected, CompilerMessage actual) {
-        assertThat("Message did not match", actual.getMessage(), is(expected.getMessage()));
-        assertThat("Kind did not match", actual.getKind(), is(expected.getKind()));
-        assertThat("File did not match", actual.getFile(), is(expected.getFile()));
-        assertThat("Start line did not match", actual.getStartLine(), is(expected.getStartLine()));
-        assertThat("Start column did not match", actual.getStartColumn(), is(expected.getStartColumn()));
-        assertThat("End line did not match", actual.getEndLine(), is(expected.getEndLine()));
-        assertThat("End column did not match", actual.getEndColumn(), is(expected.getEndColumn()));
+        assertEquals(expected.getMessage(), actual.getMessage(), "Message did not match");
+        assertEquals(expected.getKind(), actual.getKind(), "Kind did not match");
+        assertEquals(expected.getFile(), actual.getFile(), "File did not match");
+        assertEquals(expected.getStartLine(), actual.getStartLine(), "Start line did not match");
+        assertEquals(expected.getStartColumn(), actual.getStartColumn(), "Start column did not match");
+        assertEquals(expected.getEndLine(), actual.getEndLine(), "End line did not match");
+        assertEquals(expected.getEndColumn(), actual.getEndColumn(), "End column did not match");
     }
 }

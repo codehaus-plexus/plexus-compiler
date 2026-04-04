@@ -37,10 +37,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
@@ -83,15 +83,15 @@ public abstract class AbstractCompilerTckTest {
         //
         // ----------------------------------------------------------------------
 
-        assertThat(result.size(), is(1));
+        assertEquals(1, result.size());
 
         CompilerMessage error = result.get(0);
 
-        assertThat(error.isError(), is(false));
+        assertFalse(error.isError());
 
-        assertThat(error.getMessage(), containsString("Date"));
+        assertTrue(error.getMessage().contains("Date"));
 
-        assertThat(error.getMessage(), containsString("deprecated"));
+        assertTrue(error.getMessage().contains("deprecated"));
     }
 
     @Test
@@ -116,13 +116,13 @@ public abstract class AbstractCompilerTckTest {
         //
         // ----------------------------------------------------------------------
 
-        assertThat(result.size(), is(1));
+        assertEquals(1, result.size());
 
         CompilerMessage error = result.get(0);
 
-        assertThat(error.isError(), is(false));
+        assertFalse(error.isError());
 
-        assertThat(error.getMessage(), containsString("finally block does not complete normally"));
+        assertTrue(error.getMessage().contains("finally block does not complete normally"));
     }
 
     protected List<CompilerMessage> compile(CompilerConfiguration configuration) throws Exception {
@@ -145,7 +145,7 @@ public abstract class AbstractCompilerTckTest {
         List<CompilerMessage> result =
                 getCompiler().performCompile(configuration).getCompilerMessages();
 
-        assertThat(result, notNullValue());
+        assertNotNull(result);
 
         return result;
     }
@@ -168,7 +168,7 @@ public abstract class AbstractCompilerTckTest {
         File parent = path.getParentFile();
 
         if (!parent.exists()) {
-            assertThat(parent.mkdirs(), is(true));
+            assertTrue(parent.mkdirs());
         }
 
         String source = "import java.util.Date;" + EOL + ""
@@ -190,7 +190,7 @@ public abstract class AbstractCompilerTckTest {
         File parent = path.getParentFile();
 
         if (!parent.exists()) {
-            assertThat(parent.mkdirs(), is(true));
+            assertTrue(parent.mkdirs());
         }
 
         String source = "public class " + className + "" + EOL + "{"

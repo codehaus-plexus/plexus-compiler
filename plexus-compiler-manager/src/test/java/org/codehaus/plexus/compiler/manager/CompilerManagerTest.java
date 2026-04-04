@@ -26,8 +26,9 @@ package org.codehaus.plexus.compiler.manager;
 import javax.inject.Inject;
 
 import org.codehaus.plexus.testing.PlexusTest;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
@@ -38,7 +39,7 @@ public class CompilerManagerTest {
     private CompilerManager compilerManager;
 
     @Test
-    public void testBasic() throws Exception {
-        Assertions.assertThrows(NoSuchCompilerException.class, () -> compilerManager.getCompiler("foo"));
+    public void testBasic() {
+        assertThrows(NoSuchCompilerException.class, () -> compilerManager.getCompiler("foo"));
     }
 }

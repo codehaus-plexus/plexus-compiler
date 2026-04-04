@@ -47,14 +47,12 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.impl.LocalRepositoryProvider;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.LocalRepositoryManager;
-import org.hamcrest.io.FileMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  *
@@ -80,13 +78,13 @@ public abstract class AbstractCompilerTest {
     @BeforeEach
     final void setUpLocalRepo() throws Exception {
         String localRepo = System.getProperty("maven.repo.local");
-        assertThat("system property maven.repo.local", localRepo, notNullValue());
+        assertNotNull(localRepo, "system property maven.repo.local");
 
         LocalRepository localRepository = new LocalRepository(localRepo);
-        assertThat(
-                "test prerequisite: local repository path: " + localRepository.getBasedir(),
-                localRepository.getBasedir(),
-                FileMatchers.aReadableFile());
+        File basedir = localRepository.getBasedir();
+        assertTrue(
+                basedir != null && basedir.exists() && basedir.canRead(),
+                "test prerequisite: local repository path: " + basedir);
 
         RepositorySystemSession session = new DefaultRepositorySystemSession();
         localRepositoryManager = localRepositoryProvider.newLocalRepositoryManager(session, localRepository);
@@ -113,10 +111,9 @@ public abstract class AbstractCompilerTest {
 
         File file = getLocalArtifactPath("commons-lang", "commons-lang", "2.6", "jar");
 
-        assertThat(
-                "test prerequisite: commons-lang library must be available in local repository at " + file,
-                file,
-                FileMatchers.aReadableFile());
+        assertTrue(
+                file != null && file.exists() && file.canRead(),
+                "test prerequisite: commons-lang library must be available in local repository at " + file);
 
         cp.add(file.getAbsolutePath());
 
@@ -161,11 +158,11 @@ public abstract class AbstractCompilerTest {
                 errors.add(error.getMessage());
             }
 
-            assertThat(
-                    "Wrong number of compilation errors (" + numCompilerErrors + "/" + expectedErrors //
-                            + ") : " + displayLines(errors),
+            assertEquals(
+                    expectedErrors,
                     numCompilerErrors,
-                    is(expectedErrors));
+                    "Wrong number of compilation errors (" + numCompilerErrors + "/" + expectedErrors + ") : "
+                            + displayLines(errors));
         }
 
         int expectedWarnings = expectedWarnings();
@@ -184,16 +181,21 @@ public abstract class AbstractCompilerTest {
                 warnings.add(error.getMessage());
             }
 
-            assertThat(
-                    "Wrong number ("
-                            + numCompilerWarnings + "/" + expectedWarnings + ") of compilation warnings: "
-                            + displayLines(warnings),
+            assertEquals(
+                    expectedWarnings,
                     numCompilerWarnings,
-                    is(expectedWarnings));
+                    "Wrong number (" + numCompilerWarnings + "/" + expectedWarnings + ") of compilation warnings: "
+                            + displayLines(warnings));
         }
 
-        assertThat(
-                files, containsInAnyOrder(normalizePaths(expectedOutputFiles()).toArray(new String[0])));
+        List<String> expectedFiles = normalizePaths(expectedOutputFiles());
+        assertEquals(
+                expectedFiles.size(),
+                files.size(),
+                "Number of expected output files does not match: " + files + " vs " + expectedFiles);
+        assertTrue(
+                files.containsAll(expectedFiles),
+                "Output files do not contain all expected files: expected=" + expectedFiles + " actual=" + files);
     }
 
     protected String displayLines(List<String> warnings) {

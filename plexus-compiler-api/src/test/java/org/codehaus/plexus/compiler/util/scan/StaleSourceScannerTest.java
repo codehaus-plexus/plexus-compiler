@@ -23,15 +23,11 @@ import java.util.Set;
 import org.codehaus.plexus.compiler.util.scan.mapping.SingleTargetSourceMapping;
 import org.codehaus.plexus.compiler.util.scan.mapping.SourceMapping;
 import org.codehaus.plexus.compiler.util.scan.mapping.SuffixMapping;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author jdcasey
@@ -68,9 +64,9 @@ public class StaleSourceScannerTest extends AbstractSourceInclusionScannerTest {
 
         Set<File> result = scanner.getIncludedSources(base, base);
 
-        assertThat("wrong number of stale sources returned.", result.size(), is(1));
+        assertEquals(1, result.size(), "wrong number of stale sources returned.");
 
-        assertThat("expected stale source file not found in result", result, Matchers.contains(sourceFile));
+        assertTrue(result.contains(sourceFile), "expected stale source file not found in result");
     }
 
     @Test
@@ -97,9 +93,9 @@ public class StaleSourceScannerTest extends AbstractSourceInclusionScannerTest {
 
         Set<File> result = scanner.getIncludedSources(base, base);
 
-        assertThat("wrong number of stale sources returned.", result.size(), is(0));
+        assertEquals(0, result.size(), "wrong number of stale sources returned.");
 
-        assertThat("expected stale source file not found in result", result, empty());
+        assertTrue(result.isEmpty(), "expected stale source file not found in result");
     }
 
     @Test
@@ -116,9 +112,9 @@ public class StaleSourceScannerTest extends AbstractSourceInclusionScannerTest {
 
         Set<File> result = scanner.getIncludedSources(base, base);
 
-        assertThat("wrong number of stale sources returned.", result.size(), is(1));
+        assertEquals(1, result.size(), "wrong number of stale sources returned.");
 
-        assertThat("expected stale source file not found in result", result, contains(sourceFile));
+        assertTrue(result.contains(sourceFile), "expected stale source file not found in result");
     }
 
     @Test
@@ -150,10 +146,12 @@ public class StaleSourceScannerTest extends AbstractSourceInclusionScannerTest {
 
         Set<File> result = scanner.getIncludedSources(base, base);
 
-        assertThat("wrong number of stale sources returned.", result.size(), is(2));
+        assertEquals(2, result.size(), "wrong number of stale sources returned.");
 
-        assertThat(
-                "expected stale source file not found in result", result, containsInAnyOrder(sourceFile, sourceFile2));
+        assertEquals(2, result.size());
+        assertTrue(
+                result.contains(sourceFile) && result.contains(sourceFile2),
+                "expected stale source file not found in result");
     }
 
     @Test
@@ -203,9 +201,9 @@ public class StaleSourceScannerTest extends AbstractSourceInclusionScannerTest {
 
         Set<File> result = scanner.getIncludedSources(base, base);
 
-        assertThat("wrong number of stale sources returned.", result.size(), is(1));
+        assertEquals(1, result.size(), "wrong number of stale sources returned.");
 
-        assertThat("expected stale source file not found in result", result, contains(sourceFile));
+        assertTrue(result.contains(sourceFile), "expected stale source file not found in result");
     }
 
     @Test
@@ -249,9 +247,9 @@ public class StaleSourceScannerTest extends AbstractSourceInclusionScannerTest {
 
         Set<File> result = scanner.getIncludedSources(base, base);
 
-        assertThat("wrong number of stale sources returned.", result.size(), is(1));
+        assertEquals(1, result.size(), "wrong number of stale sources returned.");
 
-        assertThat("expected stale source file not found in result", result, contains(sourceFile2));
+        assertTrue(result.contains(sourceFile2), "expected stale source file not found in result");
     }
 
     @Test
@@ -309,9 +307,9 @@ public class StaleSourceScannerTest extends AbstractSourceInclusionScannerTest {
 
         Set<File> result = scanner.getIncludedSources(base, base);
 
-        assertThat("wrong number of stale sources returned.", result.size(), is(1));
+        assertEquals(1, result.size(), "wrong number of stale sources returned.");
 
-        assertThat("expected stale source file not found in result", result, contains(sourceFile3));
+        assertTrue(result.contains(sourceFile3), "expected stale source file not found in result");
     }
 
     @Test
@@ -369,10 +367,12 @@ public class StaleSourceScannerTest extends AbstractSourceInclusionScannerTest {
 
         Set<File> result = scanner.getIncludedSources(base, base);
 
-        assertThat("wrong number of stale sources returned.", result.size(), is(2));
+        assertEquals(2, result.size(), "wrong number of stale sources returned.");
 
-        assertThat(
-                "expected stale source file not found in result", result, containsInAnyOrder(sourceFile2, sourceFile3));
+        assertEquals(2, result.size());
+        assertTrue(
+                result.contains(sourceFile2) && result.contains(sourceFile3),
+                "expected stale source file not found in result");
     }
 
     @Test
@@ -401,9 +401,9 @@ public class StaleSourceScannerTest extends AbstractSourceInclusionScannerTest {
 
         Set<File> result = scanner.getIncludedSources(src, target);
 
-        assertThat(result.size(), is(1));
+        assertEquals(1, result.size());
 
-        assertThat(result, contains(fooCs));
+        assertTrue(result.contains(fooCs));
 
         // ----------------------------------------------------------------------
         // Add another source file
@@ -417,9 +417,10 @@ public class StaleSourceScannerTest extends AbstractSourceInclusionScannerTest {
 
         result = scanner.getIncludedSources(src, target);
 
-        assertThat(result.size(), is(2));
+        assertEquals(2, result.size());
 
-        assertThat(result, containsInAnyOrder(fooCs, barCs));
+        assertEquals(2, result.size());
+        assertTrue(result.contains(fooCs) && result.contains(barCs));
 
         // ----------------------------------------------------------------------
         // Now add the result file
@@ -433,7 +434,7 @@ public class StaleSourceScannerTest extends AbstractSourceInclusionScannerTest {
 
         result = scanner.getIncludedSources(src, target);
 
-        assertThat(result, empty());
+        assertTrue(result.isEmpty());
 
         // ----------------------------------------------------------------------
         // Make Application.exe older than the Foo.cs
@@ -443,8 +444,8 @@ public class StaleSourceScannerTest extends AbstractSourceInclusionScannerTest {
 
         result = scanner.getIncludedSources(src, target);
 
-        assertThat(result.size(), is(1));
+        assertEquals(1, result.size());
 
-        assertThat(result, contains(fooCs));
+        assertTrue(result.contains(fooCs));
     }
 }

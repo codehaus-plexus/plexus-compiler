@@ -26,10 +26,8 @@ import java.util.Set;
 import org.codehaus.plexus.compiler.util.scan.mapping.SuffixMapping;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.io.FileMatchers.anExistingFile;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for all the implementations of <code>SourceInclusionScanner</code>
@@ -59,10 +57,10 @@ public abstract class AbstractSourceInclusionScannerTest {
 
         Set<File> includedSources = scanner.getIncludedSources(base, base);
 
-        assertThat("no sources were included", includedSources, not(empty()));
+        assertFalse(includedSources.isEmpty(), "no sources were included");
 
         for (File file : includedSources) {
-            assertThat("file included does not exist", file, anExistingFile());
+            assertTrue(file.exists(), "file included does not exist");
         }
     }
 
