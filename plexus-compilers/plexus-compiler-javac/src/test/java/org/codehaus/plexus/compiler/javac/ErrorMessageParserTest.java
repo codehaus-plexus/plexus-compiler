@@ -672,7 +672,7 @@ public class ErrorMessageParserTest {
                 error3.getMessage(),
                 "message");
         assertEquals(152, error3.getStartLine(), "line");
-        assertEquals(12, error3.getStartColumn(), "column");
+        assertEquals(16, error3.getStartColumn(), "column");
     }
 
     @Test
