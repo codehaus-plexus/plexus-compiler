@@ -29,13 +29,12 @@ import java.util.Collections;
 import java.util.List;
 
 import org.codehaus.plexus.compiler.CompilerConfiguration;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EclipseCompilerConfigurationTest {
     private static final String PROPERTIES_FILE_NAME =
@@ -56,14 +55,11 @@ public class EclipseCompilerConfigurationTest {
         configuration.addCompilerCustomArgument("--add-exports", "FROM-MOD/package2=OTHER-MOD");
         List<String> args = new ArrayList<>();
         EclipseJavaCompiler.processCustomArguments(configuration, args);
-        assertThat(args.size(), is(4));
-        assertThat(
-                args,
-                contains(
-                        "--add-exports",
-                        "FROM-MOD/package1=OTHER-MOD",
-                        "--add-exports",
-                        "FROM-MOD/package2=OTHER-MOD"));
+        assertEquals(4, args.size());
+        assertEquals("--add-exports", args.get(0));
+        assertEquals("FROM-MOD/package1=OTHER-MOD", args.get(1));
+        assertEquals("--add-exports", args.get(2));
+        assertEquals("FROM-MOD/package2=OTHER-MOD", args.get(3));
         //        assertThat( args.get( 0 ), is("--add-exports") );
         //        assertThat( args.get( 1 ), is("FROM-MOD/package1=OTHER-MOD") );
         //        assertThat( args.get( 2 ), is("--add-exports") );
@@ -75,8 +71,8 @@ public class EclipseCompilerConfigurationTest {
         configuration.addCompilerCustomArgument("-proceedOnError", null);
         List<String> args = new ArrayList<>();
         EclipseJavaCompiler.processCustomArguments(configuration, args);
-        assertThat(args.size(), is(1));
-        assertThat(args, contains("-proceedOnError:Fatal"));
+        assertEquals(1, args.size());
+        assertEquals("-proceedOnError:Fatal", args.get(0));
     }
 
     @Test
@@ -84,7 +80,7 @@ public class EclipseCompilerConfigurationTest {
         configuration.addCompilerCustomArgument("errorsAsWarnings", null);
         List<String> args = new ArrayList<>();
         final boolean errorsAsWarnings = EclipseJavaCompiler.processCustomArguments(configuration, args);
-        assertThat(errorsAsWarnings, is(true));
+        assertTrue(errorsAsWarnings);
     }
 
     @Test
@@ -92,16 +88,16 @@ public class EclipseCompilerConfigurationTest {
         configuration.addCompilerCustomArgument("-errorsAsWarnings", null);
         List<String> args = new ArrayList<>();
         final boolean errorsAsWarnings = EclipseJavaCompiler.processCustomArguments(configuration, args);
-        assertThat(errorsAsWarnings, is(true));
+        assertTrue(errorsAsWarnings);
     }
 
     @Test
     public void testProcessCustomArgumentsWithPropertiesAndNonExistingFile() {
         configuration.addCompilerCustomArgument("-properties", "fooBar.txt");
-        IllegalArgumentException expected = Assertions.assertThrows(
+        IllegalArgumentException expected = assertThrows(
                 IllegalArgumentException.class,
                 () -> EclipseJavaCompiler.processCustomArguments(configuration, Collections.emptyList()));
-        assertThat(expected.getMessage(), is("Properties file specified by -properties fooBar.txt does not exist"));
+        assertEquals("Properties file specified by -properties fooBar.txt does not exist", expected.getMessage());
     }
 
     @Test
@@ -109,7 +105,8 @@ public class EclipseCompilerConfigurationTest {
         configuration.addCompilerCustomArgument("-properties", PROPERTIES_FILE_NAME);
         List<String> args = new ArrayList<>();
         EclipseJavaCompiler.processCustomArguments(configuration, args);
-        assertThat(args.size(), is(2));
-        assertThat(args, contains("-properties", PROPERTIES_FILE_NAME));
+        assertEquals(2, args.size());
+        assertEquals("-properties", args.get(0));
+        assertEquals(PROPERTIES_FILE_NAME, args.get(1));
     }
 }

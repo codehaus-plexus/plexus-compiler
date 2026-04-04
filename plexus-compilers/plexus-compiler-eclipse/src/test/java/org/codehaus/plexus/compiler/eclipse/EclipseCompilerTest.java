@@ -31,9 +31,8 @@ import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>
@@ -99,7 +98,7 @@ public class EclipseCompilerTest extends AbstractCompilerTest {
 
         IllegalArgumentException e =
                 assertThrows(IllegalArgumentException.class, () -> getCompiler().performCompile(compilerConfig));
-        assertThat("Message must start with 'Properties file'", e.getMessage(), startsWith("Properties file"));
+        assertTrue(e.getMessage().startsWith("Properties file"), "Message must start with 'Properties file'");
     }
 
     private CompilerConfiguration createMinimalCompilerConfig() {

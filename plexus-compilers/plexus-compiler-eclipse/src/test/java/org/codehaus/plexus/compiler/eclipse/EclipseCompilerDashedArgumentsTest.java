@@ -36,12 +36,12 @@ import org.codehaus.plexus.compiler.Compiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.util.FileUtils;
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.Matchers;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author <a href="mailto:jal@etc.to">Frits Jalvingh</a>
@@ -96,10 +96,9 @@ public class EclipseCompilerDashedArgumentsTest {
         CompilerConfiguration config = getConfig();
         config.addCompilerCustomArgument(BAD_DOUBLEDASH_OPTION, "b0rk3d");
 
-        EcjFailureException x =
-                Assertions.assertThrows(EcjFailureException.class, () -> compiler.performCompile(config));
+        EcjFailureException x = assertThrows(EcjFailureException.class, () -> compiler.performCompile(config));
 
-        MatcherAssert.assertThat(x.getEcjOutput(), Matchers.containsString(BAD_DOUBLEDASH_OPTION));
-        MatcherAssert.assertThat(x.getEcjOutput(), Matchers.not(Matchers.containsString("-" + BAD_DOUBLEDASH_OPTION)));
+        assertTrue(x.getEcjOutput().contains(BAD_DOUBLEDASH_OPTION));
+        assertFalse(x.getEcjOutput().contains("-" + BAD_DOUBLEDASH_OPTION));
     }
 }

@@ -34,9 +34,10 @@ import java.util.jar.JarOutputStream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for JarUtil to verify protection against Zip Slip vulnerability.
@@ -64,11 +65,11 @@ public class JarUtilTest {
             JarUtil.extract(extractDir, jarFile);
         });
 
-        assertThat(exception.getMessage(), is("Bad zip entry"));
+        assertEquals("Bad zip entry", exception.getMessage());
 
         // Verify that the file was not created outside the extraction directory
         Path evilFile = tempDir.resolve("evil.txt");
-        assertThat("Evil file should not exist", Files.exists(evilFile), is(false));
+        assertFalse(Files.exists(evilFile), "Evil file should not exist");
     }
 
     @Test
@@ -102,15 +103,15 @@ public class JarUtilTest {
 
         // Verify files were created correctly
         Path extractedFile = extractDir.resolve("file.txt");
-        assertThat("File should exist", Files.exists(extractedFile), is(true));
-        assertThat("File content should match", new String(Files.readAllBytes(extractedFile)), is("normal content"));
+        assertTrue(Files.exists(extractedFile), "File should exist");
+        assertEquals("normal content", new String(Files.readAllBytes(extractedFile)), "File content should match");
 
         Path extractedSubFile = extractDir.resolve("subdir/subfile.txt");
-        assertThat("Subdir file should exist", Files.exists(extractedSubFile), is(true));
-        assertThat(
-                "Subdir file content should match",
+        assertTrue(Files.exists(extractedSubFile), "Subdir file should exist");
+        assertEquals(
+                "subdirectory content",
                 new String(Files.readAllBytes(extractedSubFile)),
-                is("subdirectory content"));
+                "Subdir file content should match");
     }
 
     @Test
@@ -134,10 +135,10 @@ public class JarUtilTest {
             JarUtil.extract(extractDir, jarFile);
         });
 
-        assertThat(exception.getMessage(), is("Bad zip entry"));
+        assertEquals("Bad zip entry", exception.getMessage());
 
         // Verify that the file was not created outside the extraction directory
         Path evilFile = tempDir.resolve("evil.txt");
-        assertThat("Evil file should not exist", Files.exists(evilFile), is(false));
+        assertFalse(Files.exists(evilFile), "Evil file should not exist");
     }
 }
