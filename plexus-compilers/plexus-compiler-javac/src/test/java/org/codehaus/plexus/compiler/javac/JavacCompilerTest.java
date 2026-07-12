@@ -1,15 +1,23 @@
 package org.codehaus.plexus.compiler.javac;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerMessage;
+import org.codehaus.plexus.compiler.CompilerResult;
 import org.codehaus.plexus.compiler.javac.JavacCompiler.JavaVersion;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -118,5 +126,53 @@ public class JavacCompilerTest extends AbstractJavacCompilerTest {
         assertEquals("11.0", JavacCompiler.extractMajorAndMinorVersion("11.0.22"));
         assertEquals("21", JavacCompiler.extractMajorAndMinorVersion("javac 21"));
         assertEquals("1.8", JavacCompiler.extractMajorAndMinorVersion("javac 1.8.0_432"));
+    }
+
+    @Test
+    void testForkedAndInProcessDiagnosticsAreEqual(@TempDir Path tempDirectory) throws Exception {
+        Path sourceDirectory = tempDirectory.resolve("src");
+        Files.createDirectories(sourceDirectory);
+        Files.write(
+                sourceDirectory.resolve("Test.java"),
+                Arrays.asList("class Test {", "Object foo() {", " null;", "}", "}"),
+                StandardCharsets.UTF_8);
+
+        CompilerResult inProcess = compile(tempDirectory, sourceDirectory, false);
+        CompilerResult forked = compile(tempDirectory, sourceDirectory, true);
+
+        assertFalse(inProcess.isSuccess());
+        assertFalse(forked.isSuccess());
+        assertEquals(1, inProcess.getCompilerMessages().size());
+        assertEquals(1, forked.getCompilerMessages().size());
+
+        CompilerMessage inProcessMessage = inProcess.getCompilerMessages().get(0);
+        CompilerMessage forkedMessage = forked.getCompilerMessages().get(0);
+        assertEquals(getFileName(inProcessMessage.getFile()), getFileName(forkedMessage.getFile()));
+        assertEquals(inProcessMessage.getStartLine(), forkedMessage.getStartLine());
+        assertEquals(inProcessMessage.getStartColumn(), forkedMessage.getStartColumn());
+        assertEquals(inProcessMessage.getMessage(), forkedMessage.getMessage());
+    }
+
+    private static String getFileName(String path) {
+        int separator = Math.max(path.lastIndexOf('/'), path.lastIndexOf('\\'));
+        return path.substring(separator + 1);
+    }
+
+    private CompilerResult compile(Path tempDirectory, Path sourceDirectory, boolean fork) throws Exception {
+        File buildDirectory =
+                tempDirectory.resolve(fork ? "forked" : "in-process").toFile();
+        Files.createDirectories(buildDirectory.toPath());
+
+        CompilerConfiguration configuration = new CompilerConfiguration();
+        configuration.setFork(fork);
+        configuration.setWorkingDirectory(tempDirectory.toFile());
+        configuration.setBuildDirectory(buildDirectory);
+        configuration.setOutputLocation(new File(buildDirectory, "classes").getAbsolutePath());
+        configuration.addSourceLocation(sourceDirectory.toString());
+        configuration.setSourceVersion("8");
+        configuration.setTargetVersion("8");
+        configuration.addCompilerCustomArgument("-Xlint:-options", null);
+
+        return getCompiler().performCompile(configuration);
     }
 }

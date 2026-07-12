@@ -20,5 +20,5 @@ def logFile = new File( basedir, 'build.log' )
 assert logFile.exists()
 content = logFile.text.normalize()
 
-assert content.contains( "module-info.java:[2,24] [module] module not found: someOtherModule")
+assert content.contains( "module-info.java:[2,25] [module] module not found: someOtherModule")
 //assert content.contains( "exports com.company to someOtherModule;" )

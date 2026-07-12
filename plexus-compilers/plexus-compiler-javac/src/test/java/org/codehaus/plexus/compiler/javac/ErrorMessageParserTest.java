@@ -68,7 +68,7 @@ public class ErrorMessageParserTest {
 
         assertEquals("Date(java.lang.String) in java.util.Date has been deprecated", compilerError.getMessage());
 
-        assertEquals(63, compilerError.getStartColumn());
+        assertEquals(64, compilerError.getStartColumn());
 
         assertEquals(66, compilerError.getEndColumn());
 
@@ -92,7 +92,7 @@ public class ErrorMessageParserTest {
 
         assertEquals("finally clause cannot complete normally", compilerError.getMessage());
 
-        assertEquals(26, compilerError.getStartColumn());
+        assertEquals(27, compilerError.getStartColumn());
 
         assertEquals(27, compilerError.getEndColumn());
 
@@ -113,13 +113,24 @@ public class ErrorMessageParserTest {
 
         assertEquals("not a statement", compilerError.getMessage());
 
-        assertEquals(9, compilerError.getStartColumn());
+        assertEquals(10, compilerError.getStartColumn());
 
         assertEquals(11, compilerError.getEndColumn());
 
         assertEquals(7, compilerError.getStartLine());
 
         assertEquals(7, compilerError.getEndLine());
+    }
+
+    @Test
+    public void testErrorColumnIsOneBased() {
+        String error = "Test.java:5: error: not a statement" + EOL + " null;" + EOL + " ^" + EOL;
+
+        CompilerMessage compilerError = JavacCompiler.parseModernError(1, error);
+
+        assertEquals(5, compilerError.getStartLine());
+        assertEquals(2, compilerError.getStartColumn());
+        assertEquals("Test.java:[5,2] not a statement", compilerError.toString());
     }
 
     @Test
@@ -141,7 +152,7 @@ public class ErrorMessageParserTest {
                         + "location: class org.codehaus.foo.UnknownSymbol",
                 compilerError.getMessage());
 
-        assertEquals(8, compilerError.getStartColumn());
+        assertEquals(9, compilerError.getStartColumn());
 
         assertEquals(14, compilerError.getEndColumn());
 
@@ -229,7 +240,7 @@ public class ErrorMessageParserTest {
 
         CompilerMessage compilerError = JavacCompiler.parseModernError(1, error);
 
-        assertEquals("/my/prj/src/main/java/test/prj/App.java:[11,45] not a statement", String.valueOf(compilerError));
+        assertEquals("/my/prj/src/main/java/test/prj/App.java:[11,46] not a statement", String.valueOf(compilerError));
     }
 
     @Test
@@ -243,7 +254,7 @@ public class ErrorMessageParserTest {
         CompilerMessage compilerError = JavacCompiler.parseModernError(1, error);
 
         assertEquals(
-                "c:\\Documents and Settings\\My Self\\Documents\\prj\\src\\main\\java\\test\\prj\\App.java:[11,45] not a statement",
+                "c:\\Documents and Settings\\My Self\\Documents\\prj\\src\\main\\java\\test\\prj\\App.java:[11,46] not a statement",
                 String.valueOf(compilerError));
     }
 
@@ -650,7 +661,7 @@ public class ErrorMessageParserTest {
                 error1.getMessage(),
                 "message");
         assertEquals(31, error1.getStartLine(), "line");
-        assertEquals(38, error1.getStartColumn(), "column");
+        assertEquals(39, error1.getStartColumn(), "column");
         CompilerMessage error2 = compilerErrors.get(2);
         assertEquals(
                 "C:\\commander\\pre\\ec\\ec-http\\src\\main\\java\\com\\electriccloud\\http\\HttpUtil.java",
@@ -661,7 +672,7 @@ public class ErrorMessageParserTest {
                 error2.getMessage(),
                 "message");
         assertEquals(151, error2.getStartLine(), "line");
-        assertEquals(8, error2.getStartColumn(), "column");
+        assertEquals(9, error2.getStartColumn(), "column");
         CompilerMessage error3 = compilerErrors.get(3);
         assertEquals(
                 "C:\\commander\\pre\\ec\\ec-http\\src\\main\\java\\com\\electriccloud\\http\\HttpUtil.java",
@@ -672,7 +683,7 @@ public class ErrorMessageParserTest {
                 error3.getMessage(),
                 "message");
         assertEquals(152, error3.getStartLine(), "line");
-        assertEquals(16, error3.getStartColumn(), "column");
+        assertEquals(17, error3.getStartColumn(), "column");
     }
 
     @Test
@@ -701,7 +712,7 @@ public class ErrorMessageParserTest {
                 "cannot find symbol" + EOL + "symbol  : class Properties" + EOL + "location: class Error",
                 message1.getMessage());
 
-        assertEquals(16, message1.getStartColumn());
+        assertEquals(17, message1.getStartColumn());
 
         assertEquals(26, message1.getEndColumn());
 
@@ -717,7 +728,7 @@ public class ErrorMessageParserTest {
                 "cannot find symbol" + EOL + "symbol  : class Properties" + EOL + "location: class Error",
                 message2.getMessage());
 
-        assertEquals(35, message2.getStartColumn());
+        assertEquals(36, message2.getStartColumn());
 
         assertEquals(48, message2.getEndColumn());
 
@@ -753,7 +764,7 @@ public class ErrorMessageParserTest {
                 "cannot find symbol" + EOL + "  symbol:   class Properties" + EOL + "  location: class Error",
                 message1.getMessage());
 
-        assertEquals(16, message1.getStartColumn());
+        assertEquals(17, message1.getStartColumn());
 
         assertEquals(26, message1.getEndColumn());
 
@@ -769,7 +780,7 @@ public class ErrorMessageParserTest {
                 "cannot find symbol" + EOL + "  symbol:   class Properties" + EOL + "  location: class Error",
                 message2.getMessage());
 
-        assertEquals(35, message2.getStartColumn());
+        assertEquals(36, message2.getStartColumn());
 
         assertEquals(48, message2.getEndColumn());
 
@@ -1051,7 +1062,7 @@ public class ErrorMessageParserTest {
                         "C:\\repo\\src\\it\\includes-output-when-compiler-forked\\src\\main\\java\\MyClass" + ".java",
                         CompilerMessage.Kind.WARNING,
                         23,
-                        27,
+                        28,
                         23,
                         30,
                         "[divzero] division by zero"),
@@ -1082,7 +1093,7 @@ public class ErrorMessageParserTest {
                         "C:\\repo\\src\\it\\includes-output-when-compiler-forked\\src\\main\\java\\MyClass" + ".java",
                         CompilerMessage.Kind.WARNING,
                         23,
-                        27,
+                        28,
                         23,
                         30,
                         "[divzero] division by zero"),
