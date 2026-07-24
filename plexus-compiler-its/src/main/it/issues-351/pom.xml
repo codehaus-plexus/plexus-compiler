@@ -55,14 +55,15 @@
             <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
             <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
             <arg>-XDcompilePolicy=simple</arg>
-            <arg>-Xplugin:ErrorProne \
+            <arg>--should-stop=ifError=FLOW</arg>
+            <arg>-Xplugin:ErrorProne
               -Xep:DeadException:WARN</arg>
           </compilerArgs>
           <annotationProcessorPaths>
             <path>
               <groupId>com.google.errorprone</groupId>
               <artifactId>error_prone_core</artifactId>
-              <version>2.24.1</version>
+              <version>@errorprone.version@</version>
             </path>
           </annotationProcessorPaths>
         </configuration>

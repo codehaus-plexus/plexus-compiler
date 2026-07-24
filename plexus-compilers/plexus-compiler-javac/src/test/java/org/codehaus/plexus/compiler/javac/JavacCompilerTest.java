@@ -175,4 +175,29 @@ public class JavacCompilerTest extends AbstractJavacCompilerTest {
 
         return getCompiler().performCompile(configuration);
     }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("quoteArgumentArguments")
+    void quoteArgument(String description, String argument, String expected) {
+        assertEquals(expected, JavacCompiler.quoteArgument(argument));
+    }
+
+    private static Stream<Arguments> quoteArgumentArguments() {
+        return Stream.of(
+                Arguments.of("empty", "", "\"\""),
+                Arguments.of("plain", "-Xlint", "\"-Xlint\""),
+                Arguments.of("spaces", "two words", "\"two words\""),
+                Arguments.of("double quote", "say \"hello\"", "\"say \\\"hello\\\"\""),
+                Arguments.of(
+                        "Windows path",
+                        "C:\\Program Files\\Java\\bin\\javac.exe",
+                        "\"C:\\\\Program Files\\\\Java\\\\bin\\\\javac.exe\""),
+                Arguments.of("trailing backslash", "C:\\temp\\", "\"C:\\\\temp\\\\\""),
+                Arguments.of("literal backslash-n", "-Dvalue=\\n", "\"-Dvalue=\\\\n\""),
+                Arguments.of(
+                        "control whitespace",
+                        "line1\nline2\rline3\tline4\fline5",
+                        "\"line1\\nline2\\rline3\\tline4\\fline5\""),
+                Arguments.of("backslash and newline", "line1\\\nline2", "\"line1" + "\\\\" + "\\n" + "line2\""));
+    }
 }

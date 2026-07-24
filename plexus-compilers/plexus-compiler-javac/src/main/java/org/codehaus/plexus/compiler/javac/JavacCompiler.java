@@ -1068,9 +1068,7 @@ public class JavacCompiler extends AbstractCompiler {
 
             writer = new PrintWriter(new FileWriter(tempFile));
             for (String arg : args) {
-                String argValue = arg.replace(File.separatorChar, '/');
-                writer.write("\"" + argValue + "\"");
-                writer.println();
+                writer.println(quoteArgument(arg));
             }
             writer.flush();
 
@@ -1081,6 +1079,41 @@ public class JavacCompiler extends AbstractCompiler {
                 writer.close();
             }
         }
+    }
+
+    /**
+     * Quotes an argument according to javac command-line argument file syntax.
+     */
+    static String quoteArgument(String argument) {
+        StringBuilder quoted = new StringBuilder(argument.length() + 2);
+        quoted.append('"');
+        for (int i = 0; i < argument.length(); i++) {
+            char c = argument.charAt(i);
+            switch (c) {
+                case '\\':
+                    quoted.append("\\\\");
+                    break;
+                case '"':
+                    quoted.append("\\\"");
+                    break;
+                case '\n':
+                    quoted.append("\\n");
+                    break;
+                case '\r':
+                    quoted.append("\\r");
+                    break;
+                case '\t':
+                    quoted.append("\\t");
+                    break;
+                case '\f':
+                    quoted.append("\\f");
+                    break;
+                default:
+                    quoted.append(c);
+                    break;
+            }
+        }
+        return quoted.append('"').toString();
     }
 
     /**
