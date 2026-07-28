@@ -46,7 +46,7 @@
     <redirectTestOutputToFile>true</redirectTestOutputToFile>
     <project.build.outputTimestamp>2026-01-25T22:48:03Z</project.build.outputTimestamp>
     <aspectj.version>1.9.21</aspectj.version>
-    <mavenVersion>3.6.3</mavenVersion>
+    <mavenVersion>3.8.1</mavenVersion>
     <minimalMavenBuildVersion>${mavenVersion}</minimalMavenBuildVersion>
     <errorprone.version>2.37.0</errorprone.version>
     <eclipse.sisu.version>1.1.0</eclipse.sisu.version>
