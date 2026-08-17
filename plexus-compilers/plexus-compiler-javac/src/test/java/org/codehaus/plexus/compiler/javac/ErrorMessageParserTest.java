@@ -1262,6 +1262,60 @@ public class ErrorMessageParserTest {
         validateBadSourceFile(secondMessage);
     }
 
+    @Test
+    public void testUnrecognisedOutputIsReportedWhenCompilationFails() throws IOException {
+        String output = "some diagnostic nobody taught this parser about" + EOL + "and a second line of it" + EOL;
+
+        List<CompilerMessage> messages =
+                JavacCompiler.parseModernStream(1, new BufferedReader(new StringReader(output)));
+
+        assertEquals(1, messages.size());
+        assertEquals(CompilerMessage.Kind.ERROR, messages.get(0).getKind());
+        assertTrue(messages.get(0).getMessage().contains("nobody taught this parser about"));
+        assertTrue(messages.get(0).getMessage().contains("second line"));
+    }
+
+    @Test
+    public void testUnrecognisedOutputIsIgnoredWhenCompilationSucceeds() throws IOException {
+        String output = "some diagnostic nobody taught this parser about" + EOL;
+
+        List<CompilerMessage> messages =
+                JavacCompiler.parseModernStream(0, new BufferedReader(new StringReader(output)));
+
+        assertTrue(messages.isEmpty());
+    }
+
+    @Test
+    public void testCountSummaryAloneIsNotReported() throws IOException {
+        String output = "2 errors" + EOL;
+
+        List<CompilerMessage> messages =
+                JavacCompiler.parseModernStream(1, new BufferedReader(new StringReader(output)));
+
+        assertTrue(messages.isEmpty());
+    }
+
+    /**
+     * Warnings promoted by {@code -Werror} carry the file name inline rather than as a prefix, so none of the
+     * classifiers match them and they used to be dropped, leaving the failure unexplained.
+     */
+    @Test
+    public void testWerrorWarningsAreReported() throws IOException {
+        String output =
+                "gson-2.10.2-SNAPSHOT.jar(/com/google/gson/JsonParser.class): warning: Cannot find annotation method 'replacement()' in type 'InlineMe'"
+                        + EOL + "error: warnings found and -Werror specified"
+                        + EOL + "1 error"
+                        + EOL + "1 warning"
+                        + EOL;
+
+        List<CompilerMessage> messages =
+                JavacCompiler.parseModernStream(1, new BufferedReader(new StringReader(output)));
+
+        assertTrue(
+                messages.stream().anyMatch(m -> m.getMessage().contains("Cannot find annotation method")),
+                "the unclassified warning should survive: " + messages);
+    }
+
     private void validateBadSourceFile(CompilerMessage message) {
         assertEquals(CompilerMessage.Kind.ERROR, message.getKind(), "Is an Error");
         assertEquals("/MTOOLCHAINS-19/src/main/java/ch/pecunifex/x/Cls1.java", message.getFile(), "On Correct File");

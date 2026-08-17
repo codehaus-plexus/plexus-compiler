@@ -734,6 +734,11 @@ public class JavacCompiler extends AbstractCompiler {
             + ").*$");
 
     // Match exception causes, existing and omitted stack trace elements
+    /**
+     * A line that is only a tally, such as {@code 2 errors}, {@code 1 error} or the localised {@code 警告 1 個}.
+     */
+    private static final Pattern COUNT_SUMMARY = Pattern.compile("^\\s*(?:\\d+\\s+\\S+|\\S+\\s+\\d+\\s+\\S+)\\s*$");
+
     private static final Pattern STACK_TRACE_OTHER_LINE =
             Pattern.compile("^(?:Caused by:\\s.*|\\s*at .*|\\s*\\.\\.\\.\\s\\d+\\smore)$");
 
@@ -825,14 +830,33 @@ public class JavacCompiler extends AbstractCompiler {
                 buffer.append(lines[i]).append(EOL);
             }
             errors.add(new CompilerMessage(buffer.toString(), ERROR));
+        } else if (exitCode != 0) {
+            // Nothing in the buffer was recognised, yet the compiler failed. Whatever is left is reported rather
+            // than dropped, so that a failing build is never left without an explanation.
+            String unrecognised = stripCountSummaries(bufferContent);
+            if (!unrecognised.isEmpty()) {
+                errors.add(new CompilerMessage(unrecognised, ERROR));
+            }
         }
-        // TODO: Add something like this? Check if it creates more value or more unnecessary log output in general.
-        // else {
-        //     // Fall-back, if still no error or stack trace was recognised
-        //     errors.add(new CompilerMessage(bufferContent, exitCode == 0 ? OTHER : ERROR));
-        // }
 
         return errors;
+    }
+
+    /**
+     * Drops javac's trailing tallies, such as {@code 2 errors} or {@code 警告 1 個}, from otherwise unrecognised
+     * output. They repeat what the parsed messages already say, so on their own they are not worth reporting.
+     *
+     * @param content the unrecognised output
+     * @return the same content without its count lines, trimmed
+     */
+    private static String stripCountSummaries(String content) {
+        StringBuilder kept = new StringBuilder();
+        for (String line : content.split("\\R")) {
+            if (!line.trim().isEmpty() && !COUNT_SUMMARY.matcher(line).matches()) {
+                kept.append(line).append(EOL);
+            }
+        }
+        return kept.toString().trim();
     }
 
     private static boolean isMisc(String message) {
