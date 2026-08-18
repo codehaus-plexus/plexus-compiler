@@ -42,9 +42,9 @@
     </dependency>
     <!-- On the classpath the TCK hands to the compiler under test, for the test-input sources that import it -->
     <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
-      <version>2.6</version>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.20.0</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

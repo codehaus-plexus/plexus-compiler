@@ -79,7 +79,7 @@ public abstract class AbstractCompilerTest {
     protected List<String> getClasspath() throws Exception {
         List<String> cp = new ArrayList<>();
 
-        cp.add(getJarPath("org.apache.commons.lang.StringUtils").getAbsolutePath());
+        cp.add(getJarPath("org.apache.commons.lang3.StringUtils").getAbsolutePath());
 
         return cp;
     }
