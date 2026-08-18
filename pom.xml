@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.codehaus.plexus</groupId>
     <artifactId>plexus</artifactId>
-    <version>26</version>
+    <version>27</version>
   </parent>
 
   <artifactId>plexus-compiler</artifactId>
@@ -50,7 +50,8 @@
     <eclipse.sisu.version>1.1.0</eclipse.sisu.version>
     <trimStackTrace>false</trimStackTrace>
     <preparationGoals>clean install</preparationGoals>
-    <maven.compiler.version>3.15.0</maven.compiler.version>
+    <!-- interpolated into the IT projects, which do not inherit this parent -->
+    <maven.compiler.version>${version.maven-compiler-plugin}</maven.compiler.version>
   </properties>
 
   <dependencyManagement>
@@ -146,7 +147,6 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>${maven.compiler.version}</version>
           <configuration>
             <proc>none</proc>
           </configuration>
