@@ -886,12 +886,15 @@ public class JavacCompiler extends AbstractCompiler {
      * Tells whether a line continues the note that precedes it. Since JDK 21 javac wraps its notes over several
      * lines, indenting every line but the first, while the diagnostics that may follow a note all start in the
      * first column.
+     * <p>
+     * A leading space, not leading whitespace: javac indents note continuations with spaces, whereas a leading tab
+     * marks a stack trace frame, which {@link #STACK_TRACE_OTHER_LINE} is waiting for.
      *
      * @param line the line following a note
      * @return whether the line belongs to that note
      */
     private static boolean isNoteContinuation(String line) {
-        return !line.trim().isEmpty() && Character.isWhitespace(line.charAt(0));
+        return line.startsWith(" ");
     }
 
     private static boolean isWarning(String message) {

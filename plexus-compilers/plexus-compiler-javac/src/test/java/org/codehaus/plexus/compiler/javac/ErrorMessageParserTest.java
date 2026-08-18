@@ -1391,8 +1391,125 @@ public class ErrorMessageParserTest {
                 .filter(m -> m.getKind() == CompilerMessage.Kind.ERROR)
                 .collect(Collectors.toList());
 
+        assertEquals(2, messages.size(), "the note and the error, nothing else: " + messages);
+        assertEquals(CompilerMessage.Kind.NOTE, messages.get(0).getKind());
         assertEquals(1, reportedErrors.size(), "only the real error is an error: " + messages);
         assertEquals("error: cannot find symbol", reportedErrors.get(0).getMessage());
+    }
+
+    /**
+     * A note ends at the first line that is not indented, so an anchored diagnostic that follows one keeps its own
+     * identity. This is the interleaving where the note state and the pending-error flush meet.
+     */
+    @Test
+    public void testNoteFollowedByAnchoredDiagnostic() throws IOException {
+        String output = "Note: SomeFile.java uses unchecked or unsafe operations." + EOL
+                + "target/compiler-src/Foo.java:1: warning: something is off" + EOL
+                + "public class Foo {}" + EOL
+                + "       ^" + EOL;
+
+        List<CompilerMessage> messages =
+                JavacCompiler.parseModernStream(0, new BufferedReader(new StringReader(output)));
+
+        assertEquals(2, messages.size(), "note and diagnostic stay separate: " + messages);
+        assertEquals(CompilerMessage.Kind.NOTE, messages.get(0).getKind());
+        assertEquals(CompilerMessage.Kind.WARNING, messages.get(1).getKind());
+        assertEquals("target/compiler-src/Foo.java", messages.get(1).getFile());
+    }
+
+    /**
+     * The reverse order, which exercises the pending-error flush running before a note is recognised.
+     */
+    @Test
+    public void testAnchoredDiagnosticFollowedByNote() throws IOException {
+        String output = "target/compiler-src/Foo.java:1: warning: something is off" + EOL
+                + "public class Foo {}" + EOL
+                + "       ^" + EOL
+                + "Note: Recompile with -Xlint:unchecked for details." + EOL;
+
+        List<CompilerMessage> messages =
+                JavacCompiler.parseModernStream(0, new BufferedReader(new StringReader(output)));
+
+        assertEquals(2, messages.size(), "diagnostic and note stay separate: " + messages);
+        assertEquals(CompilerMessage.Kind.WARNING, messages.get(0).getKind());
+        assertEquals(CompilerMessage.Kind.NOTE, messages.get(1).getKind());
+        assertEquals(
+                "Recompile with -Xlint:unchecked for details.", messages.get(1).getMessage());
+    }
+
+    /**
+     * The deprecation and unchecked notes always arrive as a pair of single-line notes.
+     */
+    @Test
+    public void testConsecutiveNotesStaySeparate() throws IOException {
+        String output = "Note: Some input files use or override a deprecated API." + EOL
+                + "Note: Recompile with -Xlint:deprecation for details." + EOL;
+
+        List<CompilerMessage> messages =
+                JavacCompiler.parseModernStream(0, new BufferedReader(new StringReader(output)));
+
+        assertEquals(2, messages.size(), "two notes: " + messages);
+        assertEquals(
+                "Some input files use or override a deprecated API.",
+                messages.get(0).getMessage());
+        assertEquals(
+                "Recompile with -Xlint:deprecation for details.",
+                messages.get(1).getMessage());
+    }
+
+    /**
+     * A note that runs to the end of the stream is flushed after the loop, and a failing compile must not report it
+     * a second time as unrecognised output.
+     */
+    @Test
+    public void testMultiLineNoteAtEndOfStreamIsReportedOnceWhenCompilationFails() throws IOException {
+        List<CompilerMessage> messages =
+                JavacCompiler.parseModernStream(1, new BufferedReader(new StringReader(ANNOTATION_PROCESSING_NOTE)));
+
+        assertEquals(1, messages.size(), "the note is the only message: " + messages);
+        assertEquals(CompilerMessage.Kind.NOTE, messages.get(0).getKind());
+    }
+
+    /**
+     * Stack trace frames are indented with a tab rather than a space, so a crash dump that follows a note is not
+     * absorbed into it.
+     */
+    @Test
+    public void testTabIndentedStackTraceDoesNotContinueANote() throws IOException {
+        String output = "Note: SomeFile.java uses unchecked or unsafe operations." + EOL
+                + "\tat com.sun.tools.javac.comp.Attr.visitIdent(Attr.java:1)" + EOL
+                + "\tat com.sun.tools.javac.tree.JCTree.accept(JCTree.java:2)" + EOL;
+
+        List<CompilerMessage> messages =
+                JavacCompiler.parseModernStream(1, new BufferedReader(new StringReader(output)));
+
+        assertEquals(CompilerMessage.Kind.NOTE, messages.get(0).getKind());
+        assertEquals(
+                "SomeFile.java uses unchecked or unsafe operations.",
+                messages.get(0).getMessage());
+        assertTrue(
+                messages.stream()
+                        .anyMatch(m -> m.getKind() == CompilerMessage.Kind.ERROR
+                                && m.getMessage().contains("visitIdent")),
+                "the stack trace is reported on its own: " + messages);
+    }
+
+    /**
+     * Only the English prefix is stripped from a note, so a localised one keeps its own. Pinned here because the
+     * asymmetry lives in the shared API module and outlives this parser.
+     */
+    @Test
+    public void testLocalisedNoteKeepsItsPrefixAndItsContinuation() throws IOException {
+        String output = "\u6ce8: \u6ce8\u91c8\u51e6\u7406\u304c\u6709\u52b9\u3067\u3059" + EOL
+                + "  \u30af\u30e9\u30b9\u30d1\u30b9\u4e0a\u306b\u898b\u3064\u304b\u308a\u307e\u3057\u305f" + EOL;
+
+        List<CompilerMessage> messages =
+                JavacCompiler.parseModernStream(0, new BufferedReader(new StringReader(output)));
+
+        assertEquals(1, messages.size(), "one note: " + messages);
+        assertEquals(CompilerMessage.Kind.NOTE, messages.get(0).getKind());
+        assertTrue(messages.get(0).getMessage().startsWith("\u6ce8: "), "prefix is kept for a localised note");
+        assertTrue(messages.get(0).getMessage().contains("\u30af\u30e9\u30b9"), "continuation is kept");
     }
 
     private void validateBadSourceFile(CompilerMessage message) {
