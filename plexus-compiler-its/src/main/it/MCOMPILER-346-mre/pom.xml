@@ -40,7 +40,7 @@
     <dependency>
       <groupId>org.jenkins-ci.main</groupId>
       <artifactId>remoting</artifactId>
-      <version>3.2</version>
+      <version>3386.v353e57a_1b_ea_0</version>
     </dependency>
   </dependencies>
   <repositories>
