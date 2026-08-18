@@ -34,16 +34,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.apache.maven.RepositoryUtils;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DefaultArtifact;
-import org.apache.maven.artifact.handler.DefaultArtifactHandler;
-import org.apache.maven.artifact.versioning.VersionRange;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.impl.LocalRepositoryProvider;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.LocalRepositoryManager;
@@ -307,18 +304,7 @@ public abstract class AbstractCompilerTest {
     }
 
     protected File getLocalArtifactPath(String groupId, String artifactId, String version, String type) {
-        VersionRange versionRange = VersionRange.createFromVersion(version);
-
-        Artifact artifact = new DefaultArtifact(
-                groupId,
-                artifactId,
-                versionRange,
-                Artifact.SCOPE_COMPILE,
-                type,
-                null,
-                new DefaultArtifactHandler(type));
-
-        return getLocalArtifactPath(artifact);
+        return getLocalArtifactPath(new DefaultArtifact(groupId, artifactId, type, version));
     }
 
     protected String getJavaVersion() {
@@ -346,6 +332,6 @@ public abstract class AbstractCompilerTest {
     protected File getLocalArtifactPath(Artifact artifact) {
         return new File(
                 localRepositoryManager.getRepository().getBasedir(),
-                localRepositoryManager.getPathForLocalArtifact(RepositoryUtils.toArtifact(artifact)));
+                localRepositoryManager.getPathForLocalArtifact(artifact));
     }
 }
