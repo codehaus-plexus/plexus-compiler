@@ -36,13 +36,6 @@
       <artifactId>plexus-compiler-test</artifactId>
       <scope>test</scope>
     </dependency>
-    <!-- this is used for populating a test classpath in AbstractCompiler and is required in the local repository -->
-    <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
-      <version>2.6</version>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
 </project>
