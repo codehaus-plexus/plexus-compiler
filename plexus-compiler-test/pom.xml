@@ -33,16 +33,6 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-api</artifactId>
-      <version>${mavenResolverVersion}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-impl</artifactId>
-      <version>${mavenResolverVersion}</version>
-    </dependency>
-    <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
     </dependency>
@@ -50,7 +40,7 @@
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-xml</artifactId>
     </dependency>
-    <!-- This just needs to be present in the local repository for tests to pass. It would be preferable for the tests to resolve it directly -->
+    <!-- On the classpath the TCK hands to the compiler under test, for the test-input sources that import it -->
     <dependency>
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
