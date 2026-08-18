@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.codehaus.plexus.compiler.CompilerMessage;
@@ -49,6 +50,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class ErrorMessageParserTest {
     private static final String EOL = System.getProperty("line.separator");
+    private static final String ANNOTATION_PROCESSING_NOTE =
+            "Note: Annotation processing is enabled because one or more processors were found" + EOL
+                    + "  on the class path. A future release of javac may disable annotation processing" + EOL
+                    + "  unless at least one processor is specified by name (-processor), or a search" + EOL
+                    + "  path is specified (--processor-path, --processor-module-path), or annotation" + EOL
+                    + "  processing is enabled explicitly (-proc:only, -proc:full)." + EOL
+                    + "  Use -Xlint:-options to suppress this message." + EOL
+                    + "  Use -proc:none to disable annotation processing." + EOL;
+
     private static final String UNIDENTIFIED_LOG_LINES =
             "These log lines should be cut off\n" + "when preceding known error message headers\n";
 
@@ -1314,6 +1324,75 @@ public class ErrorMessageParserTest {
         assertTrue(
                 messages.stream().anyMatch(m -> m.getMessage().contains("Cannot find annotation method")),
                 "the unclassified warning should survive: " + messages);
+    }
+
+    @Test
+    public void testNoteIsReported() throws IOException {
+        String output = "Note: SomeFile.java uses unchecked or unsafe operations." + EOL;
+
+        List<CompilerMessage> messages =
+                JavacCompiler.parseModernStream(0, new BufferedReader(new StringReader(output)));
+
+        assertEquals(1, messages.size());
+        assertEquals(CompilerMessage.Kind.NOTE, messages.get(0).getKind());
+        assertEquals(
+                "SomeFile.java uses unchecked or unsafe operations.",
+                messages.get(0).getMessage());
+    }
+
+    /**
+     * Since JDK 21 javac wraps its notes over several lines, indenting every line but the first. See
+     * <a href="https://inside.java/2023/07/29/quality-heads-up/">the JDK quality heads-up</a>.
+     */
+    @Test
+    public void testMultiLineNoteIsReportedAsASingleMessage() throws IOException {
+        List<CompilerMessage> messages =
+                JavacCompiler.parseModernStream(0, new BufferedReader(new StringReader(ANNOTATION_PROCESSING_NOTE)));
+
+        assertEquals(1, messages.size());
+        assertEquals(CompilerMessage.Kind.NOTE, messages.get(0).getKind());
+        String message = messages.get(0).getMessage();
+        assertTrue(
+                message.startsWith("Annotation processing is enabled"), "note starts with its first line: " + message);
+        assertTrue(
+                message.contains("Use -proc:none to disable annotation processing."),
+                "note keeps its last line: " + message);
+    }
+
+    /**
+     * The continuation lines of a multi-line note used to fall through to the unclassified buffer, which then
+     * swallowed everything that followed it.
+     */
+    @Test
+    public void testMultiLineNoteDoesNotSwallowLaterDiagnostics() throws IOException {
+        String output = ANNOTATION_PROCESSING_NOTE + "warning: [options] bootstrap class path not set" + EOL;
+
+        List<CompilerMessage> messages =
+                JavacCompiler.parseModernStream(0, new BufferedReader(new StringReader(output)));
+
+        assertEquals(2, messages.size(), "note and warning stay separate: " + messages);
+        assertEquals(CompilerMessage.Kind.NOTE, messages.get(0).getKind());
+        assertEquals(CompilerMessage.Kind.WARNING, messages.get(1).getKind());
+        assertEquals("[options] bootstrap class path not set", messages.get(1).getMessage());
+    }
+
+    /**
+     * A failing compile reports whatever the classifiers did not recognise, so note continuation lines left in the
+     * buffer would have surfaced as a compiler error.
+     */
+    @Test
+    public void testMultiLineNoteIsNotReportedAsAnErrorWhenCompilationFails() throws IOException {
+        String output = ANNOTATION_PROCESSING_NOTE + "error: cannot find symbol" + EOL;
+
+        List<CompilerMessage> messages =
+                JavacCompiler.parseModernStream(1, new BufferedReader(new StringReader(output)));
+
+        List<CompilerMessage> reportedErrors = messages.stream()
+                .filter(m -> m.getKind() == CompilerMessage.Kind.ERROR)
+                .collect(Collectors.toList());
+
+        assertEquals(1, reportedErrors.size(), "only the real error is an error: " + messages);
+        assertEquals("error: cannot find symbol", reportedErrors.get(0).getMessage());
     }
 
     private void validateBadSourceFile(CompilerMessage message) {
