@@ -754,10 +754,20 @@ public class JavacCompiler extends AbstractCompiler {
         List<CompilerMessage> errors = new ArrayList<>();
         String line;
         StringBuilder buffer = new StringBuilder();
+        StringBuilder note = null;
         boolean hasPointer = false;
         int stackTraceLineCount = 0;
 
         while ((line = input.readLine()) != null) {
+            if (note != null) {
+                if (isNoteContinuation(line)) {
+                    note.append(EOL).append(line);
+                    continue;
+                }
+                errors.add(new CompilerMessage(note.toString(), CompilerMessage.Kind.NOTE));
+                note = null;
+            }
+
             if (stackTraceLineCount == 0 && STACK_TRACE_FIRST_LINE.matcher(line).matches()
                     || STACK_TRACE_OTHER_LINE.matcher(line).matches()) {
                 stackTraceLineCount++;
@@ -782,7 +792,8 @@ public class JavacCompiler extends AbstractCompiler {
                 } else if (isWarning(line)) {
                     errors.add(new CompilerMessage(line, WARNING));
                 } else if (isNote(line)) {
-                    // skip, JDK telling us deprecated APIs are used but -Xlint:deprecation isn't set
+                    // held back until its continuation lines, if any, have been read
+                    note = new StringBuilder(line);
                 } else if (isMisc(line)) {
                     // verbose output was set
                     errors.add(new CompilerMessage(line, CompilerMessage.Kind.OTHER));
@@ -798,6 +809,10 @@ public class JavacCompiler extends AbstractCompiler {
             if (line.endsWith("^")) {
                 hasPointer = true;
             }
+        }
+
+        if (note != null) {
+            errors.add(new CompilerMessage(note.toString(), CompilerMessage.Kind.NOTE));
         }
 
         String bufferContent = buffer.toString();
@@ -865,6 +880,18 @@ public class JavacCompiler extends AbstractCompiler {
 
     private static boolean isNote(String message) {
         return startsWithPrefix(message, NOTE_PREFIXES);
+    }
+
+    /**
+     * Tells whether a line continues the note that precedes it. Since JDK 21 javac wraps its notes over several
+     * lines, indenting every line but the first, while the diagnostics that may follow a note all start in the
+     * first column.
+     *
+     * @param line the line following a note
+     * @return whether the line belongs to that note
+     */
+    private static boolean isNoteContinuation(String line) {
+        return !line.trim().isEmpty() && Character.isWhitespace(line.charAt(0));
     }
 
     private static boolean isWarning(String message) {
