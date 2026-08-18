@@ -139,7 +139,7 @@ public abstract class AbstractCompilerTest {
 
         int numCompilerErrors = compilerErrorCount(messages);
 
-        int numCompilerWarnings = messages.size() - numCompilerErrors;
+        int numCompilerWarnings = compilerWarningCount(messages);
 
         int expectedErrors = expectedErrors();
 
@@ -169,16 +169,16 @@ public abstract class AbstractCompilerTest {
         if (expectedWarnings != numCompilerWarnings) {
             List<String> warnings = new ArrayList<>();
             System.out.println(numCompilerWarnings + " warning(s) found:");
-            for (CompilerMessage error : messages) {
-                if (error.isError()) {
+            for (CompilerMessage warning : messages) {
+                if (!isWarning(warning)) {
                     continue;
                 }
 
                 System.out.println("----");
-                System.out.println(error.getFile());
-                System.out.println(error.getMessage());
+                System.out.println(warning.getFile());
+                System.out.println(warning.getMessage());
                 System.out.println("----");
-                warnings.add(error.getMessage());
+                warnings.add(warning.getMessage());
             }
 
             assertEquals(
@@ -277,6 +277,21 @@ public abstract class AbstractCompilerTest {
         }
 
         return count;
+    }
+
+    protected int compilerWarningCount(List<CompilerMessage> messages) {
+        int count = 0;
+
+        for (CompilerMessage message : messages) {
+            count += isWarning(message) ? 1 : 0;
+        }
+
+        return count;
+    }
+
+    private static boolean isWarning(CompilerMessage message) {
+        return message.getKind() == CompilerMessage.Kind.WARNING
+                || message.getKind() == CompilerMessage.Kind.MANDATORY_WARNING;
     }
 
     protected int expectedErrors() {
