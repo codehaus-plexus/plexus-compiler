@@ -26,6 +26,7 @@ package org.codehaus.plexus.compiler;
 import javax.inject.Inject;
 
 import java.io.File;
+import java.security.CodeSource;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -37,14 +38,6 @@ import java.util.stream.Collectors;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
-import org.eclipse.aether.DefaultRepositorySystemSession;
-import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.artifact.Artifact;
-import org.eclipse.aether.artifact.DefaultArtifact;
-import org.eclipse.aether.impl.LocalRepositoryProvider;
-import org.eclipse.aether.repository.LocalRepository;
-import org.eclipse.aether.repository.LocalRepositoryManager;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -65,27 +58,7 @@ public abstract class AbstractCompilerTest {
     @Inject
     private Map<String, Compiler> compilers;
 
-    @Inject
-    private LocalRepositoryProvider localRepositoryProvider;
-
-    private LocalRepositoryManager localRepositoryManager;
-
     protected abstract String getRoleHint();
-
-    @BeforeEach
-    final void setUpLocalRepo() throws Exception {
-        String localRepo = System.getProperty("maven.repo.local");
-        assertNotNull(localRepo, "system property maven.repo.local");
-
-        LocalRepository localRepository = new LocalRepository(localRepo);
-        File basedir = localRepository.getBasedir();
-        assertTrue(
-                basedir != null && basedir.exists() && basedir.canRead(),
-                "test prerequisite: local repository path: " + basedir);
-
-        RepositorySystemSession session = new DefaultRepositorySystemSession();
-        localRepositoryManager = localRepositoryProvider.newLocalRepositoryManager(session, localRepository);
-    }
 
     protected void setCompilerDebug(boolean flag) {
         compilerDebug = flag;
@@ -106,15 +79,28 @@ public abstract class AbstractCompilerTest {
     protected List<String> getClasspath() throws Exception {
         List<String> cp = new ArrayList<>();
 
-        File file = getLocalArtifactPath("commons-lang", "commons-lang", "2.6", "jar");
-
-        assertTrue(
-                file != null && file.exists() && file.canRead(),
-                "test prerequisite: commons-lang library must be available in local repository at " + file);
-
-        cp.add(file.getAbsolutePath());
+        cp.add(getJarPath("org.apache.commons.lang.StringUtils").getAbsolutePath());
 
         return cp;
+    }
+
+    /**
+     * Locates the jar a class was loaded from, so that a test can put a dependency of its own on the classpath it
+     * asks the compiler to use. The dependency is declared in the pom like any other, and found here through the
+     * class loader rather than by guessing at a path inside the local repository.
+     *
+     * @param className fully qualified name of a class in the wanted jar
+     * @return the jar holding that class
+     */
+    protected static File getJarPath(String className) throws Exception {
+        Class<?> type = Class.forName(className);
+        CodeSource source = type.getProtectionDomain().getCodeSource();
+        assertNotNull(source, "test prerequisite: no code source for " + className);
+
+        File jar = new File(source.getLocation().toURI());
+        assertTrue(jar.canRead(), "test prerequisite: unreadable jar for " + className + ": " + jar);
+
+        return jar;
     }
 
     protected void configureCompilerConfig(CompilerConfiguration compilerConfig) {}
@@ -303,10 +289,6 @@ public abstract class AbstractCompilerTest {
         return Collections.emptyList();
     }
 
-    protected File getLocalArtifactPath(String groupId, String artifactId, String version, String type) {
-        return getLocalArtifactPath(new DefaultArtifact(groupId, artifactId, type, version));
-    }
-
     protected String getJavaVersion() {
         String javaVersion = System.getProperty("java.version");
         String realJavaVersion = javaVersion;
@@ -327,11 +309,5 @@ public abstract class AbstractCompilerTest {
                 + "\n");
 
         return javaVersion;
-    }
-
-    protected File getLocalArtifactPath(Artifact artifact) {
-        return new File(
-                localRepositoryManager.getRepository().getBasedir(),
-                localRepositoryManager.getPathForLocalArtifact(artifact));
     }
 }

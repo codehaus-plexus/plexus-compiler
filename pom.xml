@@ -46,7 +46,6 @@
     <redirectTestOutputToFile>true</redirectTestOutputToFile>
     <project.build.outputTimestamp>2026-01-25T22:48:03Z</project.build.outputTimestamp>
     <aspectj.version>1.9.21</aspectj.version>
-    <mavenResolverVersion>1.9.27</mavenResolverVersion>
     <errorprone.version>2.37.0</errorprone.version>
     <eclipse.sisu.version>1.1.0</eclipse.sisu.version>
     <trimStackTrace>false</trimStackTrace>
@@ -142,9 +141,6 @@
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
             <redirectTestOutputToFile>${redirectTestOutputToFile}</redirectTestOutputToFile>
-            <systemPropertyVariables>
-              <maven.repo.local>${settings.localRepository}</maven.repo.local>
-            </systemPropertyVariables>
           </configuration>
         </plugin>
         <plugin>

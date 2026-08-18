@@ -1,6 +1,5 @@
 package org.codehaus.plexus.compiler.ajc;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -28,9 +27,7 @@ public class AspectJCompilerTest extends AbstractCompilerTest {
     @Override
     protected List<String> getClasspath() throws Exception {
         List<String> classpath = super.getClasspath();
-        String aspectjVersion = System.getProperty("aspectj.version");
-        File aspectjRuntime = getLocalArtifactPath("org.aspectj", "aspectjrt", aspectjVersion, "jar");
-        classpath.add(aspectjRuntime.getAbsolutePath());
+        classpath.add(getJarPath("org.aspectj.lang.JoinPoint").getAbsolutePath());
         return classpath;
     }
 }
