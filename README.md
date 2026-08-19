@@ -32,7 +32,6 @@ To write against the API:
 <dependency>
   <groupId>org.codehaus.plexus</groupId>
   <artifactId>plexus-compiler-api</artifactId>
-  <version>2.16.2</version>
 </dependency>
 ```
 
