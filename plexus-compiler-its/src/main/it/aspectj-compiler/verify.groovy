@@ -32,4 +32,11 @@ Running application
 execution(String org.acme.Application.greet(String))
 call(void org.junit.Assert.assertTrue(boolean))""".normalize()
 
-assert content.contains( junitLog )
+// Maven 4's console reporter prefixes surefire lines with "[INFO] " and forked
+// test stdout with "[INFO] [stdout] "; strip those so the woven-output block
+// matches under both Maven 3 (unprefixed) and Maven 4.
+def unprefixed = content.readLines()
+    .collect { it.replaceFirst( ~/^\[INFO\] (\[stdout\] )?/, '' ) }
+    .join( '\n' )
+
+assert unprefixed.contains( junitLog )
