@@ -27,7 +27,7 @@
     <connection>${scm.url}</connection>
     <developerConnection>${scm.url}</developerConnection>
     <tag>HEAD</tag>
-    <url>http://github.com/codehaus-plexus/plexus-compiler/tree/${project.scm.tag}/</url>
+    <url>https://github.com/codehaus-plexus/plexus-compiler/tree/${project.scm.tag}/</url>
   </scm>
   <issueManagement>
     <system>github</system>
@@ -41,7 +41,7 @@
   </distributionManagement>
 
   <properties>
-    <scm.url>scm:git:git@github.com:codehaus-plexus/plexus-compiler.git</scm.url>
+    <scm.url>scm:git:https://github.com/codehaus-plexus/plexus-compiler.git</scm.url>
     <javaVersion>8</javaVersion>
     <redirectTestOutputToFile>true</redirectTestOutputToFile>
     <project.build.outputTimestamp>2026-08-19T16:04:03Z</project.build.outputTimestamp>
