@@ -1,1 +1,1 @@
-moduleSearchIndex = [];updateSearchResults();
+moduleSearchIndex = [{"l":"org.codehaus.plexus.compiler.eclipse"}];updateSearchResults();
