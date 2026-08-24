@@ -618,29 +618,4 @@ public class EclipseJavaCompiler extends AbstractCompiler {
         }
         return versionSpec;
     }
-
-    /**
-     * Joins the configured annotation processor names, skipping blank entries.
-     * <p>
-     * Maven maps an explicitly empty {@code <annotationProcessors/>} element to an array of blank
-     * strings rather than to an empty array, and passing those on produces {@code -processor} with
-     * an empty processor name.
-     *
-     * @param annotationProcessors the configured names, possibly {@code null}
-     * @return the non-blank names joined by commas, or an empty string if there are none
-     */
-    private static String joinAnnotationProcessors(String[] annotationProcessors) {
-        StringBuilder buffer = new StringBuilder();
-        if (annotationProcessors != null) {
-            for (String annotationProcessor : annotationProcessors) {
-                if (annotationProcessor != null && !annotationProcessor.trim().isEmpty()) {
-                    if (buffer.length() > 0) {
-                        buffer.append(',');
-                    }
-                    buffer.append(annotationProcessor);
-                }
-            }
-        }
-        return buffer.toString();
-    }
 }

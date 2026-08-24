@@ -295,4 +295,31 @@ public abstract class AbstractCompiler implements Compiler {
         }
         return to;
     }
+
+    /**
+     * Joins the configured annotation processor names, skipping blank entries.
+     * <p>
+     * Maven maps an explicitly empty {@code <annotationProcessors/>} element to an array holding
+     * blank strings rather than to an empty array. Passing those on yields {@code -processor} with
+     * an empty processor name, which no compiler can resolve. Callers should omit the option
+     * entirely when this returns an empty string.
+     *
+     * @param annotationProcessors the configured names, possibly {@code null}
+     * @return the non-blank names joined by commas, or an empty string if none remain
+     * @since 2.17.1
+     */
+    protected static String joinAnnotationProcessors(String[] annotationProcessors) {
+        StringBuilder buffer = new StringBuilder();
+        if (annotationProcessors != null) {
+            for (String annotationProcessor : annotationProcessors) {
+                if (annotationProcessor != null && !annotationProcessor.trim().isEmpty()) {
+                    if (buffer.length() > 0) {
+                        buffer.append(',');
+                    }
+                    buffer.append(annotationProcessor);
+                }
+            }
+        }
+        return buffer.toString();
+    }
 }
