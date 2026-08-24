@@ -217,6 +217,34 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
     }
 
     @Test
+    public void testBuildCompilerArgsBlankAnnotationProcessors() {
+        CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
+        compilerConfiguration.setOutputLocation("/output");
+        compilerConfiguration.setAnnotationProcessors(new String[] {"", ""});
+
+        String[] actualArguments = JavacCompiler.buildCompilerArguments(compilerConfiguration, new String[0], "17");
+
+        assertFalse(
+                Arrays.asList(actualArguments).contains("-processor"),
+                "an array of blank processor names must not produce -processor");
+    }
+
+    @Test
+    public void testBuildCompilerArgsMixedBlankAnnotationProcessors() {
+        CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
+        compilerConfiguration.setOutputLocation("/output");
+        compilerConfiguration.setAnnotationProcessors(
+                new String[] {"", "com.example.First", " ", "com.example.Second"});
+
+        List<String> actualArguments =
+                Arrays.asList(JavacCompiler.buildCompilerArguments(compilerConfiguration, new String[0], "17"));
+
+        int index = actualArguments.indexOf("-processor");
+        assertTrue(index >= 0, "-processor must be present when at least one name is not blank");
+        assertEquals("com.example.First,com.example.Second", actualArguments.get(index + 1));
+    }
+
+    @Test
     public void testBuildCompilerArgsAnnotationProcessors() {
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
         compilerConfiguration.setOutputLocation("/output");

@@ -371,6 +371,31 @@ public class JavacCompiler extends AbstractCompiler {
         return buildCompilerArguments(config, getSourceFiles(config), javacVersion);
     }
 
+    /**
+     * Joins the configured annotation processor names, skipping blank entries.
+     * <p>
+     * Maven maps an explicitly empty {@code <annotationProcessors/>} element to an array of blank
+     * strings rather than to an empty array, and passing those on produces {@code -processor} with
+     * an empty processor name, which javac cannot resolve.
+     *
+     * @param annotationProcessors the configured names, possibly {@code null}
+     * @return the non-blank names joined by commas, or an empty string if there are none
+     */
+    private static String joinAnnotationProcessors(String[] annotationProcessors) {
+        StringBuilder buffer = new StringBuilder();
+        if (annotationProcessors != null) {
+            for (String annotationProcessor : annotationProcessors) {
+                if (annotationProcessor != null && !annotationProcessor.trim().isEmpty()) {
+                    if (buffer.length() > 0) {
+                        buffer.append(",");
+                    }
+                    buffer.append(annotationProcessor);
+                }
+            }
+        }
+        return buffer.toString();
+    }
+
     public static String[] buildCompilerArguments(
             CompilerConfiguration config, String[] sourceFiles, String javacVersion) {
         List<String> args = new ArrayList<>();
@@ -421,17 +446,10 @@ public class JavacCompiler extends AbstractCompiler {
             if (config.getProc() != null) {
                 args.add("-proc:" + config.getProc());
             }
-            String[] annotationProcessors = config.getAnnotationProcessors();
-            if (annotationProcessors != null && annotationProcessors.length > 0) {
+            String annotationProcessors = joinAnnotationProcessors(config.getAnnotationProcessors());
+            if (!annotationProcessors.isEmpty()) {
                 args.add("-processor");
-                StringBuilder buffer = new StringBuilder();
-                for (int i = 0; i < annotationProcessors.length; i++) {
-                    if (i > 0) {
-                        buffer.append(",");
-                    }
-                    buffer.append(annotationProcessors[i]);
-                }
-                args.add(buffer.toString());
+                args.add(annotationProcessors);
             }
             if (config.getProcessorPathEntries() != null
                     && !config.getProcessorPathEntries().isEmpty()) {
