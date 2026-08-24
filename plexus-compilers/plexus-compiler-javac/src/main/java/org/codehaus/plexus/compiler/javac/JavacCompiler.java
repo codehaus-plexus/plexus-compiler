@@ -421,15 +421,15 @@ public class JavacCompiler extends AbstractCompiler {
             if (config.getProc() != null) {
                 args.add("-proc:" + config.getProc());
             }
-            if (config.getAnnotationProcessors() != null) {
+            String[] annotationProcessors = config.getAnnotationProcessors();
+            if (annotationProcessors != null && annotationProcessors.length > 0) {
                 args.add("-processor");
-                String[] procs = config.getAnnotationProcessors();
                 StringBuilder buffer = new StringBuilder();
-                for (int i = 0; i < procs.length; i++) {
+                for (int i = 0; i < annotationProcessors.length; i++) {
                     if (i > 0) {
                         buffer.append(",");
                     }
-                    buffer.append(procs[i]);
+                    buffer.append(annotationProcessors[i]);
                 }
                 args.add(buffer.toString());
             }

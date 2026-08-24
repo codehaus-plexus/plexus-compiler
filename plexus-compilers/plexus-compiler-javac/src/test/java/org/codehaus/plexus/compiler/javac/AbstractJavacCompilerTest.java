@@ -38,6 +38,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author <a href="mailto:jason@plexus.org">Jason van Zyl</a>
@@ -198,6 +201,33 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
         String[] actualArguments = JavacCompiler.buildCompilerArguments(compilerConfiguration, sources, javacVersion);
 
         assertArrayEquals(actualArguments, expectedArguments.toArray(new String[0]));
+    }
+
+    @Test
+    public void testBuildCompilerArgsEmptyAnnotationProcessors() {
+        CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
+        compilerConfiguration.setOutputLocation("/output");
+        compilerConfiguration.setAnnotationProcessors(new String[0]);
+
+        String[] actualArguments = JavacCompiler.buildCompilerArguments(compilerConfiguration, new String[0], "17");
+
+        assertFalse(
+                Arrays.asList(actualArguments).contains("-processor"),
+                "an empty processor array must not produce -processor with an empty argument");
+    }
+
+    @Test
+    public void testBuildCompilerArgsAnnotationProcessors() {
+        CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
+        compilerConfiguration.setOutputLocation("/output");
+        compilerConfiguration.setAnnotationProcessors(new String[] {"com.example.First", "com.example.Second"});
+
+        List<String> actualArguments =
+                Arrays.asList(JavacCompiler.buildCompilerArguments(compilerConfiguration, new String[0], "17"));
+
+        int index = actualArguments.indexOf("-processor");
+        assertTrue(index >= 0, "-processor must be present for a non-empty processor array");
+        assertEquals("com.example.First,com.example.Second", actualArguments.get(index + 1));
     }
 
     @Test
