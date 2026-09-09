@@ -1,5 +1,8 @@
 package org.codehaus.plexus.compiler.javac;
 
+import javax.tools.Diagnostic;
+import javax.tools.JavaFileObject;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -9,6 +12,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.codehaus.plexus.compiler.CompilerConfiguration;
@@ -26,6 +31,7 @@ import static org.codehaus.plexus.compiler.javac.JavacCompiler.Messages.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /*
@@ -159,6 +165,11 @@ public class JavacCompilerTest extends AbstractJavacCompilerTest {
     }
 
     private CompilerResult compile(Path tempDirectory, Path sourceDirectory, boolean fork) throws Exception {
+        return compile(tempDirectory, sourceDirectory, fork, "-Xlint:-options");
+    }
+
+    private CompilerResult compile(Path tempDirectory, Path sourceDirectory, boolean fork, String lintArgument)
+            throws Exception {
         File buildDirectory =
                 tempDirectory.resolve(fork ? "forked" : "in-process").toFile();
         Files.createDirectories(buildDirectory.toPath());
@@ -171,7 +182,7 @@ public class JavacCompilerTest extends AbstractJavacCompilerTest {
         configuration.addSourceLocation(sourceDirectory.toString());
         configuration.setSourceVersion("8");
         configuration.setTargetVersion("8");
-        configuration.addCompilerCustomArgument("-Xlint:-options", null);
+        configuration.addCompilerCustomArgument(lintArgument, null);
 
         return getCompiler().performCompile(configuration);
     }
@@ -199,5 +210,150 @@ public class JavacCompilerTest extends AbstractJavacCompilerTest {
                         "line1\nline2\rline3\tline4\fline5",
                         "\"line1\\nline2\\rline3\\tline4\\fline5\""),
                 Arguments.of("backslash and newline", "line1\\\nline2", "\"line1" + "\\\\" + "\\n" + "line2\""));
+    }
+
+    @Test
+    void testForkedAndInProcessLintCategoriesAreEqual(@TempDir Path tempDirectory) throws Exception {
+        Path sourceDirectory = tempDirectory.resolve("src");
+        Files.createDirectories(sourceDirectory);
+        Files.write(
+                sourceDirectory.resolve("Raw.java"),
+                Arrays.asList("class Raw {", " java.util.List raw() {", "  return null;", " }", "}"),
+                StandardCharsets.UTF_8);
+
+        CompilerResult inProcess = compile(tempDirectory, sourceDirectory, false, "-Xlint:-options,rawtypes");
+        CompilerResult forked = compile(tempDirectory, sourceDirectory, true, "-Xlint:-options,rawtypes");
+
+        assertTrue(inProcess.isSuccess());
+        assertTrue(forked.isSuccess());
+
+        CompilerMessage inProcessMessage = onlyWarning(inProcess);
+        CompilerMessage forkedMessage = onlyWarning(forked);
+        assertTrue(
+                forkedMessage.getMessage().startsWith("[rawtypes]"),
+                "forked message lost its lint category: " + forkedMessage.getMessage());
+        assertTrue(
+                inProcessMessage.getMessage().startsWith("[rawtypes]"),
+                "in-process message lost its lint category: " + inProcessMessage.getMessage());
+        assertEquals(inProcessMessage.getStartLine(), forkedMessage.getStartLine());
+        // the bodies still differ - javac's own output abbreviates the type to List where the API spells out
+        // java.util.List - which is a separate parity gap, so only the category is compared here
+    }
+
+    private static CompilerMessage onlyWarning(CompilerResult result) {
+        List<CompilerMessage> warnings = result.getCompilerMessages().stream()
+                .filter(message -> message.getKind() == CompilerMessage.Kind.WARNING)
+                .collect(Collectors.toList());
+        assertEquals(1, warnings.size(), "expected exactly one warning, got " + result.getCompilerMessages());
+        return warnings.get(0);
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("lintCategoryArguments")
+    void lintCategoryOf(String description, String rendered, String message, String expected) {
+        assertEquals(expected, JavaxToolsCompiler.lintCategoryOf(new StubDiagnostic(rendered), message));
+    }
+
+    private static Stream<Arguments> lintCategoryArguments() {
+        return Stream.of(
+                Arguments.of(
+                        "English warning",
+                        "/src/Raw.java:2: warning: [rawtypes] found raw type: java.util.List",
+                        "found raw type: java.util.List",
+                        "[rawtypes]"),
+                Arguments.of(
+                        "localised marker",
+                        "./src/Main.java:9: \u8b66\u544a:[deprecation] java.io.File \u306e toURL()",
+                        "java.io.File \u306e toURL()",
+                        "[deprecation]"),
+                Arguments.of(
+                        "wrapped message",
+                        "/src/Raw.java:2: warning: [rawtypes] found raw type: java.util.List\n"
+                                + " java.util.List raw() {\n"
+                                + " ^\n"
+                                + "  missing type arguments for generic class java.util.List<E>",
+                        "found raw type: java.util.List\n  missing type arguments for generic class java.util.List<E>",
+                        "[rawtypes]"),
+                Arguments.of("no category", "/src/Test.java:3: error: not a statement", "not a statement", null),
+                Arguments.of(
+                        "brackets in path",
+                        "/src/build[1]/Test.java:3: error: not a statement",
+                        "not a statement",
+                        null),
+                Arguments.of("message absent from rendering", "something else entirely", "not a statement", null),
+                Arguments.of("no message", "/src/Test.java:3: warning: [module] gone", "", null));
+    }
+
+    @Test
+    void lintCategoryOfUnrenderableDiagnostic() {
+        assertNull(JavaxToolsCompiler.lintCategoryOf(
+                new StubDiagnostic(null) {
+                    @Override
+                    public String toString() {
+                        throw new IllegalStateException("JDK-8210649");
+                    }
+                },
+                "found raw type: java.util.List"));
+    }
+
+    /**
+     * A diagnostic whose only meaningful part is its rendering, which is all {@code lintCategoryOf} reads.
+     */
+    private static class StubDiagnostic implements Diagnostic<JavaFileObject> {
+        private final String rendered;
+
+        StubDiagnostic(String rendered) {
+            this.rendered = rendered;
+        }
+
+        @Override
+        public String toString() {
+            return rendered;
+        }
+
+        @Override
+        public Kind getKind() {
+            return Kind.WARNING;
+        }
+
+        @Override
+        public JavaFileObject getSource() {
+            return null;
+        }
+
+        @Override
+        public long getPosition() {
+            return NOPOS;
+        }
+
+        @Override
+        public long getStartPosition() {
+            return NOPOS;
+        }
+
+        @Override
+        public long getEndPosition() {
+            return NOPOS;
+        }
+
+        @Override
+        public long getLineNumber() {
+            return NOPOS;
+        }
+
+        @Override
+        public long getColumnNumber() {
+            return NOPOS;
+        }
+
+        @Override
+        public String getCode() {
+            return null;
+        }
+
+        @Override
+        public String getMessage(Locale locale) {
+            return null;
+        }
     }
 }
