@@ -165,6 +165,10 @@ public class JavaxToolsCompiler implements InProcessCompiler {
                             }
                         }
                     }
+                    String lintCategory = lintCategoryOf(diagnostic, baseMessage);
+                    if (lintCategory != null && !formattedMessage.startsWith(lintCategory)) {
+                        formattedMessage = lintCategory + " " + formattedMessage;
+                    }
                     compilerMsgs.add(new CompilerMessage(
                             longFileName, kind, lineNumber, columnNumber, lineNumber, columnNumber, formattedMessage));
                 }
@@ -180,6 +184,62 @@ public class JavaxToolsCompiler implements InProcessCompiler {
         } finally {
             releaseJavaCompiler(compiler, config);
         }
+    }
+
+    /**
+     * Returns the bracketed {@code -Xlint} category javac prints in front of a message, for example
+     * {@code [deprecation]}, or {@code null} when the message carries none.
+     * <p>
+     * {@link Diagnostic#getMessage(java.util.Locale)} leaves the category out, and the JDK considers that
+     * intentional (<a href="https://bugs.openjdk.org/browse/JDK-8292634">JDK-8292634</a>), so it is read back
+     * from {@link Diagnostic#toString()}. The forked compiler keeps the category because it parses javac's
+     * own output, and without this the two back-ends disagree.
+     * <p>
+     * The category is located by anchoring on the message rather than on the {@code warning:} marker in front
+     * of it, because that marker is localised while the category never is.
+     */
+    static String lintCategoryOf(Diagnostic<? extends JavaFileObject> diagnostic, String message) {
+        if (message == null || message.isEmpty()) {
+            return null;
+        }
+        String rendered;
+        try {
+            rendered = diagnostic.toString();
+        } catch (Throwable e) {
+            // same JDK-8210649 / JDK-8216202 exposure as getMessage() above
+            return null;
+        }
+        if (rendered == null) {
+            return null;
+        }
+        int newLine = message.indexOf('\n');
+        // a wrapped message continues below the source line and caret, so only its first line is contiguous here
+        String firstLine = newLine < 0 ? message : message.substring(0, newLine);
+        int messageStart = rendered.indexOf(firstLine);
+        if (messageStart <= 0) {
+            return null;
+        }
+        String head = rendered.substring(0, messageStart);
+        int close = head.lastIndexOf(']');
+        if (close < 0 || !head.substring(close + 1).trim().isEmpty()) {
+            return null;
+        }
+        int open = head.lastIndexOf('[', close);
+        if (open < 0) {
+            return null;
+        }
+        String category = head.substring(open + 1, close);
+        if (category.isEmpty()) {
+            return null;
+        }
+        // a lint category is a single token; anything else is a bracket that happens to sit in a path
+        for (int i = 0; i < category.length(); i++) {
+            char c = category.charAt(i);
+            if (!Character.isLetterOrDigit(c) && c != '-' && c != '_') {
+                return null;
+            }
+        }
+        return head.substring(open, close + 1);
     }
 
     private CompilerMessage.Kind convertKind(Diagnostic<? extends JavaFileObject> diagnostic) {
