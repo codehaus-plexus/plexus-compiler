@@ -303,7 +303,34 @@
 <a class="jxr_linenumber" name="L295" href="#L295">295</a>         }
 <a class="jxr_linenumber" name="L296" href="#L296">296</a>         <strong class="jxr_keyword">return</strong> to;
 <a class="jxr_linenumber" name="L297" href="#L297">297</a>     }
-<a class="jxr_linenumber" name="L298" href="#L298">298</a> }
+<a class="jxr_linenumber" name="L298" href="#L298">298</a> 
+<a class="jxr_linenumber" name="L299" href="#L299">299</a>     <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L300" href="#L300">300</a> <em class="jxr_javadoccomment">     * Joins the configured annotation processor names, skipping blank entries.</em>
+<a class="jxr_linenumber" name="L301" href="#L301">301</a> <em class="jxr_javadoccomment">     * &lt;p&gt;</em>
+<a class="jxr_linenumber" name="L302" href="#L302">302</a> <em class="jxr_javadoccomment">     * Maven maps an explicitly empty {@code &lt;annotationProcessors/&gt;} element to an array holding</em>
+<a class="jxr_linenumber" name="L303" href="#L303">303</a> <em class="jxr_javadoccomment">     * blank strings rather than to an empty array. Passing those on yields {@code -processor} with</em>
+<a class="jxr_linenumber" name="L304" href="#L304">304</a> <em class="jxr_javadoccomment">     * an empty processor name, which no compiler can resolve. Callers should omit the option</em>
+<a class="jxr_linenumber" name="L305" href="#L305">305</a> <em class="jxr_javadoccomment">     * entirely when this returns an empty string.</em>
+<a class="jxr_linenumber" name="L306" href="#L306">306</a> <em class="jxr_javadoccomment">     *</em>
+<a class="jxr_linenumber" name="L307" href="#L307">307</a> <em class="jxr_javadoccomment">     * @param annotationProcessors the configured names, possibly {@code null}</em>
+<a class="jxr_linenumber" name="L308" href="#L308">308</a> <em class="jxr_javadoccomment">     * @return the non-blank names joined by commas, or an empty string if none remain</em>
+<a class="jxr_linenumber" name="L309" href="#L309">309</a> <em class="jxr_javadoccomment">     * @since 2.17.1</em>
+<a class="jxr_linenumber" name="L310" href="#L310">310</a> <em class="jxr_javadoccomment">     */</em>
+<a class="jxr_linenumber" name="L311" href="#L311">311</a>     <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">static</strong> String joinAnnotationProcessors(String[] annotationProcessors) {
+<a class="jxr_linenumber" name="L312" href="#L312">312</a>         StringBuilder buffer = <strong class="jxr_keyword">new</strong> StringBuilder();
+<a class="jxr_linenumber" name="L313" href="#L313">313</a>         <strong class="jxr_keyword">if</strong> (annotationProcessors != <strong class="jxr_keyword">null</strong>) {
+<a class="jxr_linenumber" name="L314" href="#L314">314</a>             <strong class="jxr_keyword">for</strong> (String annotationProcessor : annotationProcessors) {
+<a class="jxr_linenumber" name="L315" href="#L315">315</a>                 <strong class="jxr_keyword">if</strong> (annotationProcessor != <strong class="jxr_keyword">null</strong> &amp;&amp; !annotationProcessor.trim().isEmpty()) {
+<a class="jxr_linenumber" name="L316" href="#L316">316</a>                     <strong class="jxr_keyword">if</strong> (buffer.length() &gt; 0) {
+<a class="jxr_linenumber" name="L317" href="#L317">317</a>                         buffer.append(',');
+<a class="jxr_linenumber" name="L318" href="#L318">318</a>                     }
+<a class="jxr_linenumber" name="L319" href="#L319">319</a>                     buffer.append(annotationProcessor);
+<a class="jxr_linenumber" name="L320" href="#L320">320</a>                 }
+<a class="jxr_linenumber" name="L321" href="#L321">321</a>             }
+<a class="jxr_linenumber" name="L322" href="#L322">322</a>         }
+<a class="jxr_linenumber" name="L323" href="#L323">323</a>         <strong class="jxr_keyword">return</strong> buffer.toString();
+<a class="jxr_linenumber" name="L324" href="#L324">324</a>     }
+<a class="jxr_linenumber" name="L325" href="#L325">325</a> }
 </pre>
 <hr/>
 <div id="footer">© 2001–2026 <a href="https://codehaus-plexus.github.io/">Codehaus Plexus</a></div>
