@@ -478,6 +478,28 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
     }
 
     @Test
+    public void testReleaseVersionInLegacySpelling() {
+        List<String> expectedArguments = new ArrayList<>();
+
+        CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
+
+        // outputLocation
+        compilerConfiguration.setOutputLocation("/output");
+        expectedArguments.add("-d");
+        expectedArguments.add(new File("/output").getAbsolutePath());
+
+        // releaseVersion in the -source/-target spelling, which --release rejects
+        compilerConfiguration.setReleaseVersion("1.8");
+        expectedArguments.add("--release");
+        expectedArguments.add("8");
+
+        // unshared table
+        expectedArguments.add("-XDuseUnsharedTable=true");
+
+        internalTest(compilerConfiguration, expectedArguments, "11.0.1");
+    }
+
+    @Test
     public void testFailOnWarning() {
         List<String> expectedArguments = new ArrayList<>();
 

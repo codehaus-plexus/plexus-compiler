@@ -348,6 +348,21 @@ public class JavacCompiler extends AbstractCompiler {
     }
 
     /**
+     * Maps the {@code 1.x} spelling that {@code -source} and {@code -target} accept onto the plain feature
+     * number, the only form {@code --release} takes: {@code 1.8} becomes {@code 8}. Any other value is
+     * passed through unchanged, so javac still reports releases it does not support.
+     *
+     * @param release the configured release version, never empty
+     * @return the value to pass to {@code --release}
+     */
+    static String toReleaseArgument(String release) {
+        if (release.length() == 3 && release.startsWith("1.") && release.charAt(2) >= '1' && release.charAt(2) <= '9') {
+            return release.substring(2);
+        }
+        return release;
+    }
+
+    /**
      *
      * @return {@code true} if the current context class loader has access to {@code javax.tools.ToolProvider}
      */
@@ -492,7 +507,7 @@ public class JavacCompiler extends AbstractCompiler {
 
         if (JavaVersion.JAVA_9.isOlderOrEqualTo(javacVersion) && !StringUtils.isEmpty(config.getReleaseVersion())) {
             args.add("--release");
-            args.add(config.getReleaseVersion());
+            args.add(toReleaseArgument(config.getReleaseVersion()));
         } else {
             // TODO: this could be much improved
             if (StringUtils.isEmpty(config.getTargetVersion())) {
