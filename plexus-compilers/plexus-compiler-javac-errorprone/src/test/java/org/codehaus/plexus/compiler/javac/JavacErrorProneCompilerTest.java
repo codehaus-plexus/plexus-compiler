@@ -17,7 +17,8 @@ public class JavacErrorProneCompilerTest extends AbstractCompilerTest {
         String javaVersion = getJavaVersion();
         if (javaVersion.startsWith("1.8")) {
             return 1;
-        } else if (javaVersion.contains("21") || javaVersion.contains("25")) {
+        } else if (Runtime.version().feature() >= 21) {
+            // javac 21 and later also warn that -source 8 and -target 8 are obsolete
             return 5;
         }
         return 2;

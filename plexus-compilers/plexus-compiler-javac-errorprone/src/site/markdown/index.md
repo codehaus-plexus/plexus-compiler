@@ -6,4 +6,4 @@ with error-prone static analysis checks enabled.
 
 See https://errorprone.info
 
-**Requires** `JDK 17+`
+**Requires** `JDK 21+`
