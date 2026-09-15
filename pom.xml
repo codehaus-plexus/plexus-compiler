@@ -46,7 +46,7 @@
     <redirectTestOutputToFile>true</redirectTestOutputToFile>
     <project.build.outputTimestamp>2026-09-09T11:47:52Z</project.build.outputTimestamp>
     <aspectj.version>1.9.21</aspectj.version>
-    <errorprone.version>2.37.0</errorprone.version>
+    <errorprone.version>2.50.0</errorprone.version>
     <eclipse.sisu.version>1.1.0</eclipse.sisu.version>
     <trimStackTrace>false</trimStackTrace>
     <preparationGoals>clean install</preparationGoals>
