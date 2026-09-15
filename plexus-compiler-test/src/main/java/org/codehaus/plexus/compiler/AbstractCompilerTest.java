@@ -310,4 +310,20 @@ public abstract class AbstractCompilerTest {
 
         return javaVersion;
     }
+
+    /**
+     * Returns the feature version of the running JDK: 8 for {@code 1.8.x}, otherwise the leading number of
+     * {@code java.version}, such as 17 or 27.
+     */
+    protected int getJavaFeatureVersion() {
+        String javaVersion = System.getProperty("java.version");
+        if (javaVersion.startsWith("1.")) {
+            javaVersion = javaVersion.substring(2);
+        }
+        int end = 0;
+        while (end < javaVersion.length() && Character.isDigit(javaVersion.charAt(end))) {
+            end++;
+        }
+        return Integer.parseInt(javaVersion.substring(0, end));
+    }
 }
