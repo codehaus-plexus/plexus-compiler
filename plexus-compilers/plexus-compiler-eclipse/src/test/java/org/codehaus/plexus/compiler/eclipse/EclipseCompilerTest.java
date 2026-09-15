@@ -62,12 +62,8 @@ public class EclipseCompilerTest extends AbstractCompilerTest {
 
     @Override
     protected Collection<String> expectedOutputFiles() {
-        String javaVersion = getJavaVersion();
-        if (javaVersion.contains("9.0")
-                || javaVersion.contains("11")
-                || javaVersion.contains("17")
-                || javaVersion.contains("21")
-                || javaVersion.contains("25")) {
+        // assert is a keyword since Java 1.4, so ReservedWord does not compile on a modern source level
+        if (getJavaFeatureVersion() >= 9) {
             return Arrays.asList(
                     "org/codehaus/foo/Deprecation.class",
                     "org/codehaus/foo/ExternalDeps.class",

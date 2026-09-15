@@ -61,16 +61,12 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
 
     @Override
     protected int expectedErrors() {
-        String javaVersion = getJavaVersion();
-        if (javaVersion.contains("11")
-                || javaVersion.contains("17")
-                || javaVersion.contains("21")
-                || javaVersion.contains("25")) {
+        if (getJavaFeatureVersion() >= 11) {
             return 5;
         }
         // javac output changed for misspelled modifiers starting in 1.6...they now generate 2 errors per occurrence,
         // not one.
-        if ("1.5".compareTo(javaVersion) < 0) {
+        if ("1.5".compareTo(getJavaVersion()) < 0) {
             return 4;
         } else {
             return 3;
@@ -79,103 +75,46 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
 
     @Override
     protected int expectedWarnings() {
-        String javaVersion = getJavaVersion();
-        if (javaVersion.contains("11")
-                || javaVersion.contains("17")
-                || javaVersion.contains("21")
-                || javaVersion.contains("25")) {
+        if (getJavaFeatureVersion() >= 11) {
             return 1;
         }
+        String javaVersion = getJavaVersion();
         if (javaVersion.contains("1.8")) {
             // lots of new warnings about obsoletions for future releases
             return 30;
         }
-
         if ("1.6".compareTo(javaVersion) < 0) {
             // with 1.7 some warning with bootstrap class path not set in conjunction with -source 1.3
             return 9;
         }
-
         return 2;
     }
 
     @Override
     public String getTargetVersion() {
-        String javaVersion = getJavaVersion();
-        if (javaVersion.contains("9.0")) {
+        int javaFeatureVersion = getJavaFeatureVersion();
+        if (javaFeatureVersion >= 11) {
+            return Integer.toString(javaFeatureVersion);
+        } else if (getJavaVersion().contains("9.0")) {
             return "1.7";
-        } else if (javaVersion.contains("11")) {
-            return "11";
-        } else if (javaVersion.contains("14")) {
-            return "14";
-        } else if (javaVersion.contains("15")) {
-            return "15";
-        } else if (javaVersion.contains("16")) {
-            return "16";
-        } else if (javaVersion.contains("17")) {
-            return "17";
-        } else if (javaVersion.contains("18")) {
-            return "18";
-        } else if (javaVersion.contains("19")) {
-            return "19";
-        } else if (javaVersion.contains("20")) {
-            return "20";
-        } else if (javaVersion.contains("21")) {
-            return "21";
-        } else if (javaVersion.contains("22")) {
-            return "22";
-        } else if (javaVersion.contains("23")) {
-            return "23";
-        } else if (javaVersion.contains("24")) {
-            return "24";
-        } else if (javaVersion.contains("25")) {
-            return "25";
         }
         return super.getTargetVersion();
     }
 
     @Override
     public String getSourceVersion() {
-        String javaVersion = getJavaVersion();
-        if (javaVersion.contains("9.0")) {
+        int javaFeatureVersion = getJavaFeatureVersion();
+        if (javaFeatureVersion >= 11) {
+            return Integer.toString(javaFeatureVersion);
+        } else if (getJavaVersion().contains("9.0")) {
             return "1.7";
-        } else if (javaVersion.contains("11")) {
-            return "11";
-        } else if (javaVersion.contains("14")) {
-            return "14";
-        } else if (javaVersion.contains("15")) {
-            return "15";
-        } else if (javaVersion.contains("16")) {
-            return "16";
-        } else if (javaVersion.contains("17")) {
-            return "17";
-        } else if (javaVersion.contains("18")) {
-            return "18";
-        } else if (javaVersion.contains("19")) {
-            return "19";
-        } else if (javaVersion.contains("20")) {
-            return "20";
-        } else if (javaVersion.contains("21")) {
-            return "21";
-        } else if (javaVersion.contains("22")) {
-            return "22";
-        } else if (javaVersion.contains("23")) {
-            return "23";
-        } else if (javaVersion.contains("24")) {
-            return "24";
-        } else if (javaVersion.contains("25")) {
-            return "25";
         }
         return super.getSourceVersion();
     }
 
     @Override
     protected Collection<String> expectedOutputFiles() {
-        String javaVersion = getJavaVersion();
-        if (javaVersion.contains("11")
-                || javaVersion.contains("17")
-                || javaVersion.contains("21")
-                || javaVersion.contains("25")) {
+        if (getJavaFeatureVersion() >= 11) {
             return Arrays.asList(
                     "org/codehaus/foo/Deprecation.class",
                     "org/codehaus/foo/ExternalDeps.class",
