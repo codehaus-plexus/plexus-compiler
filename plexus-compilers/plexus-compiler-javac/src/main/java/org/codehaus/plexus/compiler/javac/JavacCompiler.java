@@ -224,8 +224,9 @@ public class JavacCompiler extends AbstractCompiler {
     /** Cache of javac version per executable (never invalidated) */
     private static final Map<String, String> VERSION_PER_EXECUTABLE = new ConcurrentHashMap<>();
 
+    // Sisu replaces this default by field injection; the default serves instances created by ServiceLoader
     @Inject
-    private InProcessCompiler inProcessCompiler;
+    private InProcessCompiler inProcessCompiler = new JavaxToolsCompiler();
 
     // ----------------------------------------------------------------------
     //

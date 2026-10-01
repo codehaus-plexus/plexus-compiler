@@ -20,6 +20,7 @@
     <module>plexus-compiler-manager</module>
     <module>plexus-compilers</module>
     <module>plexus-compiler-test</module>
+    <module>plexus-compiler-service-loader-test</module>
     <module>plexus-compiler-its</module>
   </modules>
 
