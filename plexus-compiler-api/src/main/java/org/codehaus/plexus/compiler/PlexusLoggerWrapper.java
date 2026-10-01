@@ -6,6 +6,10 @@ class PlexusLoggerWrapper implements org.codehaus.plexus.logging.Logger {
 
     private final Logger log;
 
+    static org.codehaus.plexus.logging.Logger wrap(Logger log) {
+        return new PlexusLoggerWrapper(log);
+    }
+
     PlexusLoggerWrapper(Logger log) {
         this.log = log;
     }

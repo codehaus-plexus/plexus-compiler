@@ -42,7 +42,10 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractCompiler implements Compiler {
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    private final org.codehaus.plexus.logging.Logger plexusLogger;
+    // created on first use, through a factory method so that verifying this class does not load the Plexus
+    // logging classes: the Plexus logging classes are optional, a compiler created without a container
+    // (see DefaultCompilerManager.fromServiceLoader) must not need them
+    private volatile org.codehaus.plexus.logging.Logger plexusLogger;
 
     protected static final String EOL = System.lineSeparator();
 
@@ -72,8 +75,6 @@ public abstract class AbstractCompiler implements Compiler {
         this.outputFileEnding = outputFileEnding;
 
         this.outputFile = outputFile;
-
-        this.plexusLogger = new PlexusLoggerWrapper(log);
     }
 
     /**
@@ -90,7 +91,11 @@ public abstract class AbstractCompiler implements Compiler {
      */
     @Deprecated
     protected org.codehaus.plexus.logging.Logger getLogger() {
-        return plexusLogger;
+        org.codehaus.plexus.logging.Logger result = plexusLogger;
+        if (result == null) {
+            plexusLogger = result = PlexusLoggerWrapper.wrap(log);
+        }
+        return result;
     }
 
     // ----------------------------------------------------------------------
