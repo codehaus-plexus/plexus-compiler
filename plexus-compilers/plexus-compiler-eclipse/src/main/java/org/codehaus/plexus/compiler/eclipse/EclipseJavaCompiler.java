@@ -198,10 +198,10 @@ public class EclipseJavaCompiler extends AbstractCompiler {
                     args.add("--processor-module-path");
                     args.add(getPathString(processorModulePathEntries));
                 }
+            }
 
-                if (config.getProc() != null) {
-                    args.add("-proc:" + config.getProc());
-                }
+            if (config.getProc() != null) {
+                args.add("-proc:" + config.getProc());
             }
         }
 
