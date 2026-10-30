@@ -42,7 +42,6 @@
 
   <properties>
     <scm.url>scm:git:https://github.com/codehaus-plexus/plexus-compiler.git</scm.url>
-    <javaVersion>8</javaVersion>
     <redirectTestOutputToFile>true</redirectTestOutputToFile>
     <project.build.outputTimestamp>2026-09-09T11:47:52Z</project.build.outputTimestamp>
     <aspectj.version>1.9.21</aspectj.version>
