@@ -14,7 +14,6 @@
   <name>Plexus Compiler It Tests</name>
 
   <properties>
-    <junit.version>4.13.2</junit.version>
     <javaVersion>21</javaVersion>
     <maven.deploy.skip>true</maven.deploy.skip>
   </properties>
