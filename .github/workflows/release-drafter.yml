@@ -4,6 +4,13 @@ on:
     branches:
       - master
   workflow_dispatch:
+
+permissions: {}
+
 jobs:
    update_release_draft:
+      # the called workflow drafts the release and reads merged pull requests
+      permissions:
+         contents: write
+         pull-requests: read
       uses: codehaus-plexus/.github/.github/workflows/release-drafter.yml@master
