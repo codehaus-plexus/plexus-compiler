@@ -519,35 +519,6 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
         internalTest(compilerConfiguration, expectedArguments, "11.0.1");
     }
 
-    /* This test fails on Java 1.4. The multiple parameters of the same source file cause an error, as it is interpreted as a DuplicateClass
-     * Setting the size of the array to 3 is fine, but does not exactly test what it is supposed to - disabling the test for now
-    public void testCommandLineTooLongWhenForking()
-        throws Exception
-    {
-        JavacCompiler compiler = (JavacCompiler) lookup( org.codehaus.plexus.compiler.Compiler.ROLE, getRoleHint() );
-
-        File destDir = new File( "target/test-classes-cmd" );
-        destDir.mkdirs();
-
-        // fill the cmd line arguments, 300 is enough to make it break
-        String[] args = new String[400];
-        args[0] = "-d";
-        args[1] = destDir.getAbsolutePath();
-        for ( int i = 2; i < args.length; i++ )
-        {
-            args[i] = "org/codehaus/foo/Person.java";
-        }
-
-        CompilerConfiguration config = new CompilerConfiguration();
-        config.setWorkingDirectory( new File( getBasedir() + "/src/test-input/src/main" ) );
-        config.setFork( true );
-
-        List messages = compiler.compileOutOfProcess( config, "javac", args );
-
-        assertEquals( "There were errors launching the external compiler: " + messages, 0, messages.size() );
-    }
-    */
-
     private void populateArguments(
             CompilerConfiguration compilerConfiguration,
             List<String> expectedArguments,
