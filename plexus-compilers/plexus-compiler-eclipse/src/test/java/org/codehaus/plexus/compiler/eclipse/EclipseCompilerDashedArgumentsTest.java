@@ -27,7 +27,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -60,7 +59,7 @@ public class EclipseCompilerDashedArgumentsTest {
         String sourceDir = getBasedir() + "/src/test-input/src/main";
 
         List<String> filenames = FileUtils.getFileNames(new File(sourceDir), "**/*.java", null, false, true);
-        Collections.sort(filenames);
+        filenames.sort(null);
         Set<File> files = new HashSet<>();
         for (String filename : filenames) {
             files.add(new File(filename));

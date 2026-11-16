@@ -194,7 +194,7 @@ public abstract class AbstractCompilerTest {
         String sourceDir = "src/test-input/src/main";
 
         List<String> filenames = FileUtils.getFileNames(new File(sourceDir), "**/*.java", null, false, true);
-        Collections.sort(filenames);
+        filenames.sort(null);
 
         List<CompilerConfiguration> compilerConfigurations = new ArrayList<>();
 
