@@ -37,7 +37,6 @@ import java.util.stream.Collectors;
 
 import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.StringUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -223,12 +222,12 @@ public abstract class AbstractCompilerTest {
             configureCompilerConfig(compilerConfig);
 
             String target = getTargetVersion();
-            if (StringUtils.isNotEmpty(target)) {
+            if (target != null && !target.isEmpty()) {
                 compilerConfig.setTargetVersion(target);
             }
 
             String source = getSourceVersion();
-            if (StringUtils.isNotEmpty(source)) {
+            if (source != null && !source.isEmpty()) {
                 compilerConfig.setSourceVersion(source);
             }
 

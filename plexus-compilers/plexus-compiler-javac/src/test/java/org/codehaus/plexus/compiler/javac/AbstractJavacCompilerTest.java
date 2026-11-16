@@ -33,7 +33,6 @@ import java.util.Map;
 
 import org.codehaus.plexus.compiler.AbstractCompilerTest;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
-import org.codehaus.plexus.util.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -565,7 +564,8 @@ public abstract class AbstractJavacCompilerTest extends AbstractCompilerTest {
 
         compilerConfiguration.setDebug(true);
 
-        if (StringUtils.isNotEmpty(compilerConfiguration.getDebugLevel())) {
+        if (compilerConfiguration.getDebugLevel() != null
+                && !compilerConfiguration.getDebugLevel().isEmpty()) {
             expectedArguments.add("-g:" + compilerConfiguration.getDebugLevel());
         } else {
             expectedArguments.add("-g");
