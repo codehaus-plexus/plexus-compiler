@@ -233,9 +233,7 @@ public abstract class AbstractCompiler implements Compiler {
                 if (canonical.startsWith(prefix)) {
                     String result = canonical.substring(prefix.length() + 1, canonical.length() - 5);
 
-                    result = result.replace('/', '.');
-
-                    return result;
+                    return result.replace('/', '.');
                 }
             } else {
                 File t = new File(sourceDir, fileName);

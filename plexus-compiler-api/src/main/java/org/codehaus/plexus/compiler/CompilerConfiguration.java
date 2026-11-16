@@ -112,7 +112,7 @@ public class CompilerConfiguration {
 
     private String compilerVersion;
 
-    private boolean verbose = false;
+    private boolean verbose;
 
     /**
      * @since 2.8.2
@@ -170,7 +170,7 @@ public class CompilerConfiguration {
      * force usage of old JavacCompiler even if javax.tools is detected
      * @since 2.0
      */
-    private boolean forceJavacCompilerUse = false;
+    private boolean forceJavacCompilerUse;
 
     /**
      * force a different of the debug file containing the forked command run (such javac.sh)

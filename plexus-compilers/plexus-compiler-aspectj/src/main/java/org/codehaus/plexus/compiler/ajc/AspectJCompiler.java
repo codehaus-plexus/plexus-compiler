@@ -382,7 +382,7 @@ public class AspectJCompiler extends AbstractCompiler {
         if (cp != null && !cp.isEmpty()) {
             List<String> elements = new ArrayList<>(cp.size());
             for (String path : cp) {
-                elements.add((new File(path)).getAbsolutePath());
+                elements.add(new File(path).getAbsolutePath());
             }
 
             buildConfig.setClasspath(elements);
@@ -493,7 +493,7 @@ public class AspectJCompiler extends AbstractCompiler {
             try {
                 URL[] urls = new URL[cp.size()];
                 for (int i = 0; i < urls.length; i++) {
-                    urls[i] = (new File(cp.get(i))).toURL();
+                    urls[i] = new File(cp.get(i)).toURL();
                 }
 
                 URLClassLoader cloader = new URLClassLoader(urls);

@@ -68,7 +68,7 @@ public class JavaxToolsCompiler implements InProcessCompiler {
             case ReuseCreated:
                 JavaCompiler javaCompiler;
                 synchronized (JAVA_COMPILERS) {
-                    if (JAVA_COMPILERS.size() > 0) {
+                    if (!JAVA_COMPILERS.isEmpty()) {
                         javaCompiler = JAVA_COMPILERS.get(0);
                         JAVA_COMPILERS.remove(javaCompiler);
                         return javaCompiler;

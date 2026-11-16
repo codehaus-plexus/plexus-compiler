@@ -29,7 +29,8 @@ import org.junit.jupiter.api.BeforeEach;
  */
 public class SimpleSourceInclusionScannerTest extends AbstractSourceInclusionScannerTest {
 
-    private Set<String> includes, excludes;
+    private Set<String> includes;
+    private Set<String> excludes;
 
     @BeforeEach
     public void setUp() throws Exception {

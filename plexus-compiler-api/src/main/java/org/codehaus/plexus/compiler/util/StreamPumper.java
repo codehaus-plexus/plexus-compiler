@@ -35,7 +35,7 @@ public class StreamPumper extends Thread {
 
     private final BufferedInputStream stream;
 
-    private boolean endOfStream = false;
+    private boolean endOfStream;
 
     private int SLEEP_TIME = 5;
 

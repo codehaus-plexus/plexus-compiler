@@ -49,11 +49,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @PlexusTest
 public abstract class AbstractCompilerTest {
-    private boolean compilerDebug = false;
+    private boolean compilerDebug;
 
-    private boolean compilerDeprecationWarnings = false;
+    private boolean compilerDeprecationWarnings;
 
-    private boolean forceJavacCompilerUse = false;
+    private boolean forceJavacCompilerUse;
 
     @Inject
     private Map<String, Compiler> compilers;
