@@ -1079,7 +1079,7 @@ public class JavacCompiler extends AbstractCompiler {
 
             final String message = msgBuffer.toString();
             final int startcolumn = Objects.requireNonNull(pointer).indexOf("^") + 1;
-            int endcolumn = (context == null) ? startcolumn : context.indexOf(" ", startcolumn);
+            int endcolumn = context == null ? startcolumn : context.indexOf(" ", startcolumn);
             if (endcolumn == -1) {
                 endcolumn = Objects.requireNonNull(context).length();
             }

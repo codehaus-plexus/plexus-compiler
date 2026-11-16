@@ -61,9 +61,7 @@ public class JarUtilTest {
         Files.createDirectories(extractDir);
 
         // Attempt to extract - should throw IOException due to path traversal attempt
-        IOException exception = assertThrows(IOException.class, () -> {
-            JarUtil.extract(extractDir, jarFile);
-        });
+        IOException exception = assertThrows(IOException.class, () -> JarUtil.extract(extractDir, jarFile));
 
         assertEquals("Bad zip entry", exception.getMessage());
 
@@ -131,9 +129,7 @@ public class JarUtilTest {
         Files.createDirectories(extractDir);
 
         // Attempt to extract - should throw IOException due to path traversal attempt
-        IOException exception = assertThrows(IOException.class, () -> {
-            JarUtil.extract(extractDir, jarFile);
-        });
+        IOException exception = assertThrows(IOException.class, () -> JarUtil.extract(extractDir, jarFile));
 
         assertEquals("Bad zip entry", exception.getMessage());
 

@@ -68,7 +68,7 @@ public class EclipseJavaCompiler extends AbstractCompiler {
     // ----------------------------------------------------------------------
     // Compiler Implementation
     // ----------------------------------------------------------------------
-    boolean errorsAsWarnings = false;
+    boolean errorsAsWarnings;
 
     @Override
     public String getCompilerId() {
@@ -178,14 +178,14 @@ public class EclipseJavaCompiler extends AbstractCompiler {
             List<String> processorModulePathEntries = config.getProcessorModulePathEntries();
 
             if (!annotationProcessors.isEmpty()
-                    || (processorPathEntries != null && processorPathEntries.size() > 0)
-                    || (processorModulePathEntries != null && processorModulePathEntries.size() > 0)) {
+                    || (processorPathEntries != null && !processorPathEntries.isEmpty())
+                    || (processorModulePathEntries != null && !processorModulePathEntries.isEmpty())) {
                 if (!annotationProcessors.isEmpty()) {
                     args.add("-processor");
                     args.add(annotationProcessors);
                 }
 
-                if (processorPathEntries != null && processorPathEntries.size() > 0) {
+                if (processorPathEntries != null && !processorPathEntries.isEmpty()) {
                     if (isReplaceProcessorPath(config)) {
                         args.add("--processor-module-path");
                     } else {
@@ -194,7 +194,7 @@ public class EclipseJavaCompiler extends AbstractCompiler {
                     args.add(getPathString(processorPathEntries));
                 }
 
-                if (processorModulePathEntries != null && processorModulePathEntries.size() > 0) {
+                if (processorModulePathEntries != null && !processorModulePathEntries.isEmpty()) {
                     args.add("--processor-module-path");
                     args.add(getPathString(processorModulePathEntries));
                 }
@@ -390,7 +390,7 @@ public class EclipseJavaCompiler extends AbstractCompiler {
     static boolean isReplaceProcessorPath(CompilerConfiguration config) {
         for (Entry<String, String> entry : config.getCustomCompilerArgumentsEntries()) {
             String opt = entry.getKey();
-            if (opt.equals(OPT_REPLACE_PROCESSOR_PATH) || opt.equals(OPT_REPLACE_PROCESSOR_PATH_)) {
+            if (OPT_REPLACE_PROCESSOR_PATH.equals(opt) || OPT_REPLACE_PROCESSOR_PATH_.equals(opt)) {
                 return true;
             }
         }
@@ -423,12 +423,12 @@ public class EclipseJavaCompiler extends AbstractCompiler {
             String optionValue = entry.getValue();
 
             // handle errorsAsWarnings options
-            if (opt.equals("errorsAsWarnings") || opt.equals("-errorsAsWarnings")) {
+            if ("errorsAsWarnings".equals(opt) || "-errorsAsWarnings".equals(opt)) {
                 result = true;
                 continue;
             }
 
-            if (opt.equals("-properties")) {
+            if ("-properties".equals(opt)) {
                 if (null != optionValue) {
                     File propFile = new File(optionValue);
                     if (!propFile.exists() || !propFile.isFile()) {
@@ -440,13 +440,13 @@ public class EclipseJavaCompiler extends AbstractCompiler {
 
             // -- Write .class files even when error occur, but make sure methods with compile errors do abort when
             // called
-            if (opt.equals("-proceedOnError")) {
+            if ("-proceedOnError".equals(opt)) {
                 // Generate a class file even with errors, but make methods with errors fail when called
                 args.add("-proceedOnError:Fatal");
                 continue;
             }
 
-            if (!opt.equals(OPT_REPLACE_PROCESSOR_PATH) && !opt.equals(OPT_REPLACE_PROCESSOR_PATH_)) {
+            if (!OPT_REPLACE_PROCESSOR_PATH.equals(opt) && !OPT_REPLACE_PROCESSOR_PATH_.equals(opt)) {
                 /*
                  * The compiler mojo makes quite a mess of passing arguments, depending on exactly WHICH
                  * way is used to pass them. The method method using <compilerArguments> uses the tag names
@@ -612,7 +612,7 @@ public class EclipseJavaCompiler extends AbstractCompiler {
             return null;
         }
 
-        if (versionSpec.equals("1.9")) {
+        if ("1.9".equals(versionSpec)) {
             getLog().warn("Version 9 should be specified as 9, not 1.9");
             return "9";
         }
