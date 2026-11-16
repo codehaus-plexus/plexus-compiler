@@ -644,7 +644,8 @@ public class JavacCompiler extends AbstractCompiler {
 
             File commandLineFile = new File(
                     config.getBuildDirectory(),
-                    StringUtils.trim(debugFileName) + "." + (Os.isFamily(Os.FAMILY_WINDOWS) ? "bat" : "sh"));
+                    (debugFileName == null ? null : debugFileName.trim()) + "."
+                            + (Os.isFamily(Os.FAMILY_WINDOWS) ? "bat" : "sh"));
             try {
                 FileUtils.fileWrite(
                         commandLineFile.getAbsolutePath(), cli.toString().replaceAll("'", ""));
