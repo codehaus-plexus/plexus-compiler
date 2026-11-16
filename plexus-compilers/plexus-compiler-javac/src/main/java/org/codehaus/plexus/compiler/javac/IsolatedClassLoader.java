@@ -37,6 +37,7 @@ public class IsolatedClassLoader extends URLClassLoader {
         super.addURL(url);
     }
 
+    @Override
     public synchronized Class<?> loadClass(String className) throws ClassNotFoundException {
         Class<?> c = findLoadedClass(className);
 

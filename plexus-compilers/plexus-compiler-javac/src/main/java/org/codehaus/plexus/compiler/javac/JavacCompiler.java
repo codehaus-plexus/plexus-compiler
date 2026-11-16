@@ -374,6 +374,7 @@ public class JavacCompiler extends AbstractCompiler {
         }
     }
 
+    @Override
     public String[] createCommandLine(CompilerConfiguration config) throws CompilerException {
         final String javacVersion;
         if (config.isFork()) {

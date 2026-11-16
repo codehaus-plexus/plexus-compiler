@@ -305,6 +305,7 @@ public class AspectJCompiler extends AbstractCompiler {
         return "aspectj";
     }
 
+    @Override
     public CompilerResult performCompile(CompilerConfiguration config) throws CompilerException {
         File destinationDir = new File(config.getOutputLocation());
 
@@ -582,6 +583,7 @@ public class AspectJCompiler extends AbstractCompiler {
     /**
      * @return null
      */
+    @Override
     public String[] createCommandLine(CompilerConfiguration config) throws CompilerException {
         return null;
     }

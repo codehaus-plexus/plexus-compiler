@@ -92,6 +92,7 @@ public class JavaxToolsCompiler implements InProcessCompiler {
         }
     }
 
+    @Override
     public CompilerResult compileInProcess(String[] args, final CompilerConfiguration config, String[] sourceFiles)
             throws CompilerException {
         JavaCompiler compiler = getJavaCompiler(config);

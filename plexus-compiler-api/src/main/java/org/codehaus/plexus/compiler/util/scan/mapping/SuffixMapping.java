@@ -41,6 +41,7 @@ public final class SuffixMapping implements SourceMapping {
         this.targetSuffixes = Collections.unmodifiableSet(targetSuffixes);
     }
 
+    @Override
     public Set<File> getTargetFiles(File targetDir, String source) {
         Set<File> targetFiles = new HashSet<>();
 

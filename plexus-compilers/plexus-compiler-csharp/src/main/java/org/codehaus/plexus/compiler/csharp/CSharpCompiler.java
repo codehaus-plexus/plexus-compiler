@@ -76,14 +76,17 @@ public class CSharpCompiler extends AbstractCompiler {
         return "csharp";
     }
 
+    @Override
     public boolean canUpdateTarget(CompilerConfiguration configuration) {
         return false;
     }
 
+    @Override
     public String getOutputFile(CompilerConfiguration configuration) throws CompilerException {
         return configuration.getOutputFileName() + "." + getTypeExtension(configuration);
     }
 
+    @Override
     public CompilerResult performCompile(CompilerConfiguration config) throws CompilerException {
         File destinationDir = new File(config.getOutputLocation());
 
@@ -115,6 +118,7 @@ public class CSharpCompiler extends AbstractCompiler {
         return new CompilerResult().compilerMessages(messages);
     }
 
+    @Override
     public String[] createCommandLine(CompilerConfiguration config) throws CompilerException {
         return buildCompilerArguments(config, CSharpCompiler.getSourceFiles(config));
     }

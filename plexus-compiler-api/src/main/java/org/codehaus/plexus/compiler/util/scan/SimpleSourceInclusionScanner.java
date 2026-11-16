@@ -45,6 +45,7 @@ public class SimpleSourceInclusionScanner extends AbstractSourceInclusionScanner
         this.sourceExcludes = sourceExcludes;
     }
 
+    @Override
     public Set<File> getIncludedSources(File sourceDir, File targetDir) throws InclusionScanException {
         List<SourceMapping> srcMappings = getSourceMappings();
 

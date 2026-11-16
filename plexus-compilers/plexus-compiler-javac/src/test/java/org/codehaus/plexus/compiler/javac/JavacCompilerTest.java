@@ -58,11 +58,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Alexander Kriegisch
  */
 public class JavacCompilerTest extends AbstractJavacCompilerTest {
-    private static final String EOL = System.getProperty("line.separator");
+    private static final String EOL = System.lineSeparator();
     private static final String UNIDENTIFIABLE_LOG_LINES =
             "These log lines should be cut off\n" + "when preceding known error message headers\n";
 
     @BeforeEach
+    @Override
     public void setUp() {
         super.setUp();
         setForceJavacCompilerUse(true);

@@ -31,6 +31,7 @@ import org.codehaus.plexus.util.DirectoryScanner;
 public abstract class AbstractSourceInclusionScanner implements SourceInclusionScanner {
     private final List<SourceMapping> sourceMappings = new ArrayList<>();
 
+    @Override
     public final void addSourceMapping(SourceMapping sourceMapping) {
         sourceMappings.add(sourceMapping);
     }

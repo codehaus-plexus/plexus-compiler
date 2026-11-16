@@ -48,10 +48,12 @@ public final class CompilerOutputStyle {
     //
     // ----------------------------------------------------------------------
 
+    @Override
     public String toString() {
         return id;
     }
 
+    @Override
     public boolean equals(Object other) {
         if (!(other instanceof CompilerOutputStyle)) {
             return false;
@@ -60,6 +62,7 @@ public final class CompilerOutputStyle {
         return id.equals(((CompilerOutputStyle) other).id);
     }
 
+    @Override
     public int hashCode() {
         return id.hashCode();
     }
