@@ -51,7 +51,6 @@ import org.codehaus.plexus.compiler.CompilerException;
 import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.compiler.CompilerOutputStyle;
 import org.codehaus.plexus.compiler.CompilerResult;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.jdt.core.compiler.CompilationProgress;
 import org.eclipse.jdt.core.compiler.batch.BatchCompiler;
 
@@ -109,7 +108,7 @@ public class EclipseJavaCompiler extends AbstractCompiler {
             }
         }
 
-        if (StringUtils.isNotEmpty(config.getSourceEncoding())) {
+        if (config.getSourceEncoding() != null && !config.getSourceEncoding().isEmpty()) {
             args.add("-encoding");
             args.add(config.getSourceEncoding());
         }
@@ -118,8 +117,9 @@ public class EclipseJavaCompiler extends AbstractCompiler {
             args.add("-warn:none");
         } else {
             String warnings = config.getWarnings();
-            StringBuilder warns =
-                    StringUtils.isEmpty(warnings) ? new StringBuilder() : new StringBuilder(warnings).append(',');
+            StringBuilder warns = warnings == null || warnings.isEmpty()
+                    ? new StringBuilder()
+                    : new StringBuilder(warnings).append(',');
 
             if (config.isShowDeprecation()) {
                 append(warns, "+deprecation");
@@ -608,7 +608,7 @@ public class EclipseJavaCompiler extends AbstractCompiler {
      * changing the compiler plugin. This is important with the half year release cycle for Java.
      */
     private String decodeVersion(String versionSpec) {
-        if (StringUtils.isEmpty(versionSpec)) {
+        if (versionSpec == null || versionSpec.isEmpty()) {
             return null;
         }
 

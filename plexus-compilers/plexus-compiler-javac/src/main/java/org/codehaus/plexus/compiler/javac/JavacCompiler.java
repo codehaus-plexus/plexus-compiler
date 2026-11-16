@@ -80,7 +80,6 @@ import org.codehaus.plexus.compiler.CompilerOutputStyle;
 import org.codehaus.plexus.compiler.CompilerResult;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.Os;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
@@ -458,7 +457,7 @@ public class JavacCompiler extends AbstractCompiler {
         }
 
         if (config.isDebug()) {
-            if (StringUtils.isNotEmpty(config.getDebugLevel())) {
+            if (config.getDebugLevel() != null && !config.getDebugLevel().isEmpty()) {
                 args.add("-g:" + config.getDebugLevel());
             } else {
                 args.add("-g");
@@ -493,7 +492,7 @@ public class JavacCompiler extends AbstractCompiler {
         } else {
             String warnings = config.getWarnings();
             if (config.isShowLint()) {
-                if (config.isShowWarnings() && StringUtils.isNotEmpty(warnings)) {
+                if (config.isShowWarnings() && (warnings != null && !warnings.isEmpty())) {
                     args.add("-Xlint:" + warnings);
                 } else {
                     args.add("-Xlint");
@@ -505,12 +504,14 @@ public class JavacCompiler extends AbstractCompiler {
             args.add("-Werror");
         }
 
-        if (JavaVersion.JAVA_9.isOlderOrEqualTo(javacVersion) && !StringUtils.isEmpty(config.getReleaseVersion())) {
+        if (JavaVersion.JAVA_9.isOlderOrEqualTo(javacVersion)
+                && !(config.getReleaseVersion() == null
+                        || config.getReleaseVersion().isEmpty())) {
             args.add("--release");
             args.add(toReleaseArgument(config.getReleaseVersion()));
         } else {
             // TODO: this could be much improved
-            if (StringUtils.isEmpty(config.getTargetVersion())) {
+            if (config.getTargetVersion() == null || config.getTargetVersion().isEmpty()) {
                 // Required, or it defaults to the target of your JDK (eg 1.5)
                 args.add("-target");
                 args.add("1.1");
@@ -519,7 +520,9 @@ public class JavacCompiler extends AbstractCompiler {
                 args.add(config.getTargetVersion());
             }
 
-            if (JavaVersion.JAVA_1_4.isOlderOrEqualTo(javacVersion) && StringUtils.isEmpty(config.getSourceVersion())) {
+            if (JavaVersion.JAVA_1_4.isOlderOrEqualTo(javacVersion)
+                    && (config.getSourceVersion() == null
+                            || config.getSourceVersion().isEmpty())) {
                 // If omitted, later JDKs complain about a 1.1 target
                 args.add("-source");
                 args.add("1.3");
@@ -529,12 +532,14 @@ public class JavacCompiler extends AbstractCompiler {
             }
         }
 
-        if (JavaVersion.JAVA_1_4.isOlderOrEqualTo(javacVersion) && !StringUtils.isEmpty(config.getSourceEncoding())) {
+        if (JavaVersion.JAVA_1_4.isOlderOrEqualTo(javacVersion)
+                && !(config.getSourceEncoding() == null
+                        || config.getSourceEncoding().isEmpty())) {
             args.add("-encoding");
             args.add(config.getSourceEncoding());
         }
 
-        if (!StringUtils.isEmpty(config.getModuleVersion())) {
+        if (!(config.getModuleVersion() == null || config.getModuleVersion().isEmpty())) {
             args.add("--module-version");
             args.add(config.getModuleVersion());
         }
@@ -542,13 +547,13 @@ public class JavacCompiler extends AbstractCompiler {
         for (Map.Entry<String, String> entry : config.getCustomCompilerArgumentsEntries()) {
             String key = entry.getKey();
 
-            if (StringUtils.isEmpty(key) || key.startsWith("-J")) {
+            if ((key == null || key.isEmpty()) || key.startsWith("-J")) {
                 continue;
             }
 
             args.add(key);
             String value = entry.getValue();
-            if (StringUtils.isEmpty(value)) {
+            if (value == null || value.isEmpty()) {
                 continue;
             }
             args.add(value);
@@ -619,15 +624,15 @@ public class JavacCompiler extends AbstractCompiler {
             cli.addArguments(
                     new String[] {"@" + argumentsFile.getCanonicalPath().replace(File.separatorChar, '/')});
 
-            if (!StringUtils.isEmpty(config.getMaxmem())) {
+            if (!(config.getMaxmem() == null || config.getMaxmem().isEmpty())) {
                 cli.addArguments(new String[] {"-J-Xmx" + config.getMaxmem()});
             }
-            if (!StringUtils.isEmpty(config.getMeminitial())) {
+            if (!(config.getMeminitial() == null || config.getMeminitial().isEmpty())) {
                 cli.addArguments(new String[] {"-J-Xms" + config.getMeminitial()});
             }
 
             for (String key : config.getCustomCompilerArgumentsAsMap().keySet()) {
-                if (StringUtils.isNotEmpty(key) && key.startsWith("-J")) {
+                if ((key != null && !key.isEmpty()) && key.startsWith("-J")) {
                     cli.addArguments(new String[] {key});
                 }
             }
@@ -640,7 +645,10 @@ public class JavacCompiler extends AbstractCompiler {
         List<CompilerMessage> messages;
 
         if (getLog().isDebugEnabled()) {
-            String debugFileName = StringUtils.isEmpty(config.getDebugFileName()) ? "javac" : config.getDebugFileName();
+            String debugFileName = config.getDebugFileName() == null
+                            || config.getDebugFileName().isEmpty()
+                    ? "javac"
+                    : config.getDebugFileName();
 
             File commandLineFile = new File(
                     config.getBuildDirectory(),
@@ -1188,7 +1196,7 @@ public class JavacCompiler extends AbstractCompiler {
     protected String getJavacExecutable(CompilerConfiguration config) {
         String executable = config.getExecutable();
 
-        if (StringUtils.isEmpty(executable)) {
+        if (executable == null || executable.isEmpty()) {
             try {
                 executable = getJavacExecutable();
             } catch (IOException e) {
@@ -1227,7 +1235,7 @@ public class JavacCompiler extends AbstractCompiler {
         if (!javacExe.isFile()) {
             Properties env = CommandLineUtils.getSystemEnvVars();
             javaHome = env.getProperty("JAVA_HOME");
-            if (StringUtils.isEmpty(javaHome)) {
+            if (javaHome == null || javaHome.isEmpty()) {
                 throw new IOException("The environment variable JAVA_HOME is not correctly set.");
             }
             if (!new File(javaHome).isDirectory()) {

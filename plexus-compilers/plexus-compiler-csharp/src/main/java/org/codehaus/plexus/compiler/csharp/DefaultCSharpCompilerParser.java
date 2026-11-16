@@ -2,7 +2,6 @@ package org.codehaus.plexus.compiler.csharp;
 
 import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.compiler.CompilerMessage.Kind;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Handles output from both mono with only the line number
@@ -136,9 +135,9 @@ public class DefaultCSharpCompilerParser {
                 colnum = "-1";
             }
 
-            startline = StringUtils.isEmpty(linenum) ? -1 : Integer.parseInt(linenum);
+            startline = linenum == null || linenum.isEmpty() ? -1 : Integer.parseInt(linenum);
 
-            startcolumn = StringUtils.isEmpty(colnum) ? -1 : Integer.parseInt(colnum);
+            startcolumn = colnum == null || colnum.isEmpty() ? -1 : Integer.parseInt(colnum);
 
             endline = startline;
 

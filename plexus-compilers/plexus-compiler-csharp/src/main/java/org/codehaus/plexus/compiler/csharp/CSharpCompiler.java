@@ -44,7 +44,6 @@ import org.codehaus.plexus.compiler.CompilerResult;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.Os;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
@@ -158,7 +157,7 @@ public class CSharpCompiler extends AbstractCompiler {
     private String findExecutable(CompilerConfiguration config) {
         String executable = config.getExecutable();
 
-        if (!StringUtils.isEmpty(executable)) {
+        if (!(executable == null || executable.isEmpty())) {
             return executable;
         }
 
@@ -426,32 +425,32 @@ public class CSharpCompiler extends AbstractCompiler {
         Map<String, String> compilerArguments = getCompilerArguments(config);
 
         String mainClass = compilerArguments.get("-main");
-        if (!StringUtils.isEmpty(mainClass)) {
+        if (!(mainClass == null || mainClass.isEmpty())) {
             args.add("/main:" + mainClass);
         }
 
         // Xml Doc output
         String doc = compilerArguments.get("-doc");
-        if (!StringUtils.isEmpty(doc)) {
+        if (!(doc == null || doc.isEmpty())) {
             args.add("/doc:"
                     + new File(config.getOutputLocation(), config.getOutputFileName() + ".xml").getAbsolutePath());
         }
 
         // Debug option (full, pdbonly...)
         String debug = compilerArguments.get("-debug");
-        if (!StringUtils.isEmpty(debug)) {
+        if (!(debug == null || debug.isEmpty())) {
             args.add("/debug:" + debug);
         }
 
         // Nowarn option (w#1,w#2...)
         String nowarn = compilerArguments.get("-nowarn");
-        if (!StringUtils.isEmpty(nowarn)) {
+        if (!(nowarn == null || nowarn.isEmpty())) {
             args.add("/nowarn:" + nowarn);
         }
 
         // Out - Override output name, this is required for generating the unit test dll
         String out = compilerArguments.get("-out");
-        if (!StringUtils.isEmpty(out)) {
+        if (!(out == null || out.isEmpty())) {
             args.add("/out:" + new File(config.getOutputLocation(), out).getAbsolutePath());
         } else {
             args.add("/out:" + new File(config.getOutputLocation(), getOutputFile(config)).getAbsolutePath());
@@ -459,14 +458,14 @@ public class CSharpCompiler extends AbstractCompiler {
 
         // Resource File - compile in a resource file into the assembly being created
         String resourcefile = compilerArguments.get("-resourcefile");
-        if (!StringUtils.isEmpty(resourcefile)) {
+        if (!(resourcefile == null || resourcefile.isEmpty())) {
             String resourceTarget = compilerArguments.get("-resourcetarget");
             args.add("/res:" + new File(resourcefile).getAbsolutePath() + "," + resourceTarget);
         }
 
         // Target - type of assembly to produce: library,exe,winexe...
         String target = compilerArguments.get("-target");
-        if (StringUtils.isEmpty(target)) {
+        if (target == null || target.isEmpty()) {
             args.add("/target:library");
         } else {
             args.add("/target:" + target);
@@ -474,25 +473,25 @@ public class CSharpCompiler extends AbstractCompiler {
 
         // remove MS logo from output (not applicable for mono)
         String nologo = compilerArguments.get("-nologo");
-        if (!StringUtils.isEmpty(nologo) && !"false".equalsIgnoreCase(nologo)) {
+        if (!(nologo == null || nologo.isEmpty()) && !"false".equalsIgnoreCase(nologo)) {
             args.add("/nologo");
         }
 
         // Unsafe option
         String unsafe = compilerArguments.get("-unsafe");
-        if (!StringUtils.isEmpty(unsafe) && "true".equalsIgnoreCase(unsafe)) {
+        if (!(unsafe == null || unsafe.isEmpty()) && "true".equalsIgnoreCase(unsafe)) {
             args.add("/unsafe");
         }
 
         // PreferredUILang option
         String preferreduilang = compilerArguments.get("-preferreduilang");
-        if (!StringUtils.isEmpty(preferreduilang)) {
+        if (!(preferreduilang == null || preferreduilang.isEmpty())) {
             args.add("/preferreduilang:" + preferreduilang);
         }
 
         // Utf8Output option
         String utf8output = compilerArguments.get("-utf8output");
-        if (!StringUtils.isEmpty(utf8output) && !"false".equals(utf8output)) {
+        if (!(utf8output == null || utf8output.isEmpty()) && !"false".equals(utf8output)) {
             args.add("/utf8output");
         }
 
@@ -643,7 +642,7 @@ public class CSharpCompiler extends AbstractCompiler {
     private String getType(Map<String, String> compilerArguments) {
         String type = compilerArguments.get("-target");
 
-        if (StringUtils.isEmpty(type)) {
+        if (type == null || type.isEmpty()) {
             return "library";
         }
 
