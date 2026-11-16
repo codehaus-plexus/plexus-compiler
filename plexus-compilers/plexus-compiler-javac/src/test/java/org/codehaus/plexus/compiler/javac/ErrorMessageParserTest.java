@@ -24,7 +24,6 @@ package org.codehaus.plexus.compiler.javac;
  * SOFTWARE.
  */
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -172,7 +171,7 @@ public class ErrorMessageParserTest {
     }
 
     @Test
-    public void testTwoErrors() throws IOException {
+    public void testTwoErrors() throws Exception {
         String errors = "./org/codehaus/foo/ExternalDeps.java:4: package org.apache.commons.lang does not exist" + EOL
                 + "import org.apache.commons.lang.StringUtils;"
                 + EOL + "                               ^"
@@ -191,7 +190,7 @@ public class ErrorMessageParserTest {
     }
 
     @Test
-    public void testAnotherTwoErrors() throws IOException {
+    public void testAnotherTwoErrors() throws Exception {
         String errors = "./org/codehaus/foo/ExternalDeps.java:4: package org.apache.commons.lang does not exist" + EOL
                 + "import org.apache.commons.lang.StringUtils;"
                 + EOL + "                               ^"
@@ -210,7 +209,7 @@ public class ErrorMessageParserTest {
     }
 
     @Test
-    public void testAssertError() throws IOException {
+    public void testAssertError() throws Exception {
         String errors =
                 "./org/codehaus/foo/ReservedWord.java:5: as of release 1.4, 'assert' is a keyword, and may not be used as an identifier"
                         + EOL + "(try -source 1.3 or lower to use 'assert' as an identifier)"
@@ -226,7 +225,7 @@ public class ErrorMessageParserTest {
     }
 
     @Test
-    public void testLocalizedWarningNotTreatedAsError() throws IOException {
+    public void testLocalizedWarningNotTreatedAsError() throws Exception {
         String errors =
                 "./src/main/java/Main.java:9: \u8b66\u544a:[deprecation] java.io.File \u306e toURL() \u306f\u63a8\u5968\u3055\u308c\u307e\u305b\u3093\u3002"
                         + EOL + "    new File( path ).toURL()"
@@ -812,8 +811,8 @@ public class ErrorMessageParserTest {
 
         String message = compilerMessages.get(0).getMessage().replaceAll(EOL, "\n");
         // Parser retains neither unidentified log lines nor slightly modified stack trace header
-        assertTrue(!message.contains(UNIDENTIFIED_LOG_LINES));
-        assertTrue(!message.contains(stackTraceHeader));
+        assertFalse(message.contains(UNIDENTIFIED_LOG_LINES));
+        assertFalse(message.contains(stackTraceHeader));
         // Parser returns stack strace without any preceding lines
         assertTrue(message.startsWith(stackTraceInternalCompilerError));
     }
@@ -1037,7 +1036,7 @@ public class ErrorMessageParserTest {
     }
 
     @Test
-    public void testNonAnchoredWarning() throws IOException {
+    public void testNonAnchoredWarning() throws Exception {
         final String error = "warning: [options] bootstrap class path not set in conjunction with -source 1.6" + EOL
                 + "1 warning" + EOL;
 
@@ -1054,7 +1053,7 @@ public class ErrorMessageParserTest {
     }
 
     @Test
-    public void testAnchoredWarning() throws IOException {
+    public void testAnchoredWarning() throws Exception {
         final String error = "C:\\repo\\src\\it\\includes-output-when-compiler-forked\\src\\main"
                 + "\\java\\MyClass.java:23: warning: [divzero] division by zero"
                 + EOL + "      System.out.println(1/0);"
@@ -1080,7 +1079,7 @@ public class ErrorMessageParserTest {
     }
 
     @Test
-    public void testMixedWarnings() throws IOException {
+    public void testMixedWarnings() throws Exception {
         final String error = "warning: [options] bootstrap class path not set in conjunction with -source 1.6" + EOL
                 + "C:\\repo\\src\\it\\includes-output-when-compiler-forked\\src\\main\\java"
                 + "\\MyClass.java:23: warning: [divzero] division by zero"
@@ -1111,7 +1110,7 @@ public class ErrorMessageParserTest {
     }
 
     @Test
-    public void testIssue37() throws IOException {
+    public void testIssue37() throws Exception {
         String error =
                 "warning: [path] bad path element \"d:\\maven_repo\\.m2\\repository\\org\\ow2\\asm\\asm-xml\\5.0.3\\asm-5.0.3.jar\": no such file or directory"
                         + EOL
@@ -1273,7 +1272,7 @@ public class ErrorMessageParserTest {
     }
 
     @Test
-    public void testUnrecognisedOutputIsReportedWhenCompilationFails() throws IOException {
+    public void testUnrecognisedOutputIsReportedWhenCompilationFails() throws Exception {
         String output = "some diagnostic nobody taught this parser about" + EOL + "and a second line of it" + EOL;
 
         List<CompilerMessage> messages =
@@ -1286,7 +1285,7 @@ public class ErrorMessageParserTest {
     }
 
     @Test
-    public void testUnrecognisedOutputIsIgnoredWhenCompilationSucceeds() throws IOException {
+    public void testUnrecognisedOutputIsIgnoredWhenCompilationSucceeds() throws Exception {
         String output = "some diagnostic nobody taught this parser about" + EOL;
 
         List<CompilerMessage> messages =
@@ -1296,7 +1295,7 @@ public class ErrorMessageParserTest {
     }
 
     @Test
-    public void testCountSummaryAloneIsNotReported() throws IOException {
+    public void testCountSummaryAloneIsNotReported() throws Exception {
         String output = "2 errors" + EOL;
 
         List<CompilerMessage> messages =
@@ -1310,7 +1309,7 @@ public class ErrorMessageParserTest {
      * classifiers match them and they used to be dropped, leaving the failure unexplained.
      */
     @Test
-    public void testWerrorWarningsAreReported() throws IOException {
+    public void testWerrorWarningsAreReported() throws Exception {
         String output =
                 "gson-2.10.2-SNAPSHOT.jar(/com/google/gson/JsonParser.class): warning: Cannot find annotation method 'replacement()' in type 'InlineMe'"
                         + EOL + "error: warnings found and -Werror specified"
@@ -1327,7 +1326,7 @@ public class ErrorMessageParserTest {
     }
 
     @Test
-    public void testNoteIsReported() throws IOException {
+    public void testNoteIsReported() throws Exception {
         String output = "Note: SomeFile.java uses unchecked or unsafe operations." + EOL;
 
         List<CompilerMessage> messages =
@@ -1345,7 +1344,7 @@ public class ErrorMessageParserTest {
      * <a href="https://inside.java/2023/07/29/quality-heads-up/">the JDK quality heads-up</a>.
      */
     @Test
-    public void testMultiLineNoteIsReportedAsASingleMessage() throws IOException {
+    public void testMultiLineNoteIsReportedAsASingleMessage() throws Exception {
         List<CompilerMessage> messages =
                 JavacCompiler.parseModernStream(0, new BufferedReader(new StringReader(ANNOTATION_PROCESSING_NOTE)));
 
@@ -1364,7 +1363,7 @@ public class ErrorMessageParserTest {
      * swallowed everything that followed it.
      */
     @Test
-    public void testMultiLineNoteDoesNotSwallowLaterDiagnostics() throws IOException {
+    public void testMultiLineNoteDoesNotSwallowLaterDiagnostics() throws Exception {
         String output = ANNOTATION_PROCESSING_NOTE + "warning: [options] bootstrap class path not set" + EOL;
 
         List<CompilerMessage> messages =
@@ -1381,7 +1380,7 @@ public class ErrorMessageParserTest {
      * buffer would have surfaced as a compiler error.
      */
     @Test
-    public void testMultiLineNoteIsNotReportedAsAnErrorWhenCompilationFails() throws IOException {
+    public void testMultiLineNoteIsNotReportedAsAnErrorWhenCompilationFails() throws Exception {
         String output = ANNOTATION_PROCESSING_NOTE + "error: cannot find symbol" + EOL;
 
         List<CompilerMessage> messages =
@@ -1402,7 +1401,7 @@ public class ErrorMessageParserTest {
      * identity. This is the interleaving where the note state and the pending-error flush meet.
      */
     @Test
-    public void testNoteFollowedByAnchoredDiagnostic() throws IOException {
+    public void testNoteFollowedByAnchoredDiagnostic() throws Exception {
         String output = "Note: SomeFile.java uses unchecked or unsafe operations." + EOL
                 + "target/compiler-src/Foo.java:1: warning: something is off" + EOL
                 + "public class Foo {}" + EOL
@@ -1421,7 +1420,7 @@ public class ErrorMessageParserTest {
      * The reverse order, which exercises the pending-error flush running before a note is recognised.
      */
     @Test
-    public void testAnchoredDiagnosticFollowedByNote() throws IOException {
+    public void testAnchoredDiagnosticFollowedByNote() throws Exception {
         String output = "target/compiler-src/Foo.java:1: warning: something is off" + EOL
                 + "public class Foo {}" + EOL
                 + "       ^" + EOL
@@ -1441,7 +1440,7 @@ public class ErrorMessageParserTest {
      * The deprecation and unchecked notes always arrive as a pair of single-line notes.
      */
     @Test
-    public void testConsecutiveNotesStaySeparate() throws IOException {
+    public void testConsecutiveNotesStaySeparate() throws Exception {
         String output = "Note: Some input files use or override a deprecated API." + EOL
                 + "Note: Recompile with -Xlint:deprecation for details." + EOL;
 
@@ -1462,7 +1461,7 @@ public class ErrorMessageParserTest {
      * a second time as unrecognised output.
      */
     @Test
-    public void testMultiLineNoteAtEndOfStreamIsReportedOnceWhenCompilationFails() throws IOException {
+    public void testMultiLineNoteAtEndOfStreamIsReportedOnceWhenCompilationFails() throws Exception {
         List<CompilerMessage> messages =
                 JavacCompiler.parseModernStream(1, new BufferedReader(new StringReader(ANNOTATION_PROCESSING_NOTE)));
 
@@ -1475,7 +1474,7 @@ public class ErrorMessageParserTest {
      * absorbed into it.
      */
     @Test
-    public void testTabIndentedStackTraceDoesNotContinueANote() throws IOException {
+    public void testTabIndentedStackTraceDoesNotContinueANote() throws Exception {
         String output = "Note: SomeFile.java uses unchecked or unsafe operations." + EOL
                 + "\tat com.sun.tools.javac.comp.Attr.visitIdent(Attr.java:1)" + EOL
                 + "\tat com.sun.tools.javac.tree.JCTree.accept(JCTree.java:2)" + EOL;
@@ -1499,7 +1498,7 @@ public class ErrorMessageParserTest {
      * asymmetry lives in the shared API module and outlives this parser.
      */
     @Test
-    public void testLocalisedNoteKeepsItsPrefixAndItsContinuation() throws IOException {
+    public void testLocalisedNoteKeepsItsPrefixAndItsContinuation() throws Exception {
         String output = "\u6ce8: \u6ce8\u91c8\u51e6\u7406\u304c\u6709\u52b9\u3067\u3059" + EOL
                 + "  \u30af\u30e9\u30b9\u30d1\u30b9\u4e0a\u306b\u898b\u3064\u304b\u308a\u307e\u3057\u305f" + EOL;
 

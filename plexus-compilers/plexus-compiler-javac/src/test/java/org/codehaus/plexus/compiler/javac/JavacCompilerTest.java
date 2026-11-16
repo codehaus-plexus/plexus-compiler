@@ -5,7 +5,6 @@ import javax.tools.JavaFileObject;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -72,7 +71,7 @@ public class JavacCompilerTest extends AbstractJavacCompilerTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource("testParseModernStream_withAnnotationProcessingErrors_args")
     void testParseModernStream_withAnnotationProcessingErrors(String jdkAndLocale, String stackTraceHeader)
-            throws IOException {
+            throws Exception {
         String stackTraceWithHeader = UNIDENTIFIABLE_LOG_LINES + stackTraceHeader + stackTraceAnnotationProcessingError;
         List<CompilerMessage> compilerMessages =
                 JavacCompiler.parseModernStream(1, new BufferedReader(new StringReader(stackTraceWithHeader)));
