@@ -58,6 +58,7 @@ public class StaleSourceScanner extends AbstractSourceInclusionScanner {
     // SourceInclusionScanner Implementation
     // ----------------------------------------------------------------------
 
+    @Override
     public Set<File> getIncludedSources(File sourceDir, File targetDir) throws InclusionScanException {
         List<SourceMapping> srcMappings = getSourceMappings();
 

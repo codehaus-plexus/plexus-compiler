@@ -54,6 +54,7 @@ public class DefaultCompilerManager implements CompilerManager {
     // CompilerManager Implementation
     // ----------------------------------------------------------------------
 
+    @Override
     public Compiler getCompiler(String compilerId) throws NoSuchCompilerException {
         // Provider<Class> is lazy -> presence of provider means compiler is present, but not yet constructed
         Provider<Compiler> compilerProvider = compilers.get(compilerId);

@@ -45,6 +45,7 @@ public class SingleTargetSourceMapping implements SourceMapping {
         this.outputFile = outputFile;
     }
 
+    @Override
     public Set<File> getTargetFiles(File targetDir, String source) throws InclusionScanException {
         if (!source.endsWith(sourceSuffix)) {
             return Collections.emptySet();

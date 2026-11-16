@@ -59,6 +59,7 @@ public class StreamPumper extends Thread {
         }
     }
 
+    @Override
     public void run() {
         try {
             while (!endOfStream) {

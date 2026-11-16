@@ -566,7 +566,7 @@ public class EclipseJavaCompiler extends AbstractCompiler {
         for (int i = lineList.size() - 1; i >= 0; i--) {
             String s = lineList.get(i);
             sb.append(s);
-            sb.append(System.getProperty("line.separator")); // 8-/
+            sb.append(System.lineSeparator()); // 8-/
         }
         return sb.toString();
     }

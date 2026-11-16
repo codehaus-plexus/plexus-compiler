@@ -49,7 +49,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Alexander Kriegisch
  */
 public class ErrorMessageParserTest {
-    private static final String EOL = System.getProperty("line.separator");
+    private static final String EOL = System.lineSeparator();
     private static final String ANNOTATION_PROCESSING_NOTE =
             "Note: Annotation processing is enabled because one or more processors were found" + EOL
                     + "  on the class path. A future release of javac may disable annotation processing" + EOL
