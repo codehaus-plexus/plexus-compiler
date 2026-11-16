@@ -159,6 +159,27 @@ public class JavacCompilerTest extends AbstractJavacCompilerTest {
         assertEquals(inProcessMessage.getMessage(), forkedMessage.getMessage());
     }
 
+    @Test
+    void testCommandLineTooLongWhenForking(@TempDir Path tempDirectory) throws Exception {
+        Path sourceDirectory = tempDirectory.resolve("src");
+        Files.createDirectories(sourceDirectory);
+        // enough source files to overflow a command line; the forked javac must read them from an argument file
+        int sources = 400;
+        for (int i = 0; i < sources; i++) {
+            Files.write(
+                    sourceDirectory.resolve("Source" + i + ".java"),
+                    Arrays.asList("class Source" + i + " {}"),
+                    StandardCharsets.UTF_8);
+        }
+
+        CompilerResult forked = compile(tempDirectory, sourceDirectory, true);
+
+        assertTrue(forked.isSuccess(), "forked javac failed: " + forked.getCompilerMessages());
+        try (Stream<Path> classes = Files.list(tempDirectory.resolve("forked/classes"))) {
+            assertEquals(sources, classes.count());
+        }
+    }
+
     private static String getFileName(String path) {
         int separator = Math.max(path.lastIndexOf('/'), path.lastIndexOf('\\'));
         return path.substring(separator + 1);
