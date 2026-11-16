@@ -24,7 +24,6 @@ package org.codehaus.plexus.compiler.csharp;
  * SOFTWARE.
  */
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
 
@@ -41,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  */
 public class CSharpCompilerTest {
     @Test
-    public void testParser() throws IOException {
+    public void testParser() throws Exception {
         CompilerMessage error;
 
         // ----------------------------------------------------------------------
