@@ -56,6 +56,8 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
@@ -78,7 +80,6 @@ import org.codehaus.plexus.compiler.CompilerException;
 import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.compiler.CompilerOutputStyle;
 import org.codehaus.plexus.compiler.CompilerResult;
-import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
@@ -656,8 +657,9 @@ public class JavacCompiler extends AbstractCompiler {
                     (debugFileName == null ? null : debugFileName.trim()) + "."
                             + (Os.isFamily(Os.FAMILY_WINDOWS) ? "bat" : "sh"));
             try {
-                FileUtils.fileWrite(
-                        commandLineFile.getAbsolutePath(), cli.toString().replaceAll("'", ""));
+                Files.write(
+                        commandLineFile.toPath(),
+                        cli.toString().replaceAll("'", "").getBytes(StandardCharsets.UTF_8));
 
                 if (!Os.isFamily(Os.FAMILY_WINDOWS)) {
                     Runtime.getRuntime().exec(new String[] {"chmod", "a+x", commandLineFile.getAbsolutePath()});
