@@ -28,11 +28,16 @@ import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 import java.util.Map;
 
 import org.codehaus.plexus.testing.PlexusTest;
-import org.codehaus.plexus.util.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
@@ -133,7 +138,7 @@ public abstract class AbstractCompilerTckTest {
         File compilerOutput = getCompilerOutput();
 
         if (compilerOutput.exists()) {
-            FileUtils.deleteDirectory(compilerOutput);
+            AbstractCompilerTckTest.deleteDirectory(compilerOutput.toPath());
         }
 
         configuration.setOutputLocation(compilerOutput.getAbsolutePath());
@@ -183,7 +188,7 @@ public abstract class AbstractCompilerTckTest {
                 + EOL + "    }"
                 + EOL + "}";
 
-        FileUtils.fileWrite(path.getAbsolutePath(), source);
+        Files.write(path.toPath(), source.getBytes(StandardCharsets.UTF_8));
     }
 
     protected void writeFileWithWarning(File path, String className) throws IOException {
@@ -201,6 +206,46 @@ public abstract class AbstractCompilerTckTest {
                 + EOL + "    }"
                 + EOL + "}";
 
-        FileUtils.fileWrite(path.getAbsolutePath(), source);
+        Files.write(path.toPath(), source.getBytes(StandardCharsets.UTF_8));
+    }
+
+    static void deleteDirectory(final Path directory) throws IOException {
+        if (!Files.exists(directory)) {
+            return;
+        }
+        final IOException[] failure = new IOException[1];
+        Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+                try {
+                    Files.delete(file);
+                } catch (IOException e) {
+                    failure[0] = e;
+                }
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFileFailed(Path file, IOException exc) {
+                failure[0] = exc;
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
+                if (exc != null) {
+                    failure[0] = exc;
+                }
+                try {
+                    Files.delete(dir);
+                } catch (IOException e) {
+                    failure[0] = e;
+                }
+                return FileVisitResult.CONTINUE;
+            }
+        });
+        if (failure[0] != null) {
+            throw failure[0];
+        }
     }
 }
