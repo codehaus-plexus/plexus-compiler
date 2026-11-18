@@ -35,8 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.codehaus.plexus.util.StringUtils;
-
 /**
  * @author jdcasey
  */
@@ -692,7 +690,7 @@ public class CompilerConfiguration {
 
         // base options: debug, optimize, verbose, deprecation
         if (isDebug()) {
-            if (StringUtils.isNotEmpty(getDebugLevel())) {
+            if (getDebugLevel() != null && !getDebugLevel().isEmpty()) {
                 params.add("debug:" + getDebugLevel());
             } else {
                 params.add("debug");
@@ -712,9 +710,9 @@ public class CompilerConfiguration {
         }
 
         // target bytecode options: release or target, module-path
-        if (!StringUtils.isEmpty(getReleaseVersion())) {
+        if (getReleaseVersion() != null && !getReleaseVersion().isEmpty()) {
             params.add("release " + getReleaseVersion());
-        } else if (!StringUtils.isEmpty(getTargetVersion())) {
+        } else if (getTargetVersion() != null && !getTargetVersion().isEmpty()) {
             params.add("target " + getTargetVersion());
         }
         if (getModulepathEntries() != null && !getModulepathEntries().isEmpty()) {

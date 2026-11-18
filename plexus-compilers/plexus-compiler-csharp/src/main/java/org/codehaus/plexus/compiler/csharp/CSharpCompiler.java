@@ -42,7 +42,6 @@ import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.compiler.CompilerOutputStyle;
 import org.codehaus.plexus.compiler.CompilerResult;
 import org.codehaus.plexus.util.DirectoryScanner;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
@@ -567,22 +566,14 @@ public class CSharpCompiler extends AbstractCompiler {
         // Build the @arguments file
         // ----------------------------------------------------------------------
 
-        File file;
+        File file = new File(target, ARGUMENTS_FILE_NAME);
 
-        PrintWriter output = null;
-
-        try {
-            file = new File(target, ARGUMENTS_FILE_NAME);
-
-            output = new PrintWriter(new FileWriter(file));
-
+        try (PrintWriter output = new PrintWriter(new FileWriter(file))) {
             for (String arg : args) {
                 output.println(arg);
             }
         } catch (IOException e) {
             throw new CompilerException("Error writing arguments file.", e);
-        } finally {
-            IOUtil.close(output);
         }
 
         // ----------------------------------------------------------------------
