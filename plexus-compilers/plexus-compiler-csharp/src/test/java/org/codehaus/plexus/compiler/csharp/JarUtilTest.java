@@ -26,14 +26,19 @@ package org.codehaus.plexus.compiler.csharp;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -42,99 +47,60 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Tests for JarUtil to verify protection against Zip Slip vulnerability.
  */
-public class JarUtilTest {
+class JarUtilTest {
 
-    @Test
-    public void testZipSlipProtection(@TempDir Path tempDir) throws Exception {
-        // Create a malicious JAR with a path traversal entry
-        File jarFile = tempDir.resolve("malicious.jar").toFile();
-        try (JarOutputStream jos = new JarOutputStream(new FileOutputStream(jarFile))) {
-            // Try to escape the extraction directory using path traversal
-            JarEntry entry = new JarEntry("../../evil.txt");
-            jos.putNextEntry(entry);
-            jos.write("malicious content".getBytes());
-            jos.closeEntry();
-        }
+    @TempDir
+    Path tempDir;
 
-        // Create extraction directory
-        Path extractDir = tempDir.resolve("extract");
-        Files.createDirectories(extractDir);
+    @ParameterizedTest(name = "rejects traversal entry: {0}")
+    @ValueSource(strings = {"../../evil.txt", "subdir/../../evil.txt"})
+    @DisplayName("Path traversal entries are rejected")
+    void zipSlipProtection(String entryName) throws Exception {
+        File jarFile = createJar("malicious.jar", entryName, "malicious content");
+        Path extractDir = Files.createDirectories(tempDir.resolve("extract"));
 
-        // Attempt to extract - should throw IOException due to path traversal attempt
         IOException exception = assertThrows(IOException.class, () -> JarUtil.extract(extractDir, jarFile));
 
-        assertEquals("Bad zip entry", exception.getMessage());
-
-        // Verify that the file was not created outside the extraction directory
-        Path evilFile = tempDir.resolve("evil.txt");
-        assertFalse(Files.exists(evilFile), "Evil file should not exist");
+        assertAll(
+                () -> assertEquals("Bad zip entry", exception.getMessage()),
+                () -> assertFalse(Files.exists(tempDir.resolve("evil.txt")), "Evil file should not exist"));
     }
 
     @Test
-    public void testNormalExtraction(@TempDir Path tempDir) throws Exception {
-        // Create a normal JAR with valid entries
+    void normalExtraction() throws Exception {
         File jarFile = tempDir.resolve("normal.jar").toFile();
         try (JarOutputStream jos = new JarOutputStream(new FileOutputStream(jarFile))) {
-            // Add a normal file entry
-            JarEntry entry = new JarEntry("file.txt");
-            jos.putNextEntry(entry);
-            jos.write("normal content".getBytes());
-            jos.closeEntry();
-
-            // Add a file in a subdirectory
-            JarEntry dirEntry = new JarEntry("subdir/");
-            jos.putNextEntry(dirEntry);
-            jos.closeEntry();
-
-            JarEntry subFileEntry = new JarEntry("subdir/subfile.txt");
-            jos.putNextEntry(subFileEntry);
-            jos.write("subdirectory content".getBytes());
-            jos.closeEntry();
+            addEntry(jos, "file.txt", "normal content");
+            addEntry(jos, "subdir/", null);
+            addEntry(jos, "subdir/subfile.txt", "subdirectory content");
         }
 
-        // Create extraction directory
-        Path extractDir = tempDir.resolve("extract");
-        Files.createDirectories(extractDir);
-
-        // Extract the JAR - should succeed without exception
+        Path extractDir = Files.createDirectories(tempDir.resolve("extract"));
         JarUtil.extract(extractDir, jarFile);
 
-        // Verify files were created correctly
-        Path extractedFile = extractDir.resolve("file.txt");
-        assertTrue(Files.exists(extractedFile), "File should exist");
-        assertEquals("normal content", new String(Files.readAllBytes(extractedFile)), "File content should match");
-
-        Path extractedSubFile = extractDir.resolve("subdir/subfile.txt");
-        assertTrue(Files.exists(extractedSubFile), "Subdir file should exist");
-        assertEquals(
-                "subdirectory content",
-                new String(Files.readAllBytes(extractedSubFile)),
-                "Subdir file content should match");
+        assertExtracted(extractDir.resolve("file.txt"), "normal content");
+        assertExtracted(extractDir.resolve("subdir/subfile.txt"), "subdirectory content");
     }
 
-    @Test
-    public void testZipSlipWithComplexPath(@TempDir Path tempDir) throws Exception {
-        // Create a malicious JAR with a more complex path traversal
-        File jarFile = tempDir.resolve("complex-malicious.jar").toFile();
+    private File createJar(String name, String entryName, String content) throws IOException {
+        File jarFile = tempDir.resolve(name).toFile();
         try (JarOutputStream jos = new JarOutputStream(new FileOutputStream(jarFile))) {
-            // Use a path like "subdir/../../evil.txt"
-            JarEntry entry = new JarEntry("subdir/../../evil.txt");
-            jos.putNextEntry(entry);
-            jos.write("malicious content".getBytes());
-            jos.closeEntry();
+            addEntry(jos, entryName, content);
         }
+        return jarFile;
+    }
 
-        // Create extraction directory
-        Path extractDir = tempDir.resolve("extract");
-        Files.createDirectories(extractDir);
+    private static void addEntry(JarOutputStream jar, String name, String content) throws IOException {
+        jar.putNextEntry(new JarEntry(name));
+        if (content != null) {
+            jar.write(content.getBytes(StandardCharsets.UTF_8));
+        }
+        jar.closeEntry();
+    }
 
-        // Attempt to extract - should throw IOException due to path traversal attempt
-        IOException exception = assertThrows(IOException.class, () -> JarUtil.extract(extractDir, jarFile));
-
-        assertEquals("Bad zip entry", exception.getMessage());
-
-        // Verify that the file was not created outside the extraction directory
-        Path evilFile = tempDir.resolve("evil.txt");
-        assertFalse(Files.exists(evilFile), "Evil file should not exist");
+    private static void assertExtracted(Path path, String expectedContent) throws IOException {
+        assertAll(
+                () -> assertTrue(Files.exists(path), "File should exist: " + path),
+                () -> assertEquals(expectedContent, new String(Files.readAllBytes(path), StandardCharsets.UTF_8)));
     }
 }

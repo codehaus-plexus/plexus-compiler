@@ -102,4 +102,11 @@ public abstract class AbstractSourceInclusionScannerTest {
             fWriter.write("This is just a test file.");
         }
     }
+
+    /** Writes a test file and sets its last-modified time in one step. */
+    protected File writeFile(File file, long lastModified) throws IOException {
+        writeFile(file);
+        file.setLastModified(lastModified);
+        return file;
+    }
 }

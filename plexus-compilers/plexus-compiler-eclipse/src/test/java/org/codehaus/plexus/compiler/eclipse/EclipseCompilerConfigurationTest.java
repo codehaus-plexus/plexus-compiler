@@ -30,13 +30,15 @@ import java.util.List;
 
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class EclipseCompilerConfigurationTest {
+class EclipseCompilerConfigurationTest {
     private static final String PROPERTIES_FILE_NAME =
             "src/test/resources".replace("/", File.separator) + File.separator
                     + EclipseCompilerConfigurationTest.class.getName().replace(".", File.separator)
@@ -45,68 +47,67 @@ public class EclipseCompilerConfigurationTest {
     private CompilerConfiguration configuration;
 
     @BeforeEach
-    protected void setUp() {
+    void setUp() {
         configuration = new CompilerConfiguration();
     }
 
     @Test
-    public void testProcessCustomArgumentsWithMultipleAddExports() {
+    @DisplayName("Each --add-exports entry is emitted as a key/value pair")
+    void multipleAddExports() {
         configuration.addCompilerCustomArgument("--add-exports", "FROM-MOD/package1=OTHER-MOD");
         configuration.addCompilerCustomArgument("--add-exports", "FROM-MOD/package2=OTHER-MOD");
+
         List<String> args = new ArrayList<>();
         EclipseJavaCompiler.processCustomArguments(configuration, args);
+
         assertEquals(4, args.size());
-        assertEquals("--add-exports", args.get(0));
-        assertEquals("FROM-MOD/package1=OTHER-MOD", args.get(1));
-        assertEquals("--add-exports", args.get(2));
-        assertEquals("FROM-MOD/package2=OTHER-MOD", args.get(3));
-        //        assertThat( args.get( 0 ), is("--add-exports") );
-        //        assertThat( args.get( 1 ), is("FROM-MOD/package1=OTHER-MOD") );
-        //        assertThat( args.get( 2 ), is("--add-exports") );
-        //        assertThat( args.get( 3 ), is("FROM-MOD/package2=OTHER-MOD") );
+        assertAll(
+                () -> assertEquals("--add-exports", args.get(0)),
+                () -> assertEquals("FROM-MOD/package1=OTHER-MOD", args.get(1)),
+                () -> assertEquals("--add-exports", args.get(2)),
+                () -> assertEquals("FROM-MOD/package2=OTHER-MOD", args.get(3)));
     }
 
     @Test
-    public void testProcessCustomArgumentsWithProceedOnError() {
+    void proceedOnErrorIsTranslatedToFatal() {
         configuration.addCompilerCustomArgument("-proceedOnError", null);
+
         List<String> args = new ArrayList<>();
         EclipseJavaCompiler.processCustomArguments(configuration, args);
-        assertEquals(1, args.size());
-        assertEquals("-proceedOnError:Fatal", args.get(0));
+
+        assertAll(() -> assertEquals(1, args.size()), () -> assertEquals("-proceedOnError:Fatal", args.get(0)));
     }
 
     @Test
-    public void testProcessCustomArgumentsWithErrorsAsWarnings() {
+    void errorsAsWarningsIsRecognizedWithAndWithoutDash() {
         configuration.addCompilerCustomArgument("errorsAsWarnings", null);
-        List<String> args = new ArrayList<>();
-        final boolean errorsAsWarnings = EclipseJavaCompiler.processCustomArguments(configuration, args);
-        assertTrue(errorsAsWarnings);
-    }
+        assertTrue(EclipseJavaCompiler.processCustomArguments(configuration, new ArrayList<>()));
 
-    @Test
-    public void testProcessCustomArgumentsWithErrorsAsWarningsAndMinus() {
         configuration.addCompilerCustomArgument("-errorsAsWarnings", null);
-        List<String> args = new ArrayList<>();
-        final boolean errorsAsWarnings = EclipseJavaCompiler.processCustomArguments(configuration, args);
-        assertTrue(errorsAsWarnings);
+        assertTrue(EclipseJavaCompiler.processCustomArguments(configuration, new ArrayList<>()));
     }
 
     @Test
-    public void testProcessCustomArgumentsWithPropertiesAndNonExistingFile() {
+    void missingPropertiesFileIsRejected() {
         configuration.addCompilerCustomArgument("-properties", "fooBar.txt");
+
         IllegalArgumentException expected = assertThrows(
                 IllegalArgumentException.class,
                 () -> EclipseJavaCompiler.processCustomArguments(configuration, Collections.emptyList()));
+
         assertEquals("Properties file specified by -properties fooBar.txt does not exist", expected.getMessage());
     }
 
     @Test
-    public void testProcessCustomArgumentsWithPropertiesAndValidFile() {
+    void validPropertiesFileIsPassedThrough() {
         configuration.addCompilerCustomArgument("-properties", PROPERTIES_FILE_NAME);
+
         List<String> args = new ArrayList<>();
         EclipseJavaCompiler.processCustomArguments(configuration, args);
-        assertEquals(2, args.size());
-        assertEquals("-properties", args.get(0));
-        assertEquals(PROPERTIES_FILE_NAME, args.get(1));
+
+        assertAll(
+                () -> assertEquals(2, args.size()),
+                () -> assertEquals("-properties", args.get(0)),
+                () -> assertEquals(PROPERTIES_FILE_NAME, args.get(1)));
     }
 }

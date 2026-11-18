@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.codehaus.plexus.compiler.javac.JavacCompiler.Messages.*;
@@ -105,33 +106,27 @@ public class JavacCompilerTest extends AbstractJavacCompilerTest {
                     + "\tat jdk.compiler/com.sun.tools.javac.Main.main(Main.java:50)\n";
 
     private static Stream<Arguments> testParseModernStream_withAnnotationProcessingErrors_args() {
-        return Stream.of(
-                Arguments.of("JDK 8 English", ANNOTATION_PROCESSING_ERROR_HEADERS[0]),
-                Arguments.of("JDK 8 Japanese", ANNOTATION_PROCESSING_ERROR_HEADERS[1]),
-                Arguments.of("JDK 8 Chinese", ANNOTATION_PROCESSING_ERROR_HEADERS[2]),
-                Arguments.of("JDK 21 English", ANNOTATION_PROCESSING_ERROR_HEADERS[3]),
-                Arguments.of("JDK 21 Japanese", ANNOTATION_PROCESSING_ERROR_HEADERS[4]),
-                Arguments.of("JDK 21 Chinese", ANNOTATION_PROCESSING_ERROR_HEADERS[5]),
-                Arguments.of("JDK 21 German", ANNOTATION_PROCESSING_ERROR_HEADERS[6]));
+        return ErrorMessageParserTest.localizedHeaders(ANNOTATION_PROCESSING_ERROR_HEADERS);
     }
 
-    @Test
-    void testJavaVersionPrefixes() {
-        assertFalse(JavaVersion.JAVA_1_4.isOlderOrEqualTo("1.3"));
-        assertTrue(JavaVersion.JAVA_1_4.isOlderOrEqualTo("1.4"));
-        assertTrue(JavaVersion.JAVA_1_4.isOlderOrEqualTo("1.4.0_something"));
-        assertFalse(JavaVersion.JAVA_1_5.isOlderOrEqualTo("1.4"));
-        assertTrue(JavaVersion.JAVA_1_8.isOlderOrEqualTo("1.8"));
-        assertTrue(JavaVersion.JAVA_1_8.isOlderOrEqualTo("22.0.2-something"));
-        assertTrue(JavaVersion.JAVA_1_8.isOlderOrEqualTo("unknown"));
+    @ParameterizedTest(name = "{0} isOlderOrEqualTo {1} -> {2}")
+    @CsvSource({
+        "JAVA_1_4, 1.3, false",
+        "JAVA_1_4, 1.4, true",
+        "JAVA_1_4, 1.4.0_something, true",
+        "JAVA_1_5, 1.4, false",
+        "JAVA_1_8, 1.8, true",
+        "JAVA_1_8, 22.0.2-something, true",
+        "JAVA_1_8, unknown, true"
+    })
+    void javaVersionPrefixes(JavaVersion version, String otherVersion, boolean expected) {
+        assertEquals(expected, version.isOlderOrEqualTo(otherVersion));
     }
 
-    @Test
-    void testExtractMajorAndMinorVersion() {
-        assertEquals("11.0", JavacCompiler.extractMajorAndMinorVersion("javac 11.0.22"));
-        assertEquals("11.0", JavacCompiler.extractMajorAndMinorVersion("11.0.22"));
-        assertEquals("21", JavacCompiler.extractMajorAndMinorVersion("javac 21"));
-        assertEquals("1.8", JavacCompiler.extractMajorAndMinorVersion("javac 1.8.0_432"));
+    @ParameterizedTest(name = "extract {0} -> {1}")
+    @CsvSource({"javac 11.0.22, 11.0", "11.0.22, 11.0", "javac 21, 21", "javac 1.8.0_432, 1.8"})
+    void extractMajorAndMinorVersion(String text, String expected) {
+        assertEquals(expected, JavacCompiler.extractMajorAndMinorVersion(text));
     }
 
     @Test

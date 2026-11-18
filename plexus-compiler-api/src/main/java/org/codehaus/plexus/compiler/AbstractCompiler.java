@@ -206,15 +206,7 @@ public abstract class AbstractCompiler implements Compiler {
             }
         }
 
-        String[] result;
-
-        if (sources.isEmpty()) {
-            result = new String[0];
-        } else {
-            result = sources.toArray(new String[0]);
-        }
-
-        return result;
+        return sources.toArray(new String[0]);
     }
 
     protected static String makeClassName(String fileName, String sourceDir) throws CompilerException {
