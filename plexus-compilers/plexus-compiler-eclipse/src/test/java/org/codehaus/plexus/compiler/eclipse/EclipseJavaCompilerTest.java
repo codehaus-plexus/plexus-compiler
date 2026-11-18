@@ -1,7 +1,9 @@
 package org.codehaus.plexus.compiler.eclipse;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -28,6 +30,53 @@ class EclipseJavaCompilerTest {
         List<String> resorted = EclipseJavaCompiler.resortSourcesToPutModuleInfoFirst(inputSources);
 
         assertEquals(expected, resorted);
+    }
+
+    @Test
+    void sourcePathIsPassedToEcj() {
+        CompilerConfiguration config = new CompilerConfiguration();
+        config.addSourceLocation("/src/main/java");
+        config.addSourceLocation("/src/generated/java");
+        List<String> args = new ArrayList<>();
+
+        EclipseJavaCompiler.addSourcePathArgument(config, args);
+
+        assertEquals(
+                asList(
+                        "-sourcepath",
+                        "/src/main/java" + File.pathSeparator + "/src/generated/java" + File.pathSeparator),
+                args);
+    }
+
+    @Test
+    void noSourcePathArgumentWithoutSourceLocations() {
+        List<String> args = new ArrayList<>();
+
+        EclipseJavaCompiler.addSourcePathArgument(new CompilerConfiguration(), args);
+
+        assertTrue(args.isEmpty());
+    }
+
+    @Test
+    void compilesSourceSubsetWithReferencesToOtherSourcesInSameRoot() throws Exception {
+        Path sourceDirectory = tempDir.resolve("subset-src");
+        Files.createDirectories(sourceDirectory.resolve("demo"));
+        Files.writeString(sourceDirectory.resolve("demo/A.java"), "package demo;\n\npublic class A { B b; }\n");
+        Files.writeString(sourceDirectory.resolve("demo/B.java"), "package demo;\n\npublic class B {}\n");
+
+        Path outputDirectory = tempDir.resolve("subset-classes");
+        Files.createDirectories(outputDirectory);
+
+        CompilerConfiguration config = new CompilerConfiguration();
+        config.setSourceVersion("17");
+        config.addSourceLocation(sourceDirectory.toString());
+        config.addInclude("demo/A.java");
+        config.setOutputLocation(outputDirectory.toString());
+
+        CompilerResult result = new EclipseJavaCompiler().performCompile(config);
+
+        assertTrue(result.isSuccess(), () -> "Compilation failed: " + result.getCompilerMessages());
+        assertTrue(Files.exists(outputDirectory.resolve("demo/A.class")));
     }
 
     @Test

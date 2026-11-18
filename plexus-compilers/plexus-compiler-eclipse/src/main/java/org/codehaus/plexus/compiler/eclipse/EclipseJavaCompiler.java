@@ -160,6 +160,8 @@ public class EclipseJavaCompiler extends AbstractCompiler {
             args.add(getPathString(modulepathEntries));
         }
 
+        addSourcePathArgument(config, args);
+
         // Annotation processors defined?
         // must be done after classpath: https://bugs.eclipse.org/bugs/show_bug.cgi?id=573833
         if (!isPreJava1_6(config)) {
@@ -395,6 +397,16 @@ public class EclipseJavaCompiler extends AbstractCompiler {
             }
         }
         return false;
+    }
+
+    static void addSourcePathArgument(CompilerConfiguration config, List<String> args) {
+        List<String> sourceLocations = config.getSourceLocations();
+        if (sourceLocations != null && !sourceLocations.isEmpty()) {
+            // Always pass the source path, even when source files are listed explicitly:
+            // annotation processors use SOURCE_PATH to resolve the other sources in the root.
+            args.add("-sourcepath");
+            args.add(getPathString(sourceLocations));
+        }
     }
 
     static List<String> resortSourcesToPutModuleInfoFirst(List<String> allSources) {
