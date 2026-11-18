@@ -58,6 +58,12 @@
               <debug>false</debug>
               <streamLogsOnFailures>true</streamLogsOnFailures>
               <projectsDirectory>src/main/it</projectsDirectory>
+              <pomExcludes>
+                <!-- Reproducer kept for when ECJ fixes https://github.com/eclipse-jdt/eclipse.jdt.core/issues/5759.
+                     Remove this exclusion and bump ECJ to enable it. See
+                     https://github.com/codehaus-plexus/plexus-compiler/issues/548. -->
+                <pomExclude>ecj-single-module-sourcepath/pom.xml</pomExclude>
+              </pomExcludes>
               <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
               <postBuildHookScript>verify</postBuildHookScript>
               <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
