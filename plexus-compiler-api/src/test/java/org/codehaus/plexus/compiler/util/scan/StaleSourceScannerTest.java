@@ -26,6 +26,7 @@ import org.codehaus.plexus.compiler.util.scan.mapping.SuffixMapping;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -33,419 +34,199 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author jdcasey
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  */
-public class StaleSourceScannerTest extends AbstractSourceInclusionScannerTest {
+class StaleSourceScannerTest extends AbstractSourceInclusionScannerTest {
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() {
         scanner = new StaleSourceScanner();
     }
 
     @Test
-    public void testWithDefaultConstructorShouldFindOneStaleSource() throws Exception {
+    void defaultConstructorFindsOneStaleSource() throws Exception {
         File base = new File(getTestBaseDir(), "test1");
-
         long now = System.currentTimeMillis();
 
-        File targetFile = new File(base, "file.xml");
+        writeFile(new File(base, "file.xml"), now - 60000);
+        File sourceFile = writeFile(new File(base, "file.java"), now);
 
-        writeFile(targetFile);
-
-        targetFile.setLastModified(now - 60000);
-
-        File sourceFile = new File(base, "file.java");
-
-        writeFile(sourceFile);
-
-        sourceFile.setLastModified(now);
-
-        SuffixMapping mapping = new SuffixMapping(".java", ".xml");
-
-        scanner.addSourceMapping(mapping);
+        addJavaToXmlMapping();
 
         Set<File> result = scanner.getIncludedSources(base, base);
 
-        assertEquals(1, result.size(), "wrong number of stale sources returned.");
-
-        assertTrue(result.contains(sourceFile), "expected stale source file not found in result");
+        assertAll(
+                () -> assertEquals(1, result.size(), "wrong number of stale sources returned"),
+                () -> assertTrue(result.contains(sourceFile), "expected stale source file not found in result"));
     }
 
     @Test
-    public void testWithDefaultConstructorShouldNotFindStaleSources() throws Exception {
+    void defaultConstructorDoesNotFindStaleSourcesForUpToDateTarget() throws Exception {
         File base = new File(getTestBaseDir(), "test2");
-
         long now = System.currentTimeMillis();
 
-        File sourceFile = new File(base, "file.java");
+        writeFile(new File(base, "file.java"), now - 60000);
+        writeFile(new File(base, "file.xml"), now);
 
-        writeFile(sourceFile);
+        addJavaToXmlMapping();
 
-        sourceFile.setLastModified(now - 60000);
-
-        File targetFile = new File(base, "file.xml");
-
-        writeFile(targetFile);
-
-        targetFile.setLastModified(now);
-
-        SuffixMapping mapping = new SuffixMapping(".java", ".xml");
-
-        scanner.addSourceMapping(mapping);
-
-        Set<File> result = scanner.getIncludedSources(base, base);
-
-        assertEquals(0, result.size(), "wrong number of stale sources returned.");
-
-        assertTrue(result.isEmpty(), "expected stale source file not found in result");
+        assertTrue(scanner.getIncludedSources(base, base).isEmpty(), "expected no stale sources");
     }
 
     @Test
-    public void testWithDefaultConstructorShouldFindStaleSourcesBecauseOfMissingTargetFile() throws Exception {
+    void defaultConstructorFindsStaleSourceWhenTargetIsMissing() throws Exception {
         File base = new File(getTestBaseDir(), "test3");
 
-        File sourceFile = new File(base, "file.java");
+        File sourceFile = writeFile(new File(base, "file.java"), System.currentTimeMillis());
 
-        writeFile(sourceFile);
-
-        SuffixMapping mapping = new SuffixMapping(".java", ".xml");
-
-        scanner.addSourceMapping(mapping);
+        addJavaToXmlMapping();
 
         Set<File> result = scanner.getIncludedSources(base, base);
 
-        assertEquals(1, result.size(), "wrong number of stale sources returned.");
-
-        assertTrue(result.contains(sourceFile), "expected stale source file not found in result");
+        assertAll(
+                () -> assertEquals(1, result.size(), "wrong number of stale sources returned"),
+                () -> assertTrue(result.contains(sourceFile), "expected stale source file not found in result"));
     }
 
     @Test
-    public void testWithDefaultConstructorShouldFindStaleSourcesOneBecauseOfMissingTargetAndOneBecauseOfStaleTarget()
-            throws Exception {
+    void defaultConstructorFindsMissingTargetAndStaleTarget() throws Exception {
         File base = new File(getTestBaseDir(), "test4");
-
         long now = System.currentTimeMillis();
 
-        File targetFile = new File(base, "file2.xml");
+        writeFile(new File(base, "file2.xml"), now - 60000);
+        File sourceFile = writeFile(new File(base, "file.java"), now);
+        File sourceFile2 = writeFile(new File(base, "file2.java"), now);
 
-        writeFile(targetFile);
-
-        targetFile.setLastModified(now - 60000);
-
-        File sourceFile = new File(base, "file.java");
-
-        writeFile(sourceFile);
-
-        File sourceFile2 = new File(base, "file2.java");
-
-        writeFile(sourceFile2);
-
-        sourceFile2.setLastModified(now);
-
-        SuffixMapping mapping = new SuffixMapping(".java", ".xml");
-
-        scanner.addSourceMapping(mapping);
+        addJavaToXmlMapping();
 
         Set<File> result = scanner.getIncludedSources(base, base);
 
-        assertEquals(2, result.size(), "wrong number of stale sources returned.");
-
-        assertEquals(2, result.size());
-        assertTrue(
-                result.contains(sourceFile) && result.contains(sourceFile2),
-                "expected stale source file not found in result");
+        assertAll(
+                () -> assertEquals(2, result.size(), "wrong number of stale sources returned"),
+                () -> assertTrue(result.contains(sourceFile), "expected stale source file not found in result"),
+                () -> assertTrue(result.contains(sourceFile2), "expected stale source file not found in result"));
     }
 
     @Test
-    public void testWithDefaultConstructorShouldFindOneStaleSourcesWithStaleTargetAndOmitUpToDateSource()
-            throws Exception {
+    void defaultConstructorOmitsUpToDateSource() throws Exception {
         File base = new File(getTestBaseDir(), "test5");
-
         long now = System.currentTimeMillis();
 
-        // target/source (1) should result in source being included.
+        // target/source (1): stale target, fresh source -> source is included.
+        writeFile(new File(base, "file.xml"), now - 60000);
+        File sourceFile = writeFile(new File(base, "file.java"), now);
 
-        // write the target file first, and set the lastmod to some time in the
-        // past to ensure this.
-        File targetFile = new File(base, "file.xml");
+        // target/source (2): fresh target, stale source -> source is omitted.
+        writeFile(new File(base, "file2.java"), now - 60000);
+        writeFile(new File(base, "file2.xml"), now);
 
-        writeFile(targetFile);
-
-        targetFile.setLastModified(now - 60000);
-
-        // now write the source file, and set the lastmod to now.
-        File sourceFile = new File(base, "file.java");
-
-        writeFile(sourceFile);
-
-        sourceFile.setLastModified(now);
-
-        // target/source (2) should result in source being omitted.
-
-        // write the source file first, and set the lastmod to some time in the
-        // past to ensure this.
-        File sourceFile2 = new File(base, "file2.java");
-
-        writeFile(sourceFile2);
-
-        sourceFile2.setLastModified(now - 60000);
-
-        // now write the target file, with lastmod of now.
-        File targetFile2 = new File(base, "file2.xml");
-
-        writeFile(targetFile2);
-
-        targetFile2.setLastModified(now);
-
-        SuffixMapping mapping = new SuffixMapping(".java", ".xml");
-
-        scanner.addSourceMapping(mapping);
+        addJavaToXmlMapping();
 
         Set<File> result = scanner.getIncludedSources(base, base);
 
-        assertEquals(1, result.size(), "wrong number of stale sources returned.");
-
-        assertTrue(result.contains(sourceFile), "expected stale source file not found in result");
+        assertAll(
+                () -> assertEquals(1, result.size(), "wrong number of stale sources returned"),
+                () -> assertTrue(result.contains(sourceFile), "expected stale source file not found in result"));
     }
 
     @Test
-    public void testConstructedWithMsecsShouldReturnOneSourceFileOfTwoDueToLastMod() throws Exception {
+    void msecsThresholdFiltersSourcesByTargetAge() throws Exception {
         File base = new File(getTestBaseDir(), "test6");
-
         long now = System.currentTimeMillis();
 
-        File targetFile = new File(base, "file.xml");
-
-        writeFile(targetFile);
-
-        // should be within the threshold of lastMod for stale sources.
-        targetFile.setLastModified(now - 8000);
-
-        File sourceFile = new File(base, "file.java");
-
-        writeFile(sourceFile);
-
-        // modified 'now' for comparison with the above target file.
-        sourceFile.setLastModified(now);
-
-        File targetFile2 = new File(base, "file2.xml");
-
-        writeFile(targetFile2);
-
-        targetFile2.setLastModified(now - 12000);
-
-        File sourceFile2 = new File(base, "file2.java");
-
-        writeFile(sourceFile2);
-
-        // modified 'now' for comparison to above target file.
-        sourceFile2.setLastModified(now);
-
-        SuffixMapping mapping = new SuffixMapping(".java", ".xml");
+        writeFile(new File(base, "file.xml"), now - 8000);
+        writeFile(new File(base, "file.java"), now);
+        writeFile(new File(base, "file2.xml"), now - 12000);
+        File sourceFile2 = writeFile(new File(base, "file2.java"), now);
 
         scanner = new StaleSourceScanner(10000);
-
-        scanner.addSourceMapping(mapping);
+        addJavaToXmlMapping();
 
         Set<File> result = scanner.getIncludedSources(base, base);
 
-        assertEquals(1, result.size(), "wrong number of stale sources returned.");
-
-        assertTrue(result.contains(sourceFile2), "expected stale source file not found in result");
+        assertAll(
+                () -> assertEquals(1, result.size(), "wrong number of stale sources returned"),
+                () -> assertTrue(result.contains(sourceFile2), "expected stale source file not found in result"));
     }
 
     @Test
-    public void testConstructedWithMsecsIncludesAndExcludesShouldReturnOneSourceFileOfThreeDueToIncludePattern()
-            throws Exception {
+    void includePatternSelectsOnlyMatchingSources() throws Exception {
         File base = new File(getTestBaseDir(), "test7");
-
         long now = System.currentTimeMillis();
 
-        File targetFile = new File(base, "file.xml");
+        for (int i = 1; i <= 3; i++) {
+            writeFile(new File(base, "file" + i + ".xml"), now - 12000);
+            writeFile(new File(base, "file" + i + ".java"), now);
+        }
 
-        writeFile(targetFile);
-
-        // should be within the threshold of lastMod for stale sources.
-        targetFile.setLastModified(now - 12000);
-
-        File sourceFile = new File(base, "file.java");
-
-        writeFile(sourceFile);
-
-        // modified 'now' for comparison with the above target file.
-        sourceFile.setLastModified(now);
-
-        File targetFile2 = new File(base, "file2.xml");
-
-        writeFile(targetFile2);
-
-        targetFile2.setLastModified(now - 12000);
-
-        File sourceFile2 = new File(base, "file2.java");
-
-        writeFile(sourceFile2);
-
-        // modified 'now' for comparison to above target file.
-        sourceFile2.setLastModified(now);
-
-        File targetFile3 = new File(base, "file3.xml");
-
-        writeFile(targetFile3);
-
-        targetFile3.setLastModified(now - 12000);
-
-        File sourceFile3 = new File(base, "file3.java");
-
-        writeFile(sourceFile3);
-
-        // modified 'now' for comparison to above target file.
-        sourceFile3.setLastModified(now);
-
-        SuffixMapping mapping = new SuffixMapping(".java", ".xml");
-
-        scanner = new StaleSourceScanner(0, Collections.singleton("*3.java"), Collections.<String>emptySet());
-
-        scanner.addSourceMapping(mapping);
+        scanner = new StaleSourceScanner(0, Collections.singleton("*3.java"), Collections.emptySet());
+        addJavaToXmlMapping();
 
         Set<File> result = scanner.getIncludedSources(base, base);
 
-        assertEquals(1, result.size(), "wrong number of stale sources returned.");
-
-        assertTrue(result.contains(sourceFile3), "expected stale source file not found in result");
+        assertAll(
+                () -> assertEquals(1, result.size(), "wrong number of stale sources returned"),
+                () -> assertTrue(result.contains(new File(base, "file3.java")), "expected source 3 only"));
     }
 
     @Test
-    public void testConstructedWithMsecsIncludesAndExcludesShouldReturnTwoSourceFilesOfThreeDueToExcludePattern()
-            throws Exception {
+    void excludePatternDropsMatchingSources() throws Exception {
         File base = new File(getTestBaseDir(), "test8");
-
         long now = System.currentTimeMillis();
 
-        File targetFile = new File(base, "fileX.xml");
-
-        writeFile(targetFile);
-
-        // should be within the threshold of lastMod for stale sources.
-        targetFile.setLastModified(now - 12000);
-
-        File sourceFile = new File(base, "fileX.java");
-
-        writeFile(sourceFile);
-
-        // modified 'now' for comparison with the above target file.
-        sourceFile.setLastModified(now);
-
-        File targetFile2 = new File(base, "file2.xml");
-
-        writeFile(targetFile2);
-
-        targetFile2.setLastModified(now - 12000);
-
-        File sourceFile2 = new File(base, "file2.java");
-
-        writeFile(sourceFile2);
-
-        // modified 'now' for comparison to above target file.
-        sourceFile2.setLastModified(now);
-
-        File targetFile3 = new File(base, "file3.xml");
-
-        writeFile(targetFile3);
-
-        targetFile3.setLastModified(now - 12000);
-
-        File sourceFile3 = new File(base, "file3.java");
-
-        writeFile(sourceFile3);
-
-        // modified 'now' for comparison to above target file.
-        sourceFile3.setLastModified(now);
-
-        SuffixMapping mapping = new SuffixMapping(".java", ".xml");
+        writeFile(new File(base, "fileX.xml"), now - 12000);
+        writeFile(new File(base, "fileX.java"), now);
+        for (int i = 2; i <= 3; i++) {
+            writeFile(new File(base, "file" + i + ".xml"), now - 12000);
+            writeFile(new File(base, "file" + i + ".java"), now);
+        }
 
         scanner = new StaleSourceScanner(0, Collections.singleton("**/*"), Collections.singleton("*X.*"));
-
-        scanner.addSourceMapping(mapping);
+        addJavaToXmlMapping();
 
         Set<File> result = scanner.getIncludedSources(base, base);
 
-        assertEquals(2, result.size(), "wrong number of stale sources returned.");
-
-        assertEquals(2, result.size());
-        assertTrue(
-                result.contains(sourceFile2) && result.contains(sourceFile3),
-                "expected stale source file not found in result");
+        assertAll(
+                () -> assertEquals(2, result.size(), "wrong number of stale sources returned"),
+                () -> assertTrue(result.contains(new File(base, "file2.java")), "expected source 2"),
+                () -> assertTrue(result.contains(new File(base, "file3.java")), "expected source 3"));
     }
 
     @Test
-    public void testSingleFileSourceMapping() throws Exception {
+    void singleTargetSourceMappingTracksOutputFile() throws Exception {
         File src = new File(getTestBaseDir(), "test9-src");
-
         File target = new File(getTestBaseDir(), "test9-target");
-
         long now = System.currentTimeMillis();
 
-        // ----------------------------------------------------------------------
-        // The output file is missing
-        // ----------------------------------------------------------------------
-
-        File fooCs = new File(src, "Foo.cs");
-
-        writeFile(fooCs);
-
-        fooCs.setLastModified(now - 10000);
+        // The output file is missing.
+        File fooCs = writeFile(new File(src, "Foo.cs"), now - 10000);
 
         SourceMapping mapping = new SingleTargetSourceMapping(".cs", "Application.exe");
-
         scanner = new StaleSourceScanner(0);
-
         scanner.addSourceMapping(mapping);
 
-        Set<File> result = scanner.getIncludedSources(src, target);
+        Set<File> missingTarget = scanner.getIncludedSources(src, target);
+        assertAll(() -> assertEquals(1, missingTarget.size()), () -> assertTrue(missingTarget.contains(fooCs)));
 
-        assertEquals(1, result.size());
+        // Add another source file.
+        File barCs = writeFile(new File(src, "Bar.cs"), now - 20000);
 
-        assertTrue(result.contains(fooCs));
+        Set<File> twoSources = scanner.getIncludedSources(src, target);
+        assertAll(
+                () -> assertEquals(2, twoSources.size()),
+                () -> assertTrue(twoSources.contains(fooCs)),
+                () -> assertTrue(twoSources.contains(barCs)));
 
-        // ----------------------------------------------------------------------
-        // Add another source file
-        // ----------------------------------------------------------------------
+        // Add the result file, newer than both sources.
+        File applicationExe = writeFile(new File(target, "Application.exe"), now);
+        assertTrue(scanner.getIncludedSources(src, target).isEmpty());
 
-        File barCs = new File(src, "Bar.cs");
-
-        writeFile(barCs);
-
-        barCs.setLastModified(now - 20000);
-
-        result = scanner.getIncludedSources(src, target);
-
-        assertEquals(2, result.size());
-
-        assertEquals(2, result.size());
-        assertTrue(result.contains(fooCs) && result.contains(barCs));
-
-        // ----------------------------------------------------------------------
-        // Now add the result file
-        // ----------------------------------------------------------------------
-
-        File applicationExe = new File(target, "Application.exe");
-
-        writeFile(applicationExe);
-
-        applicationExe.setLastModified(now);
-
-        result = scanner.getIncludedSources(src, target);
-
-        assertTrue(result.isEmpty());
-
-        // ----------------------------------------------------------------------
-        // Make Application.exe older than the Foo.cs
-        // ----------------------------------------------------------------------
-
+        // Make the result older than Foo.cs again.
         applicationExe.setLastModified(now - 15000);
 
-        result = scanner.getIncludedSources(src, target);
+        Set<File> staleTarget = scanner.getIncludedSources(src, target);
+        assertAll(() -> assertEquals(1, staleTarget.size()), () -> assertTrue(staleTarget.contains(fooCs)));
+    }
 
-        assertEquals(1, result.size());
-
-        assertTrue(result.contains(fooCs));
+    private void addJavaToXmlMapping() {
+        scanner.addSourceMapping(new SuffixMapping(".java", ".xml"));
     }
 }

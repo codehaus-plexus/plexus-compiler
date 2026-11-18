@@ -28,6 +28,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.codehaus.plexus.compiler.CompilerMessage;
@@ -60,6 +61,22 @@ public class ErrorMessageParserTest {
 
     private static final String UNIDENTIFIED_LOG_LINES =
             "These log lines should be cut off\n" + "when preceding known error message headers\n";
+
+    private static final String[] LOCALIZED_HEADER_LABELS = {
+        "JDK 8 English",
+        "JDK 8 Japanese",
+        "JDK 8 Chinese",
+        "JDK 21 English",
+        "JDK 21 Japanese",
+        "JDK 21 Chinese",
+        "JDK 21 German"
+    };
+
+    /** Shared source for the JDK/locale-labelled stack-trace header tests. */
+    static Stream<Arguments> localizedHeaders(String[] headers) {
+        return IntStream.range(0, LOCALIZED_HEADER_LABELS.length)
+                .mapToObj(i -> Arguments.of(LOCALIZED_HEADER_LABELS[i], headers[i]));
+    }
 
     @Test
     public void testDeprecationMessage() throws Exception {
@@ -938,14 +955,7 @@ public class ErrorMessageParserTest {
                     + "\tat com.sun.tools.javac.Main.main(Main.java:42)\n";
 
     private static Stream<Arguments> testSystemOutOfResourcesError_args() {
-        return Stream.of(
-                Arguments.of("JDK 8 English", SYSTEM_OUT_OF_RESOURCES_ERROR_HEADERS[0]),
-                Arguments.of("JDK 8 Japanese", SYSTEM_OUT_OF_RESOURCES_ERROR_HEADERS[1]),
-                Arguments.of("JDK 8 Chinese", SYSTEM_OUT_OF_RESOURCES_ERROR_HEADERS[2]),
-                Arguments.of("JDK 21 English", SYSTEM_OUT_OF_RESOURCES_ERROR_HEADERS[3]),
-                Arguments.of("JDK 21 Japanese", SYSTEM_OUT_OF_RESOURCES_ERROR_HEADERS[4]),
-                Arguments.of("JDK 21 Chinese", SYSTEM_OUT_OF_RESOURCES_ERROR_HEADERS[5]),
-                Arguments.of("JDK 21 German", SYSTEM_OUT_OF_RESOURCES_ERROR_HEADERS[6]));
+        return localizedHeaders(SYSTEM_OUT_OF_RESOURCES_ERROR_HEADERS);
     }
 
     @ParameterizedTest(name = "{0}")
@@ -985,14 +995,7 @@ public class ErrorMessageParserTest {
                     + "\tat jdk.compiler/com.sun.tools.javac.Main.main(Main.java:43)\n";
 
     private static Stream<Arguments> testIOError_args() {
-        return Stream.of(
-                Arguments.of("JDK 8 English", IO_ERROR_HEADERS[0]),
-                Arguments.of("JDK 8 Japanese", IO_ERROR_HEADERS[1]),
-                Arguments.of("JDK 8 Chinese", IO_ERROR_HEADERS[2]),
-                Arguments.of("JDK 21 English", IO_ERROR_HEADERS[3]),
-                Arguments.of("JDK 21 Japanese", IO_ERROR_HEADERS[4]),
-                Arguments.of("JDK 21 Chinese", IO_ERROR_HEADERS[5]),
-                Arguments.of("JDK 21 German", IO_ERROR_HEADERS[6]));
+        return localizedHeaders(IO_ERROR_HEADERS);
     }
 
     @ParameterizedTest(name = "{0}")
@@ -1025,14 +1028,7 @@ public class ErrorMessageParserTest {
                     + "\tat com.sun.tools.javac.Main.main(Main.java:42)\n";
 
     private static Stream<Arguments> testPluginError_args() {
-        return Stream.of(
-                Arguments.of("JDK 8 English", PLUGIN_ERROR_HEADERS[0]),
-                Arguments.of("JDK 8 Japanese", PLUGIN_ERROR_HEADERS[1]),
-                Arguments.of("JDK 8 Chinese", PLUGIN_ERROR_HEADERS[2]),
-                Arguments.of("JDK 21 English", PLUGIN_ERROR_HEADERS[3]),
-                Arguments.of("JDK 21 Japanese", PLUGIN_ERROR_HEADERS[4]),
-                Arguments.of("JDK 21 Chinese", PLUGIN_ERROR_HEADERS[5]),
-                Arguments.of("JDK 21 German", PLUGIN_ERROR_HEADERS[6]));
+        return localizedHeaders(PLUGIN_ERROR_HEADERS);
     }
 
     @Test

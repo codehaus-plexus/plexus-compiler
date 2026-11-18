@@ -18,7 +18,6 @@ package org.codehaus.plexus.compiler.util.scan;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 
@@ -27,15 +26,10 @@ import org.junit.jupiter.api.BeforeEach;
  *
  * @author <a href="mailto:carlos@apache.org">Carlos Sanchez</a>
  */
-public class SimpleSourceInclusionScannerTest extends AbstractSourceInclusionScannerTest {
-
-    private Set<String> includes;
-    private Set<String> excludes;
+class SimpleSourceInclusionScannerTest extends AbstractSourceInclusionScannerTest {
 
     @BeforeEach
-    public void setUp() throws Exception {
-        includes = Collections.singleton("*.java");
-        excludes = new HashSet<>();
-        scanner = new SimpleSourceInclusionScanner(includes, excludes);
+    void setUp() {
+        scanner = new SimpleSourceInclusionScanner(Collections.singleton("*.java"), new HashSet<String>());
     }
 }

@@ -20,96 +20,73 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author jdcasey
  */
-public class SuffixMappingTest {
+class SuffixMappingTest {
+    private static final File BASEDIR = new File(".");
+    private static final String BASE = "path/to/file";
 
     @Test
-    public void testShouldReturnSingleClassFileForSingleJavaFile() {
-        String base = "path/to/file";
-
-        File basedir = new File(".");
-
+    @DisplayName("A single suffix pair yields one target file for a matching source")
+    void singleClassFileForSingleJavaFile() {
         SuffixMapping mapping = new SuffixMapping(".java", ".class");
 
-        Set<File> results = mapping.getTargetFiles(basedir, base + ".java");
+        Set<File> results = mapping.getTargetFiles(BASEDIR, BASE + ".java");
 
-        assertEquals(1, results.size(), "Returned wrong number of target files.");
-
-        assertEquals(new File(basedir, base + ".class"), results.iterator().next(), "Target file is wrong.");
+        assertAll(
+                () -> assertEquals(1, results.size(), "Returned wrong number of target files"),
+                () -> assertEquals(
+                        new File(BASEDIR, BASE + ".class"), results.iterator().next(), "Target file is wrong"));
     }
 
     @Test
-    public void testShouldNotReturnClassFileWhenSourceFileHasWrongSuffix() {
-        String base = "path/to/file";
-
-        File basedir = new File(".");
-
+    void noClassFileWhenSourceHasWrongSuffix() {
         SuffixMapping mapping = new SuffixMapping(".java", ".class");
 
-        Set<File> results = mapping.getTargetFiles(basedir, base + ".xml");
-
-        assertTrue(results.isEmpty(), "Returned wrong number of target files.");
+        assertTrue(mapping.getTargetFiles(BASEDIR, BASE + ".xml").isEmpty());
     }
 
     @Test
-    public void testShouldReturnOneClassFileAndOneXmlFileForSingleJavaFile() {
-        String base = "path/to/file";
-
-        File basedir = new File(".");
-
+    void oneClassFileAndOneXmlFileForSingleJavaFile() {
         Set<String> targets = new HashSet<>();
         targets.add(".class");
         targets.add(".xml");
-
         SuffixMapping mapping = new SuffixMapping(".java", targets);
 
-        Set<File> results = mapping.getTargetFiles(basedir, base + ".java");
+        Set<File> results = mapping.getTargetFiles(BASEDIR, BASE + ".java");
 
-        assertEquals(2, results.size(), "Returned wrong number of target files.");
-
-        assertEquals(2, results.size());
-        assertTrue(results.contains(new File(basedir, base + ".class")), "Targets do not contain class target.");
-        assertTrue(results.contains(new File(basedir, base + ".xml")), "Targets do not contain xml target.");
+        assertAll(
+                () -> assertEquals(2, results.size(), "Returned wrong number of target files"),
+                () -> assertTrue(results.contains(new File(BASEDIR, BASE + ".class")), "Missing class target"),
+                () -> assertTrue(results.contains(new File(BASEDIR, BASE + ".xml")), "Missing xml target"));
     }
 
     @Test
-    public void testShouldReturnNoTargetFilesWhenSourceFileHasWrongSuffix() {
-        String base = "path/to/file";
-
-        File basedir = new File(".");
-
+    void noTargetFilesWhenSourceHasWrongSuffix() {
         Set<String> targets = new HashSet<>();
         targets.add(".class");
         targets.add(".xml");
-
         SuffixMapping mapping = new SuffixMapping(".java", targets);
 
-        Set<File> results = mapping.getTargetFiles(basedir, base + ".apt");
-
-        assertTrue(results.isEmpty(), "Returned wrong number of target files.");
+        assertTrue(mapping.getTargetFiles(BASEDIR, BASE + ".apt").isEmpty());
     }
 
     @Test
-    public void testSingleTargetMapper() throws Exception {
-        String base = "path/to/file";
-
+    void singleTargetMapperOnlyMatchesItsOwnSuffix() {
         File basedir = new File("target/");
-
         SingleTargetSourceMapping mapping = new SingleTargetSourceMapping(".cs", "/foo");
 
-        Set<File> results = mapping.getTargetFiles(basedir, base + ".apt");
-
-        assertTrue(results.isEmpty());
-
-        results = mapping.getTargetFiles(basedir, base + ".cs");
-
-        assertEquals(1, results.size());
+        assertAll(
+                () -> assertTrue(mapping.getTargetFiles(basedir, BASE + ".apt").isEmpty()),
+                () -> assertEquals(
+                        1, mapping.getTargetFiles(basedir, BASE + ".cs").size()));
     }
 }
