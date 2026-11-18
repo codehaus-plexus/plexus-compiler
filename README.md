@@ -50,7 +50,8 @@ working example.
 
 ## Requirements
 
-Java 8 or later.
+Java 8 or later for the API, manager, javac and C# compilers. The Eclipse and AspectJ compilers require
+JDK 17+ and Maven 3.9.6+; the Error Prone compiler requires JDK 21+.
 
 ## Documentation
 

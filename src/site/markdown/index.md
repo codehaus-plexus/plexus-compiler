@@ -37,6 +37,6 @@ It is composed by:
   - [`plexus-compiler-csharp`](./plexus-compilers/plexus-compiler-csharp/): C#/Mono compiler, **requires** `JDK 8+`
   - [`plexus-compiler-eclipse`](./plexus-compilers/plexus-compiler-eclipse/): Eclipse compiler, **requires** `JDK 17+` and `Maven 3.9.6+`
   - [`plexus-compiler-javac`](./plexus-compilers/plexus-compiler-javac/): javac compiler, **requires** `JDK 8+`
-  - [`plexus-compiler-javac-errorprone`](./plexus-compilers/plexus-compiler-javac-errorprone/): javac compiler with [error-prone](https://errorprone.info) static analysis checks enabled, **requires** `JDK 11+`
+  - [`plexus-compiler-javac-errorprone`](./plexus-compilers/plexus-compiler-javac-errorprone/): javac compiler with [error-prone](https://errorprone.info) static analysis checks enabled, **requires** `JDK 21+`
 - [`plexus-compiler-test`](./plexus-compiler-test/): a test harness.
 
