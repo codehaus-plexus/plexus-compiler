@@ -1,7 +1,7 @@
 # Plexus Compiler
 
 [![Maven Central](https://img.shields.io/maven-central/v/org.codehaus.plexus/plexus-compiler-api.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/org.codehaus.plexus/plexus-compiler-api)
-[![GitHub CI](https://github.com/codehaus-plexus/plexus-compiler/actions/workflows/maven.yml/badge.svg)](https://github.com/codehaus-plexus/plexus-compiler/actions/workflows/maven.yml)
+[![GitHub CI](https://github.com/codehaus-plexus/plexus-compiler/actions/workflows/maven.yml/badge.svg?branch=master)](https://github.com/codehaus-plexus/plexus-compiler/actions/workflows/maven.yml?query=branch%3Amaster)
 [![Reproducible Builds](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/jvm-repo-rebuild/reproducible-central/master/content/org/codehaus/plexus/plexus-compiler/badge.json)](https://github.com/jvm-repo-rebuild/reproducible-central/blob/master/content/org/codehaus/plexus/plexus-compiler/README.md)
 
 One API over several Java compilers, so a build tool can switch between them without knowing how each is
@@ -51,7 +51,7 @@ working example.
 ## Requirements
 
 Java 8 or later for the API, manager, javac and C# compilers. The Eclipse and AspectJ compilers require
-JDK 17+ and Maven 3.9.6+; the Error Prone compiler requires JDK 21+.
+JDK 17+ and Maven 3.9.6+; the Error Prone compiler requires JDK 21+. Building this project requires JDK 17 or newer.
 
 ## Documentation
 
@@ -61,8 +61,9 @@ JDK 17+ and Maven 3.9.6+; the Error Prone compiler requires JDK 21+.
 
 ## Contributing
 
-See [CONTRIBUTING.md](https://github.com/codehaus-plexus/.github/blob/master/CONTRIBUTING.md). In short:
-`mvn verify` builds, and run `mvn spotless:apply` before pushing or CI will fail on formatting.
+See [CONTRIBUTING.md](https://github.com/codehaus-plexus/.github/blob/master/CONTRIBUTING.md) and
+[AGENTS.md](AGENTS.md). In short: `mvn verify` builds, and run `mvn spotless:apply` before pushing or CI
+will fail on formatting.
 
 Please report security vulnerabilities privately — see
 [SECURITY.md](https://github.com/codehaus-plexus/.github/blob/master/SECURITY.md), not a public issue.

@@ -380,6 +380,12 @@ public class CompilerConfiguration {
         return releaseVersion;
     }
 
+    /**
+     * Sets the Java release to compile against, passed as {@code --release}. The javac compiler also accepts the
+     * {@code 1.x} spelling that {@code -source} and {@code -target} use, so {@code 1.8} is passed as {@code 8}.
+     *
+     * @param releaseVersion the release version, for example {@code 17}
+     */
     public void setReleaseVersion(String releaseVersion) {
         this.releaseVersion = releaseVersion;
     }
@@ -540,6 +546,13 @@ public class CompilerConfiguration {
         this.enablePreview = enablePreview;
     }
 
+    /**
+     * Sets the annotation processing mode, passed as {@code -proc:<value>}, for example {@code none} or
+     * {@code only}. The javac and Eclipse compilers pass it also when the processors are discovered from the
+     * class path and none is configured explicitly.
+     *
+     * @param proc the mode, or {@code null} to leave the compiler default
+     */
     public void setProc(String proc) {
         this.proc = proc;
     }
