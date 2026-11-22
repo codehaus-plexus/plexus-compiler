@@ -256,6 +256,50 @@ public class JavacCompilerTest extends AbstractJavacCompilerTest {
         // java.util.List - which is a separate parity gap, so only the category is compared here
     }
 
+    /**
+     * javac reports a module that {@code exports ... to} cannot find only as a {@code [module]} lint warning. Both
+     * back-ends must surface it, and they report different columns: javac's own output (parsed when
+     * {@code forceJavacCompilerUse} is set) points at the module name, the diagnostic API at the end of the name.
+     */
+    @ParameterizedTest(name = "forceJavacCompilerUse={0} -> column {1}")
+    @CsvSource({"true, 25", "false, 32"})
+    void testMissingModuleIsReportedAsWarning(
+            boolean forceJavacCompilerUse, int expectedColumn, @TempDir Path tempDirectory) throws Exception {
+        Path sourceDirectory = tempDirectory.resolve("src");
+        Path moduleInfo = sourceDirectory.resolve("module-info.java");
+        Files.createDirectories(sourceDirectory.resolve("com/company"));
+        Files.write(moduleInfo, Arrays.asList("module testcase {", "\texports com.company to someOtherModule;", "}"));
+        Files.write(
+                sourceDirectory.resolve("com/company/SomeClass.java"),
+                Arrays.asList("package com.company;", "", "public class SomeClass {", "}"));
+
+        File buildDirectory = tempDirectory.resolve("build").toFile();
+        Files.createDirectories(buildDirectory.toPath());
+        CompilerConfiguration configuration = new CompilerConfiguration();
+        configuration.setForceJavacCompilerUse(forceJavacCompilerUse);
+        configuration.setWorkingDirectory(tempDirectory.toFile());
+        configuration.setBuildDirectory(buildDirectory);
+        configuration.setOutputLocation(new File(buildDirectory, "classes").getAbsolutePath());
+        configuration.addSourceLocation(sourceDirectory.toString());
+        configuration.setSourceVersion("11");
+        configuration.setTargetVersion("11");
+        configuration.setShowWarnings(true);
+
+        CompilerResult result = getCompiler().performCompile(configuration);
+
+        assertTrue(result.isSuccess(), "compilation failed: " + result.getCompilerMessages());
+        // javac also warns about the missing system modules path; the module warning is the one of interest
+        List<CompilerMessage> moduleWarnings = result.getCompilerMessages().stream()
+                .filter(message -> message.getKind() == CompilerMessage.Kind.WARNING)
+                .filter(message -> message.getMessage().contains("[module] module not found: someOtherModule"))
+                .collect(Collectors.toList());
+        assertEquals(1, moduleWarnings.size(), "expected the module warning in " + result.getCompilerMessages());
+        CompilerMessage warning = moduleWarnings.get(0);
+        assertEquals("module-info.java", getFileName(warning.getFile()));
+        assertEquals(2, warning.getStartLine());
+        assertEquals(expectedColumn, warning.getStartColumn());
+    }
+
     private static CompilerMessage onlyWarning(CompilerResult result) {
         List<CompilerMessage> warnings = result.getCompilerMessages().stream()
                 .filter(message -> message.getKind() == CompilerMessage.Kind.WARNING)
