@@ -81,4 +81,37 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <!-- The shared build workflow gives every matrix cell the same Maven arguments, and the ITs download from
+         Central, so running them in every cell gets HTTP 429. On GitHub Actions the ITs run in one cell only
+         (Linux, JDK 21, Zulu); a local build always runs them. -->
+    <profile>
+      <id>ci-skip-its</id>
+      <activation>
+        <property>
+          <name>env.GITHUB_ACTIONS</name>
+        </property>
+      </activation>
+      <properties>
+        <invoker.skip>true</invoker.skip>
+      </properties>
+    </profile>
+    <profile>
+      <id>ci-run-its</id>
+      <activation>
+        <jdk>21</jdk>
+        <os>
+          <name>Linux</name>
+        </os>
+        <property>
+          <name>java.vendor</name>
+          <value>Azul Systems, Inc.</value>
+        </property>
+      </activation>
+      <properties>
+        <invoker.skip>false</invoker.skip>
+      </properties>
+    </profile>
+  </profiles>
 </project>
