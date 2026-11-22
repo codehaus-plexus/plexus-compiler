@@ -117,6 +117,9 @@ public class JavacCompilerTest extends AbstractJavacCompilerTest {
         "JAVA_1_5, 1.4, false",
         "JAVA_1_8, 1.8, true",
         "JAVA_1_8, 22.0.2-something, true",
+        "JAVA_9, 21.0.13, true",
+        "JAVA_9, 21.0.13.1, true",
+        "JAVA_9, 1.8.0_512, false",
         "JAVA_1_8, unknown, true"
     })
     void javaVersionPrefixes(JavaVersion version, String otherVersion, boolean expected) {
@@ -124,7 +127,14 @@ public class JavacCompilerTest extends AbstractJavacCompilerTest {
     }
 
     @ParameterizedTest(name = "extract {0} -> {1}")
-    @CsvSource({"javac 11.0.22, 11.0", "11.0.22, 11.0", "javac 21, 21", "javac 1.8.0_432, 1.8"})
+    @CsvSource({
+        "javac 11.0.22, 11.0",
+        "11.0.22, 11.0",
+        "javac 21, 21",
+        "javac 1.8.0_432, 1.8",
+        "21.0.13, 21.0",
+        "21.0.13.1, 21.0"
+    })
     void extractMajorAndMinorVersion(String text, String expected) {
         assertEquals(expected, JavacCompiler.extractMajorAndMinorVersion(text));
     }
