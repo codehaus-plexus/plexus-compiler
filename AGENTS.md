@@ -19,6 +19,9 @@ reactor contains `plexus-compiler-api`, `plexus-compiler-manager`, `plexus-compi
   `run` and `verify` goals, a `verify.groovy` post-build hook and its own settings file); each
   project runs `clean test-compile`. The projects are test fixtures: keep them as they are unless
   you are changing what they cover.
+  On GitHub Actions the `ci-skip-its` profile sets `invoker.skip`, and `ci-run-its` turns it off for
+  the Linux, JDK 21, Zulu cell only, so the ITs run once per build (they download from Central, and
+  running them in every cell got HTTP 429). A local build always runs them.
 - The parent POM pins the AspectJ, Error Prone and Eclipse Sisu versions used by the compiler
   implementations in properties; change them there.
 
