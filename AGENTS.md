@@ -12,8 +12,8 @@ reactor contains `plexus-compiler-api`, `plexus-compiler-manager`, `plexus-compi
   Eclipse and AspectJ compilers use 17, and the Error Prone compiler and `plexus-compiler-its` use 21.
   Keep the requirements in `README.md` and the module site pages in step with those values.
 - `mvn verify` builds the reactor. CI calls the shared `codehaus-plexus/.github` build workflow with
-  `verify javadoc:javadoc`, and `maven.yml` here excludes JDK 8 and 11 from its matrix and adds
-  several JDK distributions.
+  `verify javadoc:javadoc`, and `maven.yml` here excludes JDK 8 and 11 from its matrix; it adds no JDK
+  distribution to the shared workflow's default.
 - Run `mvn spotless:apply` on JDK 17 to 21 before pushing, or the formatting check fails.
 - `plexus-compiler-its` runs the projects in `src/main/it` through `maven-invoker-plugin` (`install`,
   `run` and `verify` goals, a `verify.groovy` post-build hook and its own settings file); each
